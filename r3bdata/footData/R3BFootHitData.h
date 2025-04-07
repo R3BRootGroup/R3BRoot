@@ -36,13 +36,15 @@ class R3BFootHitData : public TObject
      *@param fTheta     Master: Angle theta [rad] (lab frame)
      *@param fPhi       Master: Angle Phi [rad] (lab frame)
      *@param fEnergy    Total energy deposited by the hit ([GeV] in sim)
+     *@param fEta       Difference between the integer part of the cluster position and the cluster position
      **/
     explicit R3BFootHitData(uint8_t detid,
                             uint16_t nbhit,
                             double pos,
                             TVector3 master,
                             double energy,
-                            uint16_t mulstrip = 0);
+                            uint16_t mulstrip = 0,
+                            double eta = 0);
 
     /** Copy constructor **/
     R3BFootHitData(const R3BFootHitData&);
@@ -61,6 +63,7 @@ class R3BFootHitData : public TObject
     [[nodiscard]] inline const double& GetPhi() const { return fPhi; }
     [[nodiscard]] inline const TVector3 GetPosLab() const { return fmaster; }
     [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
+    [[nodiscard]] inline const double& GetEta() const { return fEta; }
 
   protected:
     uint8_t fDetId = 0;
@@ -71,6 +74,7 @@ class R3BFootHitData : public TObject
     TVector3 fmaster;
     double fEnergy = std::nan("");
     uint16_t fMulStrip = 0;
+    double fEta = 0;
 
   public:
     ClassDefOverride(R3BFootHitData, 1)

@@ -52,12 +52,7 @@ R3BFootStripCal2Hit::R3BFootStripCal2Hit(const TString& name, Int_t iVerbose)
 }
 
 // Virtual R3BFootStripCal2Hit::Destructor --------------------------------------
-R3BFootStripCal2Hit::~R3BFootStripCal2Hit()
-{
-    R3BLOG(debug1, "");
-    if (fFootHitData)
-        delete fFootHitData;
-}
+R3BFootStripCal2Hit::~R3BFootStripCal2Hit() { R3BLOG(debug1, ""); }
 
 void R3BFootStripCal2Hit::SetParContainers()
 {
@@ -123,13 +118,6 @@ InitStatus R3BFootStripCal2Hit::Init()
     rootManager->Register("FootHitData", "FOOT Hit", fFootHitData, !fOnline);
     fFootHitData->Clear();
 
-    char Name[255];
-    for (Int_t i = 0; i < fMaxNumDet; i++)
-    {
-        sprintf(Name, "hssd_%d", i + 1);
-        hssd[i] = new TH1F(Name, "", 640, -0.5, 640.5);
-    }
-
     return kSUCCESS;
 }
 
@@ -153,64 +141,57 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
         return;
 
     // Data from cal level
-    R3BFootCalData** calData = new R3BFootCalData*[nHits];
     int detId;
     int stripId;
     double energy;
+    double sigma;
     double x = 0., y = 0., z = 0.;
     std::vector<std::vector<int>> StripI;
     std::vector<std::vector<double>> StripE;
+    std::vector<std::vector<double>> StripS;
 
     // Clustering algorithm - A. Revel
     StripI.resize(fMaxNumDet);
     StripE.resize(fMaxNumDet);
+    StripS.resize(fMaxNumDet);
+    ClusterMult.resize(fMaxNumDet);
 
-    ClusterPos = std::vector<std::vector<double>>(fMaxNumDet, std::vector<double>(200, std::nan("")));
-
-    ClusterESum = std::vector<std::vector<double>>(fMaxNumDet, std::vector<double>(200, std::nan("")));
-
-    ClusterNStrip = std::vector<std::vector<int>>(fMaxNumDet, std::vector<int>(200, 0));
-
-    ClusterI = std::vector<std::vector<std::vector<double>>>(
-        fMaxNumDet, std::vector<std::vector<double>>(200, std::vector<double>(0)));
-
-    ClusterE = std::vector<std::vector<std::vector<double>>>(
-        fMaxNumDet, std::vector<std::vector<double>>(200, std::vector<double>(0)));
+    ClusterPos.resize(fMaxNumDet);
+    Eta.resize(fMaxNumDet);
+    ClusterESum.resize(fMaxNumDet);
+    ClusterNStrip.resize(fMaxNumDet);
+    ClusterI.resize(fMaxNumDet);
+    ClusterE.resize(fMaxNumDet);
 
     // Filling vectors
     for (int i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BFootCalData*)(fFootCalData->At(i));
-        detId = calData[i]->GetDetId() - 1;
-        stripId = calData[i]->GetStripId() - 1;
-        energy = calData[i]->GetEnergy();
+        auto calData = static_cast<R3BFootCalData*>(fFootCalData->At(i));
+        detId = calData->GetDetId() - 1;
+        stripId = calData->GetStripId() - 1;
+        energy = calData->GetEnergy();
+        sigma = calData->GetSigma();
 
         StripI[detId].push_back(stripId);
         StripE[detId].push_back(energy);
+        StripS[detId].push_back(sigma);
     }
-    if (calData)
-        delete[] calData;
 
-    // Sort (should be good by default but just in case)
-    for (int i = 0; i < fMaxNumDet; i++)
+    // Sort elements
+    for (int i = 0; i < fMaxNumDet; ++i)
     {
-        if (StripI[i].size() > 1)
+        std::vector<std::tuple<int, double, double>> hits(StripI[i].size());
+        for (size_t j = 0; j < hits.size(); ++j)
+            hits[j] = std::make_tuple(StripI[i][j], StripE[i][j], StripS[i][j]);
+
+        std::sort(
+            hits.begin(), hits.end(), [](const auto& a, const auto& b) { return std::get<0>(a) < std::get<0>(b); });
+
+        for (size_t j = 0; j < hits.size(); ++j)
         {
-            for (int j = 0; j < StripI[i].size() - 1; j++)
-            {
-                for (int k = j + 1; k < StripI[i].size(); k++)
-                {
-                    if (StripI[i][j] > StripI[i][k])
-                    {
-                        auto tempI = StripI[i][j];
-                        StripI[i][j] = StripI[i][k];
-                        StripI[i][k] = tempI;
-                        auto tempD = StripE[i][j];
-                        StripE[i][j] = StripE[i][k];
-                        StripE[i][k] = tempD;
-                    }
-                }
-            }
+            StripI[i][j] = std::get<0>(hits[j]);
+            StripE[i][j] = std::get<1>(hits[j]);
+            StripS[i][j] = std::get<2>(hits[j]);
         }
     }
 
@@ -219,16 +200,21 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
     {
 
         int ClusterCount = 0;
-        auto TempI = 0;
-
         int j = 0;
 
-        while (j < StripI[i].size())
+        while (j < StripE[i].size())
         {
-
-            if (j == 0)
+            if (StripE[i][j] < fTimesSigmas * StripS[i][j])
             {
-                TempI = StripI[i][j];
+                j++;
+                continue;
+            }
+
+            if (ClusterNStrip[i].size() <= ClusterCount)
+            {
+                ClusterNStrip[i].resize(ClusterCount + 1, 0);
+                ClusterI[i].resize(ClusterCount + 1);
+                ClusterE[i].resize(ClusterCount + 1);
             }
 
             ClusterNStrip[i][ClusterCount]++;
@@ -236,37 +222,46 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
             ClusterE[i][ClusterCount].push_back(StripE[i][j]);
 
             int k = j + 1;
-
-            while (k < StripI[i].size() && (StripI[i][k] - TempI) == 1)
+            while (k < StripE[i].size())
             {
+                if (StripI[i][k] - StripI[i][k - 1] != 1)
+                    break;
+
+                if (StripE[i][k] < fTimesSigmas * StripS[i][k])
+                    break;
+
                 ClusterNStrip[i][ClusterCount]++;
                 ClusterI[i][ClusterCount].push_back(StripI[i][k]);
                 ClusterE[i][ClusterCount].push_back(StripE[i][k]);
-                TempI = StripI[i][k];
-                StripI[i].erase(StripI[i].begin() + k);
-                StripE[i].erase(StripE[i].begin() + k);
+
+                k++;
             }
 
-            StripI[i].erase(StripI[i].begin() + j);
-            StripE[i].erase(StripE[i].begin() + j);
-
+            j = k + 1;
             ClusterCount++;
         }
+
         ClusterMult[i] = ClusterCount;
     }
 
     // Compute Sum Energy, Position and Eta
     for (int i = 0; i < fMaxNumDet; i++)
     {
+
+        ClusterPos[i].resize(ClusterMult[i], 0.0);
+        Eta[i].resize(ClusterMult[i], 0.0);
+        ClusterESum[i].resize(ClusterMult[i], 0.0);
+
         for (int j = 0; j < ClusterMult[i]; j++)
         {
             for (int k = 0; k < ClusterNStrip[i][j]; k++)
             {
                 ClusterESum[i][j] += ClusterE[i][j][k];
+
                 ClusterPos[i][j] += ClusterE[i][j][k] * ClusterI[i][j][k];
             }
             ClusterPos[i][j] = ClusterPos[i][j] / ClusterESum[i][j];
-            // Eta[i][j] = ClusterPos[i][j] - (double)ClusterPos[i][j];
+            Eta[i][j] = ClusterPos[i][j] - (int)ClusterPos[i][j];
         }
     }
 
@@ -291,9 +286,9 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
                     ClusterPos[i][j] = ClusterPos[i][k];
                     ClusterPos[i][k] = tempD;
 
-                    // tempD = Eta[i][j];
-                    // Eta[i][j] = Eta[i][k];
-                    // Eta[i][k] = tempD;
+                    tempD = Eta[i][j];
+                    Eta[i][j] = Eta[i][k];
+                    Eta[i][k] = tempD;
                 }
             }
         }
@@ -340,13 +335,16 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
 
             if (ClusterESum[i][j] > fThSum && j < fMaxNumClusters)
             {
-                AddHitData(i + 1, ClusterNStrip[i][j], pos, master, ClusterESum[i][j], ClusterMult[i]);
+                AddHitData(i + 1, ClusterNStrip[i][j], pos, master, ClusterESum[i][j], ClusterMult[i], Eta[i][j]);
+            }
+            else
+            {
+                // If this cluster is not above threshold then shouldn't be taken into account for
+                // cluster multiplicity!!
+                ClusterMult[i]--;
             }
         }
     }
-
-    for (int i = 0; i < fMaxNumDet; i++)
-        hssd[i]->Reset();
 
     StripI.clear();
     StripE.clear();
@@ -354,9 +352,10 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
     ClusterPos.clear();
     ClusterESum.clear();
     ClusterNStrip.clear();
-    // Eta.clear();
+    Eta.clear();
     ClusterI.clear();
     ClusterE.clear();
+    StripS.clear();
 
     return;
 }
@@ -375,12 +374,12 @@ R3BFootHitData* R3BFootStripCal2Hit::AddHitData(uint8_t detid,
                                                 double pos,
                                                 TVector3 master,
                                                 double energy_s,
-                                                uint16_t mulS)
+                                                uint16_t mulS,
+                                                double eta)
 {
-    // It fills the R3BFootHitData
     TClonesArray& clref = *fFootHitData;
     int size = clref.GetEntriesFast();
-    return new (clref[size]) R3BFootHitData(detid, numhit, pos, master, energy_s, mulS);
+    return new (clref.ConstructedAt(size)) R3BFootHitData(detid, numhit, pos, master, energy_s, mulS, eta);
 }
 
 ClassImp(R3BFootStripCal2Hit)

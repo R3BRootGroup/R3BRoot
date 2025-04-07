@@ -96,6 +96,12 @@ class R3BFootOnlineSpectra : public FairTask
      */
     void Reset_FOOT_Histo();
 
+    /*
+     * Method to set the refresh rate of the sigmas
+     */
+
+    void SetSigmaRefreshRate(int rate) { fSigmaRefreshRate = rate; }
+
     /**
      * Method to set the number of detectors
      */
@@ -118,18 +124,22 @@ class R3BFootOnlineSpectra : public FairTask
     int fTpat = 0;
     int fNEvents = 0; // Event counter.
     int fNbDet = 16;  // Number of AMS detectors.
+    int eventNumber = 0;
+    int fSigmaRefreshRate = 5000;
 
     // Histograms for map data
     std::vector<TH2F*> fh2_EnergyVsStrip;
     // Histograms for cal data
     std::vector<TH2F*> fh2_EnergyVsStrip_cal;
+    std::vector<TH2F*> fh2_SigmaVsStrip;
     // Histograms for hit data
     std::vector<TH1F*> fh1_pos;
     std::vector<TH1F*> fh1_ene;
 
-    TH2F* fh2_BeamSpot;
-    TH2F* fh2_BeamSpotE;
+    std::vector<TH2F*> fh2_eta;
+    std::vector<TH2F*> fh2_foot_corr;
     std::vector<TH1F*> fh1_mult;
+    std::vector<TH1F*> fh1_size;
 
   public:
     ClassDefOverride(R3BFootOnlineSpectra, 1)

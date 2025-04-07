@@ -16,8 +16,7 @@
 // -----             Created 19/07/21  by J.L. Rodriguez-Sanchez    -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BFootSiReader_H
-#define R3BFootSiReader_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -50,6 +49,8 @@ class R3BFootSiReader : public R3BReader
     // Accessor to select online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
+    void SetMapping(const std::vector<int>& map) { fMappedDetId = map; }
+
   private:
     // An event counter
     unsigned int fNEvent;
@@ -63,9 +64,9 @@ class R3BFootSiReader : public R3BReader
     Int_t fNbDet;
     // Output array
     TClonesArray* fArray;
+    // Vector with the remapped detector ids
+    std::vector<int> fMappedDetId;
 
   public:
     ClassDefOverride(R3BFootSiReader, 0);
 };
-
-#endif /* R3BFootSiReader_H */

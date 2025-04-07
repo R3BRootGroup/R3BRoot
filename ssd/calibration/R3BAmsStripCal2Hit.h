@@ -17,8 +17,7 @@
 // -----             Created 01/06/18 by J.L. Rodriguez-Sanchez    -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BAmsStripCal2Hit_H
-#define R3BAmsStripCal2Hit_H 1
+#pragma once
 
 #include "FairTask.h"
 
@@ -28,6 +27,8 @@
 
 #include "TVector3.h"
 #include <Rtypes.h>
+
+#include "TH1F.h"
 
 class TClonesArray;
 class R3BAmsMappingPar;
@@ -106,5 +107,3 @@ class R3BAmsStripCal2Hit : public FairTask
     // Class definition
     ClassDef(R3BAmsStripCal2Hit, 1)
 };
-
-#endif
