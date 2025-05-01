@@ -39,6 +39,7 @@ add_library_with_dictionary(
     calibration
     ana
     DEPENDENCIES
+    Spectrum
     R3BPassive)
 
 if(BUILD_GEOMETRY)

@@ -24,14 +24,13 @@
 #include "R3BTGeoPar.h"
 
 #include <TClonesArray.h>
-#include <TGeoManager.h>
-#include <TGeoMatrix.h>
 #include <TMath.h>
 #include <TObjArray.h>
 #include <TRandom.h>
 #include <TVector3.h>
 #include <cmath>
 #include <list>
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -140,21 +139,7 @@ void addCrystal2Cluster(struct califa_candidate* cluster,
 }
 
 R3BCalifaCrystalCal2Cluster::R3BCalifaCrystalCal2Cluster()
-    : FairTask("R3B CALIFA CrystalCal to Cluster Finder")
-    , fCrystalCalData(NULL)
-    , fCalifaClusterData(NULL)
-    , fGeometryVersion(2024)
-    , fCrystalThreshold(0)
-    , fGammaClusterThreshold(0)
-    , fRoundWindow(0.25)
-    , fSimulation(kFALSE)
-    , fTargetGeoPar(NULL)
-    , fCalifaGeoPar(NULL)
-    , fWindowAlg("Round")
-    , fOnline(kFALSE)
-    , fRand(0)
-    , fTotalCrystals(2544)
-    , fRandFile("")
+    : FairTask("R3BCalifaCrystalCal2Cluster")
 {
 }
 
@@ -189,7 +174,6 @@ void R3BCalifaCrystalCal2Cluster::SetParContainers()
         R3BLOG_IF(warn, !fTargetGeoPar, "Could not get access to TargetGeoPar container. Setting nominal position. ");
         fTargetPos.SetXYZ(0.0, 0.0, 0.0);
     }
-
     else
     {
         R3BLOG(info, "Container TargetGeoPar found.");
@@ -239,16 +223,12 @@ InitStatus R3BCalifaCrystalCal2Cluster::Init()
         R3BLOG_IF(fatal, !fHistoFile, "Randomization file not found");
 
         fAngularDistributions = new TH2F*[fTotalCrystals];
-
-        char name[100];
-
         for (Int_t i = 0; i < fTotalCrystals; i++)
         {
-            sprintf(name, "distributionCrystalID_%i", i + 1);
-            fHistoFile->GetObject(name, fAngularDistributions[i]);
+            std::string name = "distributionCrystalID_" + std::to_string(i + 1);
+            fHistoFile->GetObject(name.c_str(), fAngularDistributions[i]);
         }
     }
-
     return kSUCCESS;
 }
 
@@ -418,24 +398,27 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
         califa_candidate cluster = { motherId, vector<uint16_t>(), 0.0, 0.0, 0.0, 0.0, 0.0 };
 
         if (motherId <= fTotalCrystals)
+        {
             mother_angles = R3BCalifaGeometry::Instance()->GetAngles(motherId);
-
+        }
         else
+        {
             mother_angles = R3BCalifaGeometry::Instance()->GetAngles(motherId - fTotalCrystals);
-
+        }
         if (fRand)
         {
             if (motherId > fTotalCrystals)
+            {
                 fAngularDistributions[gammaCandidatesVec.at(0)->GetCrystalId() - 1 - fTotalCrystals]->GetRandom2(
                     fRandPhi, fRandTheta);
-
+            }
             else
+            {
                 fAngularDistributions[gammaCandidatesVec.at(0)->GetCrystalId() - 1]->GetRandom2(fRandPhi, fRandTheta);
-
+            }
             cluster.theta = TMath::DegToRad() * fRandTheta;
             cluster.phi = TMath::DegToRad() * fRandPhi;
         }
-
         else
         {
 
