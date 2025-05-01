@@ -13,16 +13,13 @@
 
 #pragma once
 
-#ifndef R3BCALIFACRYSTALCAL2CLUSTER_H
-#define R3BCALIFACRYSTALCAL2CLUSTER_H 1
-
 #include <FairTask.h>
-#include <R3BCalifaClusterData.h>
-#include <R3BCalifaGeometry.h>
 #include <Rtypes.h>
-
 #include <TH2F.h>
 #include <TVector3.h>
+
+#include "R3BCalifaClusterData.h"
+#include "R3BCalifaGeometry.h"
 
 class TClonesArray;
 class R3BTGeoPar;
@@ -31,20 +28,19 @@ class R3BCalifaMappingPar;
 class R3BCalifaCrystalCal2Cluster : public FairTask
 {
   public:
-    /** Default constructor
-     **/
+    // Default constructor
     R3BCalifaCrystalCal2Cluster();
 
-    /** Destructor **/
+    // Destructor
     virtual ~R3BCalifaCrystalCal2Cluster();
 
-    /** Virtual method Exec **/
+    // Method Exec
     void Exec(Option_t* /*opt*/) override;
 
-    /** Virtual method Reset **/
+    // Virtual method Reset
     virtual void Reset();
 
-    /** Public method SelectGeometryVersion **/
+    // Public method SelectGeometryVersion
     void SelectGeometryVersion(Int_t version);
 
     void SetCrystalThreshold(Double_t cryThresh) { fCrystalThreshold = cryThresh; }
@@ -53,16 +49,16 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
 
     void SetProtonClusterThreshold(Double_t clusterThresh) { fProtonClusterThreshold = clusterThresh; }
 
-    /** Virtual method SetParContainers **/
+    // Method SetParContainers
     void SetParContainers() override;
 
-    /** Accessor to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
+    // Accessor to select online mode
+    void SetOnline(bool option = true) { fOnline = option; }
 
-    /** Virtual method Init **/
+    // Method Init
     InitStatus Init() override;
 
-    /** Virtual method ReInit **/
+    // Method ReInit
     InitStatus ReInit() override;
 
     void SetRandomization(Bool_t rand) { fRand = rand; }
@@ -73,7 +69,7 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
         fHistoFile = new TFile(fRandFile);
     }
 
-    void IsSimulation(Bool_t simu) { fSimulation = simu; }
+    void IsSimulation(bool option = true) { fSimulation = option; }
 
     void SetTotalCrystals(Int_t total) { fTotalCrystals = total; }
 
@@ -84,40 +80,38 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     void SetRoundWindow(Double_t window);
 
   private:
-    TClonesArray* fCrystalCalData;
-    TClonesArray* fCalifaClusterData;
+    TClonesArray* fCrystalCalData = nullptr;
+    TClonesArray* fCalifaClusterData = nullptr;
 
     TVector3 fTargetPos = { 0, 0, 0 };
     TVector3 fCalifaPos = { 0, 0, 0 };
 
-    R3BTGeoPar* fTargetGeoPar;
-    R3BTGeoPar* fCalifaGeoPar;
+    R3BTGeoPar* fTargetGeoPar = nullptr;
+    R3BTGeoPar* fCalifaGeoPar = nullptr;
 
-    Bool_t fOnline;         // Selector for online data storage
-    Int_t fGeometryVersion; // Selecting the geometry of the CALIFA calorimeter
-    Int_t fTotalCrystals;
+    bool fOnline = false;          // Selector for online data storage
+    Int_t fGeometryVersion = 2024; // Selecting the geometry of the CALIFA calorimeter
+    Int_t fTotalCrystals = 2544;
 
-    Double_t fCrystalThreshold; // Minimum energy requested in a crystal to be included in a cluster
+    Double_t fCrystalThreshold = 0.; // Minimum energy requested in a crystal to be included in a cluster
     Double_t fProtonClusterThreshold =
-        50.;                         // Minimum energy in a crystal to be considered as a proton cluster candidate
-    Double_t fGammaClusterThreshold; // Minimum energy in a crystal to be considered as a gamma cluster candidate
-    Double_t fProtonThreshold;       // Defines the cut energy between proton and gamma readout
+        50.;                              // Minimum energy in a crystal to be considered as a proton cluster candidate
+    Double_t fGammaClusterThreshold = 0.; // Minimum energy in a crystal to be considered as a gamma cluster candidate
+    // Double_t fProtonThreshold;            // Defines the cut energy between proton and gamma readout
 
-    Double_t fRoundWindow; // Cluster window
-    Bool_t fSimulation;    // Simulation flag
+    Double_t fRoundWindow = 0.25; // Cluster window
+    bool fSimulation = false;     // Simulation flag
 
-    // R3BCalifaGeometry* fCalifaGeo = nullptr;
-    Bool_t fRand;      // Flag to set randomization procedure
+    Bool_t fRand = 0.; // Flag to set randomization procedure
     TString fRandFile; // File with angular coverages for each crystal
     TFile* fHistoFile = NULL;
     TH2F** fAngularDistributions;
-    TString fWindowAlg;
+    TString fWindowAlg = "Round";
     Float_t fThetaLimit;
     Float_t fPhiLimit;
-    /** Private method AddCluster
-    **
-    ** Adds a CalifaCluster to the ClusterCollection
-    **/
+
+    // Private method AddCluster
+    // Adds a CalifaCluster to the ClusterCollection
     R3BCalifaClusterData* AddCluster(std::vector<uint16_t> crystalList,
                                      Double_t ene,
                                      Double_t Nf,
@@ -130,5 +124,3 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
   public:
     ClassDefOverride(R3BCalifaCrystalCal2Cluster, 3);
 };
-
-#endif /* R3BCalifaCrystalCal2Cluster_H */

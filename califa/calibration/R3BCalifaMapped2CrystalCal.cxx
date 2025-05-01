@@ -166,17 +166,13 @@ InitStatus R3BCalifaMapped2CrystalCal::ReInit()
     return kSUCCESS;
 }
 
-void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
+void R3BCalifaMapped2CrystalCal::Exec(Option_t* /*option*/)
 {
     // Reset entries in output arrays, local arrays
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fCalifaMappedDataCA->GetEntries();
-    if (!nHits)
-        return;
-
-    R3BCalifaMappedData** mappedData = new R3BCalifaMappedData*[nHits];
+    auto nHits = fCalifaMappedDataCA->GetEntriesFast();
 
     // Overflow (R3BROOT-speech "Errors") handling:
     // If an error bit indicates that the data is invalid,
@@ -206,13 +202,13 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
     const uint32_t QPID_errorS = 0x1980 | ANY_errorS;
     const uint32_t EN_errorS = 0x0020 | ANY_errorS;
 
-    for (Int_t i = 0; i < nHits; i++)
+    for (size_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = dynamic_cast<R3BCalifaMappedData*>(fCalifaMappedDataCA->At(i));
-        auto crystalId = mappedData[i]->GetCrystalId();
-        auto wrts = mappedData[i]->GetWrts();
-        auto ov = mappedData[i]->GetOverFlow();
-        auto Tot = mappedData[i]->GetTot();
+        auto mappedData = dynamic_cast<R3BCalifaMappedData*>(fCalifaMappedDataCA->At(i));
+        auto crystalId = mappedData->GetCrystalId();
+        auto wrts = mappedData->GetWrts();
+        auto ov = mappedData->GetOverFlow();
+        auto Tot = mappedData->GetTot();
 
         auto validate_smear = [](uint16_t err_cond, double raw)
         { return err_cond ? NAN : raw + gRandom->Rndm() - 0.5; };
@@ -223,9 +219,9 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
             Ns = 2
         };
         double raw[3];
-        raw[en] = validate_smear(ov & EN_errorS, mappedData[i]->GetEnergy());
-        raw[Nf] = validate_smear(ov & QPID_errorS, mappedData[i]->GetNf());
-        raw[Ns] = validate_smear(ov & QPID_errorS, mappedData[i]->GetNs());
+        raw[en] = validate_smear(ov & EN_errorS, mappedData->GetEnergy());
+        raw[Nf] = validate_smear(ov & QPID_errorS, mappedData->GetNf());
+        raw[Ns] = validate_smear(ov & QPID_errorS, mappedData->GetNs());
         double cal[3] = { 0, 0, 0 };
 
         if (0 < crystalId && crystalId <= fNumCrystals)
@@ -248,9 +244,6 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* option)
         }
         AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);
     }
-
-    if (mappedData)
-        delete[] mappedData;
     return;
 }
 
@@ -274,4 +267,4 @@ R3BCalifaCrystalCalData* R3BCalifaMapped2CrystalCal::AddCalData(Int_t id,
     return new (clref[size]) R3BCalifaCrystalCalData(id, energy, Nf, Ns, wrts, tot_energy);
 }
 
-ClassImp(R3BCalifaMapped2CrystalCal);
+ClassImp(R3BCalifaMapped2CrystalCal)

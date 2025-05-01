@@ -13,9 +13,6 @@
 
 #pragma once
 
-#ifndef R3BCALIFAMAPPED2CRYSTALCALPAR_H
-#define R3BCALIFAMAPPED2CRYSTALCALPAR_H 1
-
 #include <FairTask.h>
 #include <TArrayF.h>
 #include <TH1F.h>
@@ -27,42 +24,35 @@ class R3BEventHeader;
 
 class R3BCalifaMapped2CrystalCalPar : public FairTask
 {
-
   public:
-    /** Default constructor **/
+    // Default constructor
     R3BCalifaMapped2CrystalCalPar();
 
-    /** Standard constructor **/
-    R3BCalifaMapped2CrystalCalPar(const char* name, Int_t iVerbose = 1);
+    // Standard constructor
+    explicit R3BCalifaMapped2CrystalCalPar(const std::string& name, int iVerbose = 1);
 
-    /** Destructor **/
+    // Destructor
     virtual ~R3BCalifaMapped2CrystalCalPar();
 
-    /** Virtual method Init **/
-    virtual InitStatus Init();
+    // Method Init
+    InitStatus Init() override;
 
-    /** Virtual method Exec **/
-    virtual void Exec(Option_t* opt);
+    // Method Exec
+    void Exec(Option_t* /*opt*/) override;
 
-    /** Virtual method FinishEvent **/
-    virtual void FinishEvent();
+    // Method FinishTask
+    void FinishTask() override;
 
-    /** Virtual method FinishTask **/
-    virtual void FinishTask();
+    // Method ReInit
+    InitStatus ReInit() override;
 
-    /** Virtual method Reset **/
-    virtual void Reset();
-
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
-
-    /** Virtual method Search peaks and calibrate **/
+    // Method Search peaks and calibrate
     virtual void SearchPeaks();
 
-    /** Virtual method SetParContainers **/
-    virtual void SetParContainers();
+    // Method SetParContainers
+    void SetParContainers() override;
 
-    /** Accessor functions **/
+    // Accessor functions
     const Int_t GetNumCrystals() { return fNumCrystals; }
     const Int_t GetCalRange_left() { return fMapHistos_left; }
     const Int_t GetCalRange_right() { return fMapHistos_right; }
@@ -98,33 +88,31 @@ class R3BCalifaMapped2CrystalCalPar : public FairTask
 
   private:
     void SetParameter();
-    Bool_t fDebugMode;
-    Int_t fNumCrystals;
-    Int_t fMapHistos_left; // gamma range
-    Int_t fMapHistos_right;
-    Int_t fMapHistos_bins;
-    Int_t fMapHistos_leftp; // particle range
-    Int_t fMapHistos_rightp;
-    Int_t fMapHistos_binsp;
+    bool fDebugMode = false;
+    Int_t fNumCrystals = 1;
+    Int_t fMapHistos_left = 0; // gamma range
+    Int_t fMapHistos_right = 0;
+    Int_t fMapHistos_bins = 0;
+    Int_t fMapHistos_leftp = 0; // particle range
+    Int_t fMapHistos_rightp = 0;
+    Int_t fMapHistos_binsp = 0;
 
-    Int_t fNumParam;
-    Int_t fMinStadistics;
+    Int_t fNumParam = 0;
+    Int_t fMinStadistics = 100;
 
-    Int_t fNumPeaks;
-    Double_t fSigma;
-    Double_t fThreshold;
+    Int_t fNumPeaks = 2;
+    Double_t fSigma = 2.5;
+    Double_t fThreshold = 0.002;
 
-    TArrayF* fEnergyPeaks;
+    TArrayF* fEnergyPeaks = nullptr;
     Double_t* fChannelPeaks;
 
-    R3BCalifaMappingPar* fMap_Par;     /**< Parameter container with mapping. >*/
-    R3BCalifaCrystalCalPar* fCal_Par;  /**< Container for Cal parameters. >*/
-    TClonesArray* fCalifaMappedDataCA; /**< Array with CALIFA Mapped-input data. >*/
+    R3BCalifaMappingPar* fMap_Par = nullptr;     // Parameter container with mapping
+    R3BCalifaCrystalCalPar* fCal_Par = nullptr;  // Container for Cal parameters
+    TClonesArray* fCalifaMappedDataCA = nullptr; // Array with CALIFA Mapped-input data
 
-    TH1F** fh_Map_energy_crystal;
+    TH1F** fh1_Map_energy_crystal;
 
   public:
-    ClassDef(R3BCalifaMapped2CrystalCalPar, 2);
+    ClassDefOverride(R3BCalifaMapped2CrystalCalPar, 2); // NOLINT
 };
-
-#endif
