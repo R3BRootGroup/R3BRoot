@@ -20,6 +20,7 @@
 #include <TRandom.h>
 #include <TSpectrum.h>
 #include <iostream>
+#include <memory>
 #include <stdlib.h>
 
 #include <FairLogger.h>
@@ -192,7 +193,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
     fCal_Par->SetNumParametersFit(fNumParam);
     fCal_Par->GetCryCalParams()->Set(numPars * fNumCrystals);
 
-    auto* spectrum = new TSpectrum(fNumPeaks);
+    auto spectrum = std::make_unique<TSpectrum>(fNumPeaks);
 
     Int_t fright, fleft;
 
@@ -235,42 +236,45 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                     fleft = fMapHistos_leftp;
                 }
 
-                TF1* f1 = nullptr;
+                std::unique_ptr<TF1> f1;
+
                 if (fNumParam > 0)
                 {
                     if (fNumParam == 1)
                     {
-                        f1 = new TF1("f1", "[0]*x", fleft, fright);
+                        f1 = std::make_unique<TF1>("f1", "[0]*x", fleft, fright);
                     }
-                    if (fNumParam == 2)
+                    else if (fNumParam == 2)
                     {
-                        f1 = new TF1("f1", "[0]+[1]*x", fleft, fright);
+                        f1 = std::make_unique<TF1>("f1", "[0]+[1]*x", fleft, fright);
                     }
-                    if (fNumParam == 3)
+                    else if (fNumParam == 3)
                     {
-                        f1 = new TF1("f1", "[0]+[1]*x+[2]*pow(x,2)", fleft, fright);
+                        f1 = std::make_unique<TF1>("f1", "[0]+[1]*x+[2]*pow(x,2)", fleft, fright);
                     }
-                    if (fNumParam == 4)
+                    else if (fNumParam == 4)
                     {
-                        f1 = new TF1("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)", fleft, fright);
+                        f1 = std::make_unique<TF1>("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)", fleft, fright);
                     }
-                    if (fNumParam == 5)
+                    else if (fNumParam == 5)
                     {
-                        f1 = new TF1("f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)", fleft, fright);
+                        f1 = std::make_unique<TF1>(
+                            "f1", "[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)", fleft, fright);
                     }
-                    if (fNumParam > 5)
+                    else
                     {
-                        R3BLOG(warn, "The number of fit parameters can not be higher than 5");
+                        R3BLOG(warn, "The number of fit parameters cannot be higher than 5");
+                        return;
                     }
                 }
                 else
                 {
-                    R3BLOG(warn, "No imput number of fit parameters, therefore, by default NumberParameters=2");
-                    f1 = new TF1("f1", "[0]+[1]*x", fleft, fright);
+                    R3BLOG(warn, "No input number of fit parameters, defaulting to number of parameters = 2");
+                    f1 = std::make_unique<TF1>("f1", "[0]+[1]*x", fleft, fright);
                 }
 
-                auto* graph = new TGraph(fNumPeaks + 1, X, Y);
-                graph->Fit("f1", "Q"); // Quiet mode (minimum printing)
+                auto graph = std::make_unique<TGraph>(fNumPeaks, X, Y);
+                graph->Fit(f1.get(), "Q");
 
                 for (Int_t h = 0; h < numPars; h++)
                 {
@@ -282,8 +286,6 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                 R3BLOG(warn, "Histogram number " << i + 1 << "not Fitted");
             }
         }
-
-    delete spectrum;
 
     fCal_Par->setChanged();
     return;
