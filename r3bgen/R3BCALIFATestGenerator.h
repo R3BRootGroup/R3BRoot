@@ -20,10 +20,9 @@
  * Derived from FairGenerator.
  **/
 
-#ifndef FAIR_CALIFATESTGENERATOR_H
-#define FAIR_CALIFATESTGENERATOR_H
+#pragma once
 
-#include "FairGenerator.h"
+#include <FairGenerator.h>
 
 #include <iostream>
 
@@ -32,7 +31,7 @@ class FairPrimaryGenerator;
 class R3BCALIFATestGenerator : public FairGenerator
 {
   public:
-    /** Default constructor. **/
+    // Default constructor
     R3BCALIFATestGenerator();
 
     /** Constructor with PDG-ID, multiplicity
@@ -41,10 +40,10 @@ class R3BCALIFATestGenerator : public FairGenerator
      **/
     R3BCALIFATestGenerator(Int_t pdgid, Int_t mult = 1);
 
-    /** Destructor **/
-    virtual ~R3BCALIFATestGenerator(){};
+    // Destructor
+    virtual ~R3BCALIFATestGenerator() = default;
 
-    /** Modifiers **/
+    // Modifiers
     void SetPDGType(Int_t pdg) { fPDGType = pdg; };
 
     void SetMultiplicity(Int_t mult) { fMult = mult; };
@@ -83,7 +82,7 @@ class R3BCALIFATestGenerator : public FairGenerator
         fYRangeIsSet = kTRUE;
     };
 
-    void SetThetaRange(Double32_t thetamin = 0, Double32_t thetamax = 90)
+    void SetThetaRange(Double32_t thetamin = 0, Double32_t thetamax = 180)
     {
         fThetaMin = thetamin;
         fThetaMax = thetamax;
@@ -124,19 +123,19 @@ class R3BCALIFATestGenerator : public FairGenerator
         fLorentzBoostIsSet = kTRUE;
     };
 
-    void SetFragmentVelocity(Double32_t beta = 0);
+    void SetFragmentVelocity(double beta = 0., double dispersion = 0.);
 
     void SetNuclearDecayChain() { fNuclearDecayChainIsSet = kTRUE; };
 
     void SetDecayChainPoint(Double32_t gammaEnergy = 0, Double32_t branchingRatio = 0);
 
     /** Initializer **/
-    virtual Bool_t Init();
+    Bool_t Init() override;
 
     /** Creates an event with given type and multiplicity.
-     **@param primGen  pointer to the FairPrimaryGenerator
+     **@param primGen pointer to the FairPrimaryGenerator
      **/
-    virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
+    Bool_t ReadEvent(FairPrimaryGenerator* primGen) override;
 
   private:
     Int_t fPDGType; // Particle type (PDG encoding)
@@ -167,13 +166,12 @@ class R3BCALIFATestGenerator : public FairGenerator
     Double32_t fGammaEnergies[8];        // Gamma energies for the nuclear decay chain [GeV] TEST UNITS!
     Double32_t fGammaBranchingRatios[8]; // Gamma branching ratios for the nuclear decay chain
     Int_t fGammasDefinedInNuclearDecay;  // Number of gammas defined (max 8)
-    Double32_t fBetaOfEmittingFragment;  // Velocity of the fragment emitting the gammas
-    Double32_t fGammaFactor;             // Velocity of the fragment emitting the gammas
+    double fBetaOfEmittingFragment;      // Velocity of the fragment emitting the gammas
+    double fGammaFactor;                 // Velocity of the fragment emitting the gammas
 
     Bool_t fLorentzBoostIsSet;      // True if Lorentz Boost is set
     Bool_t fNuclearDecayChainIsSet; // True if a nuclear decay chain is set
 
-    ClassDef(R3BCALIFATestGenerator, 1);
+  public:
+    ClassDefOverride(R3BCALIFATestGenerator, 1); // NOLINT
 };
-
-#endif

@@ -18,8 +18,7 @@
  *      Author: gu92joq
  */
 
-#ifndef R3BP2PEVTGENERATOR_H_
-#define R3BP2PEVTGENERATOR_H_
+#pragma once
 
 #include <map>
 #include <utility>
@@ -55,10 +54,13 @@ class R3Bp2pevtGenerator : public FairGenerator
     // R3Bp2pevtGenerator() : FairGenerator("R3Bp2pevtGenerator", "R3Bp2pevtGenerator") {}
     // R3Bp2pevtGenerator(const char *name, const char *title) : FairGenerator(name, title) {}
     R3Bp2pevtGenerator();
-    ~R3Bp2pevtGenerator(){};
 
-    virtual Bool_t Init();
-    virtual Bool_t ReadEvent(FairPrimaryGenerator* primGen);
+    // Destructor virtual
+    virtual ~R3Bp2pevtGenerator() = default;
+
+    Bool_t Init() override;
+    Bool_t ReadEvent(FairPrimaryGenerator* primGen) override;
+
     void SetHeavyNucleus(int A, double M_def, double M_res); // Set Mass of heavy nucleus and Mass Defect
     void SetInverse(bool inverse);                           // Set Inverse or direct kinematics
     void SetIsotropic(bool isotropic);          // Set Isotropic or parametric cross section for proton emission
@@ -66,7 +68,7 @@ class R3Bp2pevtGenerator : public FairGenerator
     void SetExcitation(double exe);             // Set Excitation energy
     void SetLightNucleus(double ma, double mi); // Set Incoming outgoing particle mass
     void SetBeamEnergy(double E);
-    void Print();
+    void PrintInfo();
 
   protected:
     /**
@@ -92,7 +94,6 @@ class R3Bp2pevtGenerator : public FairGenerator
     std::pair<double, double> Lorentz(double, double, double, double);
     void SetValues(double E, int A, double MOM, double exe, bool invert, bool iso);
 
-    ClassDef(R3Bp2pevtGenerator, 1);
+  public:
+    ClassDefOverride(R3Bp2pevtGenerator, 1); // NOLINT
 };
-
-#endif

@@ -81,7 +81,7 @@ void R3Bp2pevtGenerator::SetMomDistrib(double mom)
     return;
 }
 
-void R3Bp2pevtGenerator::Print()
+void R3Bp2pevtGenerator::PrintInfo()
 {
     cout << "***** Print generator values *****" << endl;
     cout << "Energy: \t" << ENERGY << endl;
@@ -111,7 +111,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     //  	gRandom->SetSeed(0);//using computer time
     //  	TRandom2 r1;
     //  	r1.SetSeed(0);
-    R3Bp2pevtGenerator::Print();
+    R3Bp2pevtGenerator::PrintInfo();
     bool evt = false;
     if (INVERSE)
     {

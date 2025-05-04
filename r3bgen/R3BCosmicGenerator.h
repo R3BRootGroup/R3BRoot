@@ -25,14 +25,13 @@
  * Derived from R3BGenerator.
  **/
 
-#ifndef R3B_COSMICGENERATOR_H
-#define R3B_COSMICGENERATOR_H
+#pragma once
 
 #include "R3BDistribution.h"
 
-#include "FairGenerator.h"
+#include <FairGenerator.h>
 
-#include "TRandom3.h"
+#include <TRandom3.h>
 
 #include <iostream>
 
@@ -77,7 +76,6 @@ class R3BCosmicGenerator : public FairGenerator
 
     Double_t fPDGMass; // Particle mass [GeV]
 
-    ClassDefOverride(R3BCosmicGenerator, 2)
+  public:
+    ClassDefOverride(R3BCosmicGenerator, 2);
 };
-
-#endif

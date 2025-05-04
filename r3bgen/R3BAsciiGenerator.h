@@ -32,12 +32,12 @@ class R3BAsciiGenerator : public FairGenerator
     /** Standard constructor.
      ** @param fileName The input file name
      **/
-    explicit R3BAsciiGenerator(std::string fileName);
+    explicit R3BAsciiGenerator(const std::string& fileName);
     explicit R3BAsciiGenerator(const TString& fileName);
     explicit R3BAsciiGenerator(const char* fileName); // for old macros
 
-    /** Destructor. **/
-    ~R3BAsciiGenerator() override;
+    // Destructor virtual
+    virtual ~R3BAsciiGenerator() = default;
 
     /** Reads on event from the input file and pushes the tracks onto
      ** the stack. Abstract method in base class.
@@ -61,10 +61,11 @@ class R3BAsciiGenerator : public FairGenerator
 
     void OpenOrRewindFile();
 
-    Double32_t fX, fY, fZ;    // Point vertex coordinates [cm]
-    bool fPointVtxIsSet;      // True if point vertex is set
-    Double32_t fDX, fDY, fDZ; // Point vertex coordinates [cm]
-    bool fBoxVtxIsSet;        // True if point vertex is set
+    Double32_t fX = 0., fY = 0., fZ = 0.;    // Point vertex coordinates [cm]
+    bool fPointVtxIsSet = false;             // True if point vertex is set
+    Double32_t fDX = 0., fDY = 0., fDZ = 0.; // Point vertex coordinates [cm]
+    bool fBoxVtxIsSet = false;               // True if point vertex is set
 
-    ClassDefOverride(R3BAsciiGenerator, 0);
+  public:
+    ClassDefOverride(R3BAsciiGenerator, 0); // NOLINT
 };

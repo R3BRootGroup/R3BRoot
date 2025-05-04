@@ -30,30 +30,14 @@ R3BAsciiGenerator::R3BAsciiGenerator()
     , fFile()
     , fBuf()
     , fInput(&fBuf)
-    , fX(0.)
-    , fY(0.)
-    , fZ(0.)
-    , fPointVtxIsSet(false)
-    , fDX(0.)
-    , fDY(0.)
-    , fDZ(0.)
-    , fBoxVtxIsSet(false)
 {
 }
 
-R3BAsciiGenerator::R3BAsciiGenerator(std::string fileName)
+R3BAsciiGenerator::R3BAsciiGenerator(const std::string& fileName)
     : fFileName(std::move(fileName))
     , fFile()
     , fBuf()
     , fInput(&fBuf)
-    , fX(0.)
-    , fY(0.)
-    , fZ(0.)
-    , fPointVtxIsSet(false)
-    , fDX(0.)
-    , fDY(0.)
-    , fDZ(0.)
-    , fBoxVtxIsSet(false)
 {
     RegisterIons();
 }
@@ -67,8 +51,6 @@ R3BAsciiGenerator::R3BAsciiGenerator(const char* fileName)
     : R3BAsciiGenerator(std::string(fileName))
 {
 }
-
-R3BAsciiGenerator::~R3BAsciiGenerator() {}
 
 bool R3BAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
@@ -265,4 +247,4 @@ void R3BAsciiGenerator::OpenOrRewindFile()
     }
 }
 
-ClassImp(R3BAsciiGenerator);
+ClassImp(R3BAsciiGenerator)
