@@ -28,17 +28,17 @@ class FairPrimaryGenerator;
 class R3BINCLRootGenerator : public FairGenerator
 {
   public:
-    /** Default constructor without arguments should not be used. **/
+    /// Default constructor without arguments should not be used
     R3BINCLRootGenerator();
 
     /** Standard constructor.
      ** @param fileName The input file name
      **/
-    explicit R3BINCLRootGenerator(std::string fileName);
+    explicit R3BINCLRootGenerator(const std::string& fileName);
     explicit R3BINCLRootGenerator(const TString& fileName);
     explicit R3BINCLRootGenerator(const char* fileName); // for old macros
 
-    /** Destructor. **/
+    // Destructor
     ~R3BINCLRootGenerator() override;
 
     /** Reads on event from the input file and pushes the tracks onto
@@ -62,24 +62,24 @@ class R3BINCLRootGenerator : public FairGenerator
     /**
      ** Method to simulate only fission events
      **/
-    void SetOnlyFission(Bool_t Opt = true) { fOnlyFission = Opt; }
+    void SetOnlyFission(bool Opt = true) { fOnlyFission = Opt; }
 
     /**
      **  Method to simulate only spallation events
      **/
-    void SetOnlySpallation(Bool_t Opt = true) { fOnlySpallation = Opt; }
+    void SetOnlySpallation(bool Opt = true) { fOnlySpallation = Opt; }
 
     /**
      **  Method to simulate only p2p-fission events
      **/
-    void SetOnlyP2pFission(Bool_t Opt = true) { fOnlyP2pFission = Opt; }
+    void SetOnlyP2pFission(bool Opt = true) { fOnlyP2pFission = Opt; }
 
   private:
     TString fFileName; // Input file name
     TFile* fInput;
-    Bool_t fOnlyFission;    // True if we want to simulate only fission events
-    Bool_t fOnlyP2pFission; // True if we want to simulate only p2p-fission events
-    Bool_t fOnlySpallation; // True if we want to simulate only spallation events
+    bool fOnlyFission = false;    // True if we want to simulate only fission events
+    bool fOnlyP2pFission = false; // True if we want to simulate only p2p-fission events
+    bool fOnlySpallation = false; // True if we want to simulate only spallation events
 
     /** Private method RegisterIons. Goes through the input file and registers
      ** any ion needed. TODO: Should not be needed by FairRoot. **/
@@ -87,9 +87,9 @@ class R3BINCLRootGenerator : public FairGenerator
 
     inline Int_t GetIonPdgId(int z, int a) { return 1000000000 + 10000 * z + 10 * a; }
 
-    Int_t fEvt;
+    Int_t fEvt = 0;
     TTree* Tree;
-    Int_t fEvtRoot;
+    Int_t fEvtRoot = 0;
     Short_t fParticles;
     Short_t fOrigin[160];
     Short_t fMass[160];
@@ -99,10 +99,11 @@ class R3BINCLRootGenerator : public FairGenerator
     Float_t fThetaPrime[160];
     Float_t fPhi[160];
 
-    Double32_t fX, fY, fZ;    // Point vertex coordinates [cm]
-    Bool_t fPointVtxIsSet;    // True if point vertex is set
-    Double32_t fDX, fDY, fDZ; // Point vertex coordinates [cm]
-    Bool_t fBoxVtxIsSet;      // True if point vertex is set
+    Double32_t fX = 0., fY = 0., fZ = 0.;    // Point vertex coordinates [cm]
+    bool fPointVtxIsSet = false;             // True if point vertex is set
+    Double32_t fDX = 0., fDY = 0., fDZ = 0.; // Point vertex coordinates [cm]
+    bool fBoxVtxIsSet = false;               // True if point vertex is set
 
-    ClassDefOverride(R3BINCLRootGenerator, 0);
+  public:
+    ClassDefOverride(R3BINCLRootGenerator, 0); // NOLINT
 };

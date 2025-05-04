@@ -32,13 +32,11 @@ using namespace std;
 
 R3BCryAsciiGenerator::R3BCryAsciiGenerator()
     : fFileName()
-    , fTopDist(0.0)
 {
 }
 
-R3BCryAsciiGenerator::R3BCryAsciiGenerator(std::string fileName)
+R3BCryAsciiGenerator::R3BCryAsciiGenerator(const std::string& fileName)
     : fFileName(std::move(fileName))
-    , fTopDist(0.0)
 {
     infile.open(fileName);
     if (!infile.is_open())
