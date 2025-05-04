@@ -17,15 +17,13 @@
 // ---------------------------------------------------------------
 
 // ROOT headers
-#include "TClonesArray.h"
-#include "TMath.h"
-#include "TRandom.h"
+#include <TClonesArray.h>
+#include <TMath.h>
+#include <TRandom.h>
 
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 
 // R3B headers
 #include "R3BLogger.h"
@@ -41,16 +39,8 @@ R3BMwpc0Mapped2Cal::R3BMwpc0Mapped2Cal()
 }
 
 // R3BMwpc0Mapped2Cal: Standard Constructor --------------------------
-R3BMwpc0Mapped2Cal::R3BMwpc0Mapped2Cal(const char* name, Int_t iVerbose)
-    : FairTask(name, iVerbose)
-    , NumPadX(0)
-    , NumPadY(0)
-    , NumParams(0)
-    , CalParams(NULL)
-    , fCal_Par(NULL)
-    , fMwpcMappedDataCA(NULL)
-    , fMwpcCalDataCA(NULL)
-    , fOnline(kFALSE)
+R3BMwpc0Mapped2Cal::R3BMwpc0Mapped2Cal(const std::string& name, int iVerbose)
+    : FairTask(name.c_str(), iVerbose)
 {
 }
 
@@ -64,7 +54,6 @@ R3BMwpc0Mapped2Cal::~R3BMwpc0Mapped2Cal()
 
 void R3BMwpc0Mapped2Cal::SetParContainers()
 {
-
     // Parameter Container
     // Reading padCalPar from FairRuntimeDb
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
@@ -139,7 +128,7 @@ InitStatus R3BMwpc0Mapped2Cal::ReInit()
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMwpc0Mapped2Cal::Exec(Option_t* option)
+void R3BMwpc0Mapped2Cal::Exec(Option_t* /*opt*/)
 {
     // Reset entries in output arrays, local arrays
     Reset();
@@ -153,28 +142,29 @@ void R3BMwpc0Mapped2Cal::Exec(Option_t* option)
     if (nHits == 0)
         return;
 
-    R3BMwpcMappedData** mappedData;
-    mappedData = new R3BMwpcMappedData*[nHits];
-    Int_t planeId = 0;
-    Int_t padId = 0;
     Float_t charge = 0.0;
     Float_t pedestal = 0.0;
     Int_t nbpad = 0;
 
-    for (Int_t i = 0; i < nHits; i++)
+    for (size_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
-        planeId = mappedData[i]->GetPlane();
-        padId = mappedData[i]->GetPad() - 1;
+        auto mappedData = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
+        auto planeId = mappedData->GetPlane();
+        auto padId = mappedData->GetPad() - 1;
         if (planeId == 1)
+        {
             nbpad = padId * NumParams;
+        }
         else if (planeId == 3)
+        {
             nbpad = (padId + NumPadX) * NumParams;
+        }
         else
+        {
             R3BLOG(error, "Plane " << planeId << " does not exist in MWPC0");
-
+        }
         pedestal = CalParams->GetAt(nbpad);
-        charge = mappedData[i]->GetQ() - pedestal;
+        charge = mappedData->GetQ() - pedestal;
 
         // We accept the hit if the charge is larger than zero
         if (charge > 0)
@@ -182,8 +172,6 @@ void R3BMwpc0Mapped2Cal::Exec(Option_t* option)
             AddCalData(planeId, padId + 1, charge);
         }
     }
-    if (mappedData)
-        delete[] mappedData;
     return;
 }
 
@@ -204,4 +192,4 @@ R3BMwpcCalData* R3BMwpc0Mapped2Cal::AddCalData(Int_t plane, Int_t pad, Float_t c
     return new (clref[size]) R3BMwpcCalData(plane, pad, charge);
 }
 
-ClassImp(R3BMwpc0Mapped2Cal);
+ClassImp(R3BMwpc0Mapped2Cal)

@@ -17,16 +17,15 @@
 // ----------------------------------------------------------------
 
 // ROOT headers
-#include "TClonesArray.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TMath.h>
 
 // FAIR headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 
 // R3B headers
+#include "R3BLogger.h"
 #include "R3BMwpc0Cal2Hit.h"
 #include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
@@ -38,21 +37,15 @@ R3BMwpc0Cal2Hit::R3BMwpc0Cal2Hit()
 }
 
 // R3BMwpc0Cal2Hit: Standard Constructor --------------------------
-R3BMwpc0Cal2Hit::R3BMwpc0Cal2Hit(const char* name, Int_t iVerbose)
-    : FairTask(name, iVerbose)
-    , fMwpcCalDataCA(NULL)
-    , fMwpcHitDataCA(NULL)
-    , fwx(3.125)   // in mm
-    , fwy(3.125)   // in mm
-    , fSize(200.0) // in mm
-    , fOnline(kFALSE)
+R3BMwpc0Cal2Hit::R3BMwpc0Cal2Hit(const std::string& name, int iVerbose)
+    : FairTask(name.c_str(), iVerbose)
 {
 }
 
 // Virtual R3BMwpc0Cal2Hit: Destructor
 R3BMwpc0Cal2Hit::~R3BMwpc0Cal2Hit()
 {
-    LOG(info) << "R3BMwpc0Cal2Hit: Delete instance";
+    R3BLOG(debug, "Delete instance");
     if (fMwpcHitDataCA)
         delete fMwpcHitDataCA;
 }
@@ -60,24 +53,26 @@ R3BMwpc0Cal2Hit::~R3BMwpc0Cal2Hit()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMwpc0Cal2Hit::Init()
 {
-    LOG(info) << "R3BMwpc0Cal2Hit: Init";
+    R3BLOG(info, "");
 
     // INPUT DATA
     FairRootManager* rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
 
     fMwpcCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("Mwpc0CalData"));
     if (!fMwpcCalDataCA)
     {
+        R3BLOG(fatal, "Mwpc0CalData not found");
         return kFATAL;
     }
 
     // OUTPUT DATA
     // Hit data
-    fMwpcHitDataCA = new TClonesArray("R3BMwpcHitData", 10);
+    fMwpcHitDataCA = new TClonesArray("R3BMwpcHitData");
     rootManager->Register("Mwpc0HitData", "MWPC0 Hit", fMwpcHitDataCA, !fOnline);
 
     return kSUCCESS;
@@ -87,7 +82,7 @@ InitStatus R3BMwpc0Cal2Hit::Init()
 InitStatus R3BMwpc0Cal2Hit::ReInit() { return kSUCCESS; }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMwpc0Cal2Hit::Exec(Option_t* option)
+void R3BMwpc0Cal2Hit::Exec(Option_t* /*opt*/)
 {
     // Reset entries in output arrays, local arrays
     Reset();
@@ -98,12 +93,8 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
         return;
 
     // Data from cal level
-    R3BMwpcCalData** calData;
-    calData = new R3BMwpcCalData*[nHits];
-    Int_t planeId;
-    Int_t padId;
     Int_t padmx = -1, padmy = -1;
-    Double_t q = 0., qmx = 0., qmy = 0., qleft = 0., qright = 0., qdown = 0., qup = 0.;
+    Double_t qmx = 0., qmy = 0., qleft = 0., qright = 0., qdown = 0., qup = 0.;
     Double_t x = NAN, y = NAN;
 
     for (Int_t i = 0; i < Mw0PadsX; i++)
@@ -113,10 +104,10 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
-        planeId = calData[i]->GetPlane();
-        padId = calData[i]->GetPad() - 1;
-        q = calData[i]->GetQ();
+        auto calData = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
+        auto planeId = calData->GetPlane();
+        auto padId = calData->GetPad() - 1;
+        auto q = calData->GetQ();
         if (planeId == 1)
             fx[padId] = q;
         else
@@ -150,8 +141,6 @@ void R3BMwpc0Cal2Hit::Exec(Option_t* option)
         // std::cout << x << " " << y << std::endl;
         AddHitData(x, y);
     }
-    if (calData)
-        delete[] calData;
     return;
 }
 
@@ -180,7 +169,7 @@ Double_t R3BMwpc0Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 // -----   Public method Reset   ------------------------------------------------
 void R3BMwpc0Cal2Hit::Reset()
 {
-    LOG(debug) << "Clearing Mwpc0HitData Structure";
+    R3BLOG(debug, "Clearing Mwpc0HitData Structure");
     if (fMwpcHitDataCA)
         fMwpcHitDataCA->Clear();
 }
@@ -194,4 +183,4 @@ R3BMwpcHitData* R3BMwpc0Cal2Hit::AddHitData(Double_t x, Double_t y)
     return new (clref[size]) R3BMwpcHitData(x, y);
 }
 
-ClassImp(R3BMwpc0Cal2Hit);
+ClassImp(R3BMwpc0Cal2Hit)

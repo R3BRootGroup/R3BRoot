@@ -16,71 +16,65 @@
 // -----          Created 09/10/19 by J.L. Rodriguez-Sanchez    -----
 // ------------------------------------------------------------------
 
-#ifndef R3BMwpc0Cal2Hit_H
-#define R3BMwpc0Cal2Hit_H 1
+#pragma once
 
-#include "FairTask.h"
-#include "R3BMwpcCalData.h"
-#include "R3BMwpcHitData.h"
-#include "TH1F.h"
-#include <TRandom.h>
+#include <FairTask.h>
+#include <string>
 
 #define Mw0PadsX 64
 #define Mw0PadsY 64
 
 class TClonesArray;
+class R3BMwpcHitData;
 
 class R3BMwpc0Cal2Hit : public FairTask
 {
-
   public:
-    /** Default constructor **/
+    // Default constructor
     R3BMwpc0Cal2Hit();
 
-    /** Standard constructor **/
-    R3BMwpc0Cal2Hit(const char* name, Int_t iVerbose = 1);
+    // Standard constructor
+    explicit R3BMwpc0Cal2Hit(const std::string& name, int iVerbose = 1);
 
-    /** Destructor **/
+    // Destructor
     virtual ~R3BMwpc0Cal2Hit();
 
-    /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    // Method Exec
+    void Exec(Option_t* /*opt*/) override;
 
-    /** Virtual method Reset **/
+    // Virtual method Reset
     virtual void Reset();
 
     // Fair specific
-    /** Virtual method Init **/
-    virtual InitStatus Init();
+    // Method Init
+    InitStatus Init() override;
 
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
+    // Method ReInit
+    InitStatus ReInit() override;
 
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool opt = true) { fOnline = opt; }
 
   private:
-    Double_t fSize; // Detector size in X and Y
-    Double_t fwx;   // Pad width in X
-    Double_t fwy;   // Pad width in Y
+    Double_t fSize = 200.; // Detector size in X and Y (mm)
+    Double_t fwx = 3.125;  // Pad width in X (mm)
+    Double_t fwy = 3.125;  // Pad width in Y (mm)
     Int_t fx[Mw0PadsX], fy[Mw0PadsY];
 
-    Bool_t fOnline; // Don't store data for online
+    bool fOnline = false; // Don't store data for online
 
-    TClonesArray* fMwpcCalDataCA; /**< Array with Cal input data. >*/
-    TClonesArray* fMwpcHitDataCA; /**< Array with Hit output data. >*/
+    TClonesArray* fMwpcCalDataCA = nullptr; // Array with Cal input data
+    TClonesArray* fMwpcHitDataCA = nullptr; // Array with Hit output data
 
-    /** Private method AddHitData **/
+    // Private method AddHitData
     // Adds a SofMwpcHitData to the MwpcHitCollection
     R3BMwpcHitData* AddHitData(Double_t x, Double_t y);
 
-    /** Private method to obtain the position X **/
+    // Private method to obtain the position X
     Double_t GetPositionX(Double_t qmax, Int_t padmax, Double_t qleft, Double_t qright);
-    /** Private method to obtain the position Y **/
+    // Private method to obtain the position Y
     Double_t GetPositionY(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup);
 
   public:
     // Class definition
-    ClassDef(R3BMwpc0Cal2Hit, 1)
+    ClassDefOverride(R3BMwpc0Cal2Hit, 1); // NOLINT
 };
-
-#endif

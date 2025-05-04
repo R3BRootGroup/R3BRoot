@@ -42,8 +42,8 @@ R3BMwpc1Mapped2Cal::R3BMwpc1Mapped2Cal()
 }
 
 // R3BMwpc1Mapped2Cal: Standard Constructor --------------------------
-R3BMwpc1Mapped2Cal::R3BMwpc1Mapped2Cal(const char* name, Int_t iVerbose)
-    : FairTask(name, iVerbose)
+R3BMwpc1Mapped2Cal::R3BMwpc1Mapped2Cal(const std::string& name, Int_t iVerbose)
+    : FairTask(name.c_str(), iVerbose)
     , NumPadX(0)
     , NumPadY(0)
     , NumParams(0)
@@ -139,13 +139,13 @@ InitStatus R3BMwpc1Mapped2Cal::ReInit()
 }
 
 // -----   Public method Execution   --------------------------------------------
-void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
+void R3BMwpc1Mapped2Cal::Exec(Option_t* /*option*/)
 {
     // Reset entries in output arrays, local arrays
     Reset();
 
     // Reading the Input -- Mapped Data --
-    Int_t nHits = fMwpcMappedDataCA->GetEntriesFast();
+    auto nHits = fMwpcMappedDataCA->GetEntriesFast();
     if (nHits > (NumPadX + NumPadY) && nHits > 0)
     {
         R3BLOG(warn, "nHits>(NumPadX+NumPadY)");
@@ -153,19 +153,14 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
     if (nHits == 0)
         return;
 
-    R3BMwpcMappedData** mappedData;
-    mappedData = new R3BMwpcMappedData*[nHits];
-    Int_t planeId = 0;
-    Int_t padId = 0;
-    Float_t charge = 0.0;
     Float_t pedestal = 0.0;
     Int_t nbpad = 0;
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        mappedData[i] = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
-        planeId = mappedData[i]->GetPlane();
-        padId = mappedData[i]->GetPad() - 1;
+        auto mappedData = dynamic_cast<R3BMwpcMappedData*>(fMwpcMappedDataCA->At(i));
+        auto planeId = mappedData->GetPlane();
+        auto padId = mappedData->GetPad() - 1;
         if (planeId == 1) // X
             nbpad = padId * NumParams;
         else if (planeId == 2) // X
@@ -176,7 +171,7 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
             R3BLOG(error, "Plane " << planeId << " does not exist in MWPC1");
 
         pedestal = CalParams->GetAt(nbpad);
-        charge = mappedData[i]->GetQ() - pedestal;
+        auto charge = mappedData->GetQ() - pedestal;
 
         // We accept the hit if the charge is larger than zero
         if (charge > 0)
@@ -184,8 +179,6 @@ void R3BMwpc1Mapped2Cal::Exec(Option_t* option)
             AddCalData(planeId, padId + 1, charge);
         }
     }
-    if (mappedData)
-        delete[] mappedData;
     return;
 }
 
@@ -206,4 +199,4 @@ R3BMwpcCalData* R3BMwpc1Mapped2Cal::AddCalData(Int_t plane, Int_t pad, Float_t c
     return new (clref[size]) R3BMwpcCalData(plane, pad, charge);
 }
 
-ClassImp(R3BMwpc1Mapped2Cal);
+ClassImp(R3BMwpc1Mapped2Cal)

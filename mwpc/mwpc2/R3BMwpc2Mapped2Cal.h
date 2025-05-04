@@ -16,13 +16,12 @@
 // -----         Created 10/10/19 by J.L. Rodriguez-Sanchez      -----
 // -------------------------------------------------------------------
 
-#ifndef R3BMwpc2Mapped2Cal_H
-#define R3BMwpc2Mapped2Cal_H 1
+#pragma once
 
-#include "FairTask.h"
 #include "R3BMwpcCalData.h"
-#include "TH1F.h"
-#include <TRandom.h>
+#include <FairTask.h>
+#include <TArrayF.h>
+#include <string>
 
 class TClonesArray;
 class R3BMwpc2CalPar;
@@ -34,7 +33,7 @@ class R3BMwpc2Mapped2Cal : public FairTask
     R3BMwpc2Mapped2Cal();
 
     /** Standard constructor **/
-    R3BMwpc2Mapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BMwpc2Mapped2Cal(const std::string& name, Int_t iVerbose = 1);
 
     /** Destructor **/
     virtual ~R3BMwpc2Mapped2Cal();
@@ -53,9 +52,6 @@ class R3BMwpc2Mapped2Cal : public FairTask
 
     /** Virtual method ReInit **/
     virtual InitStatus ReInit();
-
-    /** Virtual method Finish **/
-    virtual void Finish();
 
     void SetOnline(Bool_t option) { fOnline = option; }
 
@@ -79,7 +75,5 @@ class R3BMwpc2Mapped2Cal : public FairTask
 
   public:
     // Class definition
-    ClassDef(R3BMwpc2Mapped2Cal, 0)
+    ClassDef(R3BMwpc2Mapped2Cal, 0);
 };
-
-#endif
