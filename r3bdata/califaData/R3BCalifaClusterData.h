@@ -79,7 +79,7 @@ class R3BCalifaClusterData : public TObject
     uint8_t fClusterType = 0;           // Cluster type: 0 proton, 1 gamma, 2 saturation
 
   public:
-    ClassDefOverride(R3BCalifaClusterData, 4)
+    ClassDefOverride(R3BCalifaClusterData, 4);
 };
 
 // Operator overloading for printing R3BCalifaClusterData
