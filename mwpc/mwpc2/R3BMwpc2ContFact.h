@@ -11,23 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMwpc2ContFact_H
-#define R3BMwpc2ContFact_H 1
+#pragma once
 
-#include "FairContFact.h"
+#include <FairContFact.h>
 
 class FairContainer;
 
 class R3BMwpc2ContFact : public FairContFact
 {
+  public:
+    R3BMwpc2ContFact();
+    virtual ~R3BMwpc2ContFact() = default;
+
+    FairParSet* createContainer(FairContainer*) override;
+
   private:
     void setAllContainers();
 
   public:
-    R3BMwpc2ContFact();
-    ~R3BMwpc2ContFact() {}
-    FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BMwpc2ContFact, 0) // Factory for all MWPC2 parameter containers
+    ClassDefOverride(R3BMwpc2ContFact, 0); // NOLINT
 };
-
-#endif /* !R3BMwpc2ContFact_H */

@@ -17,12 +17,12 @@
 // -----  by modifying J.L. Rodriguez-Sanchez classes for Mwpc2    -----
 // ---------------------------------------------------------------------
 
-#ifndef R3BMwpc1Mapped2Cal_H
-#define R3BMwpc1Mapped2Cal_H 1
+#pragma once
 
-#include "FairTask.h"
 #include "R3BMwpcCalData.h"
-#include <TRandom.h>
+#include <FairTask.h>
+#include <TArrayF.h>
+#include <string>
 
 class TClonesArray;
 class R3BMwpc1CalPar;
@@ -34,7 +34,7 @@ class R3BMwpc1Mapped2Cal : public FairTask
     R3BMwpc1Mapped2Cal();
 
     /** Standard constructor **/
-    R3BMwpc1Mapped2Cal(const char* name, Int_t iVerbose = 1);
+    R3BMwpc1Mapped2Cal(const std::string& name, Int_t iVerbose = 1);
 
     /** Destructor **/
     virtual ~R3BMwpc1Mapped2Cal();
@@ -76,7 +76,5 @@ class R3BMwpc1Mapped2Cal : public FairTask
 
   public:
     // Class definition
-    ClassDef(R3BMwpc1Mapped2Cal, 0)
+    ClassDef(R3BMwpc1Mapped2Cal, 0);
 };
-
-#endif

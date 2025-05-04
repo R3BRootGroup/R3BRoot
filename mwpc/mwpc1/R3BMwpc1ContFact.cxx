@@ -11,13 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BMwpc1ContFact.h"
-#include "R3BMwpc1CalPar.h"
-#include "R3BTGeoPar.h"
+#include <FairRuntimeDb.h>
+#include <TClass.h>
+#include <string>
 
-#include "FairLogger.h"
-#include "FairRuntimeDb.h"
-#include "TClass.h"
+#include "R3BLogger.h"
+#include "R3BMwpc1CalPar.h"
+#include "R3BMwpc1ContFact.h"
+#include "R3BTGeoPar.h"
 
 static R3BMwpc1ContFact gR3BMwpc1ContFact;
 
@@ -50,14 +51,15 @@ FairParSet* R3BMwpc1ContFact::createContainer(FairContainer* c)
     // For an actual context, which is not an empty string and not the default context
     // of this container, the name is concatinated with the context.
 
-    const char* name = c->GetName();
-    LOG(info) << "R3BMwpc1ContFact: Create container name: " << name;
-    FairParSet* p = 0;
-    if (strcmp(name, "mwpc1CalPar") == 0)
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
+
+    FairParSet* p = nullptr;
+    if (name == "mwpc1CalPar")
     {
         p = new R3BMwpc1CalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "Mwpc1GeoPar") == 0)
+    else if (name == "Mwpc1GeoPar")
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
@@ -65,4 +67,4 @@ FairParSet* R3BMwpc1ContFact::createContainer(FairContainer* c)
     return p;
 }
 
-ClassImp(R3BMwpc1ContFact);
+ClassImp(R3BMwpc1ContFact)
