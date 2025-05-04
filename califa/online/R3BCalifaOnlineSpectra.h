@@ -72,7 +72,7 @@ class R3BCalifaOnlineSpectra : public FairTask
      */
     ~R3BCalifaOnlineSpectra() = default;
 
-    /** Virtual method SetParContainers **/
+    /** Method SetParContainers **/
     void SetParContainers() override;
 
     /**
@@ -83,7 +83,7 @@ class R3BCalifaOnlineSpectra : public FairTask
      */
     InitStatus Init() override;
 
-    /** Virtual method ReInit **/
+    /** Method ReInit **/
     InitStatus ReInit() override;
 
     /**
@@ -112,14 +112,14 @@ class R3BCalifaOnlineSpectra : public FairTask
     inline void SetRings(Int_t rings) { fNumRings = rings; }
 
     /**
-     * Method for setting max. energy per crystal in MeV for Barrel histograms at CAL level
+     * Method for setting max. energy of histograms in GR (keV)
      */
-    inline void SetMaxEnergyperCrystalBarrel(Int_t maxenergy) { fMaxEnergyBarrel = maxenergy; }
+    inline void SetMaxEnergyGR(Int_t maxenergy) { fMaxEnergyGR = maxenergy; }
 
     /**
-     * Method for setting max. energy per crystal in MeV for Iphos histograms at CAL level
+     * Method for setting max. energy of histograms in PR (MeV)
      */
-    inline void SetMaxEnergyperCrystalIphos(Int_t maxenergy) { fMaxEnergyIphos = maxenergy; }
+    inline void SetMaxEnergyPR(Int_t maxenergy) { fMaxEnergyPR = maxenergy; }
 
     /**
      * Method for setting the configuration parameters file
@@ -189,39 +189,39 @@ class R3BCalifaOnlineSpectra : public FairTask
     int fTpat1 = -1;
     int fTpat2 = -1;
 
-    R3BCalifaMappingPar* fMap_Par = nullptr;    /**< Container with mapping parameters. >*/
-    TClonesArray* fMappedItemsCalifa = nullptr; /**< Array with mapped items.    */
+    R3BCalifaMappingPar* fMap_Par = nullptr;    // Container with mapping parameters
+    TClonesArray* fMappedItemsCalifa = nullptr; // Array with mapped items
     TClonesArray* fTrigMappedItemsCalifa = nullptr;
-    TClonesArray* fCalItemsCalifa = nullptr; /**< Array with cal items.       */
-    TClonesArray* fHitItemsCalifa = nullptr; /**< Array with hit items.       */
-    TClonesArray* fWRItemsCalifa = nullptr;  /**< Array with WR-Califa items. */
-    TClonesArray* fWRItemsMaster = nullptr;  /**< Array with WR-Master items. */
+    TClonesArray* fCalItemsCalifa = nullptr; // Array with cal items
+    TClonesArray* fHitItemsCalifa = nullptr; // Array with hit items
+    TClonesArray* fWRItemsCalifa = nullptr;  // Array with WR-Califa items
+    TClonesArray* fWRItemsMaster = nullptr;  // Array with WR-Master items
 
     // Check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header = nullptr; /**< Event header.  */
-    int fNEvents = 0;                 /**< Event counter. */
+    R3BEventHeader* header = nullptr; // Event header
+    unsigned long long fNEvents = 0;  // Event counter
     int fTrigger = -1;
 
-    int fNbCalifaCrystals = MaxNbCrystals;        /**< Number of Crystals in Califa. */
-    int fNumSides = Nb_Sides;                     /**< Number of Sides, left and right.   */
-    int fNumRings = Nb_Rings;                     /**< Number of Rings.   */
-    int fNumPreamps = Nb_Preamps;                 /**< Number of Preamps per ring.   */
-    int fNumCrystalPreamp = Nb_PreampCh;          /**< Number of Crystals/Channels per Preamp. */
-    int fBinsChannelFebex = BinsChannelFebex;     /**< Number of Bins per Febex channel. */
-    int fMaxBinChannelFebex = MaxBinChannelFebex; /**< Maximum bin for Febex histograms. */
+    int fNbCalifaCrystals = MaxNbCrystals;        // Number of Crystals in Califa
+    int fNumSides = Nb_Sides;                     // Number of Sides, left and right
+    int fNumRings = Nb_Rings;                     // Number of Rings
+    int fNumPreamps = Nb_Preamps;                 // Number of Preamps per ring
+    int fNumCrystalPreamp = Nb_PreampCh;          // Number of Crystals/Channels per Preamp
+    int fBinsChannelFebex = BinsChannelFebex;     // Number of Bins per Febex channel
+    int fMaxBinChannelFebex = MaxBinChannelFebex; // Maximum bin for Febex histograms
 
     // Selector for febex or preamp sequence
     const std::array<int, Nb_PreampCh> fOrderFebexPreamp{ 6, 5, 4, 3, 2, 1, 0, 7, 8, 15, 14, 13, 12, 11, 10, 9 };
 
-    float fMinProtonE = 50000.; /**< Min proton energy (in keV) to calculate the opening angle */
+    float fMinProtonE = 50000.; // Min proton energy (in keV) to calculate the opening angle
 
-    TString fCalifaFile;       /**< Config file name. */
-    int fMaxEnergyBarrel = 10; /**< Max. energy for Barrel histograms at CAL level. */
-    int fMaxEnergyIphos = 30;  /**< Max. energy for Iphos histograms at CAL level. */
-    bool fLogScale = true;     /**< Selecting scale. */
-    bool fRaw2Cal = false;     /**< Mapped or Cal selector. */
-    bool fFebex2Preamp = true; /**< Febex or Preamp selector. */
-    bool fTotHist = false;     /**< Tot histograms selector. */
+    TString fCalifaFile;       // Config file name
+    int fMaxEnergyGR = 32000;  // Max. energy for the gamma range in keV
+    int fMaxEnergyPR = 340;    // Max. energy for the proton range in MeV
+    bool fLogScale = true;     // Selecting scale
+    bool fRaw2Cal = false;     // Mapped or Cal selector
+    bool fFebex2Preamp = true; // Febex or Preamp selector
+    bool fTotHist = false;     // Tot histograms selector
     multi_array<int, 4> fFebexInfo;
 
     // Canvas
@@ -244,7 +244,6 @@ class R3BCalifaOnlineSpectra : public FairTask
     TCanvas* cCalifa_hitenergy;
     TCanvas* cCalifa_opening;
     TCanvas* cCalifa_NsNf;
-    TCanvas* cCalifaTriggers;
     TCanvas* cCalifa_opening_tpat;
 
     // WR data
@@ -260,8 +259,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH1F* fh1_Califa_Mult;
     TH1F* fh1_Califa_MultHit;
     TH2F* fh2_Califa_cryId_energy;
-    TH2F* fh2_Preamp_vs_ch_R[Nb_Rings];
-    TH2F* fh2_Preamp_vs_ch_L[Nb_Rings];
+    std::vector<TH2F*> fh2_Preamp_vs_ch_R;
+    std::vector<TH2F*> fh2_Preamp_vs_ch_L;
     TH1F* fh1_crystals[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH2F* fh2_crystalsETot[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
     TH1F* fh1_crystals_p[Nb_Sides][Nb_Rings][Nb_Preamps][Nb_PreampCh];
@@ -275,17 +274,18 @@ class R3BCalifaOnlineSpectra : public FairTask
     TH2F* fh2_Califa_coinTheta_cutOPA;
     TH2F* fh2_Califa_coinPhi;
     TH2F* fh2_Califa_theta_phi;
-    TH2F* fh2_Califa_theta_energy;
-    TH1F* fh1_Califa_total_energy;
+    TH2F* fh2_Califa_theta_energy_pr;
+    TH2F* fh2_Califa_theta_energy_gr;
+    TH1F* fh1_Califa_total_energy_pr;
+    TH1F* fh1_Califa_total_energy_gr;
     TH1F* fh1_openangle;
     TH2F* fh2_openangle_tpat;
     TH2F* fh2_Cal_wr_energy_l;
     TH2F* fh2_Cal_wr_energy_r;
     std::vector<TH2F*> fh2_Califa_NsNf;
-    TH2F* fh2_Califa_EtrigCor[4];
-    TH1F* fh1_Califa_Etrig[2];
-    TH1F* fh1_CalifaTriggers;
+    std::vector<TH2F*> fh2_Califa_EtrigCor;
+    std::vector<TH1F*> fh1_Califa_Etrig;
 
   public:
-    ClassDefOverride(R3BCalifaOnlineSpectra, 1)
+    ClassDefOverride(R3BCalifaOnlineSpectra, 1); // NOLINT
 };

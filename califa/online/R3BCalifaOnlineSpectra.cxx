@@ -20,9 +20,7 @@
 #include "R3BLogger.h"
 #include "R3BWRData.h"
 
-#include <FairLogger.h>
 #include <FairRootManager.h>
-#include <FairRunAna.h>
 #include <FairRunOnline.h>
 #include <FairRuntimeDb.h>
 
@@ -194,7 +192,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     double minE = 0.;
 
     // CANVAS Crystal_ID vs energy
-    cCalifa_cry_energy = new TCanvas("Califa_Map_cryID_energy", "Califa_Map energy vs cryID", 10, 10, 500, 500);
+    cCalifa_cry_energy = new TCanvas("Califa_Map_energy_vs_cryID", "Califa_Map energy vs cryID", 10, 10, 500, 500);
     fh2_Califa_cryId_energy = R3B::root_owned<TH2F>("fh2_Califa_Map_cryID_energy",
                                                     "Califa: CryID vs energy",
                                                     fMap_Par->GetNumCrystals(),
@@ -208,11 +206,12 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_cryId_energy->GetYaxis()->SetTitleOffset(1.4);
     fh2_Califa_cryId_energy->GetXaxis()->CenterTitle(true);
     fh2_Califa_cryId_energy->GetYaxis()->CenterTitle(true);
+    fh2_Califa_cryId_energy->SetStats(0);
     gPad->SetLogz();
     fh2_Califa_cryId_energy->Draw("COLZ");
 
     // CANVAS Crystal_ID vs energy
-    cCalifa_cry_energy_cal = new TCanvas("Califa_Cal_cryID_energy", "Califa_Cal energy vs cryID", 10, 10, 500, 500);
+    cCalifa_cry_energy_cal = new TCanvas("Califa_Cal_energy_vs_cryID", "Califa_Cal energy vs cryID", 10, 10, 500, 500);
     fh2_Califa_cryId_energy_cal = R3B::root_owned<TH2F>("fh2_Califa_Cal_cryID_energy",
                                                         "Califa: CryID vs calibrated energy",
                                                         fMap_Par->GetNumCrystals(),
@@ -226,20 +225,22 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_cryId_energy_cal->GetYaxis()->SetTitleOffset(1.4);
     fh2_Califa_cryId_energy_cal->GetXaxis()->CenterTitle(true);
     fh2_Califa_cryId_energy_cal->GetYaxis()->CenterTitle(true);
+    fh2_Califa_cryId_energy_cal->SetStats(0);
     gPad->SetLogz();
     fh2_Califa_cryId_energy_cal->Draw("COLZ");
 
     cCalifa_NsNf = new TCanvas("Califa_Cal_NsNf", "Califa_Cal Ns vs Nf", 10, 10, 500, 500);
     cCalifa_NsNf->Divide(1, 3);
-    fh2_Califa_NsNf.resize(3);
 
     std::vector<std::string> region = { "Barrel", "iPhos", "CEPA" };
-    for (Int_t i = 0; i < fh2_Califa_NsNf.size(); i++)
+    for (Int_t i = 0; i < region.size(); i++)
     {
         std::stringstream ss1;
         ss1 << "PID_" << region[i];
-        fh2_Califa_NsNf[i] =
-            R3B::root_owned<TH2F>(ss1.str().c_str(), "Califa PID: Ns and Nf energies", 500, 0., 500., 600, 0., 1.);
+        std::stringstream ss2;
+        ss2 << "Califa " << region[i] << " PID: Ns and Nf energies";
+        fh2_Califa_NsNf.push_back(
+            R3B::root_owned<TH2F>(ss1.str().c_str(), ss2.str().c_str(), 500, 0., 500., 600, 0., 1.));
         fh2_Califa_NsNf[i]->GetXaxis()->SetTitle("Ns+Nf Energies [MeV]");
         fh2_Califa_NsNf[i]->GetYaxis()->SetTitle("Nf/(Nf+Ns)");
         fh2_Califa_NsNf[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -262,14 +263,14 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         std::stringstream ss3;
         ss3 << "Ring " << i + 1 << " left: Preamp number vs channel number";
 
-        fh2_Preamp_vs_ch_L[i] = R3B::root_owned<TH2F>(ss2.str().c_str(),
-                                                      ss3.str().c_str(),
-                                                      fNumPreamps,
-                                                      0.5,
-                                                      fNumPreamps + 0.5,
-                                                      fNumCrystalPreamp,
-                                                      0.5,
-                                                      fNumCrystalPreamp + 0.5);
+        fh2_Preamp_vs_ch_L.push_back(R3B::root_owned<TH2F>(ss2.str().c_str(),
+                                                           ss3.str().c_str(),
+                                                           fNumPreamps,
+                                                           0.5,
+                                                           fNumPreamps + 0.5,
+                                                           fNumCrystalPreamp,
+                                                           0.5,
+                                                           fNumCrystalPreamp + 0.5));
         fh2_Preamp_vs_ch_L[i]->GetXaxis()->SetTitle("Preamp number [1-16]");
         std::stringstream ss4;
         ss4 << "Channel number [1-" << fNumCrystalPreamp << "]";
@@ -277,6 +278,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         fh2_Preamp_vs_ch_L[i]->GetYaxis()->SetTitleOffset(1.2);
         fh2_Preamp_vs_ch_L[i]->GetXaxis()->CenterTitle(true);
         fh2_Preamp_vs_ch_L[i]->GetYaxis()->CenterTitle(true);
+        fh2_Preamp_vs_ch_L[i]->SetStats(0);
         fh2_Preamp_vs_ch_L[i]->Draw("colz");
 
         // Right side
@@ -288,27 +290,28 @@ InitStatus R3BCalifaOnlineSpectra::Init()
         std::stringstream ss7;
         ss7 << "Ring " << i + 1 << " right: Preamp number vs channel number";
 
-        fh2_Preamp_vs_ch_R[i] = R3B::root_owned<TH2F>(ss6.str().c_str(),
-                                                      ss7.str().c_str(),
-                                                      fNumPreamps,
-                                                      0.5,
-                                                      fNumPreamps + 0.5,
-                                                      fNumCrystalPreamp,
-                                                      0.5,
-                                                      fNumCrystalPreamp + 0.5);
+        fh2_Preamp_vs_ch_R.push_back(R3B::root_owned<TH2F>(ss6.str().c_str(),
+                                                           ss7.str().c_str(),
+                                                           fNumPreamps,
+                                                           0.5,
+                                                           fNumPreamps + 0.5,
+                                                           fNumCrystalPreamp,
+                                                           0.5,
+                                                           fNumCrystalPreamp + 0.5));
         fh2_Preamp_vs_ch_R[i]->GetXaxis()->SetTitle("Preamp number [1-16]");
         fh2_Preamp_vs_ch_R[i]->GetYaxis()->SetTitle(ss4.str().c_str());
         fh2_Preamp_vs_ch_R[i]->GetYaxis()->SetTitleOffset(1.2);
         fh2_Preamp_vs_ch_R[i]->GetXaxis()->CenterTitle(true);
         fh2_Preamp_vs_ch_R[i]->GetYaxis()->CenterTitle(true);
+        fh2_Preamp_vs_ch_R[i]->SetStats(0);
         fh2_Preamp_vs_ch_R[i]->Draw("colz");
     }
 
     auto cMap_ECor = new TCanvas("Trigger_ECor", "Trigger_ECor", 10, 10, 800, 700);
     cMap_ECor->Divide(2, 2);
 
-    fh2_Califa_EtrigCor[0] = R3B::root_owned<TH2F>(
-        "fh2Trigger_ECor", "Correlation of trigger energies (all triggers)", 2000, 0., 4000., 2000, 0., 4000.);
+    fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
+        "fh2Trigger_ECor", "Correlation of trigger energies (all triggers)", 2000, 0., 4000., 2000, 0., 4000.));
     fh2_Califa_EtrigCor[0]->GetXaxis()->SetTitle("Energy messel side");
     fh2_Califa_EtrigCor[0]->GetYaxis()->SetTitle("Energy wixhausen side");
     fh2_Califa_EtrigCor[0]->GetYaxis()->SetTitleOffset(1.2);
@@ -317,8 +320,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cMap_ECor->cd(1);
     fh2_Califa_EtrigCor[0]->Draw("colz");
 
-    fh1_Califa_Etrig[0] =
-        R3B::root_owned<TH1F>("fh1Trigger_Emessel", "Messel trigger energies (all triggers)", 2000, 0., 4000.);
+    fh1_Califa_Etrig.push_back(
+        R3B::root_owned<TH1F>("fh1Trigger_Emessel", "Messel trigger energies (all triggers)", 2000, 0., 4000.));
     fh1_Califa_Etrig[0]->GetXaxis()->SetTitle("Energy messel side");
     fh1_Califa_Etrig[0]->GetYaxis()->SetTitle("Counts");
     fh1_Califa_Etrig[0]->GetYaxis()->SetTitleOffset(1.2);
@@ -328,8 +331,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cMap_ECor->cd(2);
     fh1_Califa_Etrig[0]->Draw();
 
-    fh1_Califa_Etrig[1] =
-        R3B::root_owned<TH1F>("fh1Trigger_Ewixhausen", "Wixhausen trigger energies (all triggers)", 2000, 0., 4000.);
+    fh1_Califa_Etrig.push_back(
+        R3B::root_owned<TH1F>("fh1Trigger_Ewixhausen", "Wixhausen trigger energies (all triggers)", 2000, 0., 4000.));
     fh1_Califa_Etrig[1]->GetXaxis()->SetTitle("Energy wixhausen side");
     fh1_Califa_Etrig[1]->GetYaxis()->SetTitle("Counts");
     fh1_Califa_Etrig[1]->GetYaxis()->SetTitleOffset(1.2);
@@ -339,8 +342,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cMap_ECor->cd(3);
     fh1_Califa_Etrig[1]->Draw();
 
-    fh2_Califa_EtrigCor[1] = R3B::root_owned<TH2F>(
-        "fh2Trigger_ECor_trg1", "Correlation of trigger energies (trigger 1)", 2000, 0., 4000., 2000, 0., 4000.);
+    fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
+        "fh2Trigger_ECor_trg1", "Correlation of trigger energies (trigger 1)", 2000, 0., 4000., 2000, 0., 4000.));
     fh2_Califa_EtrigCor[1]->GetXaxis()->SetTitle("Energy messel side");
     fh2_Califa_EtrigCor[1]->GetYaxis()->SetTitle("Energy wixhausen side");
     fh2_Califa_EtrigCor[1]->GetYaxis()->SetTitleOffset(1.2);
@@ -352,7 +355,6 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     std::vector<std::string> side = { "Right", "Left" };
     for (int s = 0; s < fNumSides; s++) // Side
     {
-
         for (Int_t r = 0; r < fNumRings; r++)       // Ring
             for (Int_t p = 0; p < fNumPreamps; p++) // Preamp
             {
@@ -403,8 +405,6 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                         ss1 << "fh1_Map_Side_" << side[s] << "_Ring_" << r + 1 << "_Preamp_" << p + 1 << "_Ch_" << j + 1
                             << "_energy";
 
-                        // sprintf(Name1, "fh1_Map_Side_%s_Ring_%d_Preamp_%d_Ch_%d_energy", Side, r + 1, p + 1, j + 1);
-                        // sprintf(Name2, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
                         std::stringstream ss2;
                         ss2 << "Map level, Side " << side[s] << ", Ring " << r + 1 << ", Preamp " << p + 1 << ", ch. "
                             << j + 1;
@@ -534,23 +534,19 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                 }
                 for (Int_t j = 0; j < fNumCrystalPreamp; j++)
                 { // Channel
-                    Xaxis = "Energy [keV]";
-
                     if (fFebexInfo[s][r][p][0] != -1)
                     {
+                        // histograms for gamma range
+                        Xaxis = "Energy [keV]";
                         std::stringstream ss1;
                         ss1 << "fh1_Cal_Side_" << side[s] << "_Ring_" << r + 1 << "_Preamp_" << p + 1 << "_Ch_" << j + 1
                             << "_energy";
-
                         std::stringstream ss2;
                         ss2 << "Cal level, Side " << side[s] << ", Ring " << r + 1 << ", Preamp " << p + 1 << ", ch. "
                             << j + 1;
 
-                        fh1_crystals_cal[s][r][p][j] = R3B::root_owned<TH1F>(ss1.str().c_str(),
-                                                                             ss2.str().c_str(),
-                                                                             arry_bins[s][r][p][j],
-                                                                             arry_minE[s][r][p][j],
-                                                                             arry_maxE[s][r][p][j]);
+                        fh1_crystals_cal[s][r][p][j] = R3B::root_owned<TH1F>(
+                            ss1.str().c_str(), ss2.str().c_str(), fMaxEnergyGR / 10., 0, fMaxEnergyGR);
                         fh1_crystals_cal[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh1_crystals_cal[s][r][p][j]->GetXaxis()->SetTitle(Xaxis.c_str());
                         fh1_crystals_cal[s][r][p][j]->GetXaxis()->SetLabelSize(0.06);
@@ -567,19 +563,16 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                     if (fFebexInfo[s][r][p][2] != -1)
                     {
                         // histograms for proton range
+                        Xaxis = "Energy [MeV]";
                         std::stringstream ss1;
                         ss1 << "fh1_Cal_Side_" << side[s] << "_Ring_" << r + 1 << "_Preamp_" << p + 1 << "_Ch_" << j + 1
                             << "_energy_pr";
-
                         std::stringstream ss2;
                         ss2 << "Cal level (PR), Side" << side[s] << ", Ring " << r + 1 << ", Preamp " << p + 1
                             << ", ch. " << j + 1;
 
-                        fh1_crystals_p_cal[s][r][p][j] = R3B::root_owned<TH1F>(ss1.str().c_str(),
-                                                                               ss2.str().c_str(),
-                                                                               arry_bins[s][r][p][j],
-                                                                               arry_minE[s][r][p][j],
-                                                                               arry_maxE[s][r][p][j]);
+                        fh1_crystals_p_cal[s][r][p][j] =
+                            R3B::root_owned<TH1F>(ss1.str().c_str(), ss2.str().c_str(), fMaxEnergyPR, 0., fMaxEnergyPR);
                         fh1_crystals_p_cal[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh1_crystals_p_cal[s][r][p][j]->GetXaxis()->SetTitle(Xaxis.c_str());
                         fh1_crystals_p_cal[s][r][p][j]->GetXaxis()->SetLabelSize(0.06);
@@ -692,36 +685,75 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_theta_phi->GetYaxis()->SetTitleOffset(1.2);
     fh2_Califa_theta_phi->GetXaxis()->CenterTitle(true);
     fh2_Califa_theta_phi->GetYaxis()->CenterTitle(true);
+    fh2_Califa_theta_phi->SetStats(0);
     fh2_Califa_theta_phi->Draw("COLZ");
+    gPad->SetLogz();
 
     // CANVAS Theta vs energy
-    Name1 = "Califa_calorimeter_theta_vs_energy";
-    Name2 = "fh_Califa_theta_vs_total_energy";
-    Name3 = "Califa theta vs energy for full calorimeter";
+    Name1 = "Calorimeter_energy_vs_theta";
+    Name2 = "fh2_Califa_total_energy_vs_theta_pr";
+    Name3 = "Califa energy vs theta for full calorimeter in PR";
     cCalifa_theta_energy = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
-    fh2_Califa_theta_energy = R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 90, bins, minE, maxE);
-    fh2_Califa_theta_energy->GetXaxis()->SetTitle("Theta [deg]");
-    fh2_Califa_theta_energy->GetYaxis()->SetTitle("Energy [keV]");
-    fh2_Califa_theta_energy->GetYaxis()->SetTitleOffset(1.4);
-    fh2_Califa_theta_energy->GetXaxis()->CenterTitle(true);
-    fh2_Califa_theta_energy->GetYaxis()->CenterTitle(true);
-    fh2_Califa_theta_energy->Draw("COLZ");
+    cCalifa_theta_energy->Divide(1, 2);
+    cCalifa_theta_energy->cd(1);
+    fh2_Califa_theta_energy_pr =
+        R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 92, fMaxEnergyPR, 0, fMaxEnergyPR);
+    fh2_Califa_theta_energy_pr->GetXaxis()->SetTitle("Theta [deg]");
+    fh2_Califa_theta_energy_pr->GetYaxis()->SetTitle("Energy [MeV]");
+    fh2_Califa_theta_energy_pr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_Califa_theta_energy_pr->GetXaxis()->CenterTitle(true);
+    fh2_Califa_theta_energy_pr->GetYaxis()->CenterTitle(true);
+    fh2_Califa_theta_energy_pr->SetStats(0);
+    fh2_Califa_theta_energy_pr->Draw("COLZ");
+    gPad->SetLogz();
+
+    Name2 = "fh2_Califa_total_energy_vs_theta_gr";
+    Name3 = "Califa energy vs theta for full calorimeter in GR";
+    cCalifa_theta_energy->cd(2);
+    fh2_Califa_theta_energy_gr =
+        R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 92, fMaxEnergyGR / 10., 0, fMaxEnergyGR);
+    fh2_Califa_theta_energy_gr->GetXaxis()->SetTitle("Theta [deg]");
+    fh2_Califa_theta_energy_gr->GetYaxis()->SetTitle("Energy [keV]");
+    fh2_Califa_theta_energy_gr->GetYaxis()->SetTitleOffset(1.4);
+    fh2_Califa_theta_energy_gr->GetXaxis()->CenterTitle(true);
+    fh2_Califa_theta_energy_gr->GetYaxis()->CenterTitle(true);
+    fh2_Califa_theta_energy_gr->SetStats(0);
+    fh2_Califa_theta_energy_gr->Draw("COLZ");
+    gPad->SetLogz();
 
     // CANVAS Total energy
-    Name1 = "Califa_calorimeter_total_energy_per_hit";
-    Name2 = "fh_Califa_total_energy";
-    Name3 = "Califa total energy per hit for the full calorimeter";
+    Name1 = "Calorimeter_total_energy_per_hit";
+    Name2 = "fh1_Califa_total_energy_pr";
+    Name3 = "Califa total energy per hit for the full calorimeter in PR";
     cCalifa_hitenergy = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
-    fh1_Califa_total_energy = R3B::root_owned<TH1F>(Name2.c_str(), Name3.c_str(), bins, minE, maxE);
-    fh1_Califa_total_energy->GetXaxis()->SetTitle("Energy [keV]");
-    fh1_Califa_total_energy->GetYaxis()->SetTitle("Counts");
-    fh1_Califa_total_energy->GetYaxis()->SetTitleOffset(1.4);
-    fh1_Califa_total_energy->GetXaxis()->CenterTitle(true);
-    fh1_Califa_total_energy->GetYaxis()->CenterTitle(true);
-    fh1_Califa_total_energy->SetFillColor(29);
-    fh1_Califa_total_energy->SetLineColor(1);
-    fh1_Califa_total_energy->SetLineWidth(2);
-    fh1_Califa_total_energy->Draw("");
+    cCalifa_hitenergy->Divide(1, 2);
+    cCalifa_hitenergy->cd(1);
+    fh1_Califa_total_energy_pr = R3B::root_owned<TH1F>(Name2.c_str(), Name3.c_str(), fMaxEnergyPR, 0, fMaxEnergyPR);
+    fh1_Califa_total_energy_pr->GetXaxis()->SetTitle("Energy [MeV]");
+    fh1_Califa_total_energy_pr->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_total_energy_pr->GetYaxis()->SetTitleOffset(1.4);
+    fh1_Califa_total_energy_pr->GetXaxis()->CenterTitle(true);
+    fh1_Califa_total_energy_pr->GetYaxis()->CenterTitle(true);
+    fh1_Califa_total_energy_pr->SetFillColor(29);
+    fh1_Califa_total_energy_pr->SetLineColor(1);
+    fh1_Califa_total_energy_pr->SetLineWidth(2);
+    fh1_Califa_total_energy_pr->Draw("");
+    gPad->SetLogy();
+
+    cCalifa_hitenergy->cd(2);
+    Name2 = "fh1_Califa_total_energy_gr";
+    Name3 = "Califa total energy per hit for the full calorimeter in GR";
+    fh1_Califa_total_energy_gr =
+        R3B::root_owned<TH1F>(Name2.c_str(), Name3.c_str(), fMaxEnergyGR / 10., 0, fMaxEnergyGR);
+    fh1_Califa_total_energy_gr->GetXaxis()->SetTitle("Energy [keV]");
+    fh1_Califa_total_energy_gr->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_total_energy_gr->GetYaxis()->SetTitleOffset(1.4);
+    fh1_Califa_total_energy_gr->GetXaxis()->CenterTitle(true);
+    fh1_Califa_total_energy_gr->GetYaxis()->CenterTitle(true);
+    fh1_Califa_total_energy_gr->SetFillColor(29);
+    fh1_Califa_total_energy_gr->SetLineColor(1);
+    fh1_Califa_total_energy_gr->SetLineWidth(2);
+    fh1_Califa_total_energy_gr->Draw("");
     gPad->SetLogy();
 
     // CANVAS opening angle
@@ -816,93 +848,84 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifa_wr_energy->cd(2);
     fh2_Cal_wr_energy_r->Draw("COLZ");
 
-    cCalifaTriggers = new TCanvas("Califa_triggers", "Califa_triggers", 10, 10, 500, 500);
-    fh1_CalifaTriggers = R3B::root_owned<TH1F>("califa_triggers", "califa_triggers", 3, -0.5, 2.5);
-    fh1_CalifaTriggers->GetXaxis()->SetTitle("Triggers");
-    fh1_CalifaTriggers->GetXaxis()->CenterTitle(true);
-    fh1_CalifaTriggers->SetFillColor(29);
-    fh1_CalifaTriggers->SetLineColor(1);
-    fh1_CalifaTriggers->SetLineWidth(2);
-    fh1_CalifaTriggers->Draw();
-
     // FOLDERS for Califa
-    TFolder* folder_sta = new TFolder("Statistics_per_ring", "Statistics info");
+    auto folder_sta = new TFolder("Statistics_per_ring", "Statistics info");
     for (Int_t i = 1; i < fNumRings; i++)
     { // FIXME in the future
         folder_sta->Add(cMap_RingR[i]);
         folder_sta->Add(cMap_RingL[i]);
     }
 
-    TFolder* folder_el = new TFolder("Energy_Map_per_crystal_Left", "Energy per crystal, left side info");
+    auto folder_el = new TFolder("Energy_Map_per_crystal_Left", "Energy per crystal, left side info");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][0] != -1)
                 folder_el->Add(cMapCry[1][r][p]);
 
-    TFolder* folder_etotl = new TFolder("Energy_Tot_per_crystal_Left", "Energy vs Tot per crystal, left side info");
+    auto folder_etotl = new TFolder("Energy_Tot_per_crystal_Left", "Energy vs Tot per crystal, left side info");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][0] != -1)
                 folder_etotl->Add(cMapCryTot[1][r][p]);
 
-    TFolder* folder_eprl = new TFolder("Energy_Map_per_crystal_Left_PR", "Energy per crystal, left side info for PR");
+    auto folder_eprl = new TFolder("Energy_Map_per_crystal_Left_PR", "Energy per crystal, left side info for PR");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][2] != -1)
                 folder_eprl->Add(cMapCryP[1][r][p]);
 
-    TFolder* folder_eprtotl =
+    auto folder_eprtotl =
         new TFolder("Energy_Tot_per_crystal_Left_PR", "Energy vs Tot per crystal, left side info for PR");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][2] != -1)
                 folder_eprtotl->Add(cMapCryPTot[1][r][p]);
 
-    TFolder* folder_er = new TFolder("Energy_Map_per_crystal_Right", "Energy per crystal, right side info");
+    auto folder_er = new TFolder("Energy_Map_per_crystal_Right", "Energy per crystal, right side info");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][0] != -1)
                 folder_er->Add(cMapCry[0][r][p]);
 
-    TFolder* folder_etotr = new TFolder("Energy_Tot_per_crystal_Right", "Energy vs Tot per crystal, right side info");
+    auto folder_etotr = new TFolder("Energy_Tot_per_crystal_Right", "Energy vs Tot per crystal, right side info");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][0] != -1)
                 folder_etotr->Add(cMapCryTot[0][r][p]);
 
-    TFolder* folder_eprr = new TFolder("Energy_Map_per_crystal_Right_PR", "Energy per crystal, right side info for PR");
+    auto folder_eprr = new TFolder("Energy_Map_per_crystal_Right_PR", "Energy per crystal, right side info for PR");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][2] != -1)
                 folder_eprr->Add(cMapCryP[0][r][p]);
 
-    TFolder* folder_eprtotr =
+    auto folder_eprtotr =
         new TFolder("Energy_Tot_per_crystal_Right_PR", "Energy vs Tot per crystal, right side info for PR");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][2] != -1)
                 folder_eprtotr->Add(cMapCryPTot[0][r][p]);
 
-    TFolder* folder_ecall = new TFolder("Energy_Cal_per_crystal_Left", "Energy Cal per crystal, left side info");
+    auto folder_ecall = new TFolder("Energy_Cal_per_crystal_Left", "Energy Cal per crystal, left side info");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][0] != -1)
                 folder_ecall->Add(cMapCryCal[1][r][p]);
 
-    TFolder* folder_eprcall =
+    auto folder_eprcall =
         new TFolder("Energy_Cal_per_crystal_Left_PR", "Energy Cal per crystal, left side info for PR");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[1][r][p][2] != -1)
                 folder_eprcall->Add(cMapCryPCal[1][r][p]);
 
-    TFolder* folder_ecalr = new TFolder("Energy_Cal_per_crystal_Right", "Energy Cal per crystal, right side info");
+    auto folder_ecalr = new TFolder("Energy_Cal_per_crystal_Right", "Energy Cal per crystal, right side info");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
             if (fFebexInfo[0][r][p][0] != -1)
                 folder_ecalr->Add(cMapCryCal[0][r][p]);
 
-    TFolder* folder_eprcalr =
+    auto folder_eprcalr =
         new TFolder("Energy_Cal_per_crystal_Right_PR", "Energy Cal per crystal, right side info for PR");
     for (Int_t r = 0; r < fNumRings; r++)
         for (Int_t p = 0; p < fNumPreamps; p++)
@@ -910,11 +933,12 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                 folder_eprcalr->Add(cMapCryPCal[0][r][p]);
 
     // MAIN FOLDER-Califa
-    TFolder* mainfolCalifa = new TFolder("CALIFA", "CALIFA info");
+    auto mainfolCalifa = new TFolder("CALIFA", "CALIFA info");
     mainfolCalifa->Add(cCalifaMult);
     mainfolCalifa->Add(cCalifa_cry_energy);
 
-    TFolder* folder_wrs = new TFolder("WRs", "CALIFA white-rabbit info");
+    auto folder_wrs = new TFolder("WRs", "CALIFA white-rabbit info");
+    auto tpatfolder = new TFolder("Corr_with_tpat", "Correlations with tpat info");
 
     if (fWRItemsCalifa && fWRItemsMaster)
     {
@@ -924,7 +948,6 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     {
         folder_wrs->Add(cMap_ECor);
     }
-
     if (fWRItemsCalifa)
     {
         folder_wrs->Add(cCalifa_wr);
@@ -932,42 +955,50 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     if (fWRItemsCalifa)
         mainfolCalifa->Add(folder_wrs);
 
-    mainfolCalifa->Add(folder_sta);
-    mainfolCalifa->Add(folder_el);
-    mainfolCalifa->Add(folder_eprl);
-    mainfolCalifa->Add(folder_er);
-    mainfolCalifa->Add(folder_eprr);
+    auto mappedfolder = new TFolder("Mapped_data", "Mapped data");
+    mappedfolder->Add(folder_sta);
+    mappedfolder->Add(folder_el);
+    mappedfolder->Add(folder_eprl);
+    mappedfolder->Add(folder_er);
+    mappedfolder->Add(folder_eprr);
 
     if (fTotHist)
     {
-        mainfolCalifa->Add(folder_etotl);
-        mainfolCalifa->Add(folder_eprtotl);
-        mainfolCalifa->Add(folder_etotr);
-        mainfolCalifa->Add(folder_eprtotr);
+        mappedfolder->Add(folder_etotl);
+        mappedfolder->Add(folder_eprtotl);
+        mappedfolder->Add(folder_etotr);
+        mappedfolder->Add(folder_eprtotr);
     }
+    mainfolCalifa->Add(mappedfolder);
 
     if (fCalItemsCalifa)
     {
-        mainfolCalifa->Add(cCalifa_cry_energy_cal);
-        mainfolCalifa->Add(cCalifa_NsNf);
-        mainfolCalifa->Add(folder_ecall);
-        mainfolCalifa->Add(folder_eprcall);
-        mainfolCalifa->Add(folder_ecalr);
-        mainfolCalifa->Add(folder_eprcalr);
+        auto calfolder = new TFolder("Cal_data", "Calibrated data");
+        calfolder->Add(cCalifa_cry_energy_cal);
+        calfolder->Add(folder_ecall);
+        calfolder->Add(folder_eprcall);
+        calfolder->Add(folder_ecalr);
+        calfolder->Add(folder_eprcalr);
+        mainfolCalifa->Add(calfolder);
     }
     if (fHitItemsCalifa)
     {
-        mainfolCalifa->Add(cCalifaCoinE);
-        mainfolCalifa->Add(cCalifaCoinTheta);
-        mainfolCalifa->Add(cCalifaCoinPhi);
-        mainfolCalifa->Add(cCalifa_angles);
-        mainfolCalifa->Add(cCalifa_opening);
-        mainfolCalifa->Add(cCalifa_opening_tpat);
-        mainfolCalifa->Add(cCalifa_theta_energy);
-        mainfolCalifa->Add(cCalifa_hitenergy);
+        auto hitfolder = new TFolder("Hit_data", "Hit data");
+        hitfolder->Add(cCalifaCoinE);
+        hitfolder->Add(cCalifaCoinTheta);
+        hitfolder->Add(cCalifaCoinPhi);
+        hitfolder->Add(cCalifa_angles);
+        hitfolder->Add(cCalifa_opening);
+        hitfolder->Add(cCalifa_theta_energy);
+        hitfolder->Add(cCalifa_hitenergy);
+        tpatfolder->Add(cCalifa_opening_tpat);
         if (fWRItemsCalifa && fWRItemsMaster)
-            mainfolCalifa->Add(cCalifa_wr_energy);
-        mainfolCalifa->Add(cCalifaTriggers);
+            hitfolder->Add(cCalifa_wr_energy);
+        mainfolCalifa->Add(hitfolder);
+        mainfolCalifa->Add(tpatfolder);
+        auto pidfolder = new TFolder("PID", "PID data");
+        pidfolder->Add(cCalifa_NsNf);
+        mainfolCalifa->Add(pidfolder);
     }
     run->AddObject(mainfolCalifa);
 
@@ -993,7 +1024,6 @@ InitStatus R3BCalifaOnlineSpectra::ReInit()
 void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
 {
     R3BLOG(info, "");
-
     if (fWRItemsCalifa)
     {
         fh1_Califa_wr->Reset();
@@ -1012,22 +1042,27 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
 
     if (fTrigMappedItemsCalifa)
     {
-        fh2_Califa_EtrigCor[0]->Reset();
-        fh2_Califa_EtrigCor[1]->Reset();
-        fh1_Califa_Etrig[0]->Reset();
-        fh1_Califa_Etrig[1]->Reset();
+        for (const auto& hist : fh2_Califa_EtrigCor)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_Califa_Etrig)
+        {
+            hist->Reset();
+        }
     }
 
     if (fMappedItemsCalifa)
     {
         fh1_Califa_Mult->Reset();
-        // for (Int_t s = 0; s < 3; s++)
-        //   fh1_Califa_sync[s]->Reset();
         fh2_Califa_cryId_energy->Reset();
-        for (Int_t i = 0; i < fNumRings; i++)
+        for (const auto& hist : fh2_Preamp_vs_ch_R)
         {
-            fh2_Preamp_vs_ch_R[i]->Reset();
-            fh2_Preamp_vs_ch_L[i]->Reset();
+            hist->Reset();
+        }
+        for (const auto& hist : fh2_Preamp_vs_ch_L)
+        {
+            hist->Reset();
         }
         for (Int_t s = 0; s < fNumSides; s++)
             for (Int_t r = 0; r < fNumRings; r++)
@@ -1075,11 +1110,12 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
         fh2_Califa_coinTheta_cutOPA->Reset();
         fh2_Califa_coinPhi->Reset();
         fh2_Califa_theta_phi->Reset();
-        fh2_Califa_theta_energy->Reset();
-        fh1_Califa_total_energy->Reset();
+        fh2_Califa_theta_energy_pr->Reset();
+        fh2_Califa_theta_energy_gr->Reset();
+        fh1_Califa_total_energy_pr->Reset();
+        fh1_Califa_total_energy_gr->Reset();
         fh1_openangle->Reset();
         fh2_openangle_tpat->Reset();
-        fh1_CalifaTriggers->Reset();
     }
 }
 
@@ -1087,24 +1123,10 @@ void R3BCalifaOnlineSpectra::Log_CALIFA_Histo()
 {
     R3BLOG(info, "");
     cCalifa_cry_energy->cd();
-    if (fLogScale)
-    {
-        gPad->SetLogz(0);
-    }
-    else
-    {
-        gPad->SetLogz(1);
-    }
+    gPad->SetLogz(fLogScale ? 1 : 0);
 
     cCalifaMult->cd();
-    if (fLogScale)
-    {
-        gPad->SetLogy(0);
-    }
-    else
-    {
-        gPad->SetLogy(1);
-    }
+    gPad->SetLogy(fLogScale ? 1 : 0);
 
     for (Int_t s = 0; s < fNumSides; s++)
     {
@@ -1118,52 +1140,24 @@ void R3BCalifaOnlineSpectra::Log_CALIFA_Histo()
                     if (fFebexInfo[s][r][p][0] != -1)
                     {
                         cMapCry[s][r][p]->cd(j + 1);
-                        if (fLogScale)
-                        {
-                            gPad->SetLogy(0);
-                        }
-                        else
-                        {
-                            gPad->SetLogy(1);
-                        }
+                        gPad->SetLogy(fLogScale ? 1 : 0);
                     }
                     if (fFebexInfo[s][r][p][2] != -1)
                     { // histograms for proton range
                         cMapCryP[s][r][p]->cd(j + 1);
-                        if (fLogScale)
-                        {
-                            gPad->SetLogy(0);
-                        }
-                        else
-                        {
-                            gPad->SetLogy(1);
-                        }
+                        gPad->SetLogy(fLogScale ? 1 : 0);
                     }
                     if (fCalItemsCalifa)
                     {
                         if (fFebexInfo[s][r][p][0] != -1)
                         {
-                            cMapCryCal[s][r][p]->cd(p + 1);
-                            if (fLogScale)
-                            {
-                                gPad->SetLogy(0);
-                            }
-                            else
-                            {
-                                gPad->SetLogy(1);
-                            }
+                            cMapCryCal[s][r][p]->cd(j + 1);
+                            gPad->SetLogy(fLogScale ? 1 : 0);
                         }
                         if (fFebexInfo[s][r][p][2] != -1)
                         { // histograms for proton range
                             cMapCryPCal[s][r][p]->cd(j + 1);
-                            if (fLogScale)
-                            {
-                                gPad->SetLogy(0);
-                            }
-                            else
-                            {
-                                gPad->SetLogy(1);
-                            }
+                            gPad->SetLogy(fLogScale ? 1 : 0);
                         }
                     }
                 }
@@ -1174,50 +1168,38 @@ void R3BCalifaOnlineSpectra::Log_CALIFA_Histo()
     if (fCalItemsCalifa)
     {
         cCalifa_cry_energy_cal->cd();
-        if (fLogScale)
+        gPad->SetLogz(fLogScale ? 1 : 0);
+        for (int padN = 1; padN <= fh2_Califa_NsNf.size(); ++padN)
         {
-            gPad->SetLogz(0);
-        }
-        else
-        {
-            gPad->SetLogz(1);
+            cCalifa_NsNf->cd(padN);
+            gPad->SetLogz(fLogScale ? 1 : 0);
         }
     }
 
     if (fHitItemsCalifa)
     {
-        cCalifa_hitenergy->cd();
-        if (fLogScale)
+        for (int padN : { 1, 2 })
         {
-            gPad->SetLogy(0);
+            cCalifa_hitenergy->cd(padN);
+            gPad->SetLogy(fLogScale ? 1 : 0);
+            cCalifa_theta_energy->cd(padN);
+            gPad->SetLogz(fLogScale ? 1 : 0);
         }
-        else
-        {
-            gPad->SetLogy(1);
-        }
+        cCalifa_angles->cd();
+        gPad->SetLogz(fLogScale ? 1 : 0);
     }
-
-    if (fLogScale)
-        fLogScale = kFALSE;
-    else
-        fLogScale = kTRUE;
+    fLogScale = fLogScale ? kFALSE : kTRUE;
 }
 
 void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
 {
     R3BLOG(info, "");
 
-    char Name[255];
-    char Side[50];
-
     if (fFebex2Preamp)
     { // Preamp to Febex sequence
         for (Int_t s = 0; s < fNumSides; s++)
         {
-            if (s == 1)
-                sprintf(Side, "Left");
-            else
-                sprintf(Side, "Right");
+            const char* Side = (s == 1) ? "Left" : "Right";
             for (Int_t r = 0; r < fNumRings; r++)
             {
                 for (Int_t p = 0; p < fNumPreamps; p++)
@@ -1228,50 +1210,34 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                         {
                             cMapCry[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             fh1_crystals[s][r][p][j]->SetFillColor(kGreen);
-                            sprintf(Name,
-                                    "Map level, Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
-                                    Side,
-                                    r + 1,
-                                    fFebexInfo[s][r][p][0],
-                                    fFebexInfo[s][r][p][1],
-                                    fOrderFebexPreamp[j]);
-                            fh1_crystals[s][r][p][j]->SetTitle(Name);
+                            std::stringstream Name;
+                            Name << "Map level, Side " << Side << ", Ring " << (r + 1) << ", Slot "
+                                 << fFebexInfo[s][r][p][0] << ", Febex " << fFebexInfo[s][r][p][1] << ", ch. "
+                                 << fOrderFebexPreamp[j];
+                            fh1_crystals[s][r][p][j]->SetTitle(Name.str().c_str());
                             fh1_crystals[s][r][p][j]->Draw();
 
                             cMapCryTot[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
-                            sprintf(Name,
-                                    "Map level, Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
-                                    Side,
-                                    r + 1,
-                                    fFebexInfo[s][r][p][0],
-                                    fFebexInfo[s][r][p][1],
-                                    fOrderFebexPreamp[j]);
-                            fh2_crystalsETot[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot[s][r][p][j]->SetTitle(Name.str().c_str());
                             fh2_crystalsETot[s][r][p][j]->Draw();
                         }
                         if (fFebexInfo[s][r][p][2] != -1)
                         {
                             cMapCryP[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                             fh1_crystals_p[s][r][p][j]->SetFillColor(kGreen);
-                            sprintf(Name,
-                                    "Map level (PR), Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
-                                    Side,
-                                    r + 1,
-                                    fFebexInfo[s][r][p][2],
-                                    fFebexInfo[s][r][p][3],
-                                    fOrderFebexPreamp[j]);
-                            fh1_crystals_p[s][r][p][j]->SetTitle(Name);
+                            std::stringstream Name1;
+                            Name1 << "Map level (PR), Side " << Side << ", Ring " << (r + 1) << ", Slot "
+                                  << fFebexInfo[s][r][p][2] << ", Febex " << fFebexInfo[s][r][p][3] << ", ch. "
+                                  << fOrderFebexPreamp[j];
+                            fh1_crystals_p[s][r][p][j]->SetTitle(Name1.str().c_str());
                             fh1_crystals_p[s][r][p][j]->Draw();
 
                             cMapCryPTot[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
-                            sprintf(Name,
-                                    "Map level (PR), Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
-                                    Side,
-                                    r + 1,
-                                    fFebexInfo[s][r][p][2],
-                                    fFebexInfo[s][r][p][3],
-                                    fOrderFebexPreamp[j]);
-                            fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name);
+                            std::stringstream Name2;
+                            Name2 << "Cal level (PR), Side " << Side << ", Ring " << (r + 1) << ", Slot "
+                                  << fFebexInfo[s][r][p][2] << ", Febex " << fFebexInfo[s][r][p][3] << ", ch. "
+                                  << fOrderFebexPreamp[j];
+                            fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name2.str().c_str());
                             fh2_crystalsETot_p[s][r][p][j]->Draw();
                         }
 
@@ -1281,28 +1247,22 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             {
                                 cMapCryCal[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                                 fh1_crystals_cal[s][r][p][j]->SetFillColor(kGreen);
-                                sprintf(Name,
-                                        "Cal level, Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
-                                        Side,
-                                        r + 1,
-                                        fFebexInfo[s][r][p][0],
-                                        fFebexInfo[s][r][p][1],
-                                        fOrderFebexPreamp[j]);
-                                fh1_crystals_cal[s][r][p][j]->SetTitle(Name);
+                                std::stringstream Name;
+                                Name << "Cal level (PR), Side " << Side << ", Ring " << (r + 1) << ", Slot "
+                                     << fFebexInfo[s][r][p][0] << ", Febex " << fFebexInfo[s][r][p][1] << ", ch. "
+                                     << fOrderFebexPreamp[j];
+                                fh1_crystals_cal[s][r][p][j]->SetTitle(Name.str().c_str());
                                 fh1_crystals_cal[s][r][p][j]->Draw();
                             }
                             if (fFebexInfo[s][r][p][2] != -1)
                             {
                                 cMapCryPCal[s][r][p]->cd(fOrderFebexPreamp[j] + 1);
                                 fh1_crystals_p_cal[s][r][p][j]->SetFillColor(kGreen);
-                                sprintf(Name,
-                                        "Cal level (PR), Side %s, Ring %d, Slot %d, Febex %d, ch. %d",
-                                        Side,
-                                        r + 1,
-                                        fFebexInfo[s][r][p][2],
-                                        fFebexInfo[s][r][p][3],
-                                        fOrderFebexPreamp[j]);
-                                fh1_crystals_p_cal[s][r][p][j]->SetTitle(Name);
+                                std::stringstream Name;
+                                Name << "Cal level (PR), Side " << Side << ", Ring " << (r + 1) << ", Slot "
+                                     << fFebexInfo[s][r][p][2] << ", Febex " << fFebexInfo[s][r][p][3] << ", ch. "
+                                     << fOrderFebexPreamp[j];
+                                fh1_crystals_p_cal[s][r][p][j]->SetTitle(Name.str().c_str());
                                 fh1_crystals_p_cal[s][r][p][j]->Draw();
                             }
                         }
@@ -1316,10 +1276,7 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
     { // Febex to Preamp sequence
         for (Int_t s = 0; s < fNumSides; s++)
         {
-            if (s == 1)
-                sprintf(Side, "Left");
-            else
-                sprintf(Side, "Right");
+            const char* Side = (s == 1) ? "Left" : "Right";
             for (Int_t r = 0; r < fNumRings; r++)
             {
                 for (Int_t p = 0; p < fNumPreamps; p++)
@@ -1330,28 +1287,28 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                         {
                             cMapCry[s][r][p]->cd(j + 1);
                             fh1_crystals[s][r][p][j]->SetFillColor(45);
-                            sprintf(Name, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
-                            fh1_crystals[s][r][p][j]->SetTitle(Name);
+                            std::stringstream Name;
+                            Name << "Map level, Side " << Side << ", Ring " << (r + 1) << ", Preamp " << (p + 1)
+                                 << ", ch. " << (j + 1);
+                            fh1_crystals[s][r][p][j]->SetTitle(Name.str().c_str());
                             fh1_crystals[s][r][p][j]->Draw();
 
                             cMapCryTot[s][r][p]->cd(j + 1);
-                            sprintf(Name, "Map level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
-                            fh2_crystalsETot[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot[s][r][p][j]->SetTitle(Name.str().c_str());
                             fh2_crystalsETot[s][r][p][j]->Draw();
                         }
                         if (fFebexInfo[s][r][p][2] != -1)
                         {
                             cMapCryP[s][r][p]->cd(j + 1);
                             fh1_crystals_p[s][r][p][j]->SetFillColor(45);
-                            sprintf(
-                                Name, "Map level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
-                            fh1_crystals_p[s][r][p][j]->SetTitle(Name);
+                            std::stringstream Name;
+                            Name << "Map level (PR), Side " << Side << ", Ring " << (r + 1) << ", Preamp " << (p + 1)
+                                 << ", ch. " << (j + 1);
+                            fh1_crystals_p[s][r][p][j]->SetTitle(Name.str().c_str());
                             fh1_crystals_p[s][r][p][j]->Draw();
 
                             cMapCryPTot[s][r][p]->cd(j + 1);
-                            sprintf(
-                                Name, "Map level (PR), Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
-                            fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name);
+                            fh2_crystalsETot_p[s][r][p][j]->SetTitle(Name.str().c_str());
                             fh2_crystalsETot_p[s][r][p][j]->Draw();
                         }
 
@@ -1361,9 +1318,10 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             {
                                 cMapCryCal[s][r][p]->cd(j + 1);
                                 fh1_crystals_cal[s][r][p][j]->SetFillColor(45);
-                                sprintf(
-                                    Name, "Cal level, Side %s, Ring %d, Preamp %d, ch. %d", Side, r + 1, p + 1, j + 1);
-                                fh1_crystals_cal[s][r][p][j]->SetTitle(Name);
+                                std::stringstream Name;
+                                Name << "Cal level, Side " << Side << ", Ring " << (r + 1) << ", Preamp " << (p + 1)
+                                     << ", ch. " << (j + 1);
+                                fh1_crystals_cal[s][r][p][j]->SetTitle(Name.str().c_str());
                                 fh1_crystals_cal[s][r][p][j]->Draw();
                             }
 
@@ -1371,13 +1329,10 @@ void R3BCalifaOnlineSpectra::Febex2Preamp_CALIFA_Histo()
                             {
                                 cMapCryPCal[s][r][p]->cd(j + 1);
                                 fh1_crystals_p_cal[s][r][p][j]->SetFillColor(45);
-                                sprintf(Name,
-                                        "Cal level (PR), Side %s, Ring %d, Preamp %d, ch. %d",
-                                        Side,
-                                        r + 1,
-                                        p + 1,
-                                        j + 1);
-                                fh1_crystals_p_cal[s][r][p][j]->SetTitle(Name);
+                                std::stringstream Name;
+                                Name << "Cal level (PR), Side " << Side << ", Ring " << (r + 1) << ", Preamp "
+                                     << (p + 1) << ", ch. " << (j + 1);
+                                fh1_crystals_p_cal[s][r][p][j]->SetTitle(Name.str().c_str());
                                 fh1_crystals_p_cal[s][r][p][j]->Draw();
                             }
                         }
@@ -1542,7 +1497,6 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Cal data
-    bool cond_califa_veto = false;
     if (fCalItemsCalifa && fCalItemsCalifa->GetEntriesFast() > 0)
     {
         Int_t nHits = fCalItemsCalifa->GetEntriesFast();
@@ -1556,9 +1510,6 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             Int_t cryId = hit->GetCrystalId();
 
             fh2_Califa_cryId_energy_cal->Fill(cryId, hit->GetEnergy());
-
-            if (cryId > 3344 && cryId < 3473 && hit->GetEnergy() > 10000.)
-                cond_califa_veto = true;
 
             auto nf_ns = (hit->GetNs() + hit->GetNf());
             if (nf_ns > 0. && hit->GetNs() > 0 && hit->GetNf() > 0)
@@ -1583,11 +1534,11 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             if (fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2)
                 fh1_crystals_cal[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
                                 [fMap_Par->GetPreamp(cryId) - 1][fMap_Par->GetChannel(cryId) - 1]
-                                    ->Fill(hit->GetEnergy());
+                                    ->Fill(hit->GetEnergy()); // keV
             else if (fMap_Par->GetInUse(cryId) == 1 && cryId > fNbCalifaCrystals / 2)
                 fh1_crystals_p_cal[fMap_Par->GetHalf(cryId) - 1][fMap_Par->GetRing(cryId) - 1]
                                   [fMap_Par->GetPreamp(cryId) - 1][fMap_Par->GetChannel(cryId) - 1]
-                                      ->Fill(hit->GetEnergy());
+                                      ->Fill(hit->GetEnergy() / 1000.); // MeV
         }
     }
 
@@ -1617,8 +1568,15 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             }
             fh2_Califa_theta_phi->Fill(theta, phi);
             if (hit->GetClusterType() == 0) // proton
-                fh2_Califa_theta_energy->Fill(theta, hit->GetEnergy());
-            fh1_Califa_total_energy->Fill(hit->GetEnergy());
+            {
+                fh2_Califa_theta_energy_pr->Fill(theta, hit->GetEnergy() / 1000.); // MeV
+                fh1_Califa_total_energy_pr->Fill(hit->GetEnergy() / 1000.);        // MeV
+            }
+            else if (hit->GetClusterType() == 1) // gamma
+            {
+                fh2_Califa_theta_energy_gr->Fill(theta, hit->GetEnergy());
+                fh1_Califa_total_energy_gr->Fill(hit->GetEnergy());
+            }
         }
 
         TVector3 master[2];
@@ -1645,23 +1603,6 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_Califa_coinE_p2p->Fill(maxEL / 1000., maxER / 1000.);
             for (const auto& itpat : tpatindex)
                 fh2_openangle_tpat->Fill(itpat, master[0].Angle(master[1]) * TMath::RadToDeg());
-        }
-
-        // 0->veto 1->foot 2->inclusive proton
-        // if (master[0].Theta() * TMath::RadToDeg() > 90 || master[1].Theta() * TMath::RadToDeg() > 90)
-        if (cond_califa_veto)
-        {
-            fh1_CalifaTriggers->Fill(0);
-        }
-        else
-        {
-            if ((abs(master[0].Phi() * TMath::RadToDeg()) < 45 && master[0].Theta() * TMath::RadToDeg() < 90 &&
-                 master[0].Theta() * TMath::RadToDeg() > 45) ||
-                (abs(master[1].Phi() * TMath::RadToDeg()) < 45 && master[1].Theta() * TMath::RadToDeg() < 90 &&
-                 master[1].Theta() * TMath::RadToDeg() > 45))
-                fh1_CalifaTriggers->Fill(1);
-            if (master[0].Theta() * TMath::RadToDeg() < 90 && master[1].Theta() * TMath::RadToDeg() < 90)
-                fh1_CalifaTriggers->Fill(2);
         }
 
         // Comparison of hits to get energy, theta and phi correlations between them
@@ -1696,7 +1637,6 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             }
         }
     }
-
     fNEvents += 1;
 }
 

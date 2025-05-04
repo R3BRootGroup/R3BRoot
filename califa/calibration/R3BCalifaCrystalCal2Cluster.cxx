@@ -421,7 +421,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
         }
         else
         {
-
             cluster.theta = mother_angles.Theta();
             cluster.phi = mother_angles.Phi();
         }
