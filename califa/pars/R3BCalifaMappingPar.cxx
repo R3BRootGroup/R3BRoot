@@ -260,15 +260,23 @@ void R3BCalifaMappingPar::printMapCrystalInfo(const UInt_t cryID)
         return;
     }
     auto index = cryID - 1;
-    LOG(info) << "crystal_id " << cryID << " , " << "half " << fHalf->GetAt(index) << " , " << "ring "
-              << fRing->GetAt(index) << " , " << "preamp " << fPreamp->GetAt(index) << " , " << "channel "
-              << fChannel->GetAt(index) << " , " << "crystal_type " << fCrystal_type->GetAt(index) << " , "
-              << "apd_number " << fApd_number->GetAt(index) << " , " << "voltage " << fVoltage->GetAt(index) << " , "
-              << "febex_pc " << fFebex_pc->GetAt(index) << " , " << "febex_slot " << fFebex_slot->GetAt(index) << " , "
-              << "febex_mod " << fFebex_mod->GetAt(index) << " , " << "febex_channel " << fFebex_channel->GetAt(index)
-              << " , " << "lab " << fLab->GetAt(index) << " " << "mrcc_module " << fMrcc_module->GetAt(index) << " , "
-              << "mrcc_bus " << fMrcc_bus->GetAt(index) << " , " << "mrcc_preamp " << fMrcc_preamp->GetAt(index)
-              << " , " << "in_use " << fIn_use->GetAt(index);
+    LOG(info) << "crystal_id " << cryID << " , "
+              << "half " << fHalf->GetAt(index) << " , "
+              << "ring " << fRing->GetAt(index) << " , "
+              << "preamp " << fPreamp->GetAt(index) << " , "
+              << "channel " << fChannel->GetAt(index) << " , "
+              << "crystal_type " << fCrystal_type->GetAt(index) << " , "
+              << "apd_number " << fApd_number->GetAt(index) << " , "
+              << "voltage " << fVoltage->GetAt(index) << " , "
+              << "febex_pc " << fFebex_pc->GetAt(index) << " , "
+              << "febex_slot " << fFebex_slot->GetAt(index) << " , "
+              << "febex_mod " << fFebex_mod->GetAt(index) << " , "
+              << "febex_channel " << fFebex_channel->GetAt(index) << " , "
+              << "lab " << fLab->GetAt(index) << " "
+              << "mrcc_module " << fMrcc_module->GetAt(index) << " , "
+              << "mrcc_bus " << fMrcc_bus->GetAt(index) << " , "
+              << "mrcc_preamp " << fMrcc_preamp->GetAt(index) << " , "
+              << "in_use " << fIn_use->GetAt(index);
 }
 
 // ----  Method printParams ----------------------------------------------------
@@ -276,10 +284,39 @@ void R3BCalifaMappingPar::printParams()
 {
     LOG(info) << "R3BCalifaMappingPar: Califa Mapping Parameters:";
 
-    LOG(info) << "crystal_id" << " " << "half" << " " << "ring" << " " << "preamp" << " " << "channel" << " "
-              << "crystal_type" << " " << "apd_number" << " " << "voltage" << " " << "febex_pc" << " " << "febex_slot"
-              << " " << "febex_mod" << " " << "febex_channel" << " " << "lab" << " " << "mrcc_module" << " "
-              << "mrcc_bus" << " " << "mrcc_preamp" << " " << "in_use";
+    LOG(info) << "crystal_id"
+              << " "
+              << "half"
+              << " "
+              << "ring"
+              << " "
+              << "preamp"
+              << " "
+              << "channel"
+              << " "
+              << "crystal_type"
+              << " "
+              << "apd_number"
+              << " "
+              << "voltage"
+              << " "
+              << "febex_pc"
+              << " "
+              << "febex_slot"
+              << " "
+              << "febex_mod"
+              << " "
+              << "febex_channel"
+              << " "
+              << "lab"
+              << " "
+              << "mrcc_module"
+              << " "
+              << "mrcc_bus"
+              << " "
+              << "mrcc_preamp"
+              << " "
+              << "in_use";
     for (Int_t i = 0; i < fNumCrystals; i++)
     {
         LOG(info) << i + 1 << " " << fHalf->GetAt(i) << " " << fRing->GetAt(i) << " " << fPreamp->GetAt(i) << " "

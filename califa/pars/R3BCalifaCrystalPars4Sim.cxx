@@ -103,7 +103,11 @@ void R3BCalifaCrystalPars4Sim::printParams()
 {
     LOG(info) << "R3BCalifaCrystalPars4Sim: Califa Crystal Simulation Parameters: ";
 
-    LOG(info) << "Crystal ID" << " " << "Threshold" << " " << "Resolution";
+    LOG(info) << "Crystal ID"
+              << " "
+              << "Threshold"
+              << " "
+              << "Resolution";
 
     for (Int_t i = 0; i < fNumCrystals; i++)
 
