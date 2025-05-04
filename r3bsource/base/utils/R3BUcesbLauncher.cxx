@@ -15,12 +15,17 @@
 #include <R3BException.h>
 #include <R3BLogger.h>
 #include <boost/algorithm/string.hpp>
+#include <chrono>
 #include <filesystem>
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/os.h>
 #include <regex>
+#include <thread>
 
 #include <ext_data_clnt.hh>
 
+constexpr auto SLEEP_TIME = std::chrono::milliseconds(100);
 constexpr auto CHILD_CLOSE_WAITING_TIME = std::chrono::seconds(5);
 
 namespace fs = std::filesystem;
@@ -181,15 +186,29 @@ namespace R3B
             throw R3B::runtime_error("ext_data_clnt::close() failed");
         }
         auto err_code = std::error_code{};
-        if (not ucesb_server_->wait_for(CHILD_CLOSE_WAITING_TIME, err_code))
+
+        auto start = std::chrono::steady_clock::now();
+        bool closed = false;
+
+        while (std::chrono::steady_clock::now() - start < CHILD_CLOSE_WAITING_TIME)
+        {
+            if (!ucesb_server_->running())
+            {
+                closed = true;
+                break;
+            }
+            std::this_thread::sleep_for(SLEEP_TIME);
+        }
+
+        if (closed)
+        {
+            R3BLOG(info, "Ucesb server is closed successfully");
+        }
+        else
         {
             R3BLOG(warn, fmt::format("Failed to close Ucesb server! Error code: {}", err_code.value()));
             ucesb_server_->terminate(err_code);
             R3BLOG(warn, "Killing Ucesb server");
-        }
-        else
-        {
-            R3BLOG(info, "Ucesb server is closed successfully");
         }
     }
 } // namespace R3B
