@@ -273,7 +273,7 @@ void R3BCalifaMapped2CrystalCalPar::SearchPeaks()
                     f1 = std::make_unique<TF1>("f1", "[0]+[1]*x", fleft, fright);
                 }
 
-                auto graph = std::make_unique<TGraph>(fNumPeaks, X, Y);
+                auto graph = new TGraph(fNumPeaks, X, Y);
                 graph->Fit(f1.get(), "Q");
 
                 for (Int_t h = 0; h < numPars; h++)
