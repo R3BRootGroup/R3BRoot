@@ -23,6 +23,7 @@ set(SRCS
     alpideData/R3BAlpideHitData.cxx
     alpideData/R3BAlpideMappedData.cxx
     alpideData/R3BAlpidePoint.cxx
+    alpideData/R3BHmpMappedData.cxx
     amsData/R3BAmsHitData.cxx
     amsData/R3BAmsMappedData.cxx
     amsData/R3BAmsStripCalData.cxx
@@ -170,6 +171,7 @@ set(HEADERS
     alpideData/R3BAlpideHitData.h
     alpideData/R3BAlpideMappedData.h
     alpideData/R3BAlpidePoint.h
+    alpideData/R3BHmpMappedData.h
     amsData/R3BAmsHitData.h
     amsData/R3BAmsMappedData.h
     amsData/R3BAmsStripCalData.h
