@@ -41,6 +41,7 @@
 #pragma link C++ class R3BOnlineSpectraToFI_S494+;
 #pragma link C++ class R3BTwimvsFootOnlineSpectra+;
 #pragma link C++ class R3BIncomingTrackingOnlineSpectra+;
+#pragma link C++ class R3BIncomingTrackingFootOnlineSpectra+;
 #pragma link C++ class R3BCalifavsFootOnlineSpectra+;
 #pragma link C++ class R3BCalifavsTofDOnlineSpectra+;
 #pragma link C++ class R3BCalifavsSpiderOnlineSpectra+;
