@@ -105,6 +105,7 @@ set(SRCS
     foot/R3BFootSiReader.cxx
     alpide/R3BAlpideReader.cxx
     alpide/R3BMosaicReader.cxx
+    alpide/R3BHmpReader.cxx
     music/R3BMusicReader.cxx
     rpc/R3BRpcReader.cxx
     twim/R3BTwimReader.cxx
@@ -172,6 +173,7 @@ set(STRUCT_HEADERS
     foot/ext_h101_foot.h
     alpide/ext_h101_alpide.h
     alpide/ext_h101_mosaic.h
+    alpide/ext_h101_hmp.h
     music/ext_h101_music.h
     twim/ext_h101_twim.h
     tttx/ext_h101_ttt10.h
@@ -245,6 +247,7 @@ set(HEADERS
     foot/R3BFootSiReader.h
     alpide/R3BAlpideReader.h
     alpide/R3BMosaicReader.h
+    alpide/R3BHmpReader.h
     music/R3BMusicReader.h
     rpc/R3BRpcReader.h
     tttx/R3BTttxReader.h

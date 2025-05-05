@@ -131,4 +131,4 @@ void R3BAlpideReader::Reset()
     }
 }
 
-ClassImp(R3BAlpideReader);
+ClassImp(R3BAlpideReader)
