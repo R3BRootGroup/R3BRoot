@@ -30,28 +30,28 @@ class R3BFiberMAPMTCorrelationOnlineSpectra : public FairTask
   public:
     R3BFiberMAPMTCorrelationOnlineSpectra();
 
-    R3BFiberMAPMTCorrelationOnlineSpectra(const TString, const TString, Int_t iVerbose = 1);
+    explicit R3BFiberMAPMTCorrelationOnlineSpectra(const TString, const TString, int iVerbose = 1);
 
-    virtual ~R3BFiberMAPMTCorrelationOnlineSpectra();
+    virtual ~R3BFiberMAPMTCorrelationOnlineSpectra() = default;
 
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t*) override;
 
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
-    virtual void FinishTask();
+    void FinishTask() override;
 
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    inline void SetTpat(Int_t tpat1, Int_t tpat2)
+    inline void SetTrigger(int trigger) { fTrigger = trigger; }
+    inline void SetTpat(int tpat1, int tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
@@ -61,21 +61,22 @@ class R3BFiberMAPMTCorrelationOnlineSpectra : public FairTask
 
   private:
     TString fName1, fName2;
-    UInt_t fNbfibers1, fNbfibers2;
-    R3BFiberMappingPar* fMapPar1;
-    R3BFiberMappingPar* fMapPar2;
-    TClonesArray* fHitItems1;
-    TClonesArray* fHitItems2;
+    UInt_t fNbfibers1 = 512, fNbfibers2 = 512;
+    R3BFiberMappingPar* fMapPar1 = nullptr;
+    R3BFiberMappingPar* fMapPar2 = nullptr;
+    TClonesArray* fHitItems1 = nullptr;
+    TClonesArray* fHitItems2 = nullptr;
 
-    R3BEventHeader* header;
-    Int_t fTrigger;
-    Int_t fTpat1, fTpat2;
-    unsigned long fNEvents;
+    R3BEventHeader* header = nullptr;
+    int fTrigger = -1;
+    int fTpat1 = -1, fTpat2 = -1;
+    unsigned long long fNEvents = 0;
 
     TH2F* fh_Fib_posX;
     TH2F* fh_Fib_posY;
     TH2F* fh_Fib_tot;
 
   public:
-    ClassDef(R3BFiberMAPMTCorrelationOnlineSpectra, 1)
+    // Class definition
+    ClassDefOverride(R3BFiberMAPMTCorrelationOnlineSpectra, 1); // NOLINT
 };

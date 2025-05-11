@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----               R3BFiberMAPMTMapped2Cal            -----
-// -----           Created May 13th 2021 by V. Panin      -----
-// ----- Convert mapped data to time calibrated data      -----
+// -----              R3BFiberMAPMTMapped2Cal             -----
+// -----         Created May 13th 2021 by V. Panin        -----
+// -----     Convert mapped data to time calibrated data  -----
 // ------------------------------------------------------------
 
 #pragma once
@@ -44,7 +44,7 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
      * @param a_variant CTDC firmware variant, see R3BTCalEngine.
      * @param a_skip_spmt Don't process SPMT side for pure MAPMT tests.
      */
-    R3BFiberMAPMTMapped2Cal(const char*, Int_t iVerbose = 1);
+    explicit R3BFiberMAPMTMapped2Cal(const std::string&, int iVerbose = 1);
 
     /**
      * Destructor.
@@ -58,53 +58,50 @@ class R3BFiberMAPMTMapped2Cal : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for initialization of the parameter containers.
      * Called by the framework prior to Init() method.
      */
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
     /**
      * Method for re-initialization of parameter containers
      * in case the Run ID has changed.
      */
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* /*option*/) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     TString fName;
-    R3BTCalPar* fMAPMTTCalPar;
-    R3BTCalPar* fMAPMTTrigTCalPar;
-    TClonesArray* fMappedItems;
-    TClonesArray* fCalItems;
-    TClonesArray* fCalTriggerItems;
-    // Int_t fNoCalItems;
-    // Int_t fNoCalTrigItems;
-    Double_t fClockFreq;
+    R3BTCalPar* fMAPMTTCalPar = nullptr;
+    R3BTCalPar* fMAPMTTrigTCalPar = nullptr;
+    TClonesArray* fMappedItems = nullptr;
+    TClonesArray* fCalItems = nullptr;
+    TClonesArray* fCalTriggerItems = nullptr;
+    double fClockFreq = 1000. / 150;
     // Don't store data for online
-    Bool_t fOnline;
-    Int_t fnEvents;
-    // Double_t tmaxfib23a[256] = { -4096 };
-    // Double_t tminfib23a[256] = { 4096 };
+    bool fOnline = false;
+    unsigned long long fnEvents = 0;
 
   public:
-    ClassDef(R3BFiberMAPMTMapped2Cal, 1)
+    // Class definition
+    ClassDefOverride(R3BFiberMAPMTMapped2Cal, 1); // NOLINT
 };

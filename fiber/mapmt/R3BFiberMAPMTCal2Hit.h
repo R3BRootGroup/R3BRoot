@@ -15,6 +15,7 @@
 
 #include <FairTask.h>
 #include <TClonesArray.h>
+#include <cstdint>
 #include <list>
 
 class TH1F;
@@ -68,26 +69,26 @@ class R3BFiberMAPMTCal2Hit : public FairTask
         int channel;
     };
 
-    R3BFiberMAPMTCal2Hit(const char*,
-                         Int_t v = 1, // verbosity
-                         Direction dir = HORIZONTAL,
-                         UInt_t fnb = 512,    // fiber number
-                         Bool_t iscal = false // is calib
+    explicit R3BFiberMAPMTCal2Hit(const std::string&,
+                                  int v = 1, // verbosity
+                                  Direction dir = HORIZONTAL,
+                                  uint32_t fnb = 512, // fiber number
+                                  bool iscal = false  // is calib
     );
 
     virtual ~R3BFiberMAPMTCal2Hit();
 
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
-    virtual void Exec(Option_t*);
+    void Exec(Option_t*) override;
 
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
-    virtual void FinishTask();
+    void FinishTask() override;
 
     inline void SetTofWindow(Double_t tmin, Double_t tmax)
     {
@@ -97,7 +98,7 @@ class R3BFiberMAPMTCal2Hit : public FairTask
 
     inline void SetDTimeWindow(double dtwin) { fDTime_window = dtwin; }
 
-    inline void SetWriteHisto() { fWrite = kTRUE; }
+    inline void SetWriteHisto() { fWrite = true; }
 
     inline void SetTofMin(Double_t min) { ftofmin = min; }
 
@@ -108,41 +109,39 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     inline void SetOrientation(Orientation opt) { fOrientation = opt; }
 
     // Accessor to select online mode
-    inline void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     TString fName;
-    Int_t fDetId;
-    Int_t fnEvents;
-    Int_t fNumFibers;
-    Int_t maxevent;
-    Int_t multi;
-    Double_t fClockFreq;
-    Double_t fGate_ns;
+    int fDetId = 1;
+    unsigned long long fnEvents = 0;
+    uint32_t fNumFibers = 512;
+    int multi = 0;
+    double fClockFreq = 150.;
+    double fGate_ns = 100.;
 
-    Double_t tsync;
-    Double_t gainUp;
-    Double_t gainDown;
-    // Double_t offsetUp;
-    Double_t offsetDT;
-    Bool_t fIsCalibrator;
-    Double_t ftofmin, ftofmax;
-    Bool_t fWrite;
+    double tsync = 0.;
+    double gainUp = 10.;
+    double gainDown = 10.;
+    double offsetDT = 0.;
+    bool fIsCalibrator = false;
+    double ftofmin = -1000, ftofmax = 1000;
+    bool fWrite = false;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
     double fDTime_window = 20.; // ns
 
-    R3BEventHeader* fHeader; /* Event header  */
-    R3BCoarseTimeStitch* fTimeStitch;
+    R3BEventHeader* fHeader = nullptr;
+    R3BCoarseTimeStitch* fTimeStitch = nullptr;
     Direction fDirection;
-    Orientation fOrientation;
-    TClonesArray* fCalItems;
-    TClonesArray* fCalTriggerItems;
-    TClonesArray* fHitItems;
-    R3BFiberMappingPar* fMapPar;
-    R3BFiberMAPMTHitPar* fCalPar; /**< Parameter container. */
-    R3BFiberMAPMTHitPar* fHitPar; /**< Hit parameter container. */
-    Int_t fNofHitPars;            /**< Number of modules in parameter file. */
+    Orientation fOrientation = STANDARD;
+    TClonesArray* fCalItems = nullptr;
+    TClonesArray* fCalTriggerItems = nullptr;
+    TClonesArray* fHitItems = nullptr;
+    R3BFiberMappingPar* fMapPar = nullptr;
+    R3BFiberMAPMTHitPar* fCalPar = nullptr; // Parameter container
+    R3BFiberMAPMTHitPar* fHitPar = nullptr; // Hit parameter container
+    int fNofHitPars = 0;                    // Number of modules in parameter file
     // [0=bottom,1=top][Channel].
     std::vector<Channel> fChannelArray[2];
 
@@ -161,5 +160,6 @@ class R3BFiberMAPMTCal2Hit : public FairTask
     TH2F* fh_time_bottom_Fib;
 
   public:
-    ClassDef(R3BFiberMAPMTCal2Hit, 3)
+    // Class definition
+    ClassDefOverride(R3BFiberMAPMTCal2Hit, 3); // NOLINT
 };

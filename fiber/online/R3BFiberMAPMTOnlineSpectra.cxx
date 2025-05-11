@@ -26,22 +26,22 @@
 #include "R3BShared.h"
 #include "R3BTCalEngine.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TGaxis.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TMath.h"
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TGaxis.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TMath.h>
 #include <TRandom3.h>
 #include <algorithm>
+#include <cstdint>
 #include <map>
 #include <vector>
 
@@ -58,56 +58,11 @@ R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra()
 {
 }
 
-R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra(const TString name, Int_t iVerbose)
+R3BFiberMAPMTOnlineSpectra::R3BFiberMAPMTOnlineSpectra(const TString name, int iVerbose)
     : FairTask(name + "OnlineSpectra", iVerbose)
     , fName(name)
-    , fTrigger(-1)
-    , fTpat1(-1)
-    , fTpat2(-1)
-    , fClockFreq(150.)
-    , fClockPeriods(4096.)
-    , fNEvents(0)
     , fChannelArray()
-    , fMapPar(NULL)
-    , fHitItems(NULL)
-    , fCalItems(NULL)
-    , fCalTriggerItems(NULL)
-    , fMappedItems(NULL)
-    , fNbfibersplot(520)
-    , fNbfibers(512)
 {
-}
-
-R3BFiberMAPMTOnlineSpectra::~R3BFiberMAPMTOnlineSpectra()
-{
-    if (fh_channels_Fib)
-        delete fh_channels_Fib;
-    if (fh_fibers_Fib)
-        delete fh_fibers_Fib;
-    if (fh_mult_Fib)
-        delete fh_mult_Fib;
-    if (fh_time_Fib)
-        delete fh_time_Fib;
-    if (fh_multihit_m_Fib)
-        delete fh_multihit_m_Fib;
-    if (fh_multihit_s_Fib)
-        delete fh_multihit_s_Fib;
-    if (fh_ToT_Fib)
-        delete fh_ToT_Fib;
-    if (fh_channels_single_Fib)
-        delete fh_channels_single_Fib;
-    if (fh_Fib_pos)
-        delete fh_Fib_pos;
-    if (fh_Fib_vs_Events)
-        delete fh_Fib_vs_Events;
-    if (fh_ToTup_vs_ToTdown)
-        delete fh_ToTup_vs_ToTdown;
-    if (fh_chan_corell)
-        delete fh_chan_corell;
-    if (fh_raw_tot_up)
-        delete fh_raw_tot_up;
-    if (fh_raw_tot_down)
-        delete fh_raw_tot_down;
 }
 
 void R3BFiberMAPMTOnlineSpectra::SetParContainers()
@@ -375,20 +330,20 @@ void R3BFiberMAPMTOnlineSpectra::Reset_Histo()
         fh_ToTup_vs_ToTdown->Reset();
     }
 }
-void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
+void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* /*option*/)
 {
-    fNEvents += 1;
+    fNEvents++;
 
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    if ((fTrigger >= 0) && (header != nullptr) && (header->GetTrigger() != fTrigger))
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    if (fTpat1 > -1 && fTpat2 > -1)
+    if ((header != nullptr) && fTpat1 > 0 && fTpat2 > 0)
     {
         Int_t fTpat_bit1 = fTpat1 - 1;
         Int_t fTpat_bit2 = fTpat2 - 1;
-        Int_t tpatbin;
-        for (int i = 0; i < 16; i++)
+        Int_t tpatbin = 0;
+        for (size_t i = 0; i < 16; i++)
         {
             tpatbin = (header->GetTpat() & (1 << i));
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
@@ -414,11 +369,10 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
 
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
-        auto nMapp = fMappedItems->GetEntries();
-        for (Int_t i = 0; i < nMapp; i++)
+        auto nMapp = fMappedItems->GetEntriesFast();
+        for (size_t i = 0; i < nMapp; i++)
         {
             auto map_lead = dynamic_cast<R3BFiberMappedData const*>(fMappedItems->At(i));
-
             if (map_lead->IsLeading())
             {
                 auto side_i = map_lead->GetSide() - 1;
@@ -439,12 +393,9 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
 
     if (fCalItems && fCalItems->GetEntriesFast() > 0)
     {
-        UInt_t vmultihits_top[fNbfibers], vmultihits_bot[fNbfibers];
-        for (Int_t i = 0; i < fNbfibers; i++)
-        {
-            vmultihits_top[i] = 0;
-            vmultihits_bot[i] = 0;
-        }
+        std::vector<uint32_t> vmultihits_top(fNbfibers, 0);
+        std::vector<uint32_t> vmultihits_bot(fNbfibers, 0);
+
         // Resize per-channel info arrays.
         for (auto i = 0; i < 2; ++i)
         {
@@ -463,9 +414,6 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
             tl = cur_cal->GetTime_ns();
             trig_time[ch] = tl;
         }
-
-        Int_t nCals = fCalItems->GetEntries();
-
         for (auto side_i = 0; side_i < 2; ++side_i)
         {
             // Clear local helper containers.
@@ -475,7 +423,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
                 it->lead_list.clear();
             }
         }
-
+        auto nCals = fCalItems->GetEntriesFast();
         for (size_t j = 0; j < nCals; ++j)
         {
             auto cur_cal_lead = dynamic_cast<R3BFiberMAPMTCalData const*>(fCalItems->At(j));
@@ -488,13 +436,13 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
                 if (side_i == 1)
                 {
                     //   fh_channels_Fib->Fill(ch_i); // Fill which channel has events
-                    vmultihits_top[ch_i] += 1; // multihit of a given up killom channel
+                    vmultihits_top[ch_i]++; // multihit of a given up killom channel
                 }
 
                 if (side_i == 0)
                 {
                     //  fh_channels_single_Fib->Fill(ch_i); // Fill which channel has events
-                    vmultihits_bot[ch_i] += 1; // multihit of a given down killom channel
+                    vmultihits_bot[ch_i]++; // multihit of a given down killom channel
                 }
 
                 auto time_trig = trig_time[fMapPar->GetTrigMap(side_i + 1, ch_i + 1)];
@@ -512,13 +460,14 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
             }
         }
 
-        for (int i = 0; i < fNbfibers; ++i)
+        for (size_t i = 0; i < vmultihits_top.size(); ++i)
         {
-
             if (vmultihits_top[i] > 0)
                 fh_multihit_m_Fib->Fill(i + 1,
                                         vmultihits_top[i]); // multihit of a given up killom channel
-
+        }
+        for (size_t i = 0; i < vmultihits_bot.size(); ++i)
+        {
             if (vmultihits_bot[i] > 0)
                 fh_multihit_s_Fib->Fill(i + 1,
                                         vmultihits_bot[i]); // multihit of a given down killom channel
@@ -616,9 +565,6 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* option)
         iFibMax = -1000;
         totMax = 0.;
         dtimeMax = 0. / 0.;
-
-        // if (nHits > 1)
-        //  return;
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
