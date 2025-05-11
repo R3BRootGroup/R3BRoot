@@ -55,13 +55,13 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BFiberMAPMTOnlineSpectra(const TString, Int_t iVerbose = 1);
+    explicit R3BFiberMAPMTOnlineSpectra(const TString, int iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BFiberMAPMTOnlineSpectra();
+    virtual ~R3BFiberMAPMTOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -69,43 +69,43 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
-    virtual InitStatus ReInit();
+    InitStatus ReInit() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t*) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
-    virtual void SetParContainers();
+    void SetParContainers() override;
 
     /**
      * Method for setting the trigger value.
      * @param trigger 1 - physics, 2 - offspill, -1 - all events.
      */
-    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
-    void SetTpat(Int_t tpat1, Int_t tpat2)
+    void SetTrigger(int trigger) { fTrigger = trigger; }
+    void SetTpat(int tpat1, int tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
     }
-    void SetClock(Double_t CF, Double_t CP)
+    void SetClock(double CF, double CP)
     {
         fClockFreq = CF;
         fClockPeriods = CP;
@@ -115,23 +115,22 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
 
   private:
     TString fName;
-    UInt_t fNbfibersplot;
-    UInt_t fNbfibers;
-    R3BFiberMappingPar* fMapPar;
-    TClonesArray* fMappedItems;
-    TClonesArray* fCalItems;
-    TClonesArray* fHitItems;
-    TClonesArray* fCalTriggerItems;
+    UInt_t fNbfibersplot = 520;
+    UInt_t fNbfibers = 512;
+    R3BFiberMappingPar* fMapPar = nullptr;
+    TClonesArray* fMappedItems = nullptr;
+    TClonesArray* fCalItems = nullptr;
+    TClonesArray* fHitItems = nullptr;
+    TClonesArray* fCalTriggerItems = nullptr;
 
-    // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
-    Int_t fTpat1, fTpat2;
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
-    Double_t fClockPeriods;
+    R3BEventHeader* header = nullptr;
+    int fTrigger = -1;
+    int fTpat1 = -1, fTpat2 = -1;
+    double fClockFreq = 150.;
+    double fClockPeriods = 4096.;
     std::vector<Channel> fChannelArray[2];
     unsigned const* fTriggerMap[2];
-    unsigned long fNEvents; /**< Event counter. */
+    unsigned long long fNEvents = 0;
 
     TH1F* fh_channels_Fib;
     TH1F* fh_channels_single_Fib;
@@ -150,5 +149,6 @@ class R3BFiberMAPMTOnlineSpectra : public FairTask
     TH2F* fh_chan_dt_cal;
 
   public:
-    ClassDef(R3BFiberMAPMTOnlineSpectra, 1)
+    // Class definition
+    ClassDefOverride(R3BFiberMAPMTOnlineSpectra, 1); // NOLINT
 };

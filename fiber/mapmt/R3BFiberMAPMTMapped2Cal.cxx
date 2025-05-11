@@ -16,28 +16,23 @@
 // -----          Created May 13th 2021 by V.Panin        -----
 // ------------------------------------------------------------
 
-#include "R3BFiberMAPMTMapped2Cal.h"
-#include "FairLogger.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
+#include <TClonesArray.h>
+#include <cassert>
+
 #include "R3BFiberMAPMTCalData.h"
+#include "R3BFiberMAPMTMapped2Cal.h"
 #include "R3BFiberMappedData.h"
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
-#include "TClonesArray.h"
-#include <FairRootManager.h>
-#include <cassert>
 
-R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const char* a_name, Int_t a_verbose)
-    : FairTask(TString("R3B") + a_name + "Mapped2Cal", a_verbose)
+R3BFiberMAPMTMapped2Cal::R3BFiberMAPMTMapped2Cal(const std::string& a_name, int a_verbose)
+    : FairTask(("R3B" + a_name + "Mapped2Cal").c_str(), a_verbose)
     , fName(a_name)
-    , fMAPMTTCalPar(nullptr)
-    , fMAPMTTrigTCalPar(nullptr)
-    , fMappedItems(nullptr)
     , fCalItems(new TClonesArray("R3BFiberMAPMTCalData"))
     , fCalTriggerItems(new TClonesArray("R3BFiberMAPMTCalData"))
-    , fClockFreq(1000. / 150)
-    , fnEvents(0)
-    , fOnline(kFALSE)
 {
 }
 
@@ -55,7 +50,7 @@ InitStatus R3BFiberMAPMTMapped2Cal::Init()
     auto mgr = FairRootManager::Instance();
     if (!mgr)
     {
-        R3BLOG(fatal, "FairRootManager not found.");
+        R3BLOG(fatal, "FairRootManager not found");
         return kFATAL;
     }
     auto name = fName + "Mapped";
@@ -80,7 +75,7 @@ void R3BFiberMAPMTMapped2Cal::SetParContainers()
         f##NAME##TCalPar = dynamic_cast<R3BTCalPar*>(FairRuntimeDb::instance()->getContainer(name)); \
         if (!f##NAME##TCalPar)                                                                       \
         {                                                                                            \
-            R3BLOG(error, "Could not get access to " << name << " container.");                      \
+            R3BLOG(error, "Could not get access to " << name << " container");                       \
         }                                                                                            \
     } while (0)
     GET_TCALPAR(MAPMT);
@@ -94,10 +89,10 @@ InitStatus R3BFiberMAPMTMapped2Cal::ReInit()
     return kSUCCESS;
 }
 
-void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
+void R3BFiberMAPMTMapped2Cal::Exec(Option_t* /*option*/)
 {
     auto mapped_num = fMappedItems->GetEntriesFast();
-    R3BLOG(debug, "fMappedItems=" << fMappedItems->GetName() << '.');
+    R3BLOG(debug, "fMappedItems=" << fMappedItems->GetName());
 
     if (mapped_num == 0)
         return;
@@ -110,7 +105,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         auto channel = mapped->GetChannel();
         R3BLOG(debug,
                "Channel=" << channel << ":Side=" << mapped->GetSide()
-                          << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing") << '.');
+                          << ":Edge=" << (mapped->IsLeading() ? "Leading" : "Trailing"));
 
         // Fetch tcal parameters.
         R3BTCalModulePar* par;
@@ -123,9 +118,10 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             auto tcal_channel_i = channel * 2 - (mapped->IsLeading() ? 1 : 0);
             par = fMAPMTTCalPar->GetModuleParAt(1, tcal_channel_i, mapped->GetSide());
         }
+
         if (!par)
         {
-            R3BLOG(warn, "(" << fName << "): Channel=" << channel << ": TCal par not found.");
+            R3BLOG_IF(warn, fOnline == false, "(" << fName << "): Channel=" << channel << ": TCal par not found");
             continue;
         }
 
@@ -146,7 +142,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
             R3BLOG_IF(debug,
                       fOnline == false,
                       "(" << fName << "): Channel=" << channel << ": Bad CTDC fine time (raw=" << fine_raw
-                          << ",ns=" << fine_ns << ").");
+                          << ",ns=" << fine_ns << ")");
             continue;
         }
 
@@ -156,7 +152,7 @@ void R3BFiberMAPMTMapped2Cal::Exec(Option_t* option)
         // new clock TDC firmware need here a minus
         time_ns = mapped->GetCoarse() * fClockFreq - fine_ns;
 
-        R3BLOG(debug, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns.");
+        R3BLOG(debug, "(" << fName << "): Channel=" << channel << ": Time=" << time_ns << "ns");
 
         if (fName == "Fi30" || fName == "Fi31" || fName == "Fi32" || fName == "Fi33")
         {
@@ -223,4 +219,4 @@ void R3BFiberMAPMTMapped2Cal::FinishEvent()
     }
 }
 
-ClassImp(R3BFiberMAPMTMapped2Cal);
+ClassImp(R3BFiberMAPMTMapped2Cal)

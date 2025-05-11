@@ -21,18 +21,17 @@
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
 
-#include "TF1.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRtdbRun.h>
+#include <FairRunIdGenerator.h>
+#include <FairRuntimeDb.h>
+
 #include <TClonesArray.h>
-
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRtdbRun.h"
-#include "FairRunIdGenerator.h"
-#include "FairRuntimeDb.h"
-
-#include "TMath.h"
+#include <TF1.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TMath.h>
 #include <TRandom3.h>
 #include <TRandomGen.h>
 #include <iostream>
@@ -50,35 +49,18 @@ R3BFiberMAPMTCal2Hit::ToT::ToT(R3BFiberMAPMTCalData const* a_lead,
 {
 }
 
-R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const char* a_name,
-                                           Int_t a_verbose,
+R3BFiberMAPMTCal2Hit::R3BFiberMAPMTCal2Hit(const std::string& a_name,
+                                           int a_verbose,
                                            Direction a_direction,
-                                           UInt_t a_num_fibers,
-                                           Bool_t a_is_calibrator)
-    : FairTask(TString("R3B") + a_name + "Cal2Hit", a_verbose)
+                                           uint32_t a_num_fibers,
+                                           bool a_is_calibrator)
+    : FairTask(("R3B" + a_name + "Cal2Hit").c_str(), a_verbose)
     , fName(a_name)
-    , fDetId(1)
-    , fClockFreq(150.)
     , fDirection(a_direction)
     , fNumFibers(a_num_fibers)
     , fIsCalibrator(a_is_calibrator)
-    , fCalItems()
-    , fCalTriggerItems()
     , fHitItems(new TClonesArray("R3BFiberMAPMTHitData"))
-    , fMapPar(NULL)
-    , fCalPar(NULL)
-    , fHitPar(NULL)
-    , fNofHitPars(0)
     , fChannelArray()
-    , fnEvents(0)
-    , ftofmin(-1000)
-    , ftofmax(1000)
-    , fWrite(false)
-    , fGate_ns(100.)
-    , fOnline(kFALSE)
-    , fOrientation(STANDARD)
-    , fTimeStitch(nullptr)
-    , fHeader(nullptr)
 {
     if (fName == "Fi23a")
         fDetId = 230;
@@ -102,12 +84,6 @@ R3BFiberMAPMTCal2Hit::~R3BFiberMAPMTCal2Hit()
 {
     if (fHitItems)
         delete fHitItems;
-    if (fMapPar)
-        delete fMapPar;
-    if (fCalPar)
-        delete fCalPar;
-    if (fHitPar)
-        delete fHitPar;
 }
 
 InitStatus R3BFiberMAPMTCal2Hit::Init()
@@ -126,8 +102,6 @@ InitStatus R3BFiberMAPMTCal2Hit::Init()
     auto name_mapmt_trig = fName + "TriggerCal";
     fCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject(name_mapmt_trig));
     R3BLOG_IF(fatal, NULL == fCalTriggerItems, "Branch " << name_mapmt_trig << " not found");
-
-    // maxevent = mgr->CheckMaxEventNo();
 
     // TClones branch with Hit items
     mgr->Register(fName + "Hit", fName + " hit data", fHitItems, !fOnline);
@@ -259,9 +233,8 @@ void R3BFiberMAPMTCal2Hit::SetParContainers()
     }
 }
 
-void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
+void R3BFiberMAPMTCal2Hit::Exec(Option_t* /*option*/)
 {
-
     for (auto side_i = 0; side_i < 2; ++side_i)
     {
         // Clear local helper containers.
@@ -277,7 +250,7 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
     //------ Collecting cal trigger hits --------
     size_t cal_num_trig = fCalTriggerItems->GetEntriesFast();
     Double_t tl, tt; // lead and trile times of the trigger
-    for (UInt_t j = 0; j < cal_num_trig; ++j)
+    for (size_t j = 0; j < cal_num_trig; ++j)
     {
         auto cur_cal = dynamic_cast<R3BFiberMAPMTCalData*>(fCalTriggerItems->At(j));
         auto ch = cur_cal->GetChannel() - 1;
@@ -500,27 +473,10 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
                                 (-1.0 * detector_width / 2.0 + (fiber_id - 1.0) * (1.0 + air_layer) * fiber_thickness);
                         }
                     }
-
-                    if (y < -60 || y > 60)
-                    {
-                        // continue;
-                    }
-
                     Double_t eloss = sqrt(tot_down * tot_up);
-                    //  eloss = 2.069*eloss-10.414;  // testing Q
-                    // Z calib, run 773
-                    // if (fName == "Fi30") eloss =
-                    // -415.06629+174.67595*eloss-24.234506*eloss*eloss+1.1193663*eloss*eloss*eloss; if (fName ==
-                    // "Fi31") eloss = -197.91146+90.109359*eloss-13.516177*eloss*eloss+0.68043217*eloss*eloss*eloss; if
-                    // (fName == "Fi32") eloss =
-                    // -156.00382+70.021718*eloss-10.350304*eloss*eloss+0.51455325*eloss*eloss*eloss; if (fName ==
-                    // "Fi33") eloss = -298.60978+130.07812*eloss-18.699849*eloss*eloss+0.89852388*eloss*eloss*eloss;
-
                     multi++;
-
                     if (!fIsCalibrator)
                     {
-                        // if (tof >= ftofmin && tof <= ftofmax)
                         if (fabs(dtime) < fDTime_window)
                         {
                             new ((*fHitItems)[fHitItems->GetEntriesFast()]) R3BFiberMAPMTHitData(
@@ -531,7 +487,6 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* option)
             }
         }
     }
-
     fnEvents++;
 }
 

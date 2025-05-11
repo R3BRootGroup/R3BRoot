@@ -44,31 +44,11 @@ R3BFiberMAPMTCorrelationOnlineSpectra::R3BFiberMAPMTCorrelationOnlineSpectra()
 
 R3BFiberMAPMTCorrelationOnlineSpectra::R3BFiberMAPMTCorrelationOnlineSpectra(const TString name1,
                                                                              const TString name2,
-                                                                             Int_t iVerbose)
+                                                                             int iVerbose)
     : FairTask(name1 + "_" + name2 + "CorrelationOnlineSpectra", iVerbose)
     , fName1(name1)
     , fName2(name2)
-    , fTrigger(-1)
-    , fTpat1(-1)
-    , fTpat2(-1)
-    , fNEvents(0)
-    , fMapPar1(NULL)
-    , fMapPar2(NULL)
-    , fHitItems1(NULL)
-    , fHitItems2(NULL)
-    , fNbfibers1(512)
-    , fNbfibers2(512)
 {
-}
-
-R3BFiberMAPMTCorrelationOnlineSpectra::~R3BFiberMAPMTCorrelationOnlineSpectra()
-{
-    if (fh_Fib_posX)
-        delete fh_Fib_posX;
-    if (fh_Fib_posY)
-        delete fh_Fib_posY;
-    if (fh_Fib_tot)
-        delete fh_Fib_tot;
 }
 
 void R3BFiberMAPMTCorrelationOnlineSpectra::SetParContainers()
@@ -199,18 +179,18 @@ void R3BFiberMAPMTCorrelationOnlineSpectra::Reset_Histo()
 }
 void R3BFiberMAPMTCorrelationOnlineSpectra::Exec(Option_t* option)
 {
-    fNEvents += 1;
+    fNEvents++;
 
-    if ((fTrigger >= 0) && header && (header->GetTrigger() != fTrigger))
+    if ((fTrigger >= 0) && (header != nullptr) && (header->GetTrigger() != fTrigger))
         return;
 
     // fTpat = 1-16; fTpat_bit = 0-15
-    if (fTpat1 > -1 && fTpat2 > -1)
+    if ((header != nullptr) && fTpat1 > 0 && fTpat2 > 0)
     {
         Int_t fTpat_bit1 = fTpat1 - 1;
         Int_t fTpat_bit2 = fTpat2 - 1;
-        Int_t tpatbin;
-        for (int i = 0; i < 16; i++)
+        Int_t tpatbin = 0;
+        for (size_t i = 0; i < 16; i++)
         {
             tpatbin = (header->GetTpat() & (1 << i));
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
