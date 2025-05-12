@@ -190,6 +190,7 @@ set(STRUCT_HEADERS
 
 set(HEADERS
     base/R3BUcesbSource.h
+    base/R3BUcesbSource2.h
     base/R3BReader.h
     base/R3BUnpackReader.h
     base/utils/R3BUcesbDecl.h

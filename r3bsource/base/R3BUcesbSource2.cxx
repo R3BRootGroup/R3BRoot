@@ -12,18 +12,46 @@
  ******************************************************************************/
 
 #include "R3BUcesbSource2.h"
+#include "R3BUcesbLauncher.h"
 #include <FairRootManager.h>
 #include <FairRun.h>
 #include <R3BEventHeader.h>
 #include <R3BException.h>
-#include <R3BLogger.h>
 #include <R3BUcesbDecl.h>
+#include <array>
 #include <boost/core/span.hpp>
+#include <cstddef>
+#include <cstdint>
 #include <ext_data_client.h>
+#include <fairlogger/Logger.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <string_view>
+#include <sys/types.h>
+#include <utility>
 
 namespace R3B
 {
+    namespace
+    {
+        void print_uint32_with_size(const uint32_t* data, ssize_t size)
+        {
+            // TODO: use ranges library instead of reinterpret_cast
+            constexpr auto column_size = 8;
+            using SubDataType = const std::array<uint32_t, column_size>;
+
+            auto data_span = boost::span<SubDataType>(reinterpret_cast<SubDataType*>(data), size / column_size);
+            LOGP(info, "Raw data:");
+            auto index = uint32_t{};
+            for (const auto& row_data : data_span)
+            {
+                fmt::print("RAW{0:04x}: {1:08x}\n", index, fmt::join(row_data, " "));
+                index += column_size;
+            }
+        }
+
+    } // namespace
+
     UcesbSource::UcesbSource(std::string_view lmdfile_name,
                              std::string_view ntuple_options,
                              std::string_view ucesb_path,
@@ -53,7 +81,7 @@ namespace R3B
         {
             command_string = fmt::format("{} --max-events={}", command_string, max_event_num_);
         }
-        R3BLOG(info, fmt::format("Calling ucesb with command: {}", command_string));
+        LOGP(info, "Calling ucesb with command: {}", command_string);
 
         ucesb_server_launcher_.Launch(std::move(command_string));
     }
@@ -62,13 +90,13 @@ namespace R3B
     {
         if (auto* frm = FairRootManager::Instance(); frm != nullptr)
         {
-            R3BLOG(debug, "Checking the register of R3BEventHeader");
+            LOGP(debug, "Checking the register of R3BEventHeader");
             if (event_header_ = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader.")); event_header_ == nullptr)
             {
                 throw R3B::runtime_error("EventHeader. was not defined properly!");
             }
         }
-        R3BLOG(debug, "EventHeader. was defined properly");
+        LOGP(debug, "EventHeader. was defined properly");
 
         init_readers();
         setup_ucesb();
@@ -89,7 +117,7 @@ namespace R3B
         }
         else
         {
-            R3BLOG(error, "ext_data_clnt::setup() failed");
+            LOGP(error, "ext_data_clnt::setup() failed");
             const auto* msg = (ucesb_client_.last_error() == nullptr) ? UCESB_NULL_STR_MSG : ucesb_client_.last_error();
             throw R3B::runtime_error(fmt::format("UCESB error: {}", msg));
         }
@@ -104,34 +132,18 @@ namespace R3B
         }
         else if (ret_val == 0)
         {
-            R3BLOG(info, "Reached the maximal event num on the ucesb server.");
+            LOGP(info, "Reached the maximal event num on the ucesb server.");
             // ending event loop here
             return 1;
         }
         else
         {
-            R3BLOG(error, "ext_data_clnt::fetch_event() failed");
+            LOGP(error, "ext_data_clnt::fetch_event() failed");
             const auto* msg = (ucesb_client_.last_error() == nullptr) ? UCESB_NULL_STR_MSG : ucesb_client_.last_error();
             throw R3B::runtime_error(fmt::format("UCESB error: {}", msg));
         }
 
         return 0;
-    }
-
-    void print_uint32_with_size(const uint32_t* data, ssize_t size)
-    {
-        // TODO: use ranges library instead of reinterpret_cast
-        constexpr auto column_size = 8;
-        using SubDataType = const std::array<uint32_t, column_size>;
-
-        auto data_span = std::span<SubDataType>(reinterpret_cast<SubDataType*>(data), size / column_size);
-        R3BLOG(info, "Raw data:");
-        auto index = uint32_t{};
-        for (const auto& row_data : data_span)
-        {
-            fmt::print("RAW{0:04x}: {1:08x}\n", index, fmt::join(row_data, " "));
-            index += column_size;
-        }
     }
 
     void UcesbSource::print_raw_data()
@@ -151,7 +163,7 @@ namespace R3B
         }
         else
         {
-            R3BLOG(error, "ext_data_clnt::get_raw_data()");
+            LOGP(error, "ext_data_clnt::get_raw_data()");
             throw R3B::runtime_error("Failed to get raw data.");
         }
     }
@@ -166,17 +178,17 @@ namespace R3B
 
         if (run_id_ != 0)
         {
-            R3BLOG(info, fmt::format("Setting the run ID of the FairRun to be {} from FairSource", run_id_));
+            LOGP(info, "Setting the run ID of the FairRun to be {} from FairSource", run_id_);
             run->SetRunId(run_id_);
         }
         else if (auto run_id = run->GetRunId(); run_id != 0)
         {
-            R3BLOG(info, fmt::format("Setting the run ID of the FairSource to be {} from FairRun", run_id));
+            LOGP(info, "Setting the run ID of the FairSource to be {} from FairRun", run_id);
             run_id_ = run_id;
         }
         else
         {
-            R3BLOG(warn, "Run ID of neither FairRun nor FairSource is set!");
+            LOGP(warn, "Run ID of neither FairRun nor FairSource is set!");
         }
     }
 
