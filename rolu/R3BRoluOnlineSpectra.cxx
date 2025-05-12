@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                R3BRoluOnlineSpectra               -----
+// -----                R3BRoluOnlineSpectra              -----
 // -----          Created April 13th 2016 by M.Heil       -----
 // -----       Updated May 11th 2022 by J.L. Rodriguez    -----
 // ------------------------------------------------------------
@@ -23,6 +23,7 @@
 #include "R3BLogger.h"
 #include "R3BRoluCalData.h"
 #include "R3BRoluMappedData.h"
+#include "R3BShared.h"
 #include "R3BTCalEngine.h"
 
 #include <FairLogger.h>
@@ -56,12 +57,6 @@ R3BRoluOnlineSpectra::R3BRoluOnlineSpectra(const char* name, int iVerbose)
 {
 }
 
-R3BRoluOnlineSpectra::~R3BRoluOnlineSpectra()
-{
-    delete fMappedItems;
-    delete fCalItems;
-}
-
 InitStatus R3BRoluOnlineSpectra::Init()
 {
     R3BLOG(info, "");
@@ -77,86 +72,106 @@ InitStatus R3BRoluOnlineSpectra::Init()
     // Get objects for detectors on all levels
 
     fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluMapped"));
-    R3BLOG_IF(fatal, NULL == fMappedItems, "RoluMapped not found");
+    R3BLOG_IF(fatal, nullptr == fMappedItems, "RoluMapped not found");
 
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("RoluCal"));
-    R3BLOG_IF(warn, NULL == fCalItems, "RoluCal not found");
+    R3BLOG_IF(warn, nullptr == fCalItems, "RoluCal not found");
 
     //------------------------------------------------------------------------
     // create histograms of all detectors
     //------------------------------------------------------------------------
 
     // MAIN FOLDER-MWPC
-    TFolder* mainfol = new TFolder("ROLU", "ROLU info");
+    auto mainfol = new TFolder("ROLU", "ROLU info");
 
     //------------------------------------------------------------------------
     // Rolu detector
-    TCanvas* cRolu[fNofRoluDetectors];
+    std::vector<TCanvas*> cRolu;
     TString histName;
     TString canName;
+
+    fh1_rolu_tot.resize(fNofRoluDetectors);
+    fh1_rolu_LE_raw.resize(fNofRoluDetectors);
+
     if (fMappedItems)
     {
         for (int irolucount = 0; irolucount < fNofRoluDetectors; irolucount++)
         {
             histName = Form("ROLU%d", irolucount + 1);
-            cRolu[irolucount] = new TCanvas(canName.Data(), canName.Data(), 10, 10, 1010, 810);
+            cRolu.push_back(new TCanvas(canName.Data(), canName.Data(), 10, 10, 1010, 810));
 
             histName = Form("Rolu%d_channels", irolucount);
-            fh_rolu_channels[irolucount] = new TH1F(histName.Data(), histName.Data(), 5, 0., 5.);
-            fh_rolu_channels[irolucount]->GetXaxis()->SetTitle("Channel number");
-            fh_rolu_channels[irolucount]->SetFillColor(31);
+            fh1_rolu_channels.push_back(R3B::root_owned<TH1F>(histName.Data(), histName.Data(), 5, 0., 5.));
+            fh1_rolu_channels[irolucount]->GetXaxis()->SetTitle("Channel number");
+            fh1_rolu_channels[irolucount]->SetFillColor(31);
 
             histName = Form("Rolu%d_tot", irolucount);
-            fh_rolu_tot[irolucount] = new TH2F(histName.Data(), histName.Data(), 5, 0, 5, 1500, 0., 300.);
-            fh_rolu_tot[irolucount]->GetXaxis()->SetTitle("PMT number");
-            fh_rolu_tot[irolucount]->GetYaxis()->SetTitle("ToT / ns");
+            fh2_rolu_tot.push_back(R3B::root_owned<TH2F>(histName.Data(), histName.Data(), 5, 0, 5, 1500, 0., 300.));
+            fh2_rolu_tot[irolucount]->GetXaxis()->SetTitle("PMT number");
+            fh2_rolu_tot[irolucount]->GetYaxis()->SetTitle("ToT / ns");
+
+            histName = Form("Rolu%d_multi", irolucount);
+            fh1_rolu_multiplicity.push_back(R3B::root_owned<TH1F>(histName.Data(), histName.Data(), 7, -0.5, 6.5));
+            fh1_rolu_multiplicity[irolucount]->GetXaxis()->SetTitle("Hits multiplicity");
+            fh1_rolu_multiplicity[irolucount]->GetYaxis()->SetTitle("Counts");
+            fh1_rolu_multiplicity[irolucount]->SetFillColor(31);
+
+            histName = Form("Rolu%d_hit1vshit2", irolucount);
+            fh2_rolu_hit1vshit2.push_back(
+                R3B::root_owned<TH2F>(histName.Data(), histName.Data(), 4, 0.5, 4.5, 4, 0.5, 4.5));
+            fh2_rolu_hit1vshit2[irolucount]->GetXaxis()->SetTitle("Hit1");
+            fh2_rolu_hit1vshit2[irolucount]->GetYaxis()->SetTitle("Hit2");
 
             int color;
-            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            for (int ichannelcount = 0; ichannelcount < rolu_nb_ch; ichannelcount++)
             {
                 color = ichannelcount + 1;
                 if (color == 3)
                     color = 8;
                 histName = Form("Rolu%d_tot1D_ch%d", irolucount, ichannelcount);
-                fh_rolu_tot_1D[irolucount][ichannelcount] = new TH1F(histName.Data(), histName.Data(), 151, 0., 150.);
-                fh_rolu_tot_1D[irolucount][ichannelcount]->GetXaxis()->SetTitle("ToT / ns");
-                fh_rolu_tot_1D[irolucount][ichannelcount]->SetLineColor(color);
+                fh1_rolu_tot[irolucount].push_back(
+                    R3B::root_owned<TH1F>(histName.Data(), histName.Data(), 151, 0., 150.));
+                fh1_rolu_tot[irolucount][ichannelcount]->GetXaxis()->SetTitle("ToT / ns");
+                fh1_rolu_tot[irolucount][ichannelcount]->SetLineColor(color);
 
                 histName = Form("Rolu%d_LE_raw_ch%d", irolucount, ichannelcount);
-                fh_rolu_LE_raw[irolucount][ichannelcount] = new TH1F(histName.Data(), histName.Data(), 1050, 0, 10500);
-                fh_rolu_LE_raw[irolucount][ichannelcount]->GetXaxis()->SetTitle("ToT / ns");
-                fh_rolu_LE_raw[irolucount][ichannelcount]->SetLineColor(color);
+                fh1_rolu_LE_raw[irolucount].push_back(
+                    R3B::root_owned<TH1F>(histName.Data(), histName.Data(), 1050, 0, 10500));
+                fh1_rolu_LE_raw[irolucount][ichannelcount]->GetXaxis()->SetTitle("ToT / ns");
+                fh1_rolu_LE_raw[irolucount][ichannelcount]->SetLineColor(color);
             }
 
-            cRolu[irolucount]->Divide(2, 2);
+            cRolu[irolucount]->Divide(2, 3);
             cRolu[irolucount]->cd(1);
-            fh_rolu_channels[irolucount]->Draw();
+            fh1_rolu_channels[irolucount]->Draw();
             gPad->SetLogy();
             cRolu[irolucount]->cd(2);
             gPad->SetLogz();
-            fh_rolu_tot[irolucount]->Draw("colz");
-            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            fh2_rolu_tot[irolucount]->Draw("colz");
+            for (size_t ichannelcount = 0; ichannelcount < rolu_nb_ch; ichannelcount++)
             {
                 cRolu[irolucount]->cd(3);
                 if (ichannelcount == 0)
-                    fh_rolu_tot_1D[irolucount][ichannelcount]->Draw();
+                    fh1_rolu_tot[irolucount][ichannelcount]->Draw();
                 else
-                    fh_rolu_tot_1D[irolucount][ichannelcount]->Draw("same");
+                    fh1_rolu_tot[irolucount][ichannelcount]->Draw("same");
                 gPad->SetLogy();
                 cRolu[irolucount]->cd(4);
                 gPad->SetLogy();
                 if (ichannelcount == 0)
-                    fh_rolu_LE_raw[irolucount][ichannelcount]->Draw();
+                    fh1_rolu_LE_raw[irolucount][ichannelcount]->Draw();
                 else
-                    fh_rolu_LE_raw[irolucount][ichannelcount]->Draw("same");
+                    fh1_rolu_LE_raw[irolucount][ichannelcount]->Draw("same");
             }
+            cRolu[irolucount]->cd(5);
+            fh1_rolu_multiplicity[irolucount]->Draw();
+            cRolu[irolucount]->cd(6);
+            fh2_rolu_hit1vshit2[irolucount]->Draw("colz");
             mainfol->Add(cRolu[irolucount]);
         }
-
         run->AddObject(mainfol);
         run->GetHttpServer()->RegisterCommand("Reset_ROLU_HIST", Form("/Objects/%s/->Reset_ROLU_Histo()", GetName()));
     }
-
     return kSUCCESS;
 }
 
@@ -165,14 +180,42 @@ void R3BRoluOnlineSpectra::Reset_ROLU_Histo()
     R3BLOG(info, "");
     if (fMappedItems)
     {
-        for (int irolucount = 0; irolucount < fNofRoluDetectors; irolucount++)
+        for (auto* hist : fh1_rolu_channels)
         {
-            fh_rolu_channels[irolucount]->Reset();
-            fh_rolu_tot[irolucount]->Reset();
-            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            hist->Reset();
+        }
+
+        for (auto* hist : fh1_rolu_multiplicity)
+        {
+            hist->Reset();
+        }
+
+        for (auto* hist : fh2_rolu_hit1vshit2)
+        {
+            hist->Reset();
+        }
+    }
+    if (fCalItems)
+    {
+        for (auto* hist : fh2_rolu_tot)
+        {
+            hist->Reset();
+        }
+        for (const auto& tot_vec : fh1_rolu_tot)
+        {
+            for (auto* hist : tot_vec)
             {
-                fh_rolu_tot_1D[irolucount][ichannelcount]->Reset();
-                fh_rolu_LE_raw[irolucount][ichannelcount]->Reset();
+                if (hist)
+                    hist->Reset();
+            }
+        }
+
+        for (const auto& le_vec : fh1_rolu_LE_raw)
+        {
+            for (auto* hist : le_vec)
+            {
+                if (hist)
+                    hist->Reset();
             }
         }
     }
@@ -192,18 +235,35 @@ void R3BRoluOnlineSpectra::Exec(Option_t* option)
     if (fMappedItems)
     {
         int nHits = fMappedItems->GetEntriesFast();
-
         if (nHits > 0)
-            nRoluEvents += 1;
+            nRoluEvents++;
 
-        for (int ihit = 0; ihit < nHits; ihit++)
+        std::vector<uint16_t> det_mul(fNofRolu, 0);
+        std::vector<uint32_t> ch1(fNofRolu, 0);
+        std::vector<uint32_t> ch2(fNofRolu, 0);
+        for (size_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BRoluMappedData* hit = dynamic_cast<R3BRoluMappedData*>(fMappedItems->At(ihit));
+            auto hit = dynamic_cast<R3BRoluMappedData*>(fMappedItems->At(ihit));
             if (!hit)
                 continue;
-
+            auto detid = hit->GetDetector() - 1;
+            auto type = hit->GetType();
+            det_mul[detid]++;
+            if (type == 0)
+            {
+                if (ch1[detid] == 0)
+                    ch1[detid] = hit->GetChannel();
+                else
+                    ch2[detid] = hit->GetChannel();
+            }
             // channel numbers are stored 1-based (1..n)
-            fh_rolu_channels[hit->GetDetector() - 1]->Fill(hit->GetChannel());
+            fh1_rolu_channels[detid]->Fill(hit->GetChannel());
+        }
+        for (size_t det = 0; det < fNofRoluDetectors; det++)
+        {
+            fh1_rolu_multiplicity[det]->Fill(det_mul[det]);
+            if (ch1[det] > 0 && ch2[det] > 0)
+                fh2_rolu_hit1vshit2[det]->Fill(ch1[det], ch2[det]);
         }
     }
 
@@ -212,30 +272,33 @@ void R3BRoluOnlineSpectra::Exec(Option_t* option)
         nPartROLU = fCalItems->GetEntriesFast();
         int iDet = 0;
 
-        for (int iPart = 0; iPart < nPartROLU; iPart++)
+        for (size_t iPart = 0; iPart < nPartROLU; iPart++)
         {
-            R3BRoluCalData* calData = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
+            auto calData = dynamic_cast<R3BRoluCalData*>(fCalItems->At(iPart));
             assert(calData && "dynamic cast failed!");
-            for (int chan = 0; chan < 4; chan++)
-            // if (!(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))) &&
-            // !(IS_NAN(calData->GetTimeL_ns(calData->GetTAMEXLNcha()-1))))
+            auto detid = calData->GetDetector() - 1;
+            for (size_t chan = 0; chan < rolu_nb_ch; chan++)
             { // TAMEX leading
                 double time_L = calData->GetTimeL_ns(chan);
                 double time_T = calData->GetTimeT_ns(chan);
                 tot = fmod(time_T - time_L + c_range_ns + c_range_ns / 2., c_range_ns) - c_range_ns / 2.;
                 if (!std::isnan(tot))
                 {
-                    fh_rolu_tot[calData->GetDetector() - 1]->Fill(chan + 1, tot);
-                    fh_rolu_tot_1D[calData->GetDetector() - 1][chan]->Fill(tot);
-                    fh_rolu_LE_raw[calData->GetDetector() - 1][chan]->Fill(calData->GetTimeL_ns(chan));
+                    fh2_rolu_tot[detid]->Fill(chan + 1, tot);
+                    fh1_rolu_tot[detid][chan]->Fill(tot);
+                    fh1_rolu_LE_raw[detid][chan]->Fill(calData->GetTimeL_ns(chan));
                 }
             }
         }
+
+        for (size_t det = 0; det < fNofRoluDetectors; det++)
+        {
+            double maxentries = 0;
+            for (size_t i = 0; i < rolu_nb_ch; i++)
+                maxentries = max(maxentries, fh1_rolu_tot[det][i]->GetMaximum());
+            fh1_rolu_tot[det][0]->SetMaximum(maxentries);
+        }
     } // if fCallItems
-    double maxentries = 0;
-    for (int i = 0; i < 4; i++)
-        maxentries = max(maxentries, fh_rolu_tot_1D[0][i]->GetMaximum());
-    fh_rolu_tot_1D[0][0]->SetMaximum(maxentries);
 }
 
 void R3BRoluOnlineSpectra::FinishEvent()
@@ -254,14 +317,43 @@ void R3BRoluOnlineSpectra::FinishTask()
 {
     if (fMappedItems)
     {
-        for (int irolucount = 0; irolucount < fNofRoluDetectors; irolucount++)
+        for (auto* hist : fh1_rolu_channels)
         {
-            fh_rolu_channels[irolucount]->Write();
-            fh_rolu_tot[irolucount]->Write();
-            for (int ichannelcount = 0; ichannelcount < 4; ichannelcount++)
+            hist->Write();
+        }
+
+        for (auto* hist : fh1_rolu_multiplicity)
+        {
+            hist->Write();
+        }
+
+        for (auto* hist : fh2_rolu_hit1vshit2)
+        {
+            hist->Write();
+        }
+    }
+
+    if (fCalItems)
+    {
+        for (auto* hist : fh2_rolu_tot)
+        {
+            hist->Write();
+        }
+        for (const auto& tot_vec : fh1_rolu_tot)
+        {
+            for (auto* hist : tot_vec)
             {
-                fh_rolu_tot_1D[irolucount][ichannelcount]->Write();
-                fh_rolu_LE_raw[irolucount][ichannelcount]->Write();
+                if (hist)
+                    hist->Write();
+            }
+        }
+
+        for (const auto& le_vec : fh1_rolu_LE_raw)
+        {
+            for (auto* hist : le_vec)
+            {
+                if (hist)
+                    hist->Write();
             }
         }
     }

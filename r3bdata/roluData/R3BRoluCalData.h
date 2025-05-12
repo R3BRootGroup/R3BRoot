@@ -11,10 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROLUCALITEM_H
-#define R3BROLUCALITEM_H
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
+
+constexpr size_t rolu_nb_ch = 4;
 
 // for the data analysis of the ROLU following LOS.
 
@@ -25,10 +26,10 @@ class R3BRoluCalData : public TObject
     R3BRoluCalData();
 
     // Standard Constructor
-    R3BRoluCalData(UInt_t);
+    explicit R3BRoluCalData(UInt_t);
 
     // Destructor
-    virtual ~R3BRoluCalData() {}
+    virtual ~R3BRoluCalData() = default;
 
     UInt_t GetDetector() const;
     UInt_t GetTAMEXLNcha();
@@ -41,15 +42,14 @@ class R3BRoluCalData : public TObject
     Double_t GetMeanTimeTAMEXL();
     Double_t GetMeanTimeTAMEXT();
 
+    Double_t fTimeL_ns[rolu_nb_ch]; // TAMEX leading
+    Double_t fTimeT_ns[rolu_nb_ch]; // TAMEX trailing
+
   private:
     UInt_t fDetector;
     void Reset();
 
   public:
-    Double_t fTimeL_ns[4]; // TAMEX leading
-    Double_t fTimeT_ns[4]; // TAMEX trailing
-
-    ClassDef(R3BRoluCalData, 1)
+    // Class definition
+    ClassDef(R3BRoluCalData, 1); // NOLINT
 };
-
-#endif // R3BROLUCALITEM_H
