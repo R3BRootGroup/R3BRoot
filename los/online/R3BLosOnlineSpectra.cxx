@@ -23,20 +23,19 @@
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosMappedData.h"
-#include "R3BTCalEngine.h"
+#include "R3BShared.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TMath.h"
-#include <vector>
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
 
 #define IS_NAN(x) TMath::IsNaN(x)
 using namespace std;
@@ -46,23 +45,9 @@ R3BLosOnlineSpectra::R3BLosOnlineSpectra()
 {
 }
 
-R3BLosOnlineSpectra::R3BLosOnlineSpectra(const char* name, Int_t iVerbose)
+R3BLosOnlineSpectra::R3BLosOnlineSpectra(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
-    , fTrigger(-1)
-    , fTpat(-1)
-    , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvents(0)
-    , fTimeStitch(nullptr)
 {
-}
-
-R3BLosOnlineSpectra::~R3BLosOnlineSpectra()
-{
-    for (Int_t i = 0; i < fMappedItems.size(); i++)
-        delete fMappedItems[i];
-
-    for (Int_t i = 0; i < fCalItems.size(); i++)
-        delete fCalItems[i];
 }
 
 InitStatus R3BLosOnlineSpectra::Init()
@@ -79,8 +64,6 @@ InitStatus R3BLosOnlineSpectra::Init()
     R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -107,7 +90,7 @@ InitStatus R3BLosOnlineSpectra::Init()
     fhTrigger = new TH1F("Trigger", "Trigger all", 20, 0, 20);
     fhTrigger->GetXaxis()->SetTitle("Trigger value");
 
-    TCanvas* cTrigg = new TCanvas("Trigg", "Triggers", 10, 10, 650, 350);
+    auto cTrigg = new TCanvas("Trigg", "Triggers", 10, 10, 650, 350);
     cTrigg->Divide(2, 1);
     cTrigg->cd(1);
     gPad->SetLogy();
@@ -118,139 +101,138 @@ InitStatus R3BLosOnlineSpectra::Init()
     cTrigg->cd(0);
 
     // MAIN FOLDER-MWPC
-    TFolder* mainfol = new TFolder("LOS", "LOS info");
+    auto mainfol = new TFolder("LOS", "LOS info");
 
-    //------------------------------------------------------------------------
-    // Los detector
-    TCanvas* cLos[fNofLosDetectors];                 // NOLINT
-    TCanvas* cLos_diagnosis[fNofLosDetectors];       // NOLINT
-    TCanvas* cLos_mapped_channels[fNofLosDetectors]; // NOLINT
+    // Los detector  ---------------------------------------------------
+    std::vector<TCanvas*> cLos;
+    std::vector<TCanvas*> cLos_diagnosis;
+    std::vector<TCanvas*> cLos_mapped_channels;
     if (fMappedItems.at(DET_LOS))
     {
         for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
         {
+            auto detName = Form("LOS%d", iloscount + 1);
+            cLos.push_back(new TCanvas(detName, detName, 10, 10, 1010, 810));
 
-            char detName[255];
-            sprintf(detName, "LOS%d", iloscount + 1);
-            cLos[iloscount] = new TCanvas(detName, detName, 10, 10, 1010, 810);
+            cLos_diagnosis.push_back(new TCanvas(
+                Form("LOS%d_diagnosis", iloscount + 1), Form("LOS%d diagnosis", iloscount + 1), 10, 10, 1010, 810));
 
-            char detName2[255];
-            sprintf(detName2, "LOS%d_diagnosis", iloscount + 1);
-            cLos_diagnosis[iloscount] = new TCanvas(detName2, detName2, 10, 10, 1010, 810);
-
-            char detName3[255];
-            sprintf(detName3, "LOS_mapped_channels%d", iloscount + 1);
-            cLos_mapped_channels[iloscount] = new TCanvas(detName3, detName3, 10, 10, 1010, 810);
+            cLos_mapped_channels.push_back(new TCanvas(Form("LOS_mapped_channels%d", iloscount + 1),
+                                                       Form("LOS mapped channels %d", iloscount + 1),
+                                                       10,
+                                                       10,
+                                                       1010,
+                                                       810));
 
             fh_los_channels[iloscount] =
-                new TH1F(Form("%s_channels", detName), Form("%s channels", detName), 20, 0., 20.);
+                R3B::root_owned<TH1F>(Form("%s_channels", detName), Form("%s channels", detName), 20, 0., 20.);
             fh_los_channels[iloscount]->GetXaxis()->SetTitle("Channel number");
             fh_los_channels[iloscount]->SetFillColor(31);
 
-            fh_los_multihit[iloscount] =
-                new TH1F(Form("%s_multihit", detName), Form("%s multihit && all 8 PMs", detName), 30, 0., 30.);
+            fh_los_multihit[iloscount] = R3B::root_owned<TH1F>(
+                Form("%s_multihit", detName), Form("%s multihit && all 8 PMs", detName), 30, 0., 30.);
             fh_los_multihit[iloscount]->GetXaxis()->SetTitle("Multihit");
             fh_los_multihit[iloscount]->SetFillColor(31);
 
-            fh_los_pos_MCFD[iloscount] =
-                new TH2F(Form("%s_pos_MCFD", detName), Form("%s MCFD Position ", detName), 500, -5., 5., 500, -5., 5.);
+            fh_los_pos_MCFD[iloscount] = R3B::root_owned<TH2F>(
+                Form("%s_pos_MCFD", detName), Form("%s MCFD Position ", detName), 500, -5., 5., 500, -5., 5.);
             fh_los_pos_MCFD[iloscount]->GetXaxis()->SetTitle("X position / cm");
             fh_los_pos_MCFD[iloscount]->GetYaxis()->SetTitle("Y position / cm");
 
-            fh_los_pos_TAMEX[iloscount] = new TH2F(
+            fh_los_pos_TAMEX[iloscount] = R3B::root_owned<TH2F>(
                 Form("%s_pos_TAMEX", detName), Form("%s TAMEX Position ", detName), 500, -5., 5., 500, -5., 5.);
             fh_los_pos_TAMEX[iloscount]->GetXaxis()->SetTitle("X position / cm");
             fh_los_pos_TAMEX[iloscount]->GetYaxis()->SetTitle("Y position / cm");
 
-            fh_los_pos_ToT[iloscount] =
-                new TH2F(Form("%s_pos_ToT", detName), Form("%s ToT Position ", detName), 500, -5., 5., 500, -5., 5.);
+            fh_los_pos_ToT[iloscount] = R3B::root_owned<TH2F>(
+                Form("%s_pos_ToT", detName), Form("%s ToT Position ", detName), 500, -5., 5., 500, -5., 5.);
             fh_los_pos_ToT[iloscount]->GetXaxis()->SetTitle("X position / cm");
             fh_los_pos_ToT[iloscount]->GetYaxis()->SetTitle("Y position / cm");
 
-            fh_los_dt_hits_ToT[iloscount] =
-                new TH2F(Form("%s_dt_ToT", detName), Form("%s ToT dt ", detName), 4000, -4., 4., 300, 0, 300.);
+            fh_los_dt_hits_ToT[iloscount] = R3B::root_owned<TH2F>(
+                Form("%s_dt_ToT", detName), Form("%s ToT dt ", detName), 4000, -4., 4., 300, 0, 300.);
             fh_los_dt_hits_ToT[iloscount]->GetXaxis()->SetTitle("Time MCFD / ns"); // dt between two hits / ns
             fh_los_dt_hits_ToT[iloscount]->GetYaxis()->SetTitle("ToT / ns");       // ToT / ns
 
-            fh_los_tres_MCFD[iloscount] = new TH1F(Form("%s_dt_4vs4_MCFD", detName),
-                                                   Form("%s MCFD Time resolution - 4pmts vs 4pmts", detName),
-                                                   4000,
-                                                   -4.,
-                                                   4.);
+            fh_los_tres_MCFD[iloscount] =
+                R3B::root_owned<TH1F>(Form("%s_dt_4vs4_MCFD", detName),
+                                      Form("%s MCFD Time resolution - 4pmts vs 4pmts", detName),
+                                      4000,
+                                      -4.,
+                                      4.);
             fh_los_tres_MCFD[iloscount]->GetXaxis()->SetTitle("Time MCFD / ns");
             fh_los_tres_MCFD[iloscount]->SetFillColor(31);
 
-            fh_los_tres_TAMEX[iloscount] = new TH1F(Form("%s_dt_4vs4_TAMEX", detName),
-                                                    Form("%s TAMEX Time resolution - 4pmts vs 4pmts ", detName),
-                                                    4000,
-                                                    -4.,
-                                                    4.);
+            fh_los_tres_TAMEX[iloscount] =
+                R3B::root_owned<TH1F>(Form("%s_dt_4vs4_TAMEX", detName),
+                                      Form("%s TAMEX Time resolution - 4pmts vs 4pmts ", detName),
+                                      4000,
+                                      -4.,
+                                      4.);
             fh_los_tres_TAMEX[iloscount]->GetXaxis()->SetTitle("Time TAMEX / ns");
             fh_los_tres_TAMEX[iloscount]->SetFillColor(31);
 
-            fh_los_tot[iloscount] =
-                new TH2F(Form("%s_tot", detName), Form("%s ToT vs PMT", detName), 10, 0, 10, 1500, 0., 300.);
+            fh_los_tot[iloscount] = R3B::root_owned<TH2F>(
+                Form("%s_tot", detName), Form("%s ToT vs PMT", detName), 10, 0, 10, 1500, 0., 300.);
             fh_los_tot[iloscount]->GetXaxis()->SetTitle("PMT number");
             fh_los_tot[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
             fh_los_tot_mean[iloscount] =
-                new TH1F(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 300.);
+                R3B::root_owned<TH1F>(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 300.);
             fh_los_tot_mean[iloscount]->GetYaxis()->SetTitle("Counts");
             fh_los_tot_mean[iloscount]->GetXaxis()->SetTitle("ToT / ns");
             fh_los_tot_mean[iloscount]->SetFillColor(31);
 
-            fh_los_ihit_ToT[iloscount] =
-                new TH2F(Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 300.);
-            // fh_los_ihit_ToT[iloscount]= new TH2F(Form("%s_tot_ihit",detName),Form("%s ToT vs
-            // ihit",detName),15,0,15,300,0.,300.);
+            fh_los_ihit_ToT[iloscount] = R3B::root_owned<TH2F>(
+                Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 300.);
             fh_los_ihit_ToT[iloscount]->GetXaxis()->SetTitle("iHit");
             fh_los_ihit_ToT[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
-            fh_losToT_vs_Events[iloscount] = new TH2F(Form("%s_tot_vs_event", detName),
-                                                      Form("%s ToT vs. Event #", detName),
-                                                      10000,
-                                                      0,
-                                                      10000000,
-                                                      300,
-                                                      0.,
-                                                      300.);
+            fh_losToT_vs_Events[iloscount] = R3B::root_owned<TH2F>(Form("%s_tot_vs_event", detName),
+                                                                   Form("%s ToT vs. Event #", detName),
+                                                                   10000,
+                                                                   0,
+                                                                   10000000,
+                                                                   300,
+                                                                   0.,
+                                                                   300.);
             fh_losToT_vs_Events[iloscount]->GetYaxis()->SetTitle("ToT / ns");
             fh_losToT_vs_Events[iloscount]->GetXaxis()->SetTitle("Event number");
 
-            fh_losTAMEX_vs_Events[iloscount] = new TH2F(Form("%s_dtTAMEX_vs_event", detName),
-                                                        Form("%s dtTAMEX vs. Event #", detName),
-                                                        10000,
-                                                        0,
-                                                        10000000,
-                                                        1000,
-                                                        -4.,
-                                                        4.);
+            fh_losTAMEX_vs_Events[iloscount] = R3B::root_owned<TH2F>(Form("%s_dtTAMEX_vs_event", detName),
+                                                                     Form("%s dtTAMEX vs. Event #", detName),
+                                                                     10000,
+                                                                     0,
+                                                                     10000000,
+                                                                     1000,
+                                                                     -4.,
+                                                                     4.);
             fh_losTAMEX_vs_Events[iloscount]->GetYaxis()->SetTitle("Time TAMEX  / ns");
             fh_losTAMEX_vs_Events[iloscount]->GetXaxis()->SetTitle("Event number");
 
-            fh_losMCFD_vs_Events[iloscount] = new TH2F(Form("%s_dtMCFD_vs_event", detName),
-                                                       Form("%s dtMCFD vs. Event #", detName),
-                                                       10000,
-                                                       0,
-                                                       10000000,
-                                                       1000,
-                                                       -4.,
-                                                       4.);
+            fh_losMCFD_vs_Events[iloscount] = R3B::root_owned<TH2F>(Form("%s_dtMCFD_vs_event", detName),
+                                                                    Form("%s dtMCFD vs. Event #", detName),
+                                                                    10000,
+                                                                    0,
+                                                                    10000000,
+                                                                    1000,
+                                                                    -4.,
+                                                                    4.);
             fh_losMCFD_vs_Events[iloscount]->GetYaxis()->SetTitle("Time MCFD  / ns");
             fh_losMCFD_vs_Events[iloscount]->GetXaxis()->SetTitle("Event number");
 
-            fh_los_vftx_tamex[iloscount] =
-                new TH1F(Form("%s_vftx_tamex", detName), Form("%s vftx_tamex", detName), 100000, -5000, 5000.);
+            fh_los_vftx_tamex[iloscount] = R3B::root_owned<TH1F>(
+                Form("%s_vftx_tamex", detName), Form("%s vftx_tamex", detName), 100000, -5000, 5000.);
             fh_los_vftx_tamex[iloscount]->GetYaxis()->SetTitle("Counts");
             fh_los_vftx_tamex[iloscount]->GetXaxis()->SetTitle("Ttamex-Tvftx / ns");
             fh_los_vftx_tamex[iloscount]->SetFillColor(31);
 
-            fh_los_mapped.resize(24);
+            fh1_los_mapped.resize(nb_pmts * 3);
             const char* names[] = { "VFTX", "TMX_L", "TMX_T" };
-            for (Int_t t = 0; t < 24; t++)
+            for (Int_t t = 0; t < fh1_los_mapped.size(); t++)
             {
-                TString title = Form("%s_%s_los_channels_%d", detName, names[t / 8], t % 8);
-                fh_los_mapped[t] = new TH1F(title, title, 2048, 0, 4 * 2048 * 5.);
+                TString title = Form("%s_%s_los_channels_%d", detName, names[t / nb_pmts], t % nb_pmts);
+                fh1_los_mapped[t] = R3B::root_owned<TH1F>(title, title, 2048, 0, 4 * 2048 * 5.);
             }
 
             cLos[iloscount]->Divide(3, 3);
@@ -302,16 +284,16 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_vftx_tamex[iloscount]->Draw();
             mainfol->Add(cLos_diagnosis[iloscount]);
 
-            cLos_mapped_channels[iloscount]->Divide(8, 3);
+            cLos_mapped_channels[iloscount]->Divide(nb_pmts, 3);
 
-            for (int t = 0; t < 24; t++)
+            for (size_t t = 0; t < fh1_los_mapped.size(); t++)
             {
                 cLos_mapped_channels[iloscount]->cd(t + 1);
-                fh_los_mapped[t]->Draw();
+                fh1_los_mapped[t]->SetFillColor(31);
+                fh1_los_mapped[t]->Draw();
             }
             mainfol->Add(cLos_mapped_channels[iloscount]);
         }
-
         run->AddObject(mainfol);
         run->GetHttpServer()->RegisterCommand("Reset_LOS_HIST", Form("/Objects/%s/->Reset_LOS_Histo()", GetName()));
     }
@@ -327,7 +309,7 @@ void R3BLosOnlineSpectra::Reset_LOS_Histo()
     R3BLOG(info, "");
     if (fMappedItems.at(DET_LOS))
     {
-        for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
+        for (size_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
         {
             fh_los_channels[iloscount]->Reset();
             fh_los_tres_MCFD[iloscount]->Reset();
@@ -344,10 +326,14 @@ void R3BLosOnlineSpectra::Reset_LOS_Histo()
             fh_losMCFD_vs_Events[iloscount]->Reset();
             fh_los_dt_hits_ToT[iloscount]->Reset();
         }
+        for (auto* hist : fh1_los_mapped)
+        {
+            hist->Reset();
+        }
     }
 }
 
-void R3BLosOnlineSpectra::Exec(Option_t* option)
+void R3BLosOnlineSpectra::Exec(Option_t* /*option*/)
 {
     time = header->GetTimeStamp();
     if (time_start == 0 && time > 0)
@@ -371,7 +357,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
     if (header->GetTrigger() == 13)
         cout << "Spill stop: " << double(time_spill_end - time_start) / 1.e9 << " sec" << endl;
 
-    Int_t tpatbin;
+    Int_t tpatbin = 0;
     for (int i = 0; i < 16; i++)
     {
         tpatbin = (header->GetTpat() & (1 << i));
@@ -381,7 +367,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         }
     }
 
-    if ((fTpat > 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
+    if ((fTpat > 0) && (header != nullptr) && ((header->GetTpat() & fTpat) != fTpat))
         return;
 
     //----------------------------------------------------------------------
@@ -396,29 +382,28 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
 
     Double_t timeTofd = 0;
 
-    Double_t timeLosV[fNofLosDetectors][32];
-    Double_t LosTresV[fNofLosDetectors][32];
-    Double_t timeLosT[fNofLosDetectors][32];
-    Double_t LosTresT[fNofLosDetectors][32];
-    Double_t timeLos[fNofLosDetectors][32];
-    Double_t totsum[fNofLosDetectors][32];
-    Double_t xT_cm[fNofLosDetectors][32];
-    Double_t yT_cm[fNofLosDetectors][32];
-    Double_t xToT_cm[fNofLosDetectors][32];
-    Double_t yToT_cm[fNofLosDetectors][32];
-    Double_t xV_cm[fNofLosDetectors][32];
-    Double_t yV_cm[fNofLosDetectors][32];
+    Double_t timeLosV[maxnb_los_det][mult_hit];
+    Double_t LosTresV[maxnb_los_det][mult_hit];
+    Double_t timeLosT[maxnb_los_det][mult_hit];
+    Double_t LosTresT[maxnb_los_det][mult_hit];
+    Double_t timeLos[maxnb_los_det][mult_hit];
+    Double_t totsum[maxnb_los_det][mult_hit];
+    Double_t xT_cm[maxnb_los_det][mult_hit];
+    Double_t yT_cm[maxnb_los_det][mult_hit];
+    Double_t xToT_cm[maxnb_los_det][mult_hit];
+    Double_t yToT_cm[maxnb_los_det][mult_hit];
+    Double_t xV_cm[maxnb_los_det][mult_hit];
+    Double_t yV_cm[maxnb_los_det][mult_hit];
 
-    Double_t time_V[fNofLosDetectors][32][8]; // [det][multihit][pm]
-    Double_t time_L[fNofLosDetectors][32][8];
-    Double_t time_T[fNofLosDetectors][32][8];
-    Double_t tot[fNofLosDetectors][32][8];
-    Double_t time_MTDC[32][8] = { { 0. } };
-    Double_t LosTresMTDC[32];
+    Double_t time_V[maxnb_los_det][mult_hit][nb_pmts]; // [det][multihit][pm]
+    Double_t time_L[maxnb_los_det][mult_hit][nb_pmts];
+    Double_t time_T[maxnb_los_det][mult_hit][nb_pmts];
+    Double_t tot[maxnb_los_det][mult_hit][nb_pmts];
+    Double_t time_MTDC[mult_hit][nb_pmts] = { { 0. } };
 
-    for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
+    for (size_t idet = 0; idet < fNofLosDetectors; idet++)
     {
-        for (Int_t imult = 0; imult < 32; imult++)
+        for (size_t imult = 0; imult < mult_hit; imult++)
         {
             timeLosV[idet][imult] = 0.0;
             LosTresV[idet][imult] = 0.0 / 0.0;
@@ -432,7 +417,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
             yToT_cm[idet][imult] = -100000.;
             xV_cm[idet][imult] = 0.0 / 0.0;
             yV_cm[idet][imult] = 0.0 / 0.0;
-            for (Int_t icha = 0; icha < 8; icha++)
+            for (Int_t icha = 0; icha < nb_pmts; icha++)
             {
                 time_V[idet][imult][icha] = 0.0 / 0.0; // [det][multihit][pm]
                 time_L[idet][imult][icha] = 0.0 / 0.0;
@@ -442,38 +427,30 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         }
     }
     Int_t nPartLOS = 0;
-    Int_t nPartc[fNofLosDetectors];
-    for (Int_t d = 0; d < fNofLosDetectors; d++)
-        nPartc[d] = 0;
+    std::vector<Int_t> nPartc(fNofLosDetectors, 0);
 
-    Bool_t iLOSType[fNofLosDetectors][32];
-    Bool_t iLOSPileUp[fNofLosDetectors][32];
-    for (Int_t idet = 0; idet < fNofLosDetectors; idet++)
+    Bool_t iLOSType[maxnb_los_det][mult_hit];
+    Bool_t iLOSPileUp[maxnb_los_det][mult_hit];
+    for (size_t idet = 0; idet < fNofLosDetectors; idet++)
     {
-        for (Int_t imult = 0; imult < 32; imult++)
+        for (size_t imult = 0; imult < mult_hit; imult++)
         {
             iLOSType[idet][imult] = false;
             iLOSPileUp[idet][imult] = false;
         }
     }
 
-    Int_t Multip;
-
     if (fMappedItems.at(DET_LOS))
     {
         auto det = fMappedItems.at(DET_LOS);
-        Int_t nHits = det->GetEntriesFast();
+        auto nHits = det->GetEntriesFast();
 
-        //       cout<<"nHits in LOS: "<<nHits<<endl;
         if (nHits > 0)
-            nLosEvents += 1;
-        Multip = nHits;
-
-        //    cout<<"LOS: nHits"<<nHits<<endl;
+            nLosEvents++;
 
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
+            auto hit = dynamic_cast<R3BLosMappedData*>(det->At(ihit));
             if (!hit)
                 continue;
 
@@ -484,8 +461,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
             // Int_t iFT = hit->GetTimeFine();
             Int_t iCT = hit->GetTimeCoarse();
             if (iTyp == 0 || iTyp == 1)
-                fh_los_channels[iDet - 1]->Fill(8 * iTyp + iCha); // exclude MTDC data
-            fh_los_mapped[8 * iTyp + iCha - 1]->Fill(iCT * 5);
+                fh_los_channels[iDet - 1]->Fill(nb_pmts * iTyp + iCha); // exclude MTDC data
+            fh1_los_mapped[nb_pmts * iTyp + iCha - 1]->Fill(iCT * 5);
         }
     }
 
@@ -495,19 +472,19 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
         nPartLOS = det->GetEntriesFast();
 
         Int_t iDet = 0;
-        Double_t time_V_LOS1[32][8] = { { 0. } };
-        Double_t time_V_LOS2[32][8] = { { 0. } };
+        Double_t time_V_LOS1[mult_hit][nb_pmts] = { { 0. } };
+        Double_t time_V_LOS2[mult_hit][nb_pmts] = { { 0. } };
 
-        for (Int_t iPart = 0; iPart < nPartLOS; iPart++)
+        for (size_t iPart = 0; iPart < nPartLOS; iPart++)
         {
             /*
              * nPart is the number of particle passing through LOS detector in one event
              */
-            R3BLosCalData* calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
+            auto calData = dynamic_cast<R3BLosCalData*>(det->At(iPart));
             iDet = calData->GetDetector();
 
             Double_t sumvtemp = 0, sumltemp = 0, sumttemp = 0;
-            for (Int_t iCha = 0; iCha < 8; iCha++)
+            for (size_t iCha = 0; iCha < nb_pmts; iCha++)
             {
                 sumvtemp += calData->GetTimeV_ns(iCha);
                 sumltemp += calData->GetTimeL_ns(iCha);
@@ -522,7 +499,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                 continue;
             }
 
-            for (Int_t iCha = 0; iCha < 8; iCha++)
+            for (size_t iCha = 0; iCha < nb_pmts; iCha++)
             {
                 if (iDet == 1)
                 {
@@ -588,7 +565,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                        });
             for (Int_t iPart = 0; iPart < nPartc[0]; iPart++)
             {
-                for (int ipm = 0; ipm < 8; ipm++)
+                for (size_t ipm = 0; ipm < nb_pmts; ipm++)
                 {
                     time_V[0][iPart][ipm] = time_V_LOS1[iPart][ipm];
                 }
@@ -610,7 +587,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                        });
             for (Int_t iPart = 0; iPart < nPartc[1]; iPart++)
             {
-                for (int ipm = 0; ipm < 8; ipm++)
+                for (size_t ipm = 0; ipm < nb_pmts; ipm++)
                 {
                     time_V[1][iPart][ipm] = time_V_LOS2[iPart][ipm];
                 }
@@ -626,7 +603,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
 
         for (iDet = 1; iDet <= fNofLosDetectors; iDet++)
         {
-            for (Int_t iPart = 0; iPart < nPartc[iDet - 1]; iPart++)
+            for (size_t iPart = 0; iPart < nPartc[iDet - 1]; iPart++)
             {
                 Bool_t iLOSTypeMCFD = false;
                 Bool_t iLOSTypeTAMEX = false;
@@ -673,7 +650,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
                     int nPMT = 0;
                     int nPMV = 0;
 
-                    for (int ipm = 0; ipm < 8; ipm++)
+                    for (size_t ipm = 0; ipm < nb_pmts; ipm++)
                     {
 
                         if (time_T[iDet - 1][iPart][ipm] > 0. && time_L[iDet - 1][iPart][ipm] > 0. &&
@@ -799,7 +776,7 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
 
                     if (!(iLOSPileUp[iDet - 1][iPart])) // desregard pile-up events
                     {
-                        for (int ipm = 0; ipm < 8; ipm++)
+                        for (size_t ipm = 0; ipm < nb_pmts; ipm++)
                         {
                             fh_los_tot[iDet - 1]->Fill(ipm + 1, tot[iDet - 1][iPart][ipm]);
                         }
@@ -819,13 +796,12 @@ void R3BLosOnlineSpectra::Exec(Option_t* option)
 
     } // if fCallItems
 
-    fNEvents += 1;
+    fNEvents++;
 }
 
 void R3BLosOnlineSpectra::FinishEvent()
 {
-
-    for (Int_t det = 0; det < DET_MAX; det++)
+    for (size_t det = 0; det < DET_MAX; det++)
     {
         if (fMappedItems.at(det))
         {
@@ -842,7 +818,7 @@ void R3BLosOnlineSpectra::FinishTask()
 {
     if (fMappedItems.at(DET_LOS))
     {
-        for (Int_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
+        for (size_t iloscount = 0; iloscount < fNofLosDetectors; iloscount++)
         {
             fh_los_channels[iloscount]->Write();
             fh_los_tot[iloscount]->Write();
@@ -855,6 +831,10 @@ void R3BLosOnlineSpectra::FinishTask()
             fh_los_pos_TAMEX[iloscount]->Write();
             fh_los_pos_ToT[iloscount]->Write();
         }
+        for (auto* hist : fh1_los_mapped)
+        {
+            hist->Write();
+        }
     }
     fhTpat->Write();
     fhTrigger->Write();
@@ -862,4 +842,4 @@ void R3BLosOnlineSpectra::FinishTask()
     R3BLOG(info, "All events: " << fNEvents << ", LOS events: " << nLosEvents);
 }
 
-ClassImp(R3BLosOnlineSpectra);
+ClassImp(R3BLosOnlineSpectra)

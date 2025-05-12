@@ -17,26 +17,29 @@
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BLosOnlineSpectra_H
-#define R3BLosOnlineSpectra_H 1
+#pragma once
 
-#include "FairTask.h"
+#include "R3BTCalEngine.h"
+
+#include <FairTask.h>
+
+#include <TMath.h>
 #include <array>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <vector>
-
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TMath.h"
-#include <cstdlib>
 
 class TClonesArray;
 class R3BCoarseTimeStitch;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
+
+constexpr size_t maxnb_los_det = 2;
+constexpr size_t mult_hit = 32;
+constexpr uint8_t nb_pmts = 8;
 
 /**
  * This taks reads LOS data items and plots histograms
@@ -57,13 +60,13 @@ class R3BLosOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLosOnlineSpectra(const char* name, Int_t iVerbose = 1);
+    explicit R3BLosOnlineSpectra(const char* name, int iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BLosOnlineSpectra();
+    virtual ~R3BLosOnlineSpectra() = default;
 
     /**
      * Method for task initialization.
@@ -71,27 +74,27 @@ class R3BLosOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t*) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Methods for setting position offset and effective velocity of light
@@ -194,10 +197,7 @@ class R3BLosOnlineSpectra : public FairTask
   private:
     std::vector<TClonesArray*> fMappedItems;
     std::vector<TClonesArray*> fCalItems;
-
-    R3BCoarseTimeStitch* fTimeStitch;
-    TClonesArray* fMappedItemsTwim; /**< Array with mapped items. */
-    TClonesArray* fCalItemsTwim;    /**< Array with cal items. */
+    R3BCoarseTimeStitch* fTimeStitch = nullptr;
 
     enum DetectorInstances
     {
@@ -208,28 +208,25 @@ class R3BLosOnlineSpectra : public FairTask
     const char* fDetectorNames[DET_MAX + 1] = { "Los", NULL };
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
-    Int_t fTpat;
-    Int_t fSamp;
-    Double_t fClockFreq; /**< Clock cycle in [ns]. */
-    Int_t nLosEvents = 0;
-    //   TClonesArray *fbmonMappedItems;
-    Int_t fNofLosDetectors = 1; /**< Number of LOS detectors. */
+    R3BEventHeader* header = nullptr;
+    int fTrigger = -1;
+    int fTpat = -1;
+    double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.; // Clock cycle in [ns]
+    unsigned long long nLosEvents = 0;
+    Int_t fNofLosDetectors = 1;
 
-    Double_t flosVeffXV[2];
-    Double_t flosVeffYV[2];
-    Double_t flosOffsetXV[2];
-    Double_t flosOffsetYV[2];
-    Double_t flosVeffXT[2];
-    Double_t flosVeffYT[2];
-    Double_t flosOffsetXT[2];
-    Double_t flosOffsetYT[2];
-    Double_t flosVeffXQ[2];
-    Double_t flosVeffYQ[2];
-    Double_t flosOffsetXQ[2];
-    Double_t flosOffsetYQ[2];
-    Int_t foptcond;
+    Double_t flosVeffXV[maxnb_los_det];
+    Double_t flosVeffYV[maxnb_los_det];
+    Double_t flosOffsetXV[maxnb_los_det];
+    Double_t flosOffsetYV[maxnb_los_det];
+    Double_t flosVeffXT[maxnb_los_det];
+    Double_t flosVeffYT[maxnb_los_det];
+    Double_t flosOffsetXT[maxnb_los_det];
+    Double_t flosOffsetYT[maxnb_los_det];
+    Double_t flosVeffXQ[maxnb_los_det];
+    Double_t flosVeffYQ[maxnb_los_det];
+    Double_t flosOffsetXQ[maxnb_los_det];
+    Double_t flosOffsetYQ[maxnb_los_det];
 
     unsigned long long time_V_mem = 0, time_start = 0, time = 0, time_mem = 0;
     std::vector<unsigned long long> time_prev;
@@ -244,7 +241,7 @@ class R3BLosOnlineSpectra : public FairTask
     Double_t fNorm = 1.;
     Double_t fEpileup;
 
-    unsigned long fNEvents = 0, fNEvents_start = 0; /**< Event counter. */
+    unsigned long long fNEvents = 0, fNEvents_start = 0;
 
     TH1F* fhTpat;
     TH1F* fh_spill_length;
@@ -268,10 +265,9 @@ class R3BLosOnlineSpectra : public FairTask
     std::vector<TH2F*> fh_losTAMEX_vs_Events;
     std::vector<TH2F*> fh_losMCFD_vs_Events;
     std::vector<TH1F*> fh_los_vftx_tamex;
-    std::vector<TH1F*> fh_los_mapped;
+    std::vector<TH1F*> fh1_los_mapped;
 
   public:
-    ClassDef(R3BLosOnlineSpectra, 2)
+    // Class definition
+    ClassDefOverride(R3BLosOnlineSpectra, 2); // NOLINT
 };
-
-#endif
