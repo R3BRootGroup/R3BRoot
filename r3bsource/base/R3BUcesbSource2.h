@@ -18,7 +18,13 @@
 #include <R3BUcesbLauncher.h>
 #include <R3BUcesbMappingFlag.h>
 #include <R3BUcesbStructInfo.h>
+#include <Rtypes.h>
+#include <cstddef>
 #include <ext_data_clnt.hh>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <vector>
 
 struct EXT_STR_h101_t;
 using EventStructType = EXT_STR_h101_t;
@@ -59,10 +65,10 @@ namespace R3B
         auto AddReader(Args&&... args) -> ReaderType*;
         // TODO: C++20 concepts
         template <typename UnaryOp>
-        void ForEachReader(UnaryOp&& opt);
+        void ForEachReader(UnaryOp opt);
 
         template <typename Predicate>
-        auto FindReaderIf(Predicate&& pred) -> R3BReader*;
+        auto FindReaderIf(Predicate pred) -> R3BReader*;
 
         // deprecate the old API because of bad memory managerment
         [[deprecated("Please use smart pointer method to add a reader")]] auto* AddReader(R3BReader* a_reader)
@@ -115,7 +121,7 @@ namespace R3B
         Source_Type GetSourceType() override { return kONLINE; }
 
       public:
-        ClassDefInlineOverride(R3B::UcesbSource, 1);
+        ClassDefOverride(R3B::UcesbSource, 1);
     };
 
     template <typename ReaderType>
@@ -133,7 +139,7 @@ namespace R3B
     }
 
     template <typename UnaryOp>
-    void UcesbSource::ForEachReader(UnaryOp&& opt)
+    void UcesbSource::ForEachReader(UnaryOp opt)
     {
         for (auto& reader : readers_)
         {
@@ -142,7 +148,7 @@ namespace R3B
     }
 
     template <typename Predicate>
-    auto UcesbSource::FindReaderIf(Predicate&& pred) -> R3BReader*
+    auto UcesbSource::FindReaderIf(Predicate pred) -> R3BReader*
     {
         auto res = std::find_if(readers_.begin(), readers_.end(), [&pred](auto& reader) { return pred(reader.get()); });
         return (res == readers_.end()) ? nullptr : res->get();

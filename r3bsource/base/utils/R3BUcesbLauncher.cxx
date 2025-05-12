@@ -14,12 +14,30 @@
 #include "R3BUcesbLauncher.h"
 #include <R3BException.h>
 #include <R3BLogger.h>
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/constants.hpp>
+#include <boost/algorithm/string/split.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/process/v2/process.hpp>
+#include <boost/process/v2/stdio.hpp>
+#include <chrono>
+#include <cstddef>
+#include <fairlogger/Logger.h>
 #include <filesystem>
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fmt/os.h>
+#include <memory>
 #include <regex>
 
 #include <ext_data_clnt.hh>
+#include <string>
+#include <string_view>
+#include <system_error>
+#include <utility>
+#include <vector>
 
 constexpr auto CHILD_CLOSE_WAITING_TIME = std::chrono::seconds(5);
 
@@ -162,9 +180,12 @@ namespace R3B
                            launch_strings.executable,
                            fmt::join(launch_args, " ")));
 
-        ucesb_server_ = std::make_unique<boost::process::child>(
-            launch_strings.executable, boost::process::args(launch_args), boost::process::std_out > server_pipe_);
-        if (auto is_status_ok = client_->connect(server_pipe_.native_source()); not is_status_ok)
+        ucesb_server_ =
+            std::make_unique<bpv2::process>(ios_,
+                                            launch_strings.executable,
+                                            launch_args,
+                                            bpv2::process_stdio{ .in = nullptr, .out = server_pipe_, .err = stdout });
+        if (auto is_status_ok = client_->connect(server_pipe_.native_handle()); not is_status_ok)
         {
             R3BLOG(error, "ext_data_clnt::connect() failed");
             const auto* msg = (client_->last_error() == nullptr) ? UCESB_NULL_STR_MSG : client_->last_error();
@@ -181,15 +202,15 @@ namespace R3B
             throw R3B::runtime_error("ext_data_clnt::close() failed");
         }
         auto err_code = std::error_code{};
-        if (not ucesb_server_->wait_for(CHILD_CLOSE_WAITING_TIME, err_code))
-        {
-            R3BLOG(warn, fmt::format("Failed to close Ucesb server! Error code: {}", err_code.value()));
-            ucesb_server_->terminate(err_code);
-            R3BLOG(warn, "Killing Ucesb server");
-        }
-        else
-        {
-            R3BLOG(info, "Ucesb server is closed successfully");
-        }
+        ucesb_server_->async_wait(
+            [](const std::error_code& err, int ret)
+            {
+                if (err)
+                {
+                    LOGP(error, "Error occured from ucesb server. Error message: {}", err.message());
+                }
+                LOGP(info, "Ucesb server is closed successfully with the return value: {}", ret);
+            });
+        ios_.run_for(CHILD_CLOSE_WAITING_TIME);
     }
 } // namespace R3B

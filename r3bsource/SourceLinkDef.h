@@ -20,6 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BUcesbSource+;
+#pragma link C++ class R3B::UcesbSource+;
 #pragma link C++ class R3BReader+;
 #pragma link C++ class R3BUnpackReader+;
 #pragma link C++ class R3BWhiterabbitNeulandReader+;

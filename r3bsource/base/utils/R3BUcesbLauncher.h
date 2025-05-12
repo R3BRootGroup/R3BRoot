@@ -13,10 +13,17 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 #include <boost/asio.hpp>
-#include <boost/process.hpp>
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/readable_pipe.hpp>
+#include <boost/process/v2/process.hpp>
+#include <cstddef>
 #include <ext_data_clnt.hh>
+#include <memory>
+#include <string>
 
 constexpr auto UCESB_NULL_STR_MSG = "Can't retrieve error message as last_error returns nullptr!";
+
+namespace bpv2 = boost::process::v2;
 
 namespace R3B
 {
@@ -33,9 +40,9 @@ namespace R3B
 
       private:
         ext_data_clnt* client_ = nullptr;
-        std::unique_ptr<boost::process::child> ucesb_server_;
+        std::unique_ptr<bpv2::process> ucesb_server_;
         boost::asio::io_service ios_;
-        boost::process::async_pipe server_pipe_{ ios_ };
+        boost::asio::readable_pipe server_pipe_{ ios_ };
     };
 
 } // namespace R3B
