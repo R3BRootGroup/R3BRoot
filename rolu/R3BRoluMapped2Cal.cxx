@@ -344,4 +344,4 @@ void R3BRoluMapped2Cal::FinishEvent()
     }
 }
 
-ClassImp(R3BRoluMapped2Cal);
+ClassImp(R3BRoluMapped2Cal)

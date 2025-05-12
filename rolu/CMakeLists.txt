@@ -15,9 +15,17 @@
 # the array. The extension is already found. Any number of sources could be
 # listed here.
 
-set(SRCS R3BRoluMapped2Cal.cxx R3BRoluMapped2CalPar.cxx R3BRoluCal2Hit.cxx R3BRoluOnlineSpectra.cxx)
+set(SRCS 
+R3BRoluMapped2Cal.cxx 
+R3BRoluMapped2CalPar.cxx 
+R3BRoluCal2Hit.cxx 
+R3BRoluOnlineSpectra.cxx)
 
-set(HEADERS R3BRoluMapped2Cal.h R3BRoluMapped2CalPar.h R3BRoluCal2Hit.h R3BRoluOnlineSpectra.h)
+set(HEADERS 
+R3BRoluMapped2Cal.h 
+R3BRoluMapped2CalPar.h 
+R3BRoluCal2Hit.h 
+R3BRoluOnlineSpectra.h)
 
 add_library_with_dictionary(
     LIBNAME

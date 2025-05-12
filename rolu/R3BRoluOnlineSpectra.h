@@ -12,7 +12,7 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----                  R3BRoluOnlineSpectra             -----
+// -----                  R3BRoluOnlineSpectra            -----
 // -----            Created 13-04-2016 by M.Heil          -----
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
@@ -33,6 +33,8 @@
 
 #define VFTX_CLOCK_MHZ 200
 
+constexpr size_t fNofRolu = 2;
+
 class TClonesArray;
 class R3BCoarseTimeStitch;
 class TH1F;
@@ -50,22 +52,22 @@ class R3BRoluOnlineSpectra : public FairTask
     R3BRoluOnlineSpectra();
 
     // Standard constructor.
-    R3BRoluOnlineSpectra(const char* name, int iVerbose = 1);
+    explicit R3BRoluOnlineSpectra(const char* name, int iVerbose = 1);
 
     // Destructor.
-    virtual ~R3BRoluOnlineSpectra();
+    virtual ~R3BRoluOnlineSpectra() = default;
 
     // Method for task initialization.
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     // Method for event loop implementation.
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t*) override;
 
     // A method for finish of processing of an event.
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     // Method for finish of the task execution.
-    virtual void FinishTask();
+    void FinishTask() override;
 
     // Method for setting the trigger value.
     //  @param trigger 1 - physics, 2 - offspill, -1 - all events.
@@ -74,31 +76,30 @@ class R3BRoluOnlineSpectra : public FairTask
 
     void Reset_ROLU_Histo();
 
-    /* Method for setting number of ROLU detectors */
+    // Method for setting number of ROLU detectors
     inline void SetNofRoluModules(int nDets) { fNofRoluDetectors = nDets; }
 
   private:
-    TClonesArray* fMappedItems;
-    TClonesArray* fCalItems;
+    TClonesArray* fMappedItems = nullptr;
+    TClonesArray* fCalItems = nullptr;
 
-    // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header{}; /**< Event header. */
-    int fTrigger = -1;        /**< Trigger value. */
+    R3BEventHeader* header{};
+    int fTrigger = -1;
     int fTpat = -1;
-    double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.; /**< Clock cycle in [ns]. */
+    double fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.; // Clock cycle in [ns]
     int nRoluEvents = 0;
-    int fNofRoluDetectors = 1; /**< Number of ROLU detectors. */
-    static constexpr int fNofRolu = 2;
-
-    int counter[4] = { 0 };
+    int fNofRoluDetectors = 1; // Number of ROLU detectors
 
     const char* fDetectorNames[fNofRolu] = { "Rolu" };
 
-    TH1F* fh_rolu_channels[fNofRolu]{};
-    TH2F* fh_rolu_tot[fNofRolu]{};
-    TH1F* fh_rolu_tot_1D[fNofRolu][4]{};
-    TH1F* fh_rolu_LE_raw[fNofRolu][4]{};
+    std::vector<TH1F*> fh1_rolu_channels;
+    std::vector<TH1F*> fh1_rolu_multiplicity;
+    std::vector<TH2F*> fh2_rolu_tot;
+    std::vector<TH2F*> fh2_rolu_hit1vshit2;
+    std::vector<std::vector<TH1F*>> fh1_rolu_tot;
+    std::vector<std::vector<TH1F*>> fh1_rolu_LE_raw;
 
   public:
-    ClassDef(R3BRoluOnlineSpectra, 0)
+    // Class definition
+    ClassDefOverride(R3BRoluOnlineSpectra, 0); // NOLINT
 };
