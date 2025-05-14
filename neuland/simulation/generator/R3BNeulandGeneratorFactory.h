@@ -7,12 +7,12 @@
 #include <Math/Vector3D.h> // NOLINT
 #include <Math/Vector3Dfwd.h>
 #include <R3BMinMaxValue.h>
-#include <R3BPDGParticle.h>
 #include <TRandom3.h>
 #include <cstdint>
 #include <functional>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <string>
 
 namespace R3B::Neuland
 {
@@ -27,13 +27,13 @@ namespace R3B::Neuland
       public:
         struct Options
         {
-            int multiplicity = 1;                                   //!< Multiplicity of particles
-            GeneratorType generator_type = GeneratorType::box;      //!< Type of generator
-            Particle::Type particle_type = Particle::Type::neutron; //!< Particle type
-            ValueErrorD energy = DEFAULT_GENERATOR_ENERGY;          //!< energy value with error [MeV]
-            MinMaxValueD theta = DEFAULT_BOX_GENERATOR_THETA;       //!< Theta min and max value for outgoing direction
-            MinMaxValueD phi = DEFAULT_BOX_GENERATOR_PHI;           //!< Phi min and max value for outgoing direction
-            ROOT::Math::XYZVectorD position{ 0., 0., 0. };          //!< Location of particle generation
+            int multiplicity = 1;                              //!< Multiplicity of particles
+            GeneratorType generator_type = GeneratorType::box; //!< Type of generator
+            std::string particle_type = "neutron";             //!< Particle type
+            ValueErrorD energy = DEFAULT_GENERATOR_ENERGY;     //!< energy value with error [MeV]
+            MinMaxValueD theta = DEFAULT_BOX_GENERATOR_THETA;  //!< Theta min and max value for outgoing direction
+            MinMaxValueD phi = DEFAULT_BOX_GENERATOR_PHI;      //!< Phi min and max value for outgoing direction
+            ROOT::Math::XYZVectorD position{ 0., 0., 0. };     //!< Location of particle generation
         };
 
         /**

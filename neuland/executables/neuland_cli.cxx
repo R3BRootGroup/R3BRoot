@@ -1,3 +1,4 @@
+#include <fairlogger/Logger.h>
 #define JSON_USE_IMPLICIT_CONVERSIONS 0 // NOLINT
 
 #include <CLI/App.hpp> // NOLINT
@@ -23,6 +24,7 @@ auto main(int argc, char** argv) -> int
     auto is_failed = false;
     auto num_proc = 0;
     auto num_rank = 0;
+
 #ifdef HAS_MPI
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &num_proc);
@@ -54,6 +56,8 @@ auto main(int argc, char** argv) -> int
 
         CLI11_PARSE(program_options, argc, argv);
 
+        app->post_parse();
+
         if (app == nullptr)
         {
             throw R3B::runtime_error("Application is not instantiated!");
@@ -78,7 +82,7 @@ auto main(int argc, char** argv) -> int
     catch (const std::exception& ex)
     {
         fmt::println("");
-        R3BLOG(error, fmt::format("Exception ocurred: \n\n{}\n", ex.what()));
+        LOGP(error, "Exception ocurred: \n\n{}\n", ex.what());
         is_failed = true;
         app->set_fail(is_failed);
     }

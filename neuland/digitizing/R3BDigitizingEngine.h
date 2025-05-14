@@ -57,7 +57,7 @@ namespace R3B::Digitizing
          * will be appended in the engine.
          * @param paddle_id ID of the paddle with the light deposition
          * @param time Time of the light deposition
-         * @param light Energy of the light deposition (MeV)
+         * @param energy_dep Energy of the light deposition (MeV)
          * @param dist Distance to the center point of the bar
          */
         void DepositLight(int paddle_id, double time, double energy_dep, double dist)
@@ -277,7 +277,7 @@ namespace R3B::Digitizing
          *
          * Constructing a number of bars for the input data. If the available bars are not enough for the new data, the
          * whole data will be reallocated (just like std::vector). The reallocation should happen rarely!
-         * @param num_of_modules Initial number of bars preallocated
+         * @param initFunc Initiator functor
          */
         void SetInit(const InitFunc& initFunc) { initFunc_ = initFunc; }
         void ExtraReset() override {}

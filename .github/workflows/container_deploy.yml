@@ -71,6 +71,7 @@ jobs:
           APPTAINER_TMPDIR: ${{ github.workspace }}/tmp
 
       - name: clean up
+        if: success() || failure()
         run: |
           apptainer remote logout SylabsCloud
           apptainer cache clean -f

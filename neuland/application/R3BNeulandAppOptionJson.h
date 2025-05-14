@@ -1,6 +1,7 @@
 #pragma once
 
 #include "R3BNeulandApp.h"
+#include "R3BNeulandDigitizer.h"
 #include <R3BDigitizingTamex.h>
 #include <R3BNeulandAnalysisApp.h>
 #include <R3BNeulandSimApp.h>
@@ -68,10 +69,10 @@ namespace R3B::Neuland
     // =============================================================================================
     // tasks specialization:
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const AnalysisApplication::Options::Tasks::Digi& option);
+    void to_json(nlohmann::ordered_json& json_obj, const R3B::Neuland::DigiTaskOptions& option);
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, AnalysisApplication::Options::Tasks::Digi& option);
+    void from_json(const nlohmann::ordered_json& json_obj, R3B::Neuland::DigiTaskOptions& option);
 
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const AnalysisApplication::Options::Tasks::MultiTrain& option);

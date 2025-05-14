@@ -75,7 +75,8 @@ The general JSON configuration exists for every application/mode.
   - `run-id`: Run ID for the current run. (default: 999)
   - `number-of-events`: Number of events to simulate/analyze. (default: 100)
   - `enable-mpi`: Enable MPI execution. **This should be true** when running in HPC. (default: `false`)
-  - `log-level`: Log level. Available options: `fatal`, `error`, `warn`, `info`, `debug`, `debug1`, `debug2` and `debug3`. (default: `error`)
+  - `log-level`: Log (severity) level. Available options: `fatal`, `error`, `warn`, etc. See section @ref log below. (default: `error`)
+  - `verbosity-level`: Verbosity level. Available options: `low`, `high`, `user1`, etc. See section @ref log below. (default: `user1`)
   - `input`: Options for inputs.
     - `working-dir`: The working directory containing all input data and parameters. If it's empty and the following input file path is a relative path, the working directory is the current directory.
     - `data`: File name (regex) for input data file, containing the data tree and the FairRoot folder structure. (default: see `-h` for each application)
@@ -94,6 +95,26 @@ Further information:
 - Input files and output files can be disabled by setting the file name empty.
 - Each input file name can be a [regex](https://users.cs.cf.ac.uk/Dave.Marshall/Internet/NEWS/regexp.html). The program will use all file names that can be matched by the regex.
 - Users can give multiple values for the field `input.data` and `input.tree-data`. Each value must be inside a square bracket and separated by comma.
+
+### Logging specifications {#log}
+
+The logging tool used in this program is [fairlogger](https://github.com/FairRootGroup/FairLogger). There are two different levels user can adjust: severity (`log-level`) and verbosity (`verbosity-level`). The severity specifies the level threshold whether a certain message should be printed out whereas the verbosity specifies the format with which the printed messages are displayed. Their available options are:
+
+- severity: `nolog`, `trace`, `debug4`, `debug3`, `debug2`, `debug1`, `debug`, `detail`, `info`, `state`, `warn`, `important`, `alarm`, `error`, `critical`, `fatal`
+
+- verbosity: `verylow`, `low`, `medium`, `high`, `veryhigh`, `user1`, `user2`
+
+The format of each verbosity is shown in the following table:
+
+| verbosity | format                                                            |
+| :-------: | ----------------------------------------------------------------- |
+|  verylow  | message                                                           |
+|    low    | [severity] message                                                |
+|  medium   | [HH:MM:SS][severity] message                                      |
+|   high    | [process_name][HH:MM:SS][severity] message                        |
+| veryhigh  | [process_name][HH:MM:SS:µS][severity][file:line:function] message |
+|   user1   | [severity][file:line:function] message                            |
+|   user2   | [severity][HH:MM:SS][file:line:function] message                  |
 
 ## Simulation application
 

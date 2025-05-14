@@ -2,6 +2,7 @@
 
 #include "R3BDigitizingTamex.h"
 #include "R3BNeulandApp.h"
+#include "R3BNeulandDigitizer.h"
 #include <R3BNeulandCalToHitParTask.h>
 #include <string>
 #include <string_view>
@@ -37,21 +38,7 @@ namespace R3B::Neuland
             Application::Options general;
             struct Tasks
             {
-                struct Digi
-                {
-                    bool enable = false;
-                    std::string name = "NeulandDigitizer";
-                    std::string channel = "tamex";
-                    std::string paddle = "neuland";
-                    bool enable_sim_cal = false;
-                    bool enable_hit_par = false;
-                    bool enable_size_monitor = false;
-                    R3B::Digitizing::Neuland::Tamex::Params tamex_par{ TamexChannel::GetDefaultRandomGen() };
-                    Digitizing::Neuland::Tamex::PeakPileUpStrategy pileup_strategy =
-                        Digitizing::Neuland::Tamex::PeakPileUpStrategy::width;
-                    std::string read = "NeulandPoints;NeulandHitPar";
-                    std::string write = "NeulandHits;NeulandSimCal";
-                } digi;
+                R3B::Neuland::DigiTaskOptions digi;
                 struct SimCal2Cal
                 {
                     bool enable = false;
@@ -75,8 +62,8 @@ namespace R3B::Neuland
                 } prim_inter_finder;
                 struct ClusterFinder
                 {
-                    std::string read = "read";
-                    std::string write = "write";
+                    std::string read = "NeulandHits";
+                    std::string write = "NeulandClusters";
                     bool enable = false;
                     std::string name = "NeulandClusterFinder";
                 } cluster_finder;
@@ -151,6 +138,6 @@ namespace R3B::Neuland
 
         // non-virtual private member functions:
         void set_parameters();
-        auto create_neuland_digi_engine_map(const Options::Tasks::Digi& option, std::string_view hit_par_name);
+        auto create_neuland_digi_engine_map(const R3B::Neuland::DigiTaskOptions& option, std::string_view hit_par_name);
     };
 } // namespace R3B::Neuland

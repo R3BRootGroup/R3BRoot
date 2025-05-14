@@ -109,7 +109,7 @@ HPC clusters have some special nodes that are only used to submit the tasks from
 
 ### Registration
 
-To get access to the submit node, users have to complete the registration using this [link](https://git.gsi.de/users/sign_in) (GSI Web account is acquired). During the registration, please provide the following information:
+To get access to the submit node, users have to complete the registration using this [link](https://git.gsi.de/hpc/cluster/access-request/-/issues/new?issuable_template=slurm_user_request&issue%5Bconfidential%5D=true&issue%5Btitle%5D=Request+User+Access) (GSI Web account is acquired). During the registration, please provide the following information:
 
 - **Linux group**: land
 - **Collaboration/Experiment/Department**: r3b

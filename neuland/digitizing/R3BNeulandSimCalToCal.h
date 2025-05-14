@@ -5,7 +5,10 @@
 #include <R3BIOConnector.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandCommon.h>
+#include <RtypesCore.h>
+#include <string_view>
 #include <unordered_map>
+#include <vector>
 
 class R3BEventHeader;
 class FairMCEventHeader;

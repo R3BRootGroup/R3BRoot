@@ -24,6 +24,7 @@ set(SRCS
     R3BFileSource.cxx
     R3BFileSource2.cxx
     R3BModule.cxx
+    R3BPDGConverter.cxx
     R3BTcutPar.cxx
     R3BTsplinePar.cxx
     R3BWhiterabbitPropagator.cxx)
@@ -43,6 +44,7 @@ set(HEADERS
     R3BIOConnector.h
     R3BLogger.h
     R3BModule.h
+    R3BPDGConverter.h
     R3BShared.h
     R3BFormatters.h
     R3BValueError.h
@@ -66,7 +68,9 @@ add_library_with_dictionary(
     data_monitor
     ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDENCIES
-    ${DEPENDENCIES})
+    ${DEPENDENCIES}
+    PRIVATE_DEPENDENCIES
+    Geant4::G4materials)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
     message(STATUS "Linking -lstdc++fs due to the old version of gcc")

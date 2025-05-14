@@ -17,10 +17,16 @@
 #include "R3BDetector.h"
 #include "R3BNeulandPoint.h"
 #include "TLorentzVector.h"
+#include <FairDetector.h>
 #include <R3BIOConnector.h>
 #include <R3BNeulandCommon.h>
 #include <R3BNeulandGeoCreator.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TClonesArray.h>
+#include <TGeoMatrix.h>
+#include <TString.h>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -93,8 +99,8 @@ class R3BNeuland : public FairDetector
     int num_of_planes_ = R3B::Neuland::MaxNumberOfPlanes; //!< The number of planes.
 
     // Track information to be stored until the track leaves the active volume.
-    int fTrackId = 0;            //!< A buffer for the track IDs.
-    int fPaddleId = 0;           //!< A buffer for the paddle ids.
+    int track_id_ = 0;           //!< A buffer for the track IDs.
+    int paddle_id_ = 0;          //!< A buffer for the paddle ids.
     int particle_id_ = 0;        //!< A buffer for the particle IDs.
     int parent_particle_id_ = 0; //!< A buffer for the parent particle IDs.
     double time_ = 0.;           //!< A buffer for time values.

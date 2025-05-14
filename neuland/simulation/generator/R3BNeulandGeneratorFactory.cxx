@@ -3,7 +3,7 @@
 #include "CosmicMuonDistributions.h"
 #include "R3BException.h"
 #include "R3BNeulandCommon.h"
-#include "R3BPDGParticle.h"
+#include "R3BPDGConverter.h"
 #include <FairBoxGenerator.h>
 #include <FairPrimaryGenerator.h>
 #include <R3BROOTTypeJson.h> // NOLINT
@@ -64,8 +64,9 @@ namespace R3B::Neuland
     {
         // Primary particle generator
         auto& options = options_.get();
+        auto converter = R3B::PDGConverter();
         auto boxGen =
-            std::make_unique<FairBoxGenerator>(Particle::type_to_uint64(options.particle_type), options.multiplicity);
+            std::make_unique<FairBoxGenerator>(converter.get_pid(options.particle_type), options.multiplicity);
         const auto& position = options.position;
         boxGen->SetXYZ(position.x(), position.y(), position.z());
         boxGen->SetThetaRange(options.theta.min, options.theta.max);
@@ -80,7 +81,7 @@ namespace R3B::Neuland
     {
         json_obj = nlohmann::ordered_json{
             { "type", magic_enum::enum_name(options.generator_type) },
-            { "particle", magic_enum::enum_name(options.particle_type) },
+            { "particle", options.particle_type },
             { "energy", options.energy },
             { "theta", options.theta },
             { "phi", options.phi },
@@ -91,22 +92,16 @@ namespace R3B::Neuland
     void from_json(const nlohmann::ordered_json& json_obj, GeneratorFactory::Options& options)
     {
         auto type_str = std::string{};
-        auto particle_str = std::string{};
         json_obj.at("type").get_to(type_str);
-        json_obj.at("particle").get_to(particle_str);
+        json_obj.at("particle").get_to(options.particle_type);
         json_obj.at("energy").get_to(options.energy);
         json_obj.at("theta").get_to(options.theta);
         json_obj.at("phi").get_to(options.phi);
         json_obj.at("position").get_to(options.position);
         auto type_str_val = magic_enum::enum_cast<GeneratorType>(type_str, magic_enum::case_insensitive);
-        auto particle_str_val = magic_enum::enum_cast<Particle::Type>(particle_str, magic_enum::case_insensitive);
         if (type_str_val.has_value())
         {
             options.generator_type = type_str_val.value();
-        }
-        if (particle_str_val.has_value())
-        {
-            options.particle_type = particle_str_val.value();
         }
     }
 

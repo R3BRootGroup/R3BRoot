@@ -1,7 +1,6 @@
 #include "R3BNeulandApp.h"
 #include "R3BException.h"
 #include "R3BFileSource2.h"
-#include "R3BLogger.h"
 #include "R3BShared.h"
 #include <CLI/CLI.hpp>
 #include <FairLogger.h>
@@ -16,6 +15,7 @@
 #include <boost/range/adaptor/reversed.hpp>
 #include <cmath>
 #include <cstdint>
+#include <fairlogger/Logger.h>
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
@@ -106,6 +106,7 @@ namespace R3B::Neuland
         , run_(std::move(run))
         , option_{ option }
     {
+        setup_logger();
         timer_.Start();
     }
 
@@ -113,7 +114,7 @@ namespace R3B::Neuland
     {
         if (is_inited_)
         {
-            R3BLOG(info, "Writting all parameters to files");
+            LOGP(info, "Writting all parameters to files");
             run_->GetRuntimeDb()->writeContainers();
             run_->GetSink()->Close();
         }
@@ -136,17 +137,36 @@ namespace R3B::Neuland
         }
     }
 
+    void Application::setup_logger()
+    {
+        auto spec1 = fair::VerbositySpec::Make(fair::VerbositySpec::Info::severity,
+                                               fair::VerbositySpec::Info::file_line_function);
+        fair::Logger::DefineVerbosity("user1", spec1);
+
+        auto spec2 = fair::VerbositySpec::Make(fair::VerbositySpec::Info::severity,
+                                               fair::VerbositySpec::Info::timestamp_s,
+                                               fair::VerbositySpec::Info::file_line_function);
+        fair::Logger::DefineVerbosity("user2", spec2);
+
+        fair::Logger::SetConsoleColor(true);
+    }
+
+    void Application::post_parse()
+    {
+        fair::Logger::SetConsoleSeverity(option_.get().log_level);
+        fair::Logger::SetVerbosity(option_.get().verbose_level);
+    }
+
     void Application::init()
     {
-        R3BLOG(info, "Initializaing application ...");
+        LOGP(info, "Initializaing application ...");
         is_inited_ = true;
-        FairLogger::GetLogger()->SetLogScreenLevel(option_.get().log_level.c_str());
         add_inout_files();
         add_inout_pars();
         pre_init(run_.get());
         run_->Init();
         post_init(run_.get());
-        R3BLOG(info, "Application is initialized.");
+        LOGP(info, "Application is initialized.");
     }
 
     void Application::setup_options(CLI::App& program_options)
@@ -186,7 +206,8 @@ namespace R3B::Neuland
             ->default_val(dump_json_filename_)
             ->run_callback_for_default()
             ->expected(0, 1);
-        program_options.add_option("-v, --verbose", options.log_level, "Set the verbose level");
+        program_options.add_option("-s, --severity", options.log_level, "Set the severity level");
+        program_options.add_option("-v, --verbose", options.verbose_level, "Set the verbose level");
         program_options.add_option("-n, --event-num", options.event_num, "Set the event number")->capture_default_str();
         program_options.add_option("--run-id", options.run_id, "Set the run id")->capture_default_str();
 
@@ -238,7 +259,7 @@ namespace R3B::Neuland
         {
             file_source->SetInitRunID(option_.get().run_id);
             run_->SetRunId(option_.get().run_id);
-            R3BLOG(info, fmt::format("Filesource2: Set to run id {}", option_.get().run_id));
+            LOGP(info, "Filesource2: Set to run id {}", option_.get().run_id);
         }
         add_input_filename(file_source.get());
         if (not file_source->IsEmpty())
@@ -260,7 +281,7 @@ namespace R3B::Neuland
             file_path =
                 input_wd.empty() ? fs::path{ input_option.par } : fs::path{ input_wd } / fs::path{ input_option.par };
             auto fileio = std::make_unique<FairParRootFileIo>();
-            R3BLOG(info, fmt::format("Input first parameter file is {:?}", file_path.string()));
+            LOGP(info, "Input first parameter file is {:?}", file_path.string());
             fileio->open(file_path.c_str(), "READ");
             run_->GetRuntimeDb()->setFirstInput(fileio.release());
         }
@@ -270,7 +291,7 @@ namespace R3B::Neuland
             file_path = input_wd.empty() ? fs::path{ input_option.par_2 }
                                          : fs::path{ input_wd } / fs::path{ input_option.par_2 };
             auto fileio = std::make_unique<FairParRootFileIo>();
-            R3BLOG(info, fmt::format("Input second parameter file is {:?}", file_path.string()));
+            LOGP(info, "Input second parameter file is {:?}", file_path.string());
             fileio->open(file_path.c_str(), "READ");
             run_->GetRuntimeDb()->setSecondInput(fileio.release());
         }
@@ -281,7 +302,7 @@ namespace R3B::Neuland
             const auto output_name =
                 option.enable_mpi ? fmt::format("{}.{}", output_option.par, rank_num_) : output_option.par;
             file_path = output_wd.empty() ? fs::path{ output_name } : fs::path{ output_wd } / fs::path{ output_name };
-            R3BLOG(info, fmt::format("Ouptut parameter file is {:?}", file_path.string()));
+            LOGP(info, "Ouptut parameter file is {:?}", file_path.string());
             auto fileio = std::make_unique<FairParRootFileIo>(true);
             fileio->open(file_path.c_str(), "RECREATE");
             auto* rtdb = run_->GetRuntimeDb();
@@ -295,7 +316,7 @@ namespace R3B::Neuland
         max_event = max_event > 0 ? max_event : 0;
         if (max_event > 0)
         {
-            R3BLOG(info, fmt::format("{} is set to run with {} events", app_name_, max_event));
+            LOGP(info, "{} is set to run with {} events", app_name_, max_event);
         }
         run_action(run_.get(), max_event);
     }
@@ -349,14 +370,13 @@ namespace R3B::Neuland
                     case JSONConfigInputType::string:
                     {
                         auto json_string = transform_to_json_string(filename_or_option);
-                        R3BLOG(info, fmt::format("Reading the configuration from the string {:?}.", json_string));
+                        LOGP(info, "Reading the configuration from the string {:?}.", json_string);
                         return nlohmann::ordered_json::parse(std::move(json_string), nullptr, true, true);
                     }
                     case JSONConfigInputType::file:
                     {
                         auto file = std::ifstream{ filename_or_option };
-                        R3BLOG(info,
-                               fmt::format("Reading the configuration from the json file {:?}.", filename_or_option));
+                        LOGP(info, "Reading the configuration from the json file {:?}.", filename_or_option);
                         return nlohmann::ordered_json::parse(file, nullptr, true, true);
                     }
                     case JSONConfigInputType::invalid:

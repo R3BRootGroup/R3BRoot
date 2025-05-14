@@ -15,7 +15,7 @@
 
 set(SRCS
     # cmake-format: sortable
-    NeulandPointFilter.cxx
+    NeulandParticleFilter.cxx
     R3BDigitizingChannel.cxx
     R3BDigitizingChannelMock.h
     R3BDigitizingPaddle.cxx
@@ -29,7 +29,7 @@ set(SRCS
 
 set(HEADERS
     # cmake-format: sortable
-    NeulandPointFilter.h
+    NeulandParticleFilter.h
     R3BDigitizingChannel.h
     R3BDigitizingChannelMock.h
     R3BDigitizingEngine.h
@@ -55,4 +55,5 @@ add_library_with_dictionary(
     HEADERS
     ${HEADERS}
     DEPENDENCIES
+    magic_enum::magic_enum
     R3BNeulandCalibration)

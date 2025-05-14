@@ -641,6 +641,8 @@ if(NOT MODULE)
         endif()
     endif()
 
+    add_subdirectory(test)
+
     #================================================================================
     # TODO: Since other dependencies still use the old cmake configurations, include(ROOTMacros) has to be used. Please change them using CMake targets ASAP.
     include(ROOTMacros)

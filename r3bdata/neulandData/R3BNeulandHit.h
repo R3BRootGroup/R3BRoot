@@ -35,7 +35,7 @@ struct R3BNeulandHit : public TObject
     TVector3 pixel{};
 
     R3BNeulandHit() = default;
-    R3BNeulandHit(Int_t paddle,
+    R3BNeulandHit(int paddle,
                   double TdcL,
                   double TdcR,
                   double time,

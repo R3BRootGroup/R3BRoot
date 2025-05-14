@@ -1,9 +1,11 @@
 #include "R3BNeulandAppOptionJson.h"
+#include "JsonParse/ParticleFilterJson.h" //NOLINT
 #include "R3BDigitizingTamex.h"
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandCalToHitParTask.h"
+#include "R3BNeulandDigitizer.h"
 #include "R3BNeulandSimApp.h"
 #include <R3BROOTTypeJson.h> //NOLINT
 #include <fmt/core.h>
@@ -75,10 +77,15 @@ namespace R3B::Neuland
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const Application::Options& option)
     {
-        json_obj =
-            nlohmann::ordered_json{ { "run-id", option.run_id },         { "number-of-events", option.event_num },
-                                    { "enable-mpi", option.enable_mpi }, { "log-level", option.log_level },
-                                    { "input", option.input },           { "output", option.output } };
+        json_obj = nlohmann::ordered_json{
+            { "run-id", option.run_id },
+            { "number-of-events", option.event_num },
+            { "enable-mpi", option.enable_mpi },
+            { "log-level", option.log_level },
+            { "verbose-level", option.verbose_level },
+            { "input", option.input },
+            { "output", option.output },
+        };
     }
 
     template <>
@@ -88,6 +95,7 @@ namespace R3B::Neuland
         json_obj.at("number-of-events").get_to(option.event_num);
         json_obj.at("enable-mpi").get_to(option.enable_mpi);
         json_obj.at("log-level").get_to(option.log_level);
+        json_obj.at("verbose-level").get_to(option.verbose_level);
         json_obj.at("input").get_to(option.input);
         json_obj.at("output").get_to(option.output);
     }
@@ -181,12 +189,13 @@ namespace R3B::Neuland
     // =============================================================================================
     // tasks specialization:
     template <>
-    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Digi& option)
+    void to_json(json& json_obj, const R3B::Neuland::DigiTaskOptions& option)
     {
         json_obj = json{
             { "enable", option.enable },
             { "channel", option.channel },
             { "paddle", option.paddle },
+            { "point-filter", option.point_filter },
             { "par", option.tamex_par },
             { "pileup-strategy", magic_enum::enum_name(option.pileup_strategy) },
             { "enable-sim-cal", option.enable_sim_cal },
@@ -198,7 +207,7 @@ namespace R3B::Neuland
     }
 
     template <>
-    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::Digi& option)
+    void from_json(const json& json_obj, R3B::Neuland::DigiTaskOptions& option)
     {
         json_obj.at("enable").get_to(option.enable);
         json_obj.at("channel").get_to(option.channel);
@@ -209,6 +218,7 @@ namespace R3B::Neuland
         json_obj.at("enable-size-monitor").get_to(option.enable_size_monitor);
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
+        json_obj.at("point-filter").get_to(option.point_filter);
 
         // parse enum string
         auto enum_name = std::string{};

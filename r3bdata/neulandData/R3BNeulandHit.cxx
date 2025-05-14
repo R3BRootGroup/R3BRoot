@@ -12,8 +12,14 @@
  ******************************************************************************/
 
 #include "R3BNeulandHit.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TVector3.h>
+#include <cmath>
+#include <iostream>
+#include <ostream>
 
-constexpr double light_speed = 29.97924580000000105; // cm/ns
+constexpr double light_speed = 29.97924580000000105; //!< cm/ns
 // constexpr double light_speed_square = 898.75517873681758374; // cm²/ns²
 
 R3BNeulandHit::R3BNeulandHit(int paddle,

@@ -38,6 +38,7 @@ namespace R3B::Neuland
             int event_num = DEFAULT_EVENT_NUM;
             bool enable_mpi = false;
             std::string log_level = "error";
+            std::string verbose_level = "user1";
             struct Input
             {
                 std::string working_dir;
@@ -66,6 +67,7 @@ namespace R3B::Neuland
         // common APIs:
 
         void setup_options(CLI::App& program_options);
+        void post_parse();
 
         template <typename CLIAPP, typename OptionType>
         void setup_common_options(CLIAPP& program_options, OptionType& options);
@@ -150,6 +152,7 @@ namespace R3B::Neuland
         void add_inout_files();
         void add_inout_pars();
         void extract_input_files();
+        void setup_logger();
         static void patch_files_or_strings(nlohmann::ordered_json& json_obj,
                                            const std::vector<std::string>& filenames_or_options);
     };
@@ -183,7 +186,7 @@ namespace R3B::Neuland
         {
             file << json_obj.dump(4);
         }
-        R3BLOG(info, fmt::format("Configuration of {} is saved into the file {:?}", app_name_, filename));
+        fmt::println("Configuration of {} is saved into the file {:?}", app_name_, filename);
     }
 
     template <typename OptionType>

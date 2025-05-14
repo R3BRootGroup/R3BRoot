@@ -25,6 +25,7 @@
 #pragma link C++ class R3B::Digitizing::Neuland::TacQuila::Channel+;
 #pragma link C++ class R3B::Digitizing::Neuland::Tamex::Channel+;
 #pragma link C++ class R3B::Digitizing::Neuland::Tamex::Params+;
+#pragma link C++ class R3B::Neuland::DigiTaskOptions+;
 #pragma link C++ class R3BNeulandHitMon+;
 #pragma link C++ class R3BNeulandDigitizer+;
 #pragma link C++ class R3B::Neuland::SimCalData+;

@@ -14,12 +14,29 @@
 #include "R3BNeuland.h"
 #include "FairRun.h"
 #include "FairRuntimeDb.h"
+#include "R3BDetectorList.h"
+#include "R3BException.h"
 #include "R3BMCStack.h"
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandPoint.h"
+#include "TClonesArray.h"
+#include "TGeoManager.h"
+#include "TVirtualMC.h"
+#include <FairGeoLoader.h>
 #include <FairRootManager.h>
 #include <FairVolume.h>
 #include <R3BLogger.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TCollection.h>
+#include <TGeoMatrix.h>
+#include <TGeoNode.h>
+#include <TMathBase.h>
+#include <TString.h>
+#include <fairlogger/Logger.h>
+#include <fmt/core.h>
+#include <memory>
+#include <string>
 
 // Initialize variables from Birk' s Law
 constexpr auto seconds_to_nanoseconds = 1e9;
@@ -106,7 +123,7 @@ auto R3BNeuland::ProcessHits(FairVolume* /*v*/) -> bool
         length_ = gMC->TrackLength();
         gMC->TrackPosition(pos_in_);
         gMC->TrackMomentum(mom_in_);
-        gMC->CurrentVolOffID(1, fPaddleId);
+        gMC->CurrentVolOffID(1, paddle_id_);
 
         particle_id_ = gMC->TrackPid();
         track_pid_map_.emplace(gMC->GetStack()->GetCurrentTrackNumber(), gMC->TrackPid());
@@ -132,18 +149,24 @@ auto R3BNeuland::ProcessHits(FairVolume* /*v*/) -> bool
             return kTRUE;
         }
 
-        fTrackId = gMC->GetStack()->GetCurrentTrackNumber();
+        track_id_ = gMC->GetStack()->GetCurrentTrackNumber();
         gMC->TrackPosition(pos_out_);
         gMC->TrackMomentum(mom_out_);
 
         // Add Point
-        LOG(debug) << "R3BNeuland: Adding Point at (" << pos_in_.X() << ", " << pos_in_.Y() << ", " << pos_in_.Z()
-                   << ") cm,  paddle " << fPaddleId << ", track " << fTrackId << ", energy loss " << energy_loss_
-                   << " GeV " << gMC->GetStack()->GetCurrentParentTrackNumber();
+        LOGP(debug,
+             "R3BNeuland: Adding Point at (\"{}\", \"{}\", \"{}\") cm, paddle {}, track {}, energy loss {} GeV",
+             pos_in_.X(),
+             pos_in_.Y(),
+             pos_in_.Z(),
+             paddle_id_,
+             track_id_,
+             energy_loss_,
+             gMC->GetStack()->GetCurrentParentTrackNumber());
         auto* neuland_point =
             dynamic_cast<R3BNeulandPoint*>(tca_points_buffer_->ConstructedAt(tca_points_buffer_->GetEntriesFast()));
-        neuland_point->SetTrackID(fTrackId);
-        neuland_point->SetDetectorID(fPaddleId);
+        neuland_point->SetTrackID(track_id_);
+        neuland_point->SetDetectorID(paddle_id_);
         neuland_point->SetPosition(pos_in_.Vect());
         neuland_point->SetMomentum(mom_in_.Vect());
         neuland_point->SetTime(time_);
@@ -153,17 +176,6 @@ auto R3BNeuland::ProcessHits(FairVolume* /*v*/) -> bool
         neuland_point->SetLightYield(light_yield_);
         neuland_point->SetParticleId(particle_id_);
         neuland_point->SetParentParticleId(parent_particle_id_);
-        // fNeulandPoints.get().emplace_back(fTrackId,
-        //                                   fPaddleId,
-        //                                   fPosIn.Vect(),
-        //                                   fMomIn.Vect(),
-        //                                   fTime,
-        //                                   fLength,
-        //                                   fEnergyLoss,
-        //                                   gMC->CurrentEvent(),
-        //                                   fLightYield,
-        //                                   fParticleId,
-        //                                   fParentParticleId);
 
         // Increment number of LandPoints for this track
         auto* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
@@ -211,8 +223,8 @@ void R3BNeuland::Reset()
 void R3BNeuland::reset_values()
 {
     is_last_hit_done_ = kTRUE;
-    fTrackId = 0;
-    fPaddleId = -1;
+    track_id_ = 0;
+    paddle_id_ = -1;
     time_ = 0;
     length_ = 0.;
     energy_loss_ = 0.;
