@@ -123,7 +123,7 @@ class R3BFootOnlineSpectra : public FairTask
     int fTrigger = -1; // Trigger value.
     int fTpat = 0;
     int fNEvents = 0; // Event counter.
-    int fNbDet = 16;  // Number of AMS detectors.
+    int fNbDet = 16;  // Number of Foot detectors.
     int eventNumber = 0;
     int fSigmaRefreshRate = 5000;
 
