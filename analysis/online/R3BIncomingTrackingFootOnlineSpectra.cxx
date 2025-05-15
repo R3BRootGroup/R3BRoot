@@ -89,9 +89,6 @@ void R3BIncomingTrackingFootOnlineSpectra::SetParContainers()
     fFootMappingPar = dynamic_cast<R3BFootMappingPar*>(rtdb->getContainer("footMappingPar"));
     R3BLOG_IF(fatal, !fFootMappingPar, "Could not get access to footMappingPar container.");
 
-    for (size_t i = 0; i < fFootZPos.size(); i++)
-        fFootZPos[i] = fFootMappingPar->GetDist2target(i + 1);
-
     return;
 }
 
@@ -116,6 +113,10 @@ InitStatus R3BIncomingTrackingFootOnlineSpectra::Init()
 
     fFrsHitData = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
     R3BLOG_IF(warn, fFrsHitData == nullptr, "FrsData not found");
+
+    // Get the Z position from the parameter container
+    for (size_t i = 0; i < fFootZPos.size(); i++)
+        fFootZPos[i] = fFootMappingPar->GetDist2target(i + 1);
 
     // Create histograms for detectors
     TString Name1;

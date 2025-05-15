@@ -273,7 +273,7 @@ InitStatus R3BFootOnlineSpectra::Init()
 
             sprintf(Name1, "fh1_mult_det_%d", i + 1);
             sprintf(Name2, "Cluster multiplicity for FOOT Det: %d", i + 1);
-            fh1_mult[i] = R3B::root_owned<TH1F>(Name1, Name2, 20, 1, 20);
+            fh1_mult[i] = R3B::root_owned<TH1F>(Name1, Name2, 20, 0, 20);
             fh1_mult[i]->GetXaxis()->SetTitle("Multiplicity");
             fh1_mult[i]->GetYaxis()->SetTitle("Counts");
             fh1_mult[i]->GetYaxis()->SetTitleOffset(1.4);
@@ -436,6 +436,9 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         }
     }
 
+    // Vector to store the multiplicity of each event
+    std::vector<int> mult(fNbDet, 0);
+
     // Fill hit data
     if (fHitItems && fHitItems->GetEntriesFast() > 0)
     {
@@ -448,7 +451,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
             fh1_ene[hit->GetDetId() - 1]->Fill(hit->GetEnergy());
             fh1_size[hit->GetDetId() - 1]->Fill(hit->GetMulStrip());
-            fh1_mult[hit->GetDetId() - 1]->Fill(hit->GetNbHit());
+            mult[hit->GetDetId() - 1]++;
             fh2_eta[hit->GetDetId() - 1]->Fill(hit->GetEta(), hit->GetEnergy());
 
             int pairNdx = (hit->GetDetId() - 1) / 2;
@@ -495,6 +498,17 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             }
         }
     }
+
+    // Fill the mutiplicity of the cluster per event
+    for (int i = 0; i < fNbDet; i++)
+    {
+        if (mult[i] == 0)
+        {
+            continue;
+        }
+        fh1_mult[i]->Fill(mult[i]);
+    }
+
     fNEvents += 1;
     return;
 }
