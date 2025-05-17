@@ -24,7 +24,8 @@ R3BFootHitData::R3BFootHitData(uint8_t detid,
                                TVector3 master,
                                double energy,
                                uint16_t mulstrip,
-                               double eta)
+                               double eta,
+                               double zcharge)
     : fDetId(detid)
     , fNbHit(nbhit)
     , fPos(pos)
@@ -34,6 +35,7 @@ R3BFootHitData::R3BFootHitData(uint8_t detid,
     , fEnergy(energy)
     , fMulStrip(mulstrip)
     , fEta(eta)
+    , fZCharge(zcharge)
 {
 }
 
@@ -48,6 +50,7 @@ R3BFootHitData::R3BFootHitData(const R3BFootHitData& right)
     , fEnergy(right.fEnergy)
     , fMulStrip(right.fMulStrip)
     , fEta(right.fEta)
+    , fZCharge(right.fZCharge)
 {
 }
 
