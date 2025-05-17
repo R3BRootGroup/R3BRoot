@@ -77,7 +77,7 @@ Bool_t R3BFootSiReader::R3BRead()
 {
     R3BLOG(debug1, "Event data");
 
-    int kDet;
+    uint16_t kDet = 0;
     // Read FOOT detectors
     for (Int_t d = 0; d < fNbDet; d++)
     {
@@ -120,4 +120,4 @@ void R3BFootSiReader::Reset()
     fArray->Clear();
 }
 
-ClassImp(R3BFootSiReader);
+ClassImp(R3BFootSiReader)
