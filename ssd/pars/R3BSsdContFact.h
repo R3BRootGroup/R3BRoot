@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BSsdContFact_H
-#define R3BSsdContFact_H
+#pragma once
 
 #include "FairContFact.h"
 
@@ -20,14 +19,15 @@ class FairContainer;
 
 class R3BSsdContFact : public FairContFact
 {
+  public:
+    R3BSsdContFact();
+    virtual ~R3BSsdContFact() = default;
+
+    FairParSet* createContainer(FairContainer*) override;
+
   private:
     void setAllContainers();
 
   public:
-    R3BSsdContFact();
-    ~R3BSsdContFact() {}
-    FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BSsdContFact, 0) // Factory for all SSD parameter containers
+    ClassDefOverride(R3BSsdContFact, 0); // NOLINT
 };
-
-#endif /* R3BSsdContFact_H */
