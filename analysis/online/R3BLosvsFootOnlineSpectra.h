@@ -12,8 +12,8 @@
  ******************************************************************************/
 
 // ------------------------------------------------------------
-// -----            R3BMwpcvsFootOnlineSpectra            -----
-// -----    Created 15/05/25 by J.L. Rodriguez-Sanchez    -----
+// -----             R3BLosvsFootOnlineSpectra            -----
+// -----    Created 17/05/25 by J.L. Rodriguez-Sanchez    -----
 // ------------------------------------------------------------
 
 #pragma once
@@ -27,14 +27,14 @@ class TH2F;
 class TClonesArray;
 class R3BEventHeader;
 
-class R3BMwpcvsFootOnlineSpectra : public FairTask
+class R3BLosvsFootOnlineSpectra : public FairTask
 {
   public:
     /**
      * Default constructor.
      * Creates an instance of the task with default parameters.
      */
-    R3BMwpcvsFootOnlineSpectra();
+    R3BLosvsFootOnlineSpectra();
 
     /**
      * Standard constructor.
@@ -42,13 +42,13 @@ class R3BMwpcvsFootOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    explicit R3BMwpcvsFootOnlineSpectra(const TString& name, int iVerbose = 1);
+    explicit R3BLosvsFootOnlineSpectra(const TString& name, int iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BMwpcvsFootOnlineSpectra() = default;
+    virtual ~R3BLosvsFootOnlineSpectra() = default;
 
     /** Virtual method SetParContainers **/
     void SetParContainers() override;
@@ -90,28 +90,23 @@ class R3BMwpcvsFootOnlineSpectra : public FairTask
     inline void SetTpat(int tpat) { fTpat = tpat; }
 
     /**
-     * Method for setting min difference in X (in mm) for MW-Foot correlations
-     */
-    inline void SetMinDist(double min) { fMinDist = min; }
-
-    /**
      * Method to reset histograms
      */
     void Reset_Histo();
 
   private:
-    TClonesArray* fHitItemsMw = nullptr;
+    TClonesArray* fHitItemsLos = nullptr;
     TClonesArray* fHitItemsFoot = nullptr;
     R3BEventHeader* fHeader = nullptr;
 
     unsigned long long fNEvents = 0;
     int fTpat = 0;
-    double fMinDist = 20.; // mm
-    int8_t fNbHist = 6;
 
     std::vector<TH2F*> fh2_cor;
-    std::unique_ptr<TCanvas> cCMwF;
+    std::vector<TH2F*> fh2_cor_max;
+    std::unique_ptr<TCanvas> cCLF;
+    std::unique_ptr<TCanvas> cCLF_max;
 
   public:
-    ClassDefOverride(R3BMwpcvsFootOnlineSpectra, 1); // NOLINT
+    ClassDefOverride(R3BLosvsFootOnlineSpectra, 1); // NOLINT
 };
