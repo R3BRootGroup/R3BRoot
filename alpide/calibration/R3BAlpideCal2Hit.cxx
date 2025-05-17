@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -44,7 +44,7 @@ R3BAlpideCal2Hit::R3BAlpideCal2Hit()
 }
 
 // R3BAlpideCal2Hit::Standard Constructor --------------------------
-R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, Int_t iVerbose)
+R3BAlpideCal2Hit::R3BAlpideCal2Hit(const TString& name, int iVerbose)
     : FairTask(name, iVerbose)
     , fAlpideCluster(new TClonesArray("R3BAlpideCluster"))
 {
@@ -99,9 +99,11 @@ void R3BAlpideCal2Hit::SetParameter()
     fNbSensors = fMap_Par->GetNbSensors();
     R3BLOG(info, "Nb of sensors: " << fNbSensors);
 
-    fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
-    fAlpidePos.SetXYZ(fAlpideGeoPar->GetPosX(), fAlpideGeoPar->GetPosY(), fAlpideGeoPar->GetPosZ());
-
+    if (fAlpideGeoPar && fTargetGeoPar)
+    {
+        fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
+        fAlpidePos.SetXYZ(fAlpideGeoPar->GetPosX(), fAlpideGeoPar->GetPosY(), fAlpideGeoPar->GetPosZ());
+    }
     return;
 }
 
@@ -127,10 +129,12 @@ InitStatus R3BAlpideCal2Hit::Init()
 
     SetParameter();
 
-    fAlpideGeo = R3BAlpideGeometry::Instance();
-    R3BLOG_IF(error, !fAlpideGeo->Init(fGeoversion), "Alpide geometry " << fGeoversion << " not found");
-
-    fAlpidetoTargetPos = fTargetPos - fAlpidePos;
+    if (fGeoversion == 202402)
+    {
+        fAlpideGeo = R3BAlpideGeometry::Instance();
+        R3BLOG_IF(warn, !fAlpideGeo->Init(fGeoversion), "Alpide geometry " << fGeoversion << " not found");
+    }
+    fAlpidetoTargetPos = fAlpidePos - fTargetPos;
 
     return kSUCCESS;
 }
@@ -154,13 +158,13 @@ void R3BAlpideCal2Hit::Exec(Option_t*)
     bool shouldround = false;
 
     // Reading the Input -- Cal Data --
-    auto fAlpidePixel = dynamic_cast<TClonesArray*>(fAlpideCalData->Clone());
-    Int_t nHits = fAlpidePixel->GetEntriesFast();
+    Int_t nHits = fAlpideCalData->GetEntriesFast();
     if (nHits == 0)
     {
-        delete fAlpidePixel;
         return;
     }
+
+    auto fAlpidePixel = dynamic_cast<TClonesArray*>(fAlpideCalData->Clone());
 
 nextcluster:
     nbcluster++;
@@ -169,13 +173,12 @@ nextcluster:
 nextround:
     shouldround = false;
 
-    auto calData = new R3BAlpideCalData*[fAlpidePixel->GetEntriesFast()];
     for (Int_t i = 0; i < fAlpidePixel->GetEntriesFast(); i++)
     {
-        calData[i] = dynamic_cast<R3BAlpideCalData*>(fAlpidePixel->At(i));
-        auto sen = calData[i]->GetSensorId();
-        auto col = calData[i]->GetCol();
-        auto row = calData[i]->GetRow();
+        auto calData = dynamic_cast<R3BAlpideCalData*>(fAlpidePixel->At(i));
+        auto sen = calData->GetSensorId();
+        auto col = calData->GetCol();
+        auto row = calData->GetRow();
 
         if (i == 0 && first)
         {
@@ -212,11 +215,6 @@ nextround:
                 delete[] cluster;
             }
         }
-    }
-
-    if (calData)
-    {
-        delete[] calData;
     }
 
     if (shouldround)
@@ -262,49 +260,107 @@ void R3BAlpideCal2Hit::FindClusters()
         return;
     }
 
-    auto cluster = new R3BAlpideCluster*[nHits];
-    Int_t mult[fNbSensors][nHits];
-    Double_t meancol[fNbSensors][nHits];
-    Double_t meanrow[fNbSensors][nHits];
-    for (Int_t s = 0; s < fNbSensors; s++)
-        for (Int_t i = 0; i < nHits; i++)
+    uint16_t mult[fNbSensors][nHits];  // NOLINT
+    double meancol[fNbSensors][nHits]; // NOLINT
+    double meanrow[fNbSensors][nHits]; // NOLINT
+    for (size_t s = 0; s < fNbSensors; s++)
+        for (size_t i = 0; i < nHits; i++)
         {
             mult[s][i] = 0;
             meancol[s][i] = 0.;
             meanrow[s][i] = 0.;
         }
 
-    for (Int_t i = 0; i < nHits; i++)
+    for (size_t i = 0; i < nHits; i++)
     {
-        cluster[i] = dynamic_cast<R3BAlpideCluster*>(fAlpideCluster->At(i));
-        auto clid = cluster[i]->GetClusterId() - 1;
-        auto senid = cluster[i]->GetSensorId() - 1;
+        auto cluster = dynamic_cast<R3BAlpideCluster*>(fAlpideCluster->At(i));
+        auto clid = cluster->GetClusterId() - 1;
+        auto senid = cluster->GetSensorId() - 1;
         mult[senid][clid]++;
-        meancol[senid][clid] += (double)cluster[i]->GetCol();
-        meanrow[senid][clid] += (double)cluster[i]->GetRow();
+        meancol[senid][clid] += (double)cluster->GetCol();
+        meanrow[senid][clid] += (double)cluster->GetRow();
     }
-    if (cluster)
-        delete[] cluster;
 
-    for (Int_t s = 0; s < fNbSensors; s++)
-        for (Int_t i = 0; i < nHits; i++)
-            if (mult[s][i] > 0)
-            {
-                nbcluster++;
+    if (fGeoversion == 202402)
+    {
+        for (size_t s = 0; s < fNbSensors; s++)
+            for (size_t i = 0; i < nHits; i++)
+                if (mult[s][i] > 0)
+                {
+                    nbcluster++;
 
-                fRot = fAlpideGeo->GetRotation(s + 1);
-                fTrans = fAlpideGeo->GetTranslation(s + 1);
+                    fRot = fAlpideGeo->GetRotation(s + 1);
+                    fTrans = fAlpideGeo->GetTranslation(s + 1);
 
-                TVector3 localpos;
-                localpos.SetXYZ(-meancol[s][i] / double(mult[s][i]) * fPixelSize + 30. / 2.0,
-                                meanrow[s][i] / double(mult[s][i]) * fPixelSize - 15. / 2.0,
-                                0.0);
+                    TVector3 localpos;
+                    localpos.SetXYZ(-meancol[s][i] / double(mult[s][i]) * fPixelSize_ls + 30. / 2.0,
+                                    meanrow[s][i] / double(mult[s][i]) * fPixelSize_ss - 13.8 / 2.0,
+                                    0.0);
+                    // Lab frame
+                    TVector3 labpos = fRot * localpos + fTrans * 10.; // 10 because fTrans is in mm
+                    AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
+                }
+    }
+    else if (fGeoversion == 202505)
+    {
+        for (size_t s = 0; s < fNbSensors; s++)
+            for (size_t i = 0; i < nHits; i++)
+                if (mult[s][i] > 0)
+                {
+                    nbcluster++;
 
-                // Lab frame
-                TVector3 labpos = fRot * localpos + fTrans * 10.; // 10 because fTrans is in mm
+                    TVector3 localpos;
+                    localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize_ls,
+                                    meanrow[s][i] / double(mult[s][i]) * fPixelSize_ss,
+                                    0.0);
 
-                AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
-            }
+                    TVector3 labpos;
+                    if (s < 3)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -45. - localpos.Y(), fAlpidetoTargetPos.Z());
+                    else if (s < 6)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), -45. + localpos.Y(), fAlpidetoTargetPos.Z());
+                    else if (s < 9)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 6), -15. + localpos.Y(), fAlpidetoTargetPos.Z());
+                    else if (s < 12)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 9), -15. - localpos.Y(), fAlpidetoTargetPos.Z());
+                    else if (s < 15)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 12), 15. - localpos.Y(), fAlpidetoTargetPos.Z());
+                    else if (s < 18)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 15), 15. + localpos.Y(), fAlpidetoTargetPos.Z());
+                    else if (s < 21)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 18), 45. + localpos.Y(), fAlpidetoTargetPos.Z());
+                    else
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 21), 45. - localpos.Y(), fAlpidetoTargetPos.Z());
+
+                    AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
+                }
+    }
+    else if (fGeoversion == 202506)
+    {
+        for (size_t s = 0; s < fNbSensors; s++)
+            for (size_t i = 0; i < nHits; i++)
+                if (mult[s][i] > 0)
+                {
+                    nbcluster++;
+
+                    TVector3 localpos;
+                    localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize_ls,
+                                    meanrow[s][i] / double(mult[s][i]) * fPixelSize_ss,
+                                    0.0);
+
+                    TVector3 labpos;
+                    if (s < 3)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -45. - localpos.Y(), 0.0);
+                    else if (s < 6)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), -45. + localpos.Y(), 0.0);
+                    else if (s < 9)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -45. - localpos.Y(), 73.);
+                    else
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), -45. + localpos.Y(), 73.);
+
+                    AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
+                }
+    }
 
     R3BLOG(debug, "Number of clusters: " << nbcluster);
     return;
