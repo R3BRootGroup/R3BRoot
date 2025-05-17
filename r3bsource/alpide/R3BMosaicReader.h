@@ -49,6 +49,15 @@ class R3BMosaicReader : public R3BReader
     // Accessor to select online mode
     inline void SetOnline(bool option = true) { fOnline = option; }
 
+    // Accessor to set the number of sensors per flex-PCB
+    inline void SetNbSensorsPCB(uint16_t nbs) { fNb_sensors_flex = nbs; }
+
+    // Accessor to set barrel configuration
+    inline void SetBarrelConfig() { fNb_sensors_flex = 9; }
+
+    // Accessor to set mosaic mapping
+    inline void SetMosaicMapping(const std::vector<int>& mosaicIds) { map_mosaics = mosaicIds; }
+
   private:
     // An event counter
     unsigned int fNEvent = 1;
@@ -60,13 +69,15 @@ class R3BMosaicReader : public R3BReader
     size_t fOffset = 0;
     // Don't store data for online
     bool fOnline = false;
+    // Number of ALPIDE sensors per flex-PCB
+    uint16_t fNb_sensors_flex = 6;
     // Output array
     TClonesArray* fArray = nullptr;
 
-    std::vector<int> map_mosaics = { 0, 0, 0, 0, 1, 2, 3, 0 };
+    std::vector<int> map_mosaics = { 0, 0, 0, 0, 0, 0, 1, 2, 3 };
 
     std::vector<int> map_sensors = { 1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-                                     18, 17, 16, 15, 14, 13, 24, 23, 22, 21, 20, 19 };
+                                     13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 };
 
   public:
     ClassDefOverride(R3BMosaicReader, 1);
