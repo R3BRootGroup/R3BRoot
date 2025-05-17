@@ -109,9 +109,7 @@ InitStatus R3BMwpcvsFootOnlineSpectra::Init()
     {
         cCMwF->cd(i + 1);
         gPad->SetLogz();
-        std::stringstream ss1;
-        ss1 << "fh2_Mwpc_Tttx_Xcor_" << i;
-        fh2_cor[i] = R3B::root_owned<TH2F>(hist_names[i].c_str(), hist_titles[i].c_str(), 400, -100, 100, 67, -50, 50);
+        fh2_cor[i] = R3B::root_owned<TH2F>(hist_names[i].c_str(), hist_titles[i].c_str(), 400, -60, 60, 400, -60, 60);
         fh2_cor[i]->GetXaxis()->SetTitle(hist_xaxis_titles[i].c_str());
         fh2_cor[i]->GetYaxis()->SetTitle(hist_yaxis_titles[i].c_str());
         fh2_cor[i]->GetYaxis()->SetTitleOffset(1.2);
