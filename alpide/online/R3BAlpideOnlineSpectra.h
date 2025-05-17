@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -44,7 +44,7 @@ class R3BAlpideOnlineSpectra : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BAlpideOnlineSpectra(const TString& name, Int_t iVerbose = 1);
+    explicit R3BAlpideOnlineSpectra(const TString& name, int iVerbose = 1);
 
     /**
      * Destructor.
@@ -104,11 +104,11 @@ class R3BAlpideOnlineSpectra : public FairTask
     TClonesArray* fCalItems = nullptr;
     TClonesArray* fHitItems = nullptr;
 
-    R3BEventHeader* header = nullptr;        /**< Event header. */
-    R3BAlpideMappingPar* fMap_Par = nullptr; /**< Parameter container. >*/
-    int fTrigger = -1;                       /**< Trigger value. */
-    int fTpat1 = 0, fTpat2 = 0;
-    int fNEvents = 0;
+    R3BEventHeader* header = nullptr;
+    R3BAlpideMappingPar* fMap_Par = nullptr;
+    int fTrigger = -1;
+    int fTpat1 = -1, fTpat2 = -1;
+    unsigned long long fNEvents = 0;
     uint16_t fNbSensors = 24;
 
     std::vector<TH2F*> fh2_ColVsRow;
@@ -121,10 +121,11 @@ class R3BAlpideOnlineSpectra : public FairTask
     TH1F* fh1_Calmult_total;
     TH2F* fh2_sensor_pixelsize;
     TH2F* fh2_theta_phi;
+    TH2F* fh2_y_x;
 
     TCanvas* cCalPixelSize = nullptr;
     TCanvas* cHit_angcor = nullptr;
 
   public:
-    ClassDefOverride(R3BAlpideOnlineSpectra, 1)
+    ClassDefOverride(R3BAlpideOnlineSpectra, 1); // NOLINT
 };

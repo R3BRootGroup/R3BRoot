@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -37,7 +37,7 @@ class R3BAlpideCal2Hit : public FairTask
     R3BAlpideCal2Hit();
 
     /** Standard constructor **/
-    R3BAlpideCal2Hit(const TString& name, Int_t iVerbose = 1);
+    explicit R3BAlpideCal2Hit(const TString& name, int iVerbose = 1);
 
     /** Destructor **/
     ~R3BAlpideCal2Hit() override;
@@ -58,13 +58,14 @@ class R3BAlpideCal2Hit : public FairTask
     InitStatus ReInit() override;
 
     // Method to setup online mode
-    inline void SetOnline(bool option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     void SetParameter();
     void FindClusters();
 
-    double fPixelSize = 0.0292968;
+    const double fPixelSize_ls = 0.0292968; // long side
+    const double fPixelSize_ss = 0.02695;   // short side
     int fNbSensors = 108;
     bool fOnline = false;
 
@@ -77,7 +78,7 @@ class R3BAlpideCal2Hit : public FairTask
 
     R3BTGeoPar* fTargetGeoPar = nullptr;
     R3BTGeoPar* fAlpideGeoPar = nullptr;
-    int fGeoversion = 202402;
+    int fGeoversion = 202505;
     R3BAlpideGeometry* fAlpideGeo = nullptr;
     R3BAlpideMappingPar* fMap_Par = nullptr;
     TClonesArray* fAlpideCalData = nullptr; // Array with Alpide Cal input data
@@ -95,5 +96,5 @@ class R3BAlpideCal2Hit : public FairTask
 
   public:
     // Class definition
-    ClassDefOverride(R3BAlpideCal2Hit, 1)
+    ClassDefOverride(R3BAlpideCal2Hit, 1); // NOLINT
 };

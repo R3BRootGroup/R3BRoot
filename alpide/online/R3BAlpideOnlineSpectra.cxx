@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -50,7 +50,7 @@ R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra()
 }
 
 // R3BAlpideOnlineSpectra::Standard Constructor --------------------------
-R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra(const TString& name, Int_t iVerbose)
+R3BAlpideOnlineSpectra::R3BAlpideOnlineSpectra(const TString& name, int iVerbose)
     : FairTask(name, iVerbose)
 {
 }
@@ -111,50 +111,56 @@ InitStatus R3BAlpideOnlineSpectra::Init()
     //
     SetParameter();
 
-    char Name1[255];
-    char Name2[255];
-    fh2_ColVsRow.resize(fNbSensors);
+    auto* cMap = new TCanvas("Sensor_mapping", "Row vs Col per sensor", 10, 10, 500, 500);
+    cMap->Divide(3, fNbSensors / 3);
+
     for (int s = 0; s < fNbSensors; s++)
     {
-        sprintf(Name1, "Sensor_%d_col_vs_row_map", s + 1);
-        auto* cMap = new TCanvas(Name1, "mapped info", 10, 10, 500, 500);
-        sprintf(Name1, "fh2_col_vs_row_sensor_%d", s + 1);
-        sprintf(Name2, "Mapped col vs row for sensor: %d", s + 1);
-        fh2_ColVsRow[s] = R3B::root_owned<TH2F>(Name1, Name2, 1024, 1, 1025, 512, 1, 513);
+        std::string hist_name = "fh2_col_vs_row_sensor_" + std::to_string(s + 1);
+        std::string hist_title = "Col vs Row for sensor " + std::to_string(s + 1);
+        fh2_ColVsRow.push_back(
+            R3B::root_owned<TH2F>(hist_name.c_str(), hist_title.c_str(), 1024, 1, 1025, 512, 1, 513));
         fh2_ColVsRow[s]->GetXaxis()->SetTitle("Col");
         fh2_ColVsRow[s]->GetYaxis()->SetTitle("Row");
         fh2_ColVsRow[s]->GetYaxis()->SetTitleOffset(1.1);
         fh2_ColVsRow[s]->GetXaxis()->CenterTitle(true);
         fh2_ColVsRow[s]->GetYaxis()->CenterTitle(true);
-        cMap->cd();
+        cMap->cd(s + 1);
         fh2_ColVsRow[s]->Draw("colz");
-        mapfol->Add(cMap);
     }
+    mapfol->Add(cMap);
     mainfol->Add(mapfol);
 
     if (fCalItems)
     {
-        fh2_ColVsRowCal.resize(fNbSensors);
-        fh1_Calmult.resize(fNbSensors);
+        std::vector<TCanvas*> cCal;
+        auto nbc = fNbSensors / 6;
+        for (int s = 0; s < nbc; s++)
+        {
+            std::string name = "Sensor_after_masking_flex_" + std::to_string(s + 1);
+            cCal.push_back(new TCanvas(name.c_str(), "Row vs Col per sensor", 10, 10, 500, 500));
+            cCal[s]->Divide(2, 6);
+        }
+
         for (int s = 0; s < fNbSensors; s++)
         {
-            sprintf(Name1, "Sensor_%d_col_vs_row_cal", s + 1);
-            auto* cCal = new TCanvas(Name1, "cal info", 10, 10, 500, 500);
-            cCal->Divide(2, 1);
-            sprintf(Name1, "fh2_col_vs_row_cal_sensor_%d", s + 1);
-            sprintf(Name2, "Cal col vs row for sensor: %d", s + 1);
-            fh2_ColVsRowCal[s] = R3B::root_owned<TH2F>(Name1, Name2, 1024, 1, 1025, 512, 1, 513);
+            int canvas_index = s / 6;
+            int pad_index = 2 * (s % 6) + 1;
+            std::string hist_name = "fh2_col_vs_row_cal_sensor_" + std::to_string(s + 1);
+            std::string hist_title = "Col vs Row for sensor " + std::to_string(s + 1);
+            fh2_ColVsRowCal.push_back(
+                R3B::root_owned<TH2F>(hist_name.c_str(), hist_title.c_str(), 1024, 1, 1025, 512, 1, 513));
             fh2_ColVsRowCal[s]->GetXaxis()->SetTitle("Col");
             fh2_ColVsRowCal[s]->GetYaxis()->SetTitle("Row");
             fh2_ColVsRowCal[s]->GetYaxis()->SetTitleOffset(1.1);
             fh2_ColVsRowCal[s]->GetXaxis()->CenterTitle(true);
             fh2_ColVsRowCal[s]->GetYaxis()->CenterTitle(true);
-            cCal->cd(1);
+            cCal[canvas_index]->cd(pad_index);
             fh2_ColVsRowCal[s]->Draw("colz");
 
-            sprintf(Name1, "fh1_mulcal_sensor_%d", s + 1);
-            sprintf(Name2, "Cal_mult for sensor: %d", s + 1);
-            fh1_Calmult[s] = R3B::root_owned<TH1F>(Name1, Name2, 100, 0, 100);
+            std::string hist_name2 = "fh1_mulcal_sensor_" + std::to_string(s + 1);
+            std::string hist_title2 = "Cal_mult for sensor " + std::to_string(s + 1);
+            fh1_Calmult.push_back(R3B::root_owned<TH1F>(hist_name2.c_str(), hist_title2.c_str(), 100, 0, 100));
             fh1_Calmult[s]->GetXaxis()->SetTitle("Pixel multiplicity");
             fh1_Calmult[s]->GetYaxis()->SetTitle("Counts");
             fh1_Calmult[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -162,14 +168,17 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh1_Calmult[s]->GetYaxis()->CenterTitle(true);
             fh1_Calmult[s]->SetLineColor(1);
             fh1_Calmult[s]->SetFillColor(31);
-            cCal->cd(2);
+            pad_index++;
+            cCal[canvas_index]->cd(pad_index);
             fh1_Calmult[s]->Draw();
-            calfol->Add(cCal);
+        }
+        for (const auto& c : cCal)
+        {
+            calfol->Add(c);
         }
         mainfol->Add(calfol);
 
-        // auto* cCaltotal = new TCanvas("Ccal mul", "", 10, 10, 500, 500);
-        fh1_Calmult_total = R3B::root_owned<TH1F>("fh1_mulcal_sensor_total", "Cal_mult for all sensors", 50, 0, 50);
+        fh1_Calmult_total = R3B::root_owned<TH1F>("fh1_mulcal_sensor_total", "Cal_mult for all sensors", 70, 0, 70);
         fh1_Calmult_total->GetXaxis()->SetTitle("Pixel multiplicity");
         fh1_Calmult_total->GetYaxis()->SetTitle("Counts");
         fh1_Calmult_total->GetYaxis()->SetTitleOffset(1.1);
@@ -177,13 +186,16 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         fh1_Calmult_total->GetYaxis()->CenterTitle(true);
         fh1_Calmult_total->SetLineColor(1);
         fh1_Calmult_total->SetFillColor(31);
-        // cCaltotal->cd();
-        // fh1_Calmult_total->Draw("");
-        // mainfol->Add(cCaltotal);
 
         cCalPixelSize = new TCanvas("SensorID_PixelSize", "", 10, 10, 500, 500);
-        fh2_sensor_pixelsize = R3B::root_owned<TH2F>(
-            "fh2_sensor_pixelsize", "Pixel multiplicity per sensor", 26, -0.5, 25.5, 50, -0.5, 49.5);
+        fh2_sensor_pixelsize = R3B::root_owned<TH2F>("fh2_sensor_pixelsize",
+                                                     "Pixel multiplicity per sensor",
+                                                     fNbSensors + 2,
+                                                     -0.5,
+                                                     fNbSensors + 1.5,
+                                                     70,
+                                                     -0.5,
+                                                     69.5);
         fh2_sensor_pixelsize->GetXaxis()->SetTitle("SensorID");
         fh2_sensor_pixelsize->GetYaxis()->SetTitle("Pixel multiplicity");
         fh2_sensor_pixelsize->GetYaxis()->SetTitleOffset(1.1);
@@ -192,18 +204,22 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         gPad->SetLogz();
         fh2_sensor_pixelsize->Draw("colz");
         fh2_sensor_pixelsize->SetStats(0);
-        for (int i_mosaic = 1; i_mosaic < 5; i_mosaic++)
+        for (size_t i_mosaic = 1; i_mosaic <= nbc; i_mosaic++)
         {
-            auto l = new TLine(6 * i_mosaic + 0.5, 0, 6 * i_mosaic + 0.5, 49);
+            auto l = new TLine(6 * i_mosaic + 0.5, 0, 6 * i_mosaic + 0.5, 69);
             l->Draw("same");
             l->SetLineStyle(7);
             l->SetLineWidth(3);
             l->SetLineColor(2);
         }
+        mainfol->Add(fh1_Calmult_total);
+        mainfol->Add(cCalPixelSize);
     }
 
     if (fHitItems)
     {
+        char Name1[255];
+        char Name2[255];
         fh1_Clustermult.resize(fNbSensors);
         fh1_Clustersize.resize(fNbSensors);
         fh2_PosHit.resize(fNbSensors);
@@ -253,7 +269,6 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh1_Clustermult[s]->Draw();
             hitfol->Add(cHitm);
         }
-
         mainfol->Add(hitfol);
 
         cHit_angcor = new TCanvas("Theta_vs_Phi", "Correlation theta vs phi", 10, 10, 500, 500);
@@ -266,14 +281,22 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         gPad->SetLogz();
         fh2_theta_phi->Draw("colz");
         fh2_theta_phi->SetStats(0);
-    }
 
-    if (fh1_Calmult_total)
-        mainfol->Add(fh1_Calmult_total);
-    if (cCalPixelSize)
-        mainfol->Add(cCalPixelSize);
-    if (cHit_angcor)
-        mainfol->Add(cHit_angcor);
+        // mainfol->Add(cHit_angcor);
+
+        auto cHit_xy = new TCanvas("Y_vs_X", "Correlation Y vs X in mm", 10, 10, 500, 500);
+        fh2_y_x = R3B::root_owned<TH2F>("fh2_y_x", "Correlation Y vs X in mm", 400, -50, 50, 380, -70, 70);
+        fh2_y_x->GetXaxis()->SetTitle("Wix <--   X [mm]   --> Messel");
+        fh2_y_x->GetYaxis()->SetTitle("Y [mm]");
+        fh2_y_x->GetYaxis()->SetTitleOffset(1.1);
+        fh2_y_x->GetXaxis()->CenterTitle(true);
+        fh2_y_x->GetYaxis()->CenterTitle(true);
+        gPad->SetLogz();
+        fh2_y_x->Draw("colz");
+        fh2_y_x->SetStats(0);
+
+        mainfol->Add(cHit_xy);
+    }
 
     run->AddObject(mainfol);
 
@@ -332,6 +355,7 @@ void R3BAlpideOnlineSpectra::Reset_Histo()
             hist->Reset();
         }
         fh2_theta_phi->Reset();
+        fh2_y_x->Reset();
     }
 
     return;
@@ -340,10 +364,10 @@ void R3BAlpideOnlineSpectra::Reset_Histo()
 void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
 {
     // Check for requested trigger (Todo: should be done globablly / somewhere else)
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    if ((fTrigger >= 0) && (header != nullptr) && (header->GetTrigger() != fTrigger))
         return;
 
-    if (fTpat1 > 0 && fTpat2 > 0 && (header))
+    if (fTpat1 >= 0 && fTpat2 >= 0 && (header))
     {
         // fTpat = 1-16; fTpat_bit = 0-15
         Int_t fTpat_bit1 = fTpat1 - 1;
@@ -363,7 +387,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
         auto nHits = fMappedItems->GetEntriesFast();
-        for (int ihit = 0; ihit < nHits; ihit++)
+        for (size_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BAlpideMappedData*>(fMappedItems->At(ihit));
             if (!hit)
@@ -380,7 +404,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
         {
             std::vector<int> mult(fNbSensors, 0);
             auto nHits = fCalItems->GetEntriesFast();
-            for (int ihit = 0; ihit < nHits; ihit++)
+            for (size_t ihit = 0; ihit < nHits; ihit++)
             {
                 auto hit = dynamic_cast<R3BAlpideCalData*>(fCalItems->At(ihit));
                 if (!hit)
@@ -391,7 +415,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_ColVsRowCal[senid]->Fill(hit->GetCol(), hit->GetRow());
                 mult[senid]++;
             }
-            for (int s = 0; s < fNbSensors; s++)
+            for (size_t s = 0; s < fNbSensors; s++)
                 if (mult[s] > 0)
                 {
                     fh1_Calmult[s]->Fill(mult[s]);
@@ -406,7 +430,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
     {
         std::vector<int> mult(fNbSensors, 0);
         auto nHits = fHitItems->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        for (size_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BAlpideHitData*>(fHitItems->At(ihit));
             if (!hit)
@@ -415,9 +439,10 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
             fh1_Clustersize[senid]->Fill(hit->GetClusterSize());
             fh2_PosHit[senid]->Fill(hit->GetPosl(), hit->GetPost());
             fh2_theta_phi->Fill(hit->GetPhi() * TMath::RadToDeg(), hit->GetTheta() * TMath::RadToDeg());
+            fh2_y_x->Fill(hit->GetX(), hit->GetY());
             mult[senid]++;
         }
-        for (int s = 0; s < fNbSensors; s++)
+        for (size_t s = 0; s < fNbSensors; s++)
             if (mult[s] > 0)
                 fh1_Clustermult[s]->Fill(mult[s]);
     }
@@ -466,6 +491,7 @@ void R3BAlpideOnlineSpectra::FinishTask()
     if (fHitItems)
     {
         fh2_theta_phi->Write();
+        fh2_y_x->Write();
     }
 }
 ClassImp(R3BAlpideOnlineSpectra)
