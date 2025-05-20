@@ -12,8 +12,11 @@
  ******************************************************************************/
 
 #include "R3BNeulandEventHeaderCanvas.h"
+#include "R3BDataMonitor.h"
 #include "R3BNeulandOnlineSpectra2.h"
-#include <fmt/format.h>
+#include "R3BNeulandTriggerTypes.h"
+#include <TH1.h>
+#include <fmt/core.h>
 
 namespace R3B::Neuland
 {
@@ -31,7 +34,7 @@ namespace R3B::Neuland
     void EventHeaderCanvas::CanvasFill(DataMonitor& /*histograms*/)
     {
         auto* eventHeader = GetOnlineSpectra()->GetEventHeader();
-        const auto offspill_bit = GetOnlineSpectra()->GetBasePar()->GetOffSpillTpatPos();
+        const auto offspill_bit = GetOnlineSpectra()->GetBasePar()->get_offspill_tpat_pos();
         const auto tpat = eventHeader->GetTpat();
         h_tpats_->Fill(fmt::format("{:016b}", tpat).c_str(), 1);
 

@@ -13,7 +13,9 @@
 #pragma once
 
 #include "SteerWriter.h"
-#include <boost/asio.hpp>
+#include <boost/asio/io_context.hpp>
+#include <string>
+#include <string_view>
 
 namespace R3B::Millepede
 {
@@ -30,7 +32,7 @@ namespace R3B::Millepede
         void end();
 
       private:
-        boost::asio::io_service ios_;
+        boost::asio::io_context ios_;
         std::string steer_filename_ = DEFAULT_STEER_FILENAME;
         std::string parameter_file_;
         std::string binary_directory_ = ".";

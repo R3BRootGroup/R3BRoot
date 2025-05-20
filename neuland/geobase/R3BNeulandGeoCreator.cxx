@@ -12,9 +12,12 @@
 #include <TGeoManager.h>
 #include <TGeoMatrix.h>
 #include <TGeoShape.h>
+#include <TGeoVolume.h>
 #include <cmath>
 #include <cstdlib>
-#include <fmt/format.h>
+#include <fmt/core.h>
+#include <string>
+#include <string_view>
 
 namespace R3B::Neuland::Geometry
 {
@@ -224,8 +227,8 @@ namespace R3B::Neuland::Geometry
     void Creator::read_material_from_file(FairGeoLoader* geo_loader)
     {
         auto* geo_interface = geo_loader->getGeoInterface();
-        const auto working_dir = std::string{ std::getenv("VMCWORKDIR") };
-        if (working_dir.empty())
+        const auto* working_dir = std::getenv("VMCWORKDIR");
+        if (working_dir == nullptr)
         {
             throw R3B::logic_error("Environment variable \"VMCWORKDIR\" is not defined!");
         }

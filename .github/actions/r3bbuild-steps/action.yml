@@ -35,3 +35,8 @@ runs:
       run: |
         cmake --build --preset ${{ matrix.preset }} -- -j ${NUM_THREADS}
       shell: bash
+
+    - name: ccache stats
+      if: github.event_name == 'pull_request' && always()
+      run: ccache --show-stats
+      shell: bash

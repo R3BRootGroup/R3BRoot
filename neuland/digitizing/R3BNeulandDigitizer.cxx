@@ -32,7 +32,6 @@
 #include <FairTask.h>
 #include <R3BNeulandCommonFunc.h>
 #include <R3BShared.h>
-#include <Rtypes.h>
 #include <RtypesCore.h>
 #include <TFile.h>
 #include <TH1.h>
@@ -44,7 +43,6 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <range/v3/view.hpp>
 #include <range/v3/view/zip.hpp>
 #include <string>
 #include <string_view>

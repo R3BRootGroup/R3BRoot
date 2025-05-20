@@ -11,7 +11,6 @@
 #include <cstdint>
 #include <functional>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <string>
 
 namespace R3B::Neuland
@@ -63,7 +62,4 @@ namespace R3B::Neuland
         auto create_box_generator() -> std::unique_ptr<FairPrimaryGenerator>;
     };
 
-    void to_json(nlohmann::ordered_json& json_obj, const GeneratorFactory::Options& options);
-
-    void from_json(const nlohmann::ordered_json& json_obj, GeneratorFactory::Options& options);
 } // namespace R3B::Neuland

@@ -1,10 +1,13 @@
 #pragma once
 
 #include <R3BShared.h>
-#include <filesystem>
+#include <cstdint>
 #include <map>
 #include <optional>
+#include <string>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 
 namespace R3B::Neuland
 {
@@ -36,7 +39,7 @@ namespace R3B::Neuland
         static void AutoResolve(TrigIDMap& trigIDMap);
     };
 
-    enum class TrigIDMappingPrintFormat
+    enum class TrigIDMappingPrintFormat : uint8_t
     {
         screen,
         none
@@ -56,8 +59,6 @@ namespace R3B::Neuland
         void Save_json(const TrigIDMappingFinder::TrigIDMap& trigMap) const;
 
       private:
-        unsigned int numOfPlane_ = 0;
-        unsigned int numOfBar_ = 0;
         unsigned int numOfModule_ = 0;
         TrigIDMappingPrintFormat format_ = TrigIDMappingPrintFormat::none;
         std::string filename_ = "trigIDMap.json";

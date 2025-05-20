@@ -24,7 +24,6 @@
 #include <Rtypes.h>
 #include <TH1.h>
 #include <array>
-#include <boost/regex.hpp>
 
 // TODO: C++20 std::span
 #include <boost/regex/v5/regex.hpp>
@@ -38,7 +37,6 @@
 // TODO: C++20 std::range
 #include <map>
 #include <range/v3/algorithm/equal.hpp>
-#include <range/v3/view.hpp>
 #include <range/v3/view/iota.hpp>
 #include <range/v3/view/take.hpp>
 #include <range/v3/view/zip.hpp>
@@ -76,10 +74,8 @@ namespace
     }
 
     template <typename BinaryOperation, typename Item0, typename Item1, typename... Items>
-    inline constexpr auto CheckAmong(BinaryOperation optn,
-                                     const Item0& item0,
-                                     const Item1& item1,
-                                     const Items&... items) -> bool
+    constexpr auto CheckAmong(BinaryOperation optn, const Item0& item0, const Item1& item1, const Items&... items)
+        -> bool
     {
         return CheckAmong(optn, item0, item1) && CheckAmong(optn, item1, items...);
     }
@@ -383,7 +379,7 @@ auto R3BNeulandTamexReader2::check_trigger_needed(std::string_view item_name) co
 {
     // TODO: not the exact regex, but it suffices
     const auto neuland_trigger_regex = boost::regex{ "^NN_TRIG(C|F)(v|M)?(I|E)?$" };
-    auto res = is_triggered_ && boost::regex_match(item_name.data(), neuland_trigger_regex);
+    auto res = is_triggered_ && boost::regex_match(item_name.data(), neuland_trigger_regex); // NOLINT
     return res;
 }
 
@@ -391,7 +387,7 @@ auto R3BNeulandTamexReader2::check_bar_needed(std::string_view item_name) const 
 {
     const auto neuland_bar_regex = boost::regex{ R"(^NN_P(\d*)t.*$)" };
     auto result = boost::cmatch{};
-    if (boost::regex_search(item_name.data(), result, neuland_bar_regex))
+    if (boost::regex_search(item_name.data(), result, neuland_bar_regex)) // NOLINT
     {
         const auto plane_num = std::stoi(result.str(1));
         if (plane_num != 0 and plane_num <= numPlanes_)

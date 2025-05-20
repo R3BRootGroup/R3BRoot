@@ -12,6 +12,15 @@
  ******************************************************************************/
 
 #include "R3BNeulandClusterFinder.h"
+#include "R3BLogger.h"
+#include "R3BNeulandHit.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cstdlib>
+#include <fmt/core.h>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 R3BNeulandClusterFinder::R3BNeulandClusterFinder(const double dist_x,

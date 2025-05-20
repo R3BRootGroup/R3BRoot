@@ -2,7 +2,17 @@
 #include "FairRootManager.h"
 #include "FairRtdbRun.h"
 #include "FairRuntimeDb.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicity.h"
+#include "R3BNeulandMultiplicityBayesPar.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cmath>
+#include <fairlogger/Logger.h>
+#include <memory>
 #include <numeric>
+#include <string_view>
 
 R3BNeulandMultiplicityBayes::R3BNeulandMultiplicityBayes(std::string_view input, std::string_view output)
     : FairTask("R3BNeulandMultiplicityBayes")

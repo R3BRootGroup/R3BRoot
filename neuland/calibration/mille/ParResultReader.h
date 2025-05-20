@@ -1,7 +1,8 @@
 #pragma once
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 
 namespace R3B::Millepede

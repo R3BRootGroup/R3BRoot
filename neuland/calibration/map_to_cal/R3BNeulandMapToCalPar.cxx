@@ -1,9 +1,11 @@
 #include "R3BNeulandMapToCalPar.h"
-#include <FairDetParIo.h>
-#include <FairParIo.h>
+#include "R3BNeulandParSet.h"
+#include "R3BValueError.h"
 #include <R3BException.h>
-#include <R3BLogger.h>
 #include <fmt/core.h>
+#include <string_view>
+#include <sys/types.h>
+#include <utility>
 
 namespace R3B
 {
@@ -31,6 +33,3 @@ namespace R3B
                                            finetime_correlation_.at(ftType).value_error.size()));
     }
 } // namespace R3B
-
-ClassImp(R3B::Map2CalPar);
-ClassImp(R3B::TCalVFTXModulePar);

@@ -18,7 +18,7 @@
 #include <memory>
 #include <vector>
 
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 namespace
 {
     namespace Digitizing = R3B::Digitizing;
@@ -178,4 +178,4 @@ namespace
         ASSERT_LT(AssessReduction(lowE, lowE_out), AssessReduction(highE, highE_out)) << "PMT saturation not applied!";
     }
 } // namespace
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)

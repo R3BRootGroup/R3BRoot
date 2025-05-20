@@ -11,16 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#define BOOST_PROCESS_USE_STD_FS 1
-
 #include "PedeLauncher.h"
-#include <boost/process.hpp>
+#include <boost/process/search_path.hpp>
+#include <boost/process/v2/process.hpp>
+#include <boost/process/v2/stdio.hpp>
+#include <exception>
 #include <filesystem>
+#include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <fmt/ranges.h> // NOLINT
+#include <stdexcept>
+#include <string>
+#include <system_error>
+#include <vector>
 
 namespace bp = boost::process;
 namespace fs = std::filesystem;
+namespace bpv2 = boost::process::v2;
 
 namespace R3B::Millepede
 {
@@ -40,17 +47,19 @@ namespace R3B::Millepede
 
         try
         {
-            auto pede_program =
-                bp::child{ exe_path,
-                           bp::args(launch_args),
-                           bp::std_out > stdout,
-                           bp::std_err > stderr,
-                           ios_,
-                           bp::on_exit = [](int pid, const std::error_code& err)
-                           { fmt::print("Child process returns {} with error code: {}\n", pid, err.message()); } };
+            auto pede_program = bpv2::process{
+                ios_, exe_path, launch_args, bpv2::process_stdio{ .in = nullptr, .out = stdout, .err = stderr }
+            };
+            pede_program.async_wait(
+                [](const std::error_code& err, int ret)
+                {
+                    if (err)
+                    {
+                        fmt::println("Error occured from the pede program. Error message: {}", err.message());
+                    }
+                    fmt::println("The pede program is closed successfully with the return value: {}", ret);
+                });
             ios_.run();
-            pede_program.wait();
-            fmt::print("Child process with PID {} ended.\n", pede_program.id());
             ios_.reset();
         }
         catch (std::exception& ex)

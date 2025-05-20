@@ -12,10 +12,10 @@
  ******************************************************************************/
 
 #include "R3BNeulandHitCosmicCanvas.h"
+#include "R3BDataMonitor.h"
 #include <R3BNeulandCommon.h>
-#include <R3BNeulandOnlineSpectra2.h>
 #include <TH2.h>
-#include <range/v3/algorithm.hpp>
+#include <range/v3/algorithm/find_if.hpp>
 
 constexpr auto REFERENCE_BAR_ID_FRONT = 624;
 constexpr auto REFERENCE_BAR_ID_BACK = 674;

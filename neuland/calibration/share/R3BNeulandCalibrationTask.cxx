@@ -3,11 +3,16 @@
 #include <FairParSet.h>
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
+#include <FairTask.h>
 #include <R3BEventHeader.h>
 #include <R3BException.h>
 #include <R3BLogger.h>
-#include <R3BNeulandCommon.h>
-#include <range/v3/all.hpp>
+#include <RtypesCore.h>
+#include <TH1.h>
+#include <fmt/core.h>
+#include <range/v3/algorithm/find_if.hpp>
+#include <range/v3/algorithm/for_each.hpp>
+#include <string_view>
 
 namespace R3B::Neuland
 {
@@ -45,7 +50,7 @@ namespace R3B::Neuland
             }
 
             check_input_par();
-            offspill_tpat_bit_ = base_par_->GetOffSpillTpatPos();
+            offspill_tpat_bit_ = base_par_->get_offspill_tpat_pos();
 
             ExtraInit(rootMan);
 

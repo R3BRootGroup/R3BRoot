@@ -4,7 +4,6 @@
 #include "R3BLogger.h"
 #include "R3BShared.h"
 #include <R3BNeulandCalToHitPar.h>
-#include <R3BNeulandCommon.h>
 #include <RtypesCore.h>
 #include <algorithm>
 #include <cmath>

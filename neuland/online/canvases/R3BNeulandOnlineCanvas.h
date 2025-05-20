@@ -13,10 +13,12 @@
 
 #pragma once
 
+#include "R3BDataMonitorCanvas.h"
 #include <R3BDataMonitor.h>
-#include <R3BNeulandCommon.h>
 #include <R3BNeulandTriggerTypes.h>
 #include <string>
+#include <string_view>
+#include <utility>
 
 constexpr auto NEULAND_DEFAULT_BAR_NUM = 1300;
 namespace R3B::Neuland

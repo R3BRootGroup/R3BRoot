@@ -9,9 +9,8 @@ class CompressorRecipe(ConanFile):
     def requirements(self):
         self.requires("ms-gsl/4.0.0")
         self.requires("range-v3/0.12.0")
-        self.requires("gtest/1.14.0")
-        self.requires("nlohmann_json/3.11.2")
-        self.requires("yaml-cpp/0.8.0")
+        self.requires("gtest/cci.20210126")
+        self.requires("nlohmann_json/3.12.0")
         self.requires("magic_enum/0.9.7")
 
     def generate(self):

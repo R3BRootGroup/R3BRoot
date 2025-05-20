@@ -1,23 +1,19 @@
-#include <fairlogger/Logger.h>
-#define JSON_USE_IMPLICIT_CONVERSIONS 0 // NOLINT
-
-#include <CLI/App.hpp> // NOLINT
-#include <R3BLogger.h>
-#include <R3BNeulandAppOptionJson.h>
-#include <cstddef>
-#include <cstdlib>
-#include <exception>
-#include <fmt/core.h>
-#include <fmt/format.h>
-#include <memory>
-#ifdef HAS_MPI
-#include <mpi.h>
-#endif
-
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandSimApp.h"
+#include <CLI/App.hpp>               // NOLINT
+#include <CLI/CLI.hpp>               // NOLINT
+#include <R3BNeulandAppOptionJson.h> // NOLINT
+#include <cstddef>
+#include <cstdlib>
+#include <exception>
+#include <fairlogger/Logger.h>
+#include <fmt/core.h>
+#include <memory>
+#ifdef HAS_MPI
+#include <mpi.h>
+#endif
 
 auto main(int argc, char** argv) -> int
 {

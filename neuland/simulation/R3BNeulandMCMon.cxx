@@ -12,19 +12,29 @@
  ******************************************************************************/
 
 #include "R3BNeulandMCMon.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRun.h"
-#include "Math/Vector4D.h"
+#include "R3BMCTrack.h"
+#include "R3BNeulandCommon.h"
 #include "TDirectory.h"
 #include "TFile.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include <algorithm>
+#include <FairTask.h>
+#include <Math/Vector4Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TString.h>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <fairlogger/Logger.h>
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <string>
+#include <vector>
 
 inline Bool_t IsPrimaryNeutron(const R3BMCTrack* mcTrack)
 {
@@ -232,7 +242,7 @@ InitStatus R3BNeulandMCMon::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandMCMon::Exec(Option_t*)
+void R3BNeulandMCMon::Exec(Option_t*) // NOLINT: restructure later
 {
     nEvents++;
 
@@ -269,14 +279,14 @@ void R3BNeulandMCMon::Exec(Option_t*)
     for (const auto& npnip : npnips)
     {
         // WIP: ToF Calculation -> Should respect other origin than 0,0,0,0.
-        const Double_t s2 = std::pow(npnip.GetX(), 2) + std::pow(npnip.GetY(), 2) + std::pow(npnip.GetZ(), 2); // cm²
-        const Double_t v2 = s2 / std::pow(npnip.GetTime(), 2);                                                 // ns²
+        const Double_t point_mag2 =
+            std::pow(npnip.GetX(), 2) + std::pow(npnip.GetY(), 2) + std::pow(npnip.GetZ(), 2); // cm²
+        const Double_t velocity_sq = point_mag2 / std::pow(npnip.GetTime(), 2);                // ns²
 
-        const Double_t c2 = 898.75517873681758374898; // cm²/ns²
-        const Double_t massNeutron = 939.565379;      // MeV/c²
-        const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (v2 / c2))) - 1);
+        const Double_t massNeutron = 939.565379; // MeV/c²
+        const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (velocity_sq / R3B::Neuland::CLight2))) - 1);
 
-        auto mcTrack = mcTracks.at(npnip.GetTrackID());
+        auto* mcTrack = mcTracks.at(npnip.GetTrackID());
         fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip.GetTime());
         fhMCToF->Fill(GetKineticEnergy(mcTrack) - ETimeOfFlight);
         fhNPNIPSrvsz->Fill(npnip.GetZ(), std::sqrt(std::pow(npnip.GetX(), 2) + std::pow(npnip.GetY(), 2)));

@@ -21,9 +21,9 @@
 #include <Math/GenVector/PxPyPzE4D.h>
 #include <R3BIOConnector.h>
 #include <R3BNeulandCommon.h>
+#include <Rtypes.h>
+#include <TMath.h>
 #include <TRandom3.h>
-#include <cmath>
-#include <fmt/format.h>
 #include <memory>
 #include <utility>
 
@@ -124,7 +124,7 @@ namespace R3B::Neuland
         -> AngleRadius
     {
         auto angles = AngleRadius{};
-        angles.SetPhi(rd_engine_->Uniform(0., 2 * M_PI));
+        angles.SetPhi(rd_engine_->Uniform(0., 2 * TMath::Pi()));
         // angles.SetTheta(0);
         angles.SetTheta(angle_dist(rd_engine_));
 

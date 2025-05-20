@@ -16,7 +16,7 @@
 #include <R3BDataMonitor.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandCalToHitPar.h>
-#include <R3BShared.h>
+#include <vector>
 
 namespace R3B::Neuland
 {

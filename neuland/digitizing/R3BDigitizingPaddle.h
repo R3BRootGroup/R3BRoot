@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef DIGITIZING_PADDLE_H
-#define DIGITIZING_PADDLE_H
+#pragma once
 
 #include "R3BDigitizingChannel.h"
 #include "R3BShared.h"
@@ -117,7 +116,7 @@ namespace R3B::Digitizing
         [[nodiscard]] auto GetTrigTime() const -> double;
 
         // Setters:
-        void SetPaddleID(int id) { paddle_id_ = id; }
+        void SetPaddleID(int paddle_id) { paddle_id_ = paddle_id; }
 
         [[nodiscard]] virtual auto match_hits(const AbstractChannel::Hit& /*firstSignal*/,
                                               const AbstractChannel::Hit& /*secondSignal*/) const -> float
@@ -128,8 +127,8 @@ namespace R3B::Digitizing
       private:
         int paddle_id_{};
         Hits signal_hits_;
-        std::unique_ptr<AbstractChannel> left_channel_{};
-        std::unique_ptr<AbstractChannel> right_channel_{};
+        std::unique_ptr<AbstractChannel> left_channel_;
+        std::unique_ptr<AbstractChannel> right_channel_;
         SignalCouplingStrategy signal_coupling_strategy_;
 
         // virtual private functions
@@ -155,4 +154,3 @@ namespace R3B::Digitizing
                                          const AbstractChannel::Hits& secondSignals) -> std::vector<ChannelSignalPair>;
     };
 } // namespace R3B::Digitizing
-#endif

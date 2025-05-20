@@ -68,6 +68,7 @@ namespace R3B::Digitizing::Neuland
                                           const AbstractChannel::Hit& secondSignal) const -> double override;
         [[nodiscard]] auto compute_position(const AbstractChannel::Hit& leftSignal,
                                             const AbstractChannel::Hit& rightSignal) const -> double override;
-        [[nodiscard]] auto compute_channel_signals(const Signal& hit) const -> Pair<AbstractChannel::Signal> override;
+        [[nodiscard]] auto compute_channel_signals(const Signal& signal) const
+            -> Pair<AbstractChannel::Signal> override;
     };
 } // namespace R3B::Digitizing::Neuland

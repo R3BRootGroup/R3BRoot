@@ -1,6 +1,18 @@
 #include "R3BNeulandNeutronsRValue.h"
+#include "R3BException.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicity.h"
 #include <FairRootManager.h>
+#include <FairTask.h>
 #include <IsElastic.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <algorithm>
+#include <cstddef>
+#include <cstdlib>
+#include <map>
+#include <string_view>
+#include <vector>
 
 R3BNeulandNeutronsRValue::R3BNeulandNeutronsRValue(double EkinRefMeV,
                                                    std::string_view inputMult,
@@ -69,18 +81,20 @@ void R3BNeulandNeutronsRValue::PrioritizeTimeWiseFirstCluster(std::vector<R3BNeu
 
 void R3BNeulandNeutronsRValue::FilterClustersByEnergyDeposit(std::vector<R3BNeulandCluster>& clusters)
 {
-    clusters.erase(
-        std::remove_if(
-            clusters.begin(), clusters.end(), [&](const R3BNeulandCluster& cluster) { return cluster.GetE() < 2.5; }),
-        clusters.end());
+    static constexpr auto threshold = 2.5;
+    clusters.erase(std::remove_if(clusters.begin(),
+                                  clusters.end(),
+                                  [&](const R3BNeulandCluster& cluster) { return cluster.GetE() < threshold; }),
+                   clusters.end());
 }
 
 void R3BNeulandNeutronsRValue::FilterClustersByKineticEnergy(std::vector<R3BNeulandCluster>& clusters) const
 {
+    static constexpr auto threshold = 0.05;
     clusters.erase(std::remove_if(clusters.begin(),
                                   clusters.end(),
                                   [this](const R3BNeulandCluster& cluster)
-                                  { return std::abs(cluster.GetEToF() - fEkinRefMeV) / fEkinRefMeV > 0.05; }),
+                                  { return std::abs(cluster.GetEToF() - fEkinRefMeV) / fEkinRefMeV > threshold; }),
                    clusters.end());
 }
 

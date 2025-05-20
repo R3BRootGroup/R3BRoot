@@ -31,7 +31,6 @@ set(HEADERS
     engine/R3BNeulandCosmicEngine.h
     engine/R3BNeulandLSQREngineAdaptor.h
     engine/R3BNeulandMilleCalDataProcessor.h
-    engine/R3BNeulandMillepede.h
     engine/R3BNeulandPredecessor.h
     R3BNeulandCalToHitPar.h
     R3BNeulandCalToHitParTask.h

@@ -11,9 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULANDCOSMICTRACKER_H
-#define R3BNEULANDCOSMICTRACKER_H
+#pragma once
 
+#include <RtypesCore.h>
 #include <array>
 #include <vector>
 
@@ -64,4 +64,3 @@ namespace R3B::Neuland // NOLINT
         };
     } // namespace Calibration
 } // namespace R3B::Neuland
-#endif

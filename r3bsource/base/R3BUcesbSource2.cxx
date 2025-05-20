@@ -25,8 +25,14 @@
 #include <cstdint>
 #include <exception>
 #include <ext_data_client.h>
-#include <fmt/chrono.h>
+#include <fairlogger/Logger.h>
+#include <fmt/chrono.h> // NOLINT
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <memory>
+#include <mutex>
+#include <string_view>
+#include <sys/types.h>
 #include <thread>
 
 namespace R3B
@@ -274,7 +280,9 @@ namespace R3B
             LOGP(info, "The program has been running for {}", duration);
             waiting_time_ = std::chrono::minutes{ 0 };
         }
-        // LOGP(info, "Infinite run enabled! Relaunching ucesb server after {}. Time now: {}", waiting_time_, time_now);
+        LOGP(info,
+             fmt::format(
+                 "Infinite run enabled! Relaunching ucesb server after {}. Time now: {}", waiting_time_, time_now));
         std::this_thread::sleep_for(waiting_time_);
         restart_ucesb_server();
         last_start_time_ = std::chrono::system_clock::now();

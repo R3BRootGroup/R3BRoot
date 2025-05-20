@@ -13,10 +13,19 @@
 
 #include "R3BNeulandPrimaryInteractionFinder.h"
 #include "FairLogger.h"
+#include "R3BMCTrack.h"
+#include "R3BNeulandHit.h"
+#include "R3BNeulandPoint.h"
 #include "TFile.h"
 #include <FairRootManager.h>
-#include <TH1D.h>
-#include <TH2D.h>
+#include <FairTask.h>
+#include <RtypesCore.h>
+#include <TDirectory.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <fairlogger/Logger.h>
+#include <map>
+#include <string_view>
 #include <vector>
 
 namespace

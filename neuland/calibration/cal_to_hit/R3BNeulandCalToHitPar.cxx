@@ -12,11 +12,18 @@
  ******************************************************************************/
 
 #include "R3BNeulandCalToHitPar.h"
+#include "R3BNeulandParSet.h"
+#include "R3BValueError.h"
 #include <R3BNeulandCommon.h>
 #include <R3BShared.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <algorithm>
 #include <cmath>
-#include <range/v3/all.hpp>
+#include <range/v3/algorithm/max_element.hpp>
+#include <range/v3/view/map.hpp>
+#include <range/v3/view/transform.hpp>
+#include <string_view>
 
 namespace
 {

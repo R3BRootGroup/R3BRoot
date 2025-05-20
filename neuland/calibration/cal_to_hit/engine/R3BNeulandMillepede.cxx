@@ -27,17 +27,15 @@
 #include <TH1.h>
 #include <algorithm>
 #include <array>
+#include <cstdlib>
 #include <fmt/core.h>
 #include <iterator>
 #include <memory>
 #include <numeric>
+#include <optional>
 #include <range/v3/algorithm/all_of.hpp>
 #include <range/v3/iterator/operations.hpp>
 #include <range/v3/numeric/accumulate.hpp>
-#include <range/v3/view.hpp>
-
-#include <cstdlib>
-#include <optional>
 #include <range/v3/view/all.hpp>
 #include <range/v3/view/filter.hpp>
 #include <range/v3/view/sliding.hpp>

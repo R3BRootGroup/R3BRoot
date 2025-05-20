@@ -17,20 +17,21 @@
 // -----                The algorithm written by M.Heil                    -----
 // -----------------------------------------------------------------------------
 
-#include <algorithm>
-#include <iostream>
-
-#include "TClonesArray.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "TMath.h"
-
-#include "FairLogger.h"
+#include "R3BNeuLandClusterFinder.h"
 #include "FairRootManager.h"
-
 #include "R3BLandDigi.h"
 #include "R3BNeuLandCluster.h"
-#include "R3BNeuLandClusterFinder.h"
+#include "TClonesArray.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TMathBase.h>
+#include <algorithm>
+#include <cstddef>
+#include <fairlogger/Logger.h>
+#include <iostream>
 
 using std::cout;
 using std::endl;

@@ -1,8 +1,12 @@
 #include "ParResultReader.h"
-#include <fmt/ranges.h>
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <fstream>
+#include <ios>
 #include <optional>
-#include <range/v3/view.hpp>
+#include <range/v3/view/map.hpp>
+#include <string>
+#include <string_view>
 #include <vector>
 
 namespace rng = ranges;

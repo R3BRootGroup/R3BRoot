@@ -1,11 +1,17 @@
 #pragma once
 
 #include "R3BTrigIDMappingFinder.h"
-#include <FairParSet.h>
+#include "R3BValueError.h"
 #include <R3BNeulandParSet.h>
-#include <R3BShared.h>
-#include <cmath>
+#include <Rtypes.h>
+#include <cstdint>
+#include <map>
+#include <string>
+#include <string_view>
+#include <sys/types.h>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 namespace R3B
 {
@@ -16,7 +22,7 @@ namespace R3B
         ClassDefNV(FTChannel2TimeRelation, 1);
     };
 
-    enum class FTType
+    enum class FTType : uint8_t
     {
         leftleading,
         rightleading,

@@ -13,7 +13,6 @@
 
 #include "R3BNeulandLSQREngineAdaptor.h"
 
-#include <FairRuntimeDb.h>
 #include <R3BException.h>
 #include <R3BLogger.h>
 #include <R3BNeulandCalData2.h>

@@ -12,6 +12,8 @@
  ******************************************************************************/
 
 #include "R3BNeulandSignalMatcher.h"
+#include <cmath>
+#include <cstdlib>
 
 namespace R3B::Neuland
 {

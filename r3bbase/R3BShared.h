@@ -12,16 +12,24 @@
  ******************************************************************************/
 
 #pragma once
-#include "R3BException.h"
-#include "R3BLogger.h"
 #include <FairLogger.h>
 #include <R3BValueError.h>
+#include <Rtypes.h>
 #include <TFile.h>
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <fairlogger/Logger.h>
 #include <filesystem>
+#include <fmt/core.h>
 #include <fmt/std.h>
+#include <memory>
 #include <regex>
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 class TF1;
 class TH1;
@@ -162,7 +170,7 @@ namespace R3B
     template <uint8_t iterations = DEFAULT_ITERATION>
     auto FastExp(const float val) -> float
     {
-        auto exp = 1.F + val / (1U << iterations);
+        auto exp = 1.F + (val / (1U << iterations));
         for (auto i = 0; i < iterations; ++i)
         {
             exp *= exp;
@@ -184,10 +192,9 @@ namespace R3B
 
         if (not fs::exists(parent_folder))
         {
-            R3BLOG(
-                error,
-                fmt::format(R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)",
-                            filename));
+            LOGP(error,
+                 R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)",
+                 filename);
             return ".";
         }
 
@@ -213,7 +220,7 @@ namespace R3B
         }
         if (filelist.empty())
         {
-            R3BLOG(error, fmt::format(R"(Cannot find any files with regex "{}")", regex_string));
+            LOGP(error, R"(Cannot find any files with regex "{}")", regex_string);
         }
         std::sort(filelist.begin(), filelist.end());
         return filelist;

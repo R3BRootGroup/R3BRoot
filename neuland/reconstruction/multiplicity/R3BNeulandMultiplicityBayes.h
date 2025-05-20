@@ -1,11 +1,15 @@
-#ifndef R3BROOT_R3BNEULANDMULTIPLICITYBAYES_H
-#define R3BROOT_R3BNEULANDMULTIPLICITYBAYES_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandMultiplicityBayesPar.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <memory>
+#include <string>
+#include <string_view>
 
 class R3BNeulandMultiplicityBayes : public FairTask
 {
@@ -27,5 +31,3 @@ class R3BNeulandMultiplicityBayes : public FairTask
 
     ClassDefOverride(R3BNeulandMultiplicityBayes, 0)
 };
-
-#endif // R3BROOT_R3BNEULANDMULTIPLICITYBAYES_H

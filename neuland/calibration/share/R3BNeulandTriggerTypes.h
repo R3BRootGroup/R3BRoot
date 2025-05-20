@@ -15,12 +15,14 @@
 
 #include <R3BNeulandCommon.h>
 #include <bitset>
+#include <cstdint>
+#include <string>
 
 constexpr auto TPAT_BITSIZE = 16;
 
 namespace R3B::Neuland
 {
-    enum class CalTrigger
+    enum class CalTrigger : uint8_t
     {
         unrecognised,
         onspill,
@@ -29,7 +31,7 @@ namespace R3B::Neuland
         all
     };
 
-    inline constexpr auto Int2CalTrigger(int value) -> CalTrigger
+    constexpr auto Int2CalTrigger(int value) -> CalTrigger
     {
         switch (value)
         {
@@ -45,7 +47,7 @@ namespace R3B::Neuland
     }
 
     // off_spill_bit is 1 based
-    inline constexpr auto CalTrigger2Tpat(CalTrigger cal_trigger, int off_spill_bit) -> std::bitset<TPAT_BITSIZE>
+    constexpr auto CalTrigger2Tpat(CalTrigger cal_trigger, int off_spill_bit) -> std::bitset<TPAT_BITSIZE>
     {
         switch (cal_trigger)
         {

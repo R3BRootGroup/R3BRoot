@@ -4,7 +4,6 @@
 #include "R3BNeulandCommon.h"
 #include "R3BNeulandMapToCalPar.h"
 #include "R3BShared.h"
-#include <FairParIo.h>
 #include <FairParRootFileIo.h>
 #include <FairRootManager.h>
 #include <FairRun.h>
@@ -54,7 +53,7 @@ namespace R3B::Neuland
             }
         }
 
-        plane_num_ = GetBasePar()->GetNumOfPlanes();
+        plane_num_ = GetBasePar()->get_num_of_planes();
         calibrationPar_->SetTrigEnabled(is_trig_enabled_);
         // trigIDIO.SetNumOfModule(plane_num_ * BarsPerPlane);
     }
@@ -141,7 +140,7 @@ namespace R3B::Neuland
         mapCalEngine_.Writer_to_TCalPar(cal_strategy_, *calibrationPar_);
         if (is_trigID_auto_)
         {
-            GetBasePar()->SetTrigIDMap(trigIDMappingFinder_.extract_trigIDMap());
+            GetBasePar()->set_trig_id_map(trigIDMappingFinder_.extract_trigIDMap());
         }
         calibrationPar_->SetSlowClockFrequency(coarse_time_frequency_);
 

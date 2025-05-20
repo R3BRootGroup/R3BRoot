@@ -65,5 +65,6 @@ Macro (R3B_Generate_Version_Info)
                      -DBINARY_DIR=${CMAKE_BINARY_DIR}
                      -DINCLUDE_OUTPUT_DIRECTORY=${INCLUDE_OUTPUT_DIRECTORY}
                      -P ${CMAKE_SOURCE_DIR}/cmake/modules/R3BGenerateVersionInfo.cmake
+                     POST_BUILD
                     )
 EndMacro (R3B_Generate_Version_Info)

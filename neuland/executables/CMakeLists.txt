@@ -3,6 +3,7 @@ if(CONAN_ENABLED)
 
     add_executable(neuland neuland_cli.cxx)
     target_link_libraries(neuland PRIVATE R3BNeulandApp CLI11::CLI11)
+    target_compile_definitions(neuland PRIVATE JSON_USE_IMPLICIT_CONVERSIONS=0)
 
     if(MPI_FOUND)
         target_link_libraries(neuland PRIVATE MPI::MPI_CXX)
@@ -26,4 +27,5 @@ if(CONAN_ENABLED)
 
     add_executable(neuland_create_base_par neuland_create_base_par.cxx)
     target_link_libraries(neuland_create_base_par PRIVATE R3BNeulandCalibration R3BNeulandShared)
+    target_compile_definitions(neuland_create_base_par PRIVATE JSON_USE_IMPLICIT_CONVERSIONS=0)
 endif()

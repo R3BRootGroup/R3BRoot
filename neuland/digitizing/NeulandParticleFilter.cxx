@@ -19,14 +19,11 @@ namespace R3B::Neuland
             {
                 return true;
             }
-            else if (min_max.first < min_max.second)
+            if (min_max.first < min_max.second)
             {
                 return (value > min_max.first) and (value < min_max.second);
             }
-            else
-            {
-                return (value > min_max.first) or (value < min_max.second);
-            }
+            return (value > min_max.first) or (value < min_max.second);
         }
     } // namespace
 

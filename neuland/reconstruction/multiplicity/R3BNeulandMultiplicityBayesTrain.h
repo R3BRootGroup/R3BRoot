@@ -5,6 +5,9 @@
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandMultiplicityBayesPar.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string_view>
 
 class R3BNeulandMultiplicityBayesTrain : public FairTask
 {

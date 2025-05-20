@@ -18,14 +18,15 @@
 #include "FairParamList.h"
 #include "R3BNeulandMultiplicity.h"
 #include "TArrayD.h"
+#include <RtypesCore.h>
 #include <array>
 
 class R3BNeulandMultiplicityBayesPar : public FairParGenericSet
 {
   public:
-    R3BNeulandMultiplicityBayesPar(const char* name = "R3BNeulandMultiplicityBayesPar",
-                                   const char* title = "Neuland Multiplicity Bayes Parameters",
-                                   const char* context = "TestDefaultContext");
+    explicit R3BNeulandMultiplicityBayesPar(const char* name = "R3BNeulandMultiplicityBayesPar",
+                                            const char* title = "Neuland Multiplicity Bayes Parameters",
+                                            const char* context = "TestDefaultContext");
     ~R3BNeulandMultiplicityBayesPar() override;
 
     void clear() override;

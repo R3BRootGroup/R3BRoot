@@ -12,9 +12,17 @@
  ******************************************************************************/
 
 #include "R3BNeulandMultiplicityBayesPar.h"
-#include "FairLogger.h"
+#include "R3BNeulandMultiplicity.h"
+#include <FairParGenericSet.h>
+#include <FairParamList.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TArrayD.h>
+#include <TString.h>
+#include <cmath>
+#include <cstddef>
+#include <fairlogger/Logger.h>
 #include <numeric>
-#include <string>
 
 void normalize_TArrayD(TArrayD& a)
 {
@@ -95,7 +103,8 @@ void R3BNeulandMultiplicityBayesPar::Fill(int n, int nHits, int nClusters, doubl
 {
     fHits.at(n)[nHits]++;
     fClusters.at(n)[nClusters]++;
-    fEdep.at(n)[static_cast<int>(std::floor(Edep)) / 10]++;
+    static constexpr auto SCALE = 10;
+    fEdep.at(n)[static_cast<int>(std::floor(Edep)) / SCALE]++;
 }
 
 R3BNeulandMultiplicity::MultiplicityProbabilities R3BNeulandMultiplicityBayesPar::GetProbabilities(int nHits,

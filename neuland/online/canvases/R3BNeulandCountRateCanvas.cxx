@@ -12,10 +12,17 @@
  ******************************************************************************/
 
 #include "R3BNeulandCountRateCanvas.h"
+#include "R3BDataMonitor.h"
+#include "R3BDataMonitorCanvas.h"
+#include "R3BNeulandTriggerTypes.h"
+#include "R3BPaddleTamexMappedData2.h"
 #include <R3BNeulandOnlineSpectra2.h>
+#include <TGraph.h>
 #include <algorithm>
-#include <range/v3/numeric.hpp>
-#include <range/v3/view.hpp>
+#include <chrono>
+#include <cmath>
+#include <range/v3/numeric/accumulate.hpp>
+#include <range/v3/view/map.hpp>
 
 namespace rng = ranges;
 
@@ -89,12 +96,12 @@ namespace R3B::Neuland
     {
         map_counter_ += rng::accumulate(
             mapped_data_.get(),
-            int{ 0 },
+            0,
             [](auto init, const auto& plane_signals) -> int
             {
                 return init + rng::accumulate(plane_signals | rng::views::values,
-                                              int{ 0 },
-                                              [](auto init_bar, const auto bar_signals) -> int {
+                                              0,
+                                              [](auto init_bar, const auto& bar_signals) -> int {
                                                   return init_bar +
                                                          static_cast<int>(std::min(bar_signals.left.size(),
                                                                                    bar_signals.right.size()));
@@ -107,7 +114,7 @@ namespace R3B::Neuland
     {
         cal_counter_ += rng::accumulate(
             cal_data_.get(),
-            int{ 0 },
+            0,
             [](auto init, const auto& bar_signals)
             { return init + static_cast<int>(std::min(bar_signals.left.size(), bar_signals.right.size())); });
     }
@@ -117,7 +124,7 @@ namespace R3B::Neuland
         auto* online_spectra = GetOnlineSpectra();
         auto is_on_spill = CheckTriggerWithTpat(CalTrigger::onspill,
                                                 online_spectra->GetEventHeader()->GetTpat(),
-                                                online_spectra->GetBasePar()->GetOffSpillTpatPos());
+                                                online_spectra->GetBasePar()->get_offspill_tpat_pos());
         const auto time_start = online_spectra->GetEventHeader()->GetTStart();
         if (is_on_spill and not std::isnan(time_start))
         {

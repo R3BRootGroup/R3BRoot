@@ -1,20 +1,19 @@
 #include "R3BTrigIDMappingFinder.h"
 #include "R3BException.h"
-#include <FairRootFileSink.h>
-#include <FairRun.h>
+#include "R3BShared.h"
 #include <R3BLogger.h>
 #include <algorithm>
+#include <filesystem>
 #include <fmt/core.h>
-#include <fmt/ranges.h>
-#include <fmt/std.h>
 #include <fstream>
 #include <iomanip>
+#include <ios>
+#include <nlohmann/json_fwd.hpp>
 #include <optional>
-#include <range/v3/view.hpp>
+#include <utility>
 #define JSON_USE_IMPLICIT_CONVERSIONS 0 // NOLINT
 #include <nlohmann/json.hpp>
 
-namespace fs = std::filesystem;
 namespace nlh = nlohmann;
 
 namespace R3B::Neuland
@@ -161,7 +160,7 @@ namespace R3B::Neuland
         std::sort(jsonData.begin(),
                   jsonData.end(),
                   [](const auto& left, const auto& right) { return left.at("barID") < right.at("barID"); });
-        ostream << std::setw(4) << jsonData << std::endl;
+        ostream << std::setw(4) << jsonData << "\n";
         // ostream << jsonData.dump(4) << std::endl;
     }
 

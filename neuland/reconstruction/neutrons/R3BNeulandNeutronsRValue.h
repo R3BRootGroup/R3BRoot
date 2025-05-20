@@ -1,11 +1,15 @@
-#ifndef R3BROOT_R3BNEULANDNEUTRONSRVALUE_H
-#define R3BROOT_R3BNEULANDNEUTRONSRVALUE_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandNeutron.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
 class R3BNeulandNeutronsRValue : public FairTask
 {
@@ -35,5 +39,3 @@ class R3BNeulandNeutronsRValue : public FairTask
 
     ClassDefOverride(R3BNeulandNeutronsRValue, 1);
 };
-
-#endif // R3BROOT_R3BNEULANDNEUTRONSRVALUE_H

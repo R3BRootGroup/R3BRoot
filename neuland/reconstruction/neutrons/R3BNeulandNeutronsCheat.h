@@ -5,6 +5,10 @@
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandNeutron.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string>
+#include <string_view>
 
 class R3BNeulandNeutronsCheat : public FairTask
 {

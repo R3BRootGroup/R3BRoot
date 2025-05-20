@@ -45,7 +45,6 @@
 constexpr auto CHILD_CLOSE_WAITING_TIME = std::chrono::seconds(5);
 
 namespace fs = std::filesystem;
-namespace bp = boost::process;
 namespace
 {
     bool Check_exist(std::string_view exe)
@@ -157,7 +156,6 @@ namespace R3B
 
     void UcesbServerLauncher::Launch()
     {
-        server_pipe_ = boost::process::async_pipe{ ios_ };
         ucesb_server_ =
             std::make_unique<bpv2::process>(ios_,
                                             launch_strings_.executable,

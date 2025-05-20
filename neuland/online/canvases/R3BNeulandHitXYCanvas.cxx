@@ -12,11 +12,12 @@
  ******************************************************************************/
 
 #include "R3BNeulandHitXYCanvas.h"
+#include "R3BDataMonitor.h"
 #include <R3BNeulandCommon.h>
 #include <R3BNeulandOnlineSpectra2.h>
 #include <TH2.h>
-#include <range/v3/algorithm.hpp>
-#include <range/v3/view.hpp>
+#include <fmt/core.h>
+#include <range/v3/view/iota.hpp>
 
 namespace R3B::Neuland
 {

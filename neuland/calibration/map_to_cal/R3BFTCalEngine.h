@@ -1,17 +1,24 @@
 #pragma once
 
 #include "R3BNeulandMapToCalPar.h"
-#include <FairSink.h>
 #include <R3BLogger.h>
 #include <R3BNeulandCommon.h>
 #include <R3BShared.h>
-#include <TH2I.h>
+#include <TDirectory.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <cstdint>
 #include <fmt/core.h>
 #include <map>
+#include <memory>
+#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace R3B::Neuland::calibration
 {
-    enum class FTCalErrorMethod
+    enum class FTCalErrorMethod : uint8_t
     {
         exact,
         approx,
@@ -40,18 +47,14 @@ namespace R3B::Neuland::calibration
         FTCalErrorMethod error_method_ = FTCalErrorMethod::uniform_only;
     };
 
+    class ModuleCal;
+    class PlaneCal;
+
     template <typename Derived>
     class FTBaseCal
     {
       public:
         using ValueErrors = TCalVFTXModulePar::ValueErrors;
-        FTBaseCal(std::string_view hist_name, unsigned int moduleNum, const std::vector<FTType>& types)
-            : hist_name_(hist_name)
-            , moduleNum_{ moduleNum }
-        {
-            EmptyInitAllDistributions(types);
-        }
-
         void InitAllDistributions(TH1* hist)
         {
             for (auto& [type, distribution] : fTDistribution_)
@@ -65,7 +68,7 @@ namespace R3B::Neuland::calibration
 
         void WriteHist2File(TDirectory* sink)
         {
-            for (const auto& [_, distribution] : fTDistribution_)
+            for (const auto& [ft_type, distribution] : fTDistribution_)
             {
                 R3BLOG(
                     debug4,
@@ -96,7 +99,7 @@ namespace R3B::Neuland::calibration
         [[nodiscard]] auto GetModuleNum() const -> const auto& { return moduleNum_; }
 
         template <typename... Args>
-        inline void AddFineTime(FTType type, Args&&... args)
+        void AddFineTime(FTType type, Args&&... args)
         {
             auto* hist = static_cast<typename Derived::HistType*>(GetDistribution(type)); // NOLINT
             hist->Fill(std::forward<Args>(args)...);
@@ -108,6 +111,13 @@ namespace R3B::Neuland::calibration
         // fine time distributions:
         std::map<FTType, std::unique_ptr<TH1>> fTDistribution_;
 
+        FTBaseCal(std::string_view hist_name, unsigned int moduleNum, const std::vector<FTType>& types)
+            : hist_name_(hist_name)
+            , moduleNum_{ moduleNum }
+        {
+            EmptyInitAllDistributions(types);
+        }
+
         void EmptyInitAllDistributions(const std::vector<FTType>& types)
         {
             for (const auto& type : types)
@@ -115,6 +125,9 @@ namespace R3B::Neuland::calibration
                 fTDistribution_.insert_or_assign(type, nullptr);
             }
         }
+
+        friend ModuleCal;
+        friend PlaneCal;
     };
 
     // calirbation class for trigger mapped data
@@ -123,7 +136,7 @@ namespace R3B::Neuland::calibration
       public:
         using HistType = TH1I;
         explicit ModuleCal(std::string_view hist_name, unsigned int mID);
-        inline void Fill(FTType type, unsigned int ftValue) { AddFineTime(type, ftValue); }
+        void Fill(FTType type, unsigned int ftValue) { AddFineTime(type, ftValue); }
         template <typename Strategy>
         void Write_to_par(const Strategy& strategy, Map2CalPar& t_cal_par)
         {
@@ -148,7 +161,7 @@ namespace R3B::Neuland::calibration
         using HistType = TH2I;
         explicit PlaneCal(std::string_view hist_name, unsigned int mID);
 
-        inline void Fill(FTType type, unsigned int ftValue, unsigned int barID) { AddFineTime(type, barID, ftValue); }
+        void Fill(FTType type, unsigned int ftValue, unsigned int barID) { AddFineTime(type, barID, ftValue); }
 
         // template <typename Strategy>
         void Write_to_par(const FTCalStrategy& strategy, Map2CalPar& t_cal_par)

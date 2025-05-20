@@ -11,14 +11,16 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROOT_R3BNEULANDPRIMARYINTERACTIONFINDER_H
-#define R3BROOT_R3BNEULANDPRIMARYINTERACTIONFINDER_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BMCTrack.h"
 #include "R3BNeulandHit.h"
 #include "R3BNeulandPoint.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string_view>
 
 class TH1D;
 class TH2D;
@@ -62,5 +64,3 @@ class R3BNeulandPrimaryInteractionFinder : public FairTask
 
     ClassDefOverride(R3BNeulandPrimaryInteractionFinder, 0);
 };
-
-#endif // R3BROOT_R3BNEULANDPRIMARYINTERACTIONFINDER_H

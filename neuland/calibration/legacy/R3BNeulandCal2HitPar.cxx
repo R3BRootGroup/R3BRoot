@@ -13,9 +13,19 @@
 
 #include "R3BNeulandCal2HitPar.h"
 #include <FairRootManager.h>
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TDirectory.h>
+#include <TString.h>
+#include <cmath>
+#include <fairlogger/Logger.h>
+#include <iostream>
+#include <ostream>
 
 #include "R3BEventHeader.h"
 #include "R3BNeulandCalData.h"
+#include "R3BNeulandCommon.h"
 #include "R3BNeulandCosmicTracker.h"
 #include "R3BNeulandHitCalibrationEngine.h"
 #include "R3BNeulandHitModulePar.h"
@@ -30,6 +40,11 @@
 #include "TROOT.h"
 
 using namespace R3B::Neuland; // NOLINT
+
+R3BNeulandCal2HitPar::R3BNeulandCal2HitPar()
+    : R3BNeulandCal2HitPar("R3BNeulandCal2HitPar", 1)
+{
+}
 
 R3BNeulandCal2HitPar::R3BNeulandCal2HitPar(const char* name, const Int_t iVerbose)
     : FairTask(name, iVerbose)

@@ -1,8 +1,10 @@
 #pragma once
 #include "MilleEntry.h"
-#include <fmt/core.h>
+#include <cstddef>
 #include <fstream>
-#include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 namespace R3B
 {
@@ -17,13 +19,13 @@ namespace R3B
             index_buffer_.clear();
             value_buffer_.clear();
         }
-        inline auto get_current_size() -> std::size_t { return index_buffer_.size() + value_buffer_.size(); }
+        auto get_current_size() -> std::size_t { return index_buffer_.size() + value_buffer_.size(); }
         inline void add_entry(IndexType index, ValueType value) // NOLINT
         {
             index_buffer_.emplace_back(index);
             value_buffer_.emplace_back(value);
         }
-        inline auto is_empty() -> bool { return get_current_size() == 0; }
+        auto is_empty() -> bool { return get_current_size() == 0; }
 
         auto get_indices() -> const auto& { return index_buffer_; }
         auto get_values() -> const auto& { return value_buffer_; }
@@ -41,7 +43,7 @@ namespace R3B
 
         void mille(const MilleDataPoint& data_point);
         void special(const std::vector<std::pair<int, float>>& special_data);
-        inline void kill()
+        void kill()
         {
             buffer_.clear();
             has_special_done_ = false;

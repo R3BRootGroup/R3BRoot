@@ -13,8 +13,11 @@
 
 #pragma once
 
+#include "R3BDataMonitor.h"
+#include "R3BDataMonitorCanvas.h"
 #include "R3BNeulandOnlineCanvas.h"
-#include <TH1I.h>
+#include <TH1.h>
+#include <string_view>
 
 namespace R3B::Neuland
 {

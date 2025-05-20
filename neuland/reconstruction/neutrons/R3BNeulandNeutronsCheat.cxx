@@ -1,5 +1,12 @@
 #include "R3BNeulandNeutronsCheat.h"
 #include "FairRootManager.h"
+#include "R3BNeulandMultiplicity.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cstddef>
+#include <fairlogger/Logger.h>
+#include <string_view>
 
 R3BNeulandNeutronsCheat::R3BNeulandNeutronsCheat(std::string_view inputMult,
                                                  std::string_view inputHit,

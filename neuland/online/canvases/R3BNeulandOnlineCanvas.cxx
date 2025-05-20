@@ -11,6 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 #include "R3BNeulandOnlineCanvas.h"
+#include "R3BNeulandTriggerTypes.h"
 #include <R3BNeulandOnlineSpectra2.h>
 
 namespace R3B::Neuland
@@ -19,7 +20,7 @@ namespace R3B::Neuland
     {
         return CheckTriggerWithTpat(trigger_type_,
                                     online_spectra_->GetEventHeader()->GetTpat(),
-                                    online_spectra_->GetBasePar()->GetOffSpillTpatPos());
+                                    online_spectra_->GetBasePar()->get_offspill_tpat_pos());
     }
 
 } // namespace R3B::Neuland

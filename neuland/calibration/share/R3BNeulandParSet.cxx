@@ -3,8 +3,11 @@
 #include <FairParIo.h>
 #include <R3BException.h>
 #include <R3BLogger.h>
+#include <Rtypes.h>
+#include <fmt/core.h>
 #include <gsl/span>
-#include <range/v3/algorithm.hpp>
+#include <range/v3/algorithm/fill.hpp>
+#include <string_view>
 
 using gsl::span;
 

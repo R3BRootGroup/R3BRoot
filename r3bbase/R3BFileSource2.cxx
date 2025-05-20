@@ -36,7 +36,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <fairlogger/Logger.h>
-#include <fmt/chrono.h>
+#include <fmt/chrono.h> // NOLINT
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <memory>
@@ -93,7 +93,7 @@ namespace
     }
 
     template <typename UnaryFunc>
-    void loop_through_branch_elements(TFile* root_file, std::string_view tree_name, UnaryFunc&& action)
+    void loop_through_branch_elements(TFile* root_file, std::string_view tree_name, UnaryFunc action)
     {
         auto* tree = root_file->Get<TTree>(tree_name.data());
         auto* branches = tree->GetListOfBranches();
@@ -111,7 +111,7 @@ namespace
     }
 
     template <typename UnaryFunc>
-    void loop_through_branches(TFile* root_file, std::string_view tree_name, UnaryFunc&& action)
+    void loop_through_branches(TFile* root_file, std::string_view tree_name, UnaryFunc action)
     {
         auto* tree = root_file->Get<TTree>(tree_name.data());
         auto* branches = tree->GetListOfBranches();
@@ -142,7 +142,7 @@ namespace
     auto get_tca_data_class(TBranchElement* branch) -> std::string
     {
         TClonesArray* buffer = nullptr;
-        branch->SetAddress(&buffer);
+        branch->SetAddress(&buffer); // NOLINT: Nasty ROOT API
         branch->GetEntry(0);
         branch->SetAddress(nullptr);
         if (buffer != nullptr)

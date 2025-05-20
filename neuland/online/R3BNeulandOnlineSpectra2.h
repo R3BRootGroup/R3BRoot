@@ -13,23 +13,22 @@
 
 #pragma once
 
-#include <R3BIOConnector.h>
-#include <R3BNeulandCalCanvas.h>
-#include <R3BNeulandCalData2.h>
+#include "R3BDataMonitor.h"
+#include "R3BLogger.h"
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandCountRateCanvas.h>
-#include <R3BNeulandEventHeaderCanvas.h>
-#include <R3BNeulandHit.h>
-#include <R3BNeulandHitCanvas.h>
-#include <R3BNeulandHitCosmicCanvas.h>
-#include <R3BNeulandHitXYCanvas.h>
-#include <R3BNeulandMappedCanvas.h>
 #include <R3BNeulandOnlineCanvas.h>
-#include <R3BNeulandTJumpCanvas.h>
-#include <R3BNeulandTimingCanvas.h>
 #include <R3BNeulandTriggerTypes.h>
-#include <R3BPaddleTamexMappedData2.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TRandom.h>
+#include <atomic>
+#include <memory>
+#include <string_view>
+#include <type_traits>
+#include <vector>
 
 class FairRunOnline;
 
@@ -76,7 +75,7 @@ namespace R3B::Neuland
         }
 
         template <typename UnaryOp>
-        inline void ActionToSpectra(UnaryOp&& optn)
+        void ActionToSpectra(UnaryOp optn)
         {
             for (auto& spectrum : spectra_)
             {

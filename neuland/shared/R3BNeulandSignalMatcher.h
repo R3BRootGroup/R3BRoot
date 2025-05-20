@@ -13,9 +13,6 @@
 
 #pragma once
 
-#include "R3BNeulandCommon.h"
-#include <R3BShared.h>
-
 namespace R3B::Neuland
 {
     struct SignalMatcher

@@ -12,9 +12,15 @@
  ******************************************************************************/
 
 #include "SteerWriter.h"
+#include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <fmt/ranges.h> // NOLINT: provides formatter for std::pair<>
 #include <fstream>
+#include <ios>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace R3B
 {

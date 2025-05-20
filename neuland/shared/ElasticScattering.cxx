@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "ElasticScattering.h"
+#include "R3BNeulandCluster.h"
 #include "TVector3.h"
 #include <cmath>
 
@@ -25,9 +26,9 @@ namespace Neuland
         // Range of the proton in material is proportional to its energy E(R) = aR^b
         // Here, the "energy moment" is used as a more robust representation of the neutron track length
         // Values for a and b fitted to simulated data by shooting protons at NeuLAND
-        const double a = 55.629;
-        const double b = 0.652103;
-        return a * std::pow(cluster.GetEnergyMoment(), b);
+        const double a_val = 55.629;
+        const double b_val = 0.652103;
+        return a_val * std::pow(cluster.GetEnergyMoment(), b_val);
     }
 
     auto RecoilScatteringAngle(const R3BNeulandCluster& cluster) -> double
@@ -100,11 +101,11 @@ namespace Neuland
 
         // From Four-Momentum conservation one can deduce:
         // \frac{E_p' + E0n}{E_p' - E0n} \cos^2(\theta_{np'}) = \frac{E_N + E0n}{E_N - E0n}
-        const double a = cosTheta * cosTheta * (Ep_ + E0n) / (Ep_ - E0n);
-        const double En = E0n * ((a + 1.) / (a - 1.));
+        const double value = cosTheta * cosTheta * (Ep_ + E0n) / (Ep_ - E0n);
+        const double Etot = E0n * ((value + 1.) / (value - 1.));
 
         // return EKin
-        return En - E0n;
+        return Etot - E0n;
     }
 
     auto NeutronEnergyFromElasticScattering(const R3BNeulandCluster& first,
@@ -144,13 +145,13 @@ namespace Neuland
         const double E0n = 938.;
         const double E0k = targetMass;
 
-        const double En = first.GetFirstHit().GetEToF() + E0n;
-        const double En_ = ScatteredNeutronEnergy(first, second) + E0n;
-        const double Ek_ = first.GetE() + targetMass;
+        const double Etot = first.GetFirstHit().GetEToF() + E0n;
+        const double E_neutron = ScatteredNeutronEnergy(first, second) + E0n;
+        const double E_kinetic = first.GetE() + targetMass;
         const double cosTheta = ScatteredNeutronAngle(first, second);
 
-        const double zero = (En_ * En_) + (En_ * Ek_) - (En * E0k) - (E0n * E0n) -
-                            (sqrt((En_ * En_ - E0n * E0n) * (En * En - E0n * E0n)) * cosTheta);
+        const double zero = (E_neutron * E_neutron) + (E_neutron * E_kinetic) - (Etot * E0k) - (E0n * E0n) -
+                            (sqrt((E_neutron * E_neutron - E0n * E0n) * (Etot * Etot - E0n * E0n)) * cosTheta);
         return zero;
     }
 
@@ -158,14 +159,15 @@ namespace Neuland
     {
         const double E0n = 938.;
 
-        const double En = first.GetFirstHit().GetEToF() + E0n;
-        const double En_ = ScatteredNeutronEnergy(first, second) + E0n;
+        const double Etot = first.GetFirstHit().GetEToF() + E0n;
+        const double E_neutron = ScatteredNeutronEnergy(first, second) + E0n;
         const double Ek_kin = first.GetE();
         const double cosTheta = ScatteredNeutronAngle(first, second);
 
         const double E0k =
-            (En_ * En_ - E0n * E0n - sqrt((En_ * En_ - E0n * E0n) * (En * En - E0n * E0n)) * cosTheta + En_ * Ek_kin) /
-            (En - En_);
+            (E_neutron * E_neutron - E0n * E0n -
+             sqrt((E_neutron * E_neutron - E0n * E0n) * (Etot * Etot - E0n * E0n)) * cosTheta + E_neutron * Ek_kin) /
+            (Etot - E_neutron);
 
         return E0k;
     }

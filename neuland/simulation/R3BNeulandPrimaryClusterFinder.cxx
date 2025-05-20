@@ -12,6 +12,12 @@
  ******************************************************************************/
 
 #include "R3BNeulandPrimaryClusterFinder.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandHit.h"
+#include <FairTask.h>
+#include <RtypesCore.h>
+#include <string_view>
+#include <vector>
 
 namespace
 {

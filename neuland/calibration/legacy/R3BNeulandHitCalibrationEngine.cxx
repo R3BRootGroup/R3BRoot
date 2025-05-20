@@ -12,14 +12,25 @@
  ******************************************************************************/
 
 #include "R3BNeulandHitCalibrationEngine.h"
+#include "R3BNeulandCommon.h"
+#include "R3BNeulandCosmicTrack.h"
+#include "R3BNeulandHitCalibrationBar.h"
 #include "R3BNeulandHitModulePar.h"
 #include "R3BNeulandHitPar.h"
-
-#include "FairLogger.h"
-
 #include "TCanvas.h"
 #include "TDirectory.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TString.h>
+#include <algorithm>
+#include <array>
 #include <cmath>
+#include <iostream>
+#include <ostream>
+#include <vector>
 
 using DPair = std::array<Double_t, 2>;
 using CalibrationStatus = R3B::Neuland::Calibration::HitCalibrationBar::CalibrationStatus;

@@ -12,14 +12,13 @@
  ******************************************************************************/
 #pragma once
 
-#ifdef JSON_USE_IMPLICIT_CONVERSIONS
-#undef JSON_USE_IMPLICIT_CONVERSIONS
-#endif                                  // JSON_USE_IMPLICIT_CONVERSIONS
-#define JSON_USE_IMPLICIT_CONVERSIONS 0 // NOLINT
-
+#include <R3BNeulandJsonHeader.h> // NOLINT
 #include <R3BNeulandParSet.h>
-#include <nlohmann/json.hpp>
+#include <Rtypes.h>
+#include <string>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 
 namespace R3B::Neuland
 {
@@ -30,20 +29,21 @@ namespace R3B::Neuland
         explicit CalibrationBasePar(std::string_view name = "NeulandCalibrationBasePar",
                                     std::string_view title = "Neuland calibration base par",
                                     std::string_view context = "TestDefaultContext",
-                                    bool own = true);
-        void SetTrigIDMap(TrigIDMap trigIDMap) { trigIDMap_ = std::move(trigIDMap); }
+                                    bool own = true)
+            : Neuland::ParSet(name.data(), title.data(), context.data(), own)
+        {
+        }
 
-        [[nodiscard]] auto GetTrigIDMap() const -> const auto& { return trigIDMap_; }
-        [[nodiscard]] auto GetExpIds() const -> const auto& { return exp_ids_; }
-        auto GetOffSpillTpatPos() const -> int { return offspill_tpat_pos_; }
-        auto GetNumOfPlanes() const -> int { return num_of_planes_; }
-
-        friend void to_json(nlohmann::json& jsn, const CalibrationBasePar& par);
-        friend void from_json(const nlohmann::json& jsn, CalibrationBasePar& par);
+        [[nodiscard]] auto get_trig_id_map() const -> const auto& { return trigIDMap_; }
+        [[nodiscard]] auto get_exp_ids() const -> const auto& { return exp_ids_; }
+        auto get_offspill_tpat_pos() const -> int { return offspill_tpat_pos_; }
+        auto get_num_of_planes() const -> int { return num_of_planes_; }
 
         // setters:
         void set_num_of_planes(int num_of_plane) { num_of_planes_ = num_of_plane; }
         void set_exp_ids(const std::string& exp_ids) { exp_ids_ = exp_ids; }
+        void set_offspill_tpat_pos(int pos) { offspill_tpat_pos_ = pos; }
+        void set_trig_id_map(TrigIDMap trigIDMap) { trigIDMap_ = std::move(trigIDMap); }
 
       private:
         std::string exp_ids_;

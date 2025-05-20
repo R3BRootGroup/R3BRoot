@@ -1,22 +1,13 @@
-#include "R3BDigitizingEngine.h"
-#include "R3BDigitizingTamex.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandCommonFunc.h"
 #include "R3BNeulandSimCalToCal.h"
-#include <CLI/CLI.hpp>
+#include <CLI/CLI.hpp> // NOLINT
 #include <FairRun.h>
 #include <FairRunAna.h>
-#include <R3BDigitizingChannelMock.h>
-#include <R3BDigitizingPaddleMock.h>
-#include <R3BDigitizingPaddleNeuland.h>
-#include <R3BDigitizingTacQuila.h>
 #include <R3BEventHeader.h>
-#include <R3BException.h>
-#include <R3BFileSource2.h>
-#include <R3BLogger.h>
 #include <R3BNeulandAnalysisApp.h>
-#include <R3BNeulandAppOptionJson.h>
+#include <R3BNeulandAppOptionJson.h> // NOLINT
 #include <R3BNeulandClusterFinder.h>
 #include <R3BNeulandDigitizer.h>
 #include <R3BNeulandHitMon.h>
@@ -30,11 +21,12 @@
 #include <functional>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
 #include <vector>
 
-using json = nlohmann::ordered_json;
+using nlohmann::ordered_json;
 
 namespace R3B::Neuland
 {
@@ -188,7 +180,7 @@ namespace R3B::Neuland
 
     void AnalysisApplication::print_json_options()
     {
-        auto json_obj = json{ options_ };
+        auto json_obj = ordered_json{ options_ };
         if (json_obj.is_array())
         {
             fmt::print("{}\n", json_obj.front().dump(4));

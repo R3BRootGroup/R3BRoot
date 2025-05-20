@@ -1,7 +1,9 @@
 #pragma once
+
 #include <Math/GenVector/Cartesian3D.h>
-#include <R3BNeulandCommon.h>
+#include <Math/Math.h>
 #include <TRandom.h>
+#include <cmath>
 #include <stdexcept>
 
 namespace R3B::Neuland
@@ -36,19 +38,19 @@ namespace R3B::Neuland
 
             auto target_distribution = [](double val) -> double { return std::pow(std::cos(val), 2.); };
 
-            double current_angle = 0.;
-            double new_angle = 0.;
+            auto current_angle = 0.;
+            auto new_angle = 0.;
 
             for (int i = 0; i < n_steps; ++i)
             {
                 new_angle = rd_engine_->Gaus(current_angle, step_size);
 
-                if (new_angle < -M_PI_2 || new_angle > M_PI_2)
+                if (new_angle < -ROOT::Math::Pi() || new_angle > ROOT::Math::Pi())
                 {
                     continue;
                 }
 
-                double acceptance_ratio = target_distribution(new_angle) / target_distribution(current_angle);
+                const auto acceptance_ratio = target_distribution(new_angle) / target_distribution(current_angle);
 
                 if (rd_engine_->Uniform(0.0, 1.0) < acceptance_ratio)
                 {
@@ -62,7 +64,6 @@ namespace R3B::Neuland
 
     struct DetectorBoxSize
     {
-      public:
         double xmin{};
         double xmax{};
         double ymin{};

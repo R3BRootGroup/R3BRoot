@@ -14,8 +14,13 @@
 #pragma once
 
 #include "R3BShared.h"
+#include "R3BValueError.h"
 #include <R3BNeulandParSet.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string_view>
 #include <unordered_map>
+#include <vector>
 
 namespace R3B::Neuland
 {

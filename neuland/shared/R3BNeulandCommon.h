@@ -14,9 +14,7 @@
 #pragma once
 #include "R3BValueError.h"
 #include <R3BMinMaxValue.h>
-#include <TObject.h>
 #include <cassert>
-#include <cmath>
 #include <limits>
 
 namespace R3B::Neuland
@@ -48,17 +46,21 @@ namespace R3B::Neuland
 
     constexpr auto GetLightYieldAfterBirk(const int charge, const double length_mm, const double edep_MeV) -> double
     {
+        constexpr auto MAGIC_NUM_0 = 7.2;
+        constexpr auto MAGIC_NUM_1 = 12.6;
         return (charge * length_mm == 0.
                     ? edep_MeV
-                    : edep_MeV / (1. + BirkC1 * (Sqr(charge) > 1 ? 7.2 / 12.6 : 1.) * (edep_MeV / length_mm) +
-                                  BirkC2 * Sqr(edep_MeV / length_mm)));
+                    : edep_MeV /
+                          (1. + BirkC1 * (Sqr(charge) > 1 ? MAGIC_NUM_0 / MAGIC_NUM_1 : 1.) * (edep_MeV / length_mm) +
+                           BirkC2 * Sqr(edep_MeV / length_mm)));
     }
 
     // Physical Constants
 
-    constexpr auto CLight = 29.9792458;     // Speed of light [cm/ns]
-    constexpr auto InvCLight = 1. / CLight; // Speed of light [cm/ns]>
-    constexpr auto MUON_MASS = 0.105;       // Muonmass [GeV]
+    constexpr auto CLight = 29.9792458;                // Speed of light [cm/ns]
+    constexpr auto CLight2 = 898.75517873681758374898; // Speed of light [cm/ns]
+    constexpr auto InvCLight = 1. / CLight;            // Speed of light [cm/ns]>
+    constexpr auto MUON_MASS = 0.105;                  // Muonmass [GeV]
 
     // Electronics Constants
 
@@ -68,13 +70,14 @@ namespace R3B::Neuland
     constexpr auto MAXCTValue = 2048U;
     // Geometry & Material Constants
 
-    constexpr auto BarSize_XY = 5.0;                                  // cm NeuLAND parameter
-    constexpr auto BarUncertainty_XY = BarSize_XY / SQRT_12;          // cm NeuLAND parameter
-    constexpr auto BarSize_Z = 5.0;                                   // cm NeuLAND parameter
-    constexpr auto BarUncertainty_Z = BarSize_Z / SQRT_12;            // cm NeuLAND parameter
-    constexpr auto BarLength = 250.0;                                 // cm NeuLAND parameter
-    constexpr auto LightGuideLength = 10.0;                           // cm NeuLAND parameter
-    constexpr auto TotalBarLength = BarLength + 2 * LightGuideLength; // cm NeuLAND parameter, Bar including Light Guide
+    constexpr auto BarSize_XY = 5.0;                         // cm NeuLAND parameter
+    constexpr auto BarUncertainty_XY = BarSize_XY / SQRT_12; // cm NeuLAND parameter
+    constexpr auto BarSize_Z = 5.0;                          // cm NeuLAND parameter
+    constexpr auto BarUncertainty_Z = BarSize_Z / SQRT_12;   // cm NeuLAND parameter
+    constexpr auto BarLength = 250.0;                        // cm NeuLAND parameter
+    constexpr auto LightGuideLength = 10.0;                  // cm NeuLAND parameter
+    constexpr auto TotalBarLength =
+        BarLength + (2 * LightGuideLength); // cm NeuLAND parameter, Bar including Light Guide
 
     constexpr auto ScintillatorDensity = 1.032;        // g / cm^3
     constexpr auto MIPStoppingPowerPerDensity = 1.956; // MeV cm^2 / g
@@ -102,7 +105,7 @@ namespace R3B::Neuland
     constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
     {
         assert(planeNum > 0);
-        return (planeNum - 1) * BarsPerPlane + barNum;
+        return ((planeNum - 1) * BarsPerPlane) + barNum;
     }
     template <typename T = double>
     constexpr auto PlaneID2ZPos(int plane_id) -> T

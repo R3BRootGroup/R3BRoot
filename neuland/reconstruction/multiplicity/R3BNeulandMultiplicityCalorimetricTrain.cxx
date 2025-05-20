@@ -5,10 +5,21 @@
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicityCalorimetricPar.h"
 #include "TDirectory.h"
+#include <FairTask.h>
+#include <RtypesCore.h>
+#include <TCutG.h>
 #include <TH2.h>
+#include <TString.h>
+#include <cmath>
+#include <fairlogger/Logger.h>
 #include <iostream>
 #include <numeric>
+#include <string>
+#include <string_view>
+#include <utility>
 
 /*
  *      ^
@@ -84,9 +95,9 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandMultiplicityCalorimetricTrain::Exec(Option_t*)
+void R3BNeulandMultiplicityCalorimetricTrain::Exec(Option_t* /*option*/)
 {
-    const int nPN = fUseHits ? fPHits.get().size() : fTracks.get().size();
+    const auto nPN = fUseHits ? fPHits.get().size() : fTracks.get().size();
 
     const auto& clusters = fClusters.get();
     const auto nClusters = clusters.size();
@@ -138,7 +149,7 @@ void R3BNeulandMultiplicityCalorimetricTrain::Optimize()
 {
     ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Genetic");
 
-    ROOT::Math::Functor minimizor_functor([&](const double* cut) { return WastedEfficiency(cut); }, 4);
+    const ROOT::Math::Functor minimizor_functor([&](const double* cut) { return WastedEfficiency(cut); }, 4);
     min->SetFunction(minimizor_functor);
 
     min->SetLimitedVariable(0, "edep", fEdepOpt.at(0), fEdepOpt.at(1), fEdepOpt.at(2), fEdepOpt.at(3));

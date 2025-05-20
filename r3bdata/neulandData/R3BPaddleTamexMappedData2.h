@@ -16,7 +16,7 @@
 #include <Rtypes.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <fmt/ranges.h> // NOLINT: formatting span
 #include <map>
 #include <unordered_map>
 #include <vector>

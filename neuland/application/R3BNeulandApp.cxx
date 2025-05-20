@@ -2,13 +2,11 @@
 #include "R3BException.h"
 #include "R3BFileSource2.h"
 #include "R3BShared.h"
-#include <CLI/CLI.hpp>
-#include <FairLogger.h>
+#include <CLI/CLI.hpp> // NOLINT
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
-#include <TGeoManager.h>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -19,12 +17,12 @@
 #include <filesystem>
 #include <fmt/color.h>
 #include <fmt/core.h>
-#include <fmt/format.h>
 #include <fstream>
 #include <functional>
 #include <gsl/span>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -110,7 +108,7 @@ namespace R3B::Neuland
         timer_.Start();
     }
 
-    Application::~Application()
+    Application::~Application() // NOLINT: an unknown place may throw
     {
         if (is_inited_)
         {
@@ -133,7 +131,7 @@ namespace R3B::Neuland
                 fmt::print(fmt::emphasis::bold | fg(fmt::color::green),
                            "\nNeuland Application finished successfully!\n\n");
             }
-            fmt::print("Real time: {}s, cpu time: {}s\n", timer_.RealTime(), timer_.CpuTime());
+            fmt::println("Real time: {}s, cpu time: {}s", timer_.RealTime(), timer_.CpuTime());
         }
     }
 

@@ -13,12 +13,15 @@
 
 #include "R3BNeulandTSyncer.h"
 #include "LSQR.h"
-
-#include "FairLogger.h"
-
-#include "TF1.h"
-
-#include <numeric>
+#include "R3BNeulandCommon.h"
+#include <RtypesCore.h>
+#include <TH1.h>
+#include <array>
+#include <cmath>
+#include <cstdint>
+#include <fairlogger/Logger.h>
+#include <sys/types.h>
+#include <vector>
 
 constexpr auto NextBarLogSize = 128;
 constexpr auto NextPlaneLogSize = 64;

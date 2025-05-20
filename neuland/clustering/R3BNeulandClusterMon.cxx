@@ -21,9 +21,16 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TFile.h>
+#include <TH1.h>
+#include <TString.h>
 #include <algorithm>
-#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <fairlogger/Logger.h>
 #include <numeric>
 #include <utility>
 
@@ -34,9 +41,10 @@ namespace
     inline auto GetTheta(const R3BNeulandCluster& cluster) -> double
     {
         const auto direction = cluster.GetLastHit().GetPosition() - cluster.GetFirstHit().GetPosition();
-        const auto x = std::acos(direction.Y() / direction.Mag()) * rad2deg;
+        const auto degree = std::acos(direction.Y() / direction.Mag()) * rad2deg;
         // Not sure, but Kondos Theta is -90:90
-        return x - 90.;
+        static constexpr auto retate_angle = 90.;
+        return degree - retate_angle;
     }
 } // namespace
 
@@ -252,10 +260,11 @@ InitStatus R3BNeulandClusterMon::Init()
 void R3BNeulandClusterMon::Exec(Option_t*)
 {
     fNeulandClustersBuffer = fNeulandClusters.get();
-    fNeulandClustersBuffer.erase(std::remove_if(fNeulandClustersBuffer.begin(),
-                                                fNeulandClustersBuffer.end(),
-                                                [&](R3BNeulandCluster& c) { return !(fClusterFilters.IsValid(&c)); }),
-                                 fNeulandClustersBuffer.end());
+    fNeulandClustersBuffer.erase(
+        std::remove_if(fNeulandClustersBuffer.begin(),
+                       fNeulandClustersBuffer.end(),
+                       [&](R3BNeulandCluster& cluster) { return !(fClusterFilters.IsValid(&cluster)); }),
+        fNeulandClustersBuffer.end());
 
     const auto nClusters = fNeulandClustersBuffer.size();
 
@@ -270,10 +279,11 @@ void R3BNeulandClusterMon::Exec(Option_t*)
         }
     }
 
-    const Double_t etot = std::accumulate(fNeulandClustersBuffer.begin(),
-                                          fNeulandClustersBuffer.end(),
-                                          0.,
-                                          [](Double_t sum, const R3BNeulandCluster& c) { return sum + c.GetE(); });
+    const Double_t etot =
+        std::accumulate(fNeulandClustersBuffer.begin(),
+                        fNeulandClustersBuffer.end(),
+                        0.,
+                        [](Double_t sum, const R3BNeulandCluster& cluster) { return sum + cluster.GetE(); });
 
     fhClusterNumberVSEnergy->Fill(etot, nClusters);
 

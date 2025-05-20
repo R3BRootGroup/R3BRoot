@@ -12,17 +12,17 @@
  ******************************************************************************/
 
 #include "R3BNeulandCosmicTracker.h"
-
-#include "FairLogger.h"
-
-#include "TCanvas.h"
+#include "R3BNeulandCommon.h"
+#include "R3BNeulandCosmicTrack.h"
 #include "TFitResult.h"
 #include "TFitResultPtr.h"
 #include "TGraphErrors.h"
-
+#include <RtypesCore.h>
+#include <TVector3.h>
 #include <algorithm>
+#include <array>
 #include <cmath>
-#include <exception>
+#include <fairlogger/Logger.h>
 #include <numeric>
 
 namespace R3B::Neuland // NOLINT
@@ -450,7 +450,7 @@ namespace R3B::Neuland // NOLINT
             return { yIntercept, slope };
         }
 
-        void CosmicTracker::fillInteractions(R3BNeulandCosmicTrack& track) const
+        void CosmicTracker::fillInteractions(R3BNeulandCosmicTrack& track) const // NOLINT
         {
             auto nMissedHits = 0;
             auto lastValidSize = 0;

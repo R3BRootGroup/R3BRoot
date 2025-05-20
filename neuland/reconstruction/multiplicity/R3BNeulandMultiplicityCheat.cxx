@@ -1,5 +1,12 @@
 #include "R3BNeulandMultiplicityCheat.h"
 #include "FairRootManager.h"
+#include "R3BException.h"
+#include "R3BNeulandMultiplicity.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <memory>
+#include <string_view>
 
 R3BNeulandMultiplicityCheat::R3BNeulandMultiplicityCheat(std::string_view input, std::string_view output)
     : FairTask("R3BNeulandMultiplicityCheat")
@@ -10,7 +17,7 @@ R3BNeulandMultiplicityCheat::R3BNeulandMultiplicityCheat(std::string_view input,
 {
 }
 
-InitStatus R3BNeulandMultiplicityCheat::Init()
+auto R3BNeulandMultiplicityCheat::Init() -> InitStatus
 {
     // Input
     fPrimaryHits.init();
@@ -26,10 +33,10 @@ InitStatus R3BNeulandMultiplicityCheat::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandMultiplicityCheat::Exec(Option_t*)
+void R3BNeulandMultiplicityCheat::Exec(Option_t* /*option*/)
 {
     fMultiplicity->m.fill(0.);
-    fMultiplicity->m[fPrimaryHits.size()] = 1.;
+    fMultiplicity->m.at(fPrimaryHits.size()) = 1.;
 }
 
 ClassImp(R3BNeulandMultiplicityCheat)

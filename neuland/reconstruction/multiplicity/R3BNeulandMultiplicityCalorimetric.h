@@ -5,6 +5,11 @@
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandMultiplicityCalorimetricPar.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TString.h>
+#include <memory>
+#include <string_view>
 
 class R3BNeulandMultiplicityCalorimetric : public FairTask
 {

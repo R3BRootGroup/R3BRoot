@@ -16,12 +16,12 @@ namespace R3B::Digitizing::Neuland
             signal.qdcUnSat = newHit.intensity;
             signal.tdc = newHit.time;
             signal.side = GetSide();
-            m_Signals.emplace_back(signal);
+            signals_.emplace_back(signal);
         }
 
       private:
-        Hits m_Signals{};
-        void construct_hits(Hits& signals) override { signals = m_Signals; }
-        void extra_reset() override { m_Signals.clear(); }
+        Hits signals_;
+        void construct_hits(Hits& signals) override { signals = signals_; }
+        void extra_reset() override { signals_.clear(); }
     };
 } // namespace R3B::Digitizing::Neuland

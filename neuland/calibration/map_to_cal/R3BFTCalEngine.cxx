@@ -1,6 +1,16 @@
 #include "R3BFTCalEngine.h"
 #include "R3BException.h"
-#include <range/v3/all.hpp>
+#include "R3BNeulandCommon.h"
+#include "R3BNeulandMapToCalPar.h"
+#include "R3BShared.h"
+#include "R3BValueError.h"
+#include <TH1.h>
+#include <TH2.h>
+#include <cmath>
+#include <cstddef>
+#include <range/v3/algorithm/for_each.hpp>
+#include <string_view>
+#include <utility>
 
 namespace R3B::Neuland::calibration
 {
@@ -63,38 +73,38 @@ namespace R3B::Neuland::calibration
         auto calculate_meanerror_exact(const InputInfo& input) -> ValueError<double>
         {
             const auto base_vairance = input.bin_entry * input.bin_entry / uniform_err_divider;
-            const auto sum_term = input.previous_sum + input.bin_entry / 3;
+            const auto sum_term = input.previous_sum + (input.bin_entry / 3);
             const auto bin_prob = input.bin_entry / input.total_entry;
             const auto pre_prob = input.previous_sum / input.total_entry;
-            const auto residual = (1 - bin_prob) * sum_term - input.previous_sum * pre_prob;
+            const auto residual = ((1 - bin_prob) * sum_term) - (input.previous_sum * pre_prob);
 
-            const auto mean = input.previous_sum + input.bin_entry / 2;
+            const auto mean = input.previous_sum + (input.bin_entry / 2);
             return ValueError<double>{ mean, std::sqrt(base_vairance + residual) };
         }
 
         auto calculate_meanerror_approx(const InputInfo& input) -> ValueError<double>
         {
-            const auto mean = input.previous_sum + input.bin_entry / 2;
+            const auto mean = input.previous_sum + (input.bin_entry / 2);
 
             const auto base_error = input.bin_entry / uniform_err_divider_sqrt;
             const auto bin_prob = input.bin_entry / input.total_entry;
             const auto pre_prob = input.previous_sum / input.total_entry;
-            const auto residual_main = -(pre_prob - 0.5) * (pre_prob - 0.5) + 0.25;
+            const auto residual_main = (-(pre_prob - 0.5) * (pre_prob - 0.5)) + 0.25;
             const auto residual_factor = (bin_prob == 0.) ? 0. : sqrt_3 / bin_prob;
 
-            return ValueError<double>{ mean, base_error + residual_main * residual_factor };
+            return ValueError<double>{ mean, base_error + (residual_main * residual_factor) };
         }
 
         auto calculate_meanerror_uniform_only(const InputInfo& input) -> ValueError<double>
         {
-            const auto mean = input.previous_sum + input.bin_entry / 2;
+            const auto mean = input.previous_sum + (input.bin_entry / 2);
             const auto base_error = input.bin_entry / uniform_err_divider_sqrt;
             return ValueError<double>{ mean, base_error };
         }
 
         auto calculate_meanerror_none(const InputInfo& input) -> ValueError<double>
         {
-            const auto mean = input.previous_sum + input.bin_entry / 2;
+            const auto mean = input.previous_sum + (input.bin_entry / 2);
             return ValueError<double>{ mean, 0. };
         }
 
@@ -136,31 +146,31 @@ namespace R3B::Neuland::calibration
                                  value_error.error = value_error.error / total_entry * period;
                              });
         }
-    } // namespace
 
-    auto calculate_value_errors(TH1* hist,
-                                unsigned int max_bin,
-                                double total_entry,
-                                FTCalErrorMethod methodtype) -> std::pair<ValueErrors, unsigned int>
-    {
-        auto output = extract_bin_data(hist, max_bin);
-
-        auto method = use_method(methodtype);
-        auto previous_sum = 0.;
-        for (auto& value_error : output)
+        auto calculate_value_errors(TH1* hist,
+                                    unsigned int max_bin,
+                                    double total_entry,
+                                    FTCalErrorMethod methodtype) -> std::pair<ValueErrors, unsigned int>
         {
-            auto& value = value_error.value;
-            auto& error = value_error.error;
-            const auto inputInfo =
-                InputInfo{ .previous_sum = previous_sum, .bin_entry = value, .total_entry = total_entry };
-            previous_sum += value;
-            auto new_value_error = method(inputInfo);
-            value = new_value_error.value;
-            error = new_value_error.error;
+            auto output = extract_bin_data(hist, max_bin);
+
+            auto method = use_method(methodtype);
+            auto previous_sum = 0.;
+            for (auto& value_error : output)
+            {
+                auto& value = value_error.value;
+                auto& error = value_error.error;
+                const auto inputInfo =
+                    InputInfo{ .previous_sum = previous_sum, .bin_entry = value, .total_entry = total_entry };
+                previous_sum += value;
+                auto new_value_error = method(inputInfo);
+                value = new_value_error.value;
+                error = new_value_error.error;
+            }
+            const auto overflow = total_entry - previous_sum;
+            return std::make_pair(output, overflow);
         }
-        const auto overflow = total_entry - previous_sum;
-        return std::make_pair(output, overflow);
-    }
+    } // namespace
 
     auto FTCalStrategy::GetChannel2Time(TH1* hist) const -> FTChannel2TimeRelation
     {

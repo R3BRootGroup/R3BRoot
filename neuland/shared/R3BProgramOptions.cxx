@@ -1,4 +1,10 @@
 #include "R3BProgramOptions.h"
+#include <boost/program_options/parsers.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <exception>
+#include <iostream>
+#include <ostream>
+#include <stdexcept>
 
 namespace R3B
 {
@@ -11,7 +17,7 @@ namespace R3B
 
             if (varMap_.count("help") == 1)
             {
-                std::cout << get_desc_ref() << std::endl;
+                std::cout << get_desc_ref() << "\n";
                 return false;
             }
 
@@ -22,18 +28,18 @@ namespace R3B
         }
         catch (const std::runtime_error& err)
         {
-            std::cerr << "An exception occurs: " << err.what() << std::endl;
+            std::cerr << "An exception occurs: " << err.what() << "\n";
             return false;
         }
         catch (const std::exception& err)
         {
             // std::cerr << "exception occurs: " << boost::diagnostic_information(err) << std::endl;
-            std::cerr << "An exception occurs: " << err.what() << std::endl;
+            std::cerr << "An exception occurs: " << err.what() << "\n";
             return false;
         }
         catch (...)
         {
-            std::cerr << "An unrecognizable exception occurs!" << std::endl;
+            std::cerr << "An unrecognizable exception occurs!" << "\n";
             return false;
         }
         return true;

@@ -14,7 +14,7 @@
 
 #include "TObject.h"
 #include "TVector3.h"
-#include <R3BFormatters.h>
+#include <R3BFormatters.h> // NOLINT: for formatting
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <fmt/core.h>
@@ -31,8 +31,8 @@ struct R3BNeulandHit : public TObject
     double qdc_left = 0.;
     double qdc_right = 0.;
     double energy = 0.;
-    TVector3 position{};
-    TVector3 pixel{};
+    TVector3 position;
+    TVector3 pixel;
 
     R3BNeulandHit() = default;
     R3BNeulandHit(int paddle,

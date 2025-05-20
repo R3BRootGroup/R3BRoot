@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEULAND_ELASTICPROTONENERGY
-#define NEULAND_ELASTICPROTONENERGY
+#pragma once
 
 #include "R3BNeulandCluster.h"
 
@@ -64,5 +63,3 @@ namespace Neuland
                                 double targetMass) -> double;
     auto ElasticScatteringTargetMass(const R3BNeulandCluster& first, const R3BNeulandCluster& second) -> double;
 } // namespace Neuland
-
-#endif // NEULAND_ELASTICPROTONENERGY

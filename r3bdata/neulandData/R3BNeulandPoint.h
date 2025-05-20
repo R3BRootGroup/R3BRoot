@@ -15,8 +15,9 @@
 #define R3BNEULANDPOINT_H
 
 #include "FairMCPoint.h"
-#include "TObject.h"
 #include "TVector3.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <iostream>
 
 class R3BNeulandPoint : public FairMCPoint

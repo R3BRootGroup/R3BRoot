@@ -19,6 +19,8 @@
 #ifndef R3BNEULANDCLUSTERFINDER_H
 #define R3BNEULANDCLUSTERFINDER_H
 
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <vector>
 
 #include "FairTask.h"
@@ -36,19 +38,19 @@ class R3BNeuLandClusterFinder : public FairTask
     R3BNeuLandClusterFinder();
 
     // Standard constructor
-    R3BNeuLandClusterFinder(Int_t verbose);
+    explicit R3BNeuLandClusterFinder(int verbose);
 
     // Destructor
-    virtual ~R3BNeuLandClusterFinder();
+    ~R3BNeuLandClusterFinder() override;
 
     // Task initialization
-    virtual InitStatus Init();
+    auto Init() -> InitStatus override;
 
     // Process an event
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* option) override;
 
     // Finish of task
-    virtual void Finish();
+    void Finish() override;
 
     // Reset the containers
     void Reset();

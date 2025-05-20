@@ -13,8 +13,7 @@
 ##############################################################################
 # cmake-format: on
 
-set(SRCS # cmake-format: sortable
-         R3BNeulandBasePar.cxx R3BNeulandCalibrationTask.cxx R3BNeulandParSet.cxx)
+set(SRCS R3BNeulandCalibrationTask.cxx R3BNeulandParSet.cxx)
 
 set(HEADERS
     # cmake-format: sortable
@@ -26,6 +25,7 @@ set(HEADERS
 
 add_library(R3BNeulandCalibrationShare SHARED ${SRCS})
 target_include_directories(R3BNeulandCalibrationShare PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(R3BNeulandCalibrationShare PUBLIC JSON_USE_IMPLICIT_CONVERSIONS=0)
 target_link_libraries(R3BNeulandCalibrationShare PUBLIC R3BNeulandShared)
 root_generate_dictionary(
     R3BNeulandCalibrationShare_dict

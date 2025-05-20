@@ -1,16 +1,15 @@
 #pragma once
 
-#include <R3BLogger.h>
 #include <TStopwatch.h>
 #include <algorithm>
 #include <fmt/core.h>
-#include <fmt/format.h>
 #include <fstream>
 #include <functional>
 #include <ios>
 #include <iterator>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -152,7 +151,7 @@ namespace R3B::Neuland
         void add_inout_files();
         void add_inout_pars();
         void extract_input_files();
-        void setup_logger();
+        static void setup_logger();
         static void patch_files_or_strings(nlohmann::ordered_json& json_obj,
                                            const std::vector<std::string>& filenames_or_options);
     };

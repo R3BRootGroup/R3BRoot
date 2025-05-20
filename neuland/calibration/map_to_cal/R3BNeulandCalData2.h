@@ -14,17 +14,14 @@
  ******************************************************************************/
 
 #include "R3BValueError.h"
-#include <R3BFormatters.h>
-#include <R3BShared.h>
+#include <R3BFormatters.h> // NOLINT
 #include <Rtypes.h>
-#include <TObject.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <vector>
 
 namespace R3B::Neuland
 {
-
     struct CalDataSignal
     {
         ValueError<double> leading_time;        // ns

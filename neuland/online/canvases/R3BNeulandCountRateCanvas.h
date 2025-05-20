@@ -13,12 +13,17 @@
 
 #pragma once
 
+#include "R3BDataMonitor.h"
+#include "R3BDataMonitorCanvas.h"
 #include "R3BNeulandOnlineCanvas.h"
 #include <R3BIOConnector.h>
 #include <R3BNeulandCalData2.h>
 #include <R3BNeulandHit.h>
 #include <R3BPaddleTamexMappedData2.h>
+#include <TGraph.h>
 #include <chrono>
+#include <cstdint>
+#include <string_view>
 
 constexpr auto DEFAULT_COUNTING_DURATION = std::chrono::seconds{ 10 };
 
@@ -27,7 +32,7 @@ namespace R3B::Neuland
     class CountRateCanvas : public OnlineCanvas
     {
       public:
-        enum class RangeViewMode
+        enum class RangeViewMode : uint8_t
         {
             full,
             four_hours,
@@ -78,11 +83,11 @@ namespace R3B::Neuland
         inline void set_four_hour_view();
 
         template <typename UnaryOp>
-        void do_each_graph(UnaryOp&& optn);
+        void do_each_graph(UnaryOp optn);
     };
 
     template <typename UnaryOp>
-    void CountRateCanvas::do_each_graph(UnaryOp&& optn)
+    void CountRateCanvas::do_each_graph(UnaryOp optn)
     {
         optn(los_count_rate_);
         optn(map_count_rate_);

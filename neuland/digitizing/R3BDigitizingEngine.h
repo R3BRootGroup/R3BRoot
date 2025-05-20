@@ -219,7 +219,7 @@ namespace R3B::Digitizing
                 ranges::find_if(valid_view, [paddle_id](auto& paddle) { return paddle->GetPaddleID() == paddle_id; });
             if (iter != valid_view.end())
             {
-                return *(iter->get());
+                return *(*iter);
             }
             // check if size is still smaller than capacity
             if (size_ >= get_capacity())

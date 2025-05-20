@@ -12,24 +12,28 @@
  ******************************************************************************/
 
 #include "R3BNeulandCal2Hit.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRunAna.h"
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
+#include "R3BNeulandCalData.h"
 #include "R3BNeulandCommon.h"
+#include "R3BNeulandHit.h"
 #include "R3BNeulandHitPar.h"
-#include "R3BTCalPar.h"
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TGraph2D.h"
-#include "TH1F.h"
-#include "TH2F.h"
 #include "TMath.h"
-#include "TVector.h"
+#include <FairTask.h>
 #include <R3BLogger.h>
 
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TVector3.h>
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <fairlogger/Logger.h>
+#include <fmt/core.h>
+#include <iostream>
+#include <ostream>
+#include <stdexcept>
 
 namespace Neuland = R3B::Neuland;
 

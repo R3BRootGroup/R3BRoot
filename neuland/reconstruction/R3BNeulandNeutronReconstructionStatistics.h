@@ -15,46 +15,53 @@
 #define R3BROOT_R3BNEULANDNEUTRONRECONSTRUCTIONSTATISTICS_H
 
 #include "FairTask.h"
+#include "R3BDataMonitor.h"
+#include "R3BIOConnector.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandNeutron.h"
-#include "TCAConnector.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TH1.h>
-#include <iostream>
+#include <string>
+#include <string_view>
+#include <vector>
 
 class R3BNeulandNeutronReconstructionStatistics : public FairTask
 {
   public:
-    explicit R3BNeulandNeutronReconstructionStatistics(TString primary = "NeulandNeutronClusters",
-                                                       TString secondary = "NeulandPrimaryClusters",
-                                                       TString predicted = "NeulandSecondaryClusters",
-                                                       std::ostream& out = std::cout);
+    explicit R3BNeulandNeutronReconstructionStatistics(std::string_view primary = "NeulandNeutronClusters",
+                                                       std::string_view secondary = "NeulandPrimaryClusters",
+                                                       std::string_view predicted = "NeulandSecondaryClusters");
 
   protected:
     auto Init() -> InitStatus override;
     void Finish() override;
 
   public:
-    void Exec(Option_t*) override;
+    void Exec(Option_t* /*option*/) override;
 
   private:
-    TCAInputConnector<R3BNeulandCluster> fPrimaryClusters;
-    TCAInputConnector<R3BNeulandCluster> fSecondaryClusters;
-    TCAInputConnector<R3BNeulandNeutron> fPredictedNeutrons;
-    TString fPredictedName;
-    TH1D* fhTP;
-    TH1D* fhFP;
-    TH1D* fhFN;
-    TH1D* fhTN;
-    TH1D* fhF1;
-    int fTP;
-    int fFP;
-    int fFN;
-    int fTN;
-    std::ostream& fOut;
-    std::vector<int> fMult;
+    int true_positive_ = 0;
+    int false_positive_ = 0;
+    int false_negative_ = 0;
+    int true_negative_ = 0;
+
+    R3B::InputVectorConnector<R3BNeulandCluster> primary_clusters_;
+    R3B::InputVectorConnector<R3BNeulandCluster> secondary_clusters_;
+    R3B::InputVectorConnector<R3BNeulandNeutron> predicted_neutrons_;
+    std::string predicted_name_;
+
+    TH1D* hist_true_positive_ = nullptr;
+    TH1D* hist_false_positive_ = nullptr;
+    TH1D* hist_false_negative_ = nullptr;
+    TH1D* hist_true_negative_ = nullptr;
+    TH1D* hist_f1_value_ = nullptr;
+
+    std::vector<int> multiplicities_;
+    R3B::DataMonitor data_monitor_;
 
   public:
-    ClassDefOverride(R3BNeulandNeutronReconstructionStatistics, 0);
+    ClassDefOverride(R3BNeulandNeutronReconstructionStatistics, 1);
 };
 
 #endif // R3BROOT_R3BNEULANDNEUTRONRECONSTRUCTIONSTATISTICS_H

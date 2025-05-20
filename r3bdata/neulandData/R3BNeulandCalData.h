@@ -11,36 +11,35 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULANDCALDATA_H
-#define R3BNEULANDCALDATA_H
+#pragma once
 
 #include "TObject.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <iostream>
 
 class R3BNeulandCalData : public TObject
 {
   public:
     R3BNeulandCalData() = default;
-    R3BNeulandCalData(Int_t barId, Int_t side, Double_t time, Double_t triggertime, double qdc);
+    R3BNeulandCalData(int barId, int side, double time, double triggertime, double qdc);
 
-    Int_t GetBarId() const { return fBarId; }
-    Int_t GetSide() const { return fSide; }
-    Double_t GetTime() const { return fTime; }
-    Double_t GetTriggerTime() const { return fTriggerTime; }
+    [[nodiscard]] auto GetBarId() const -> int { return fBarId; }
+    [[nodiscard]] auto GetSide() const -> int { return fSide; }
+    [[nodiscard]] auto GetTime() const -> double { return fTime; }
+    [[nodiscard]] auto GetTriggerTime() const -> double { return fTriggerTime; }
     [[nodiscard]] auto GetQdc() const -> double { return fQdc; }
 
-    void Print(const Option_t*) const override;
+    void Print(const Option_t* /*option*/) const override;
 
   private:
-    Int_t fBarId;
-    Int_t fSide;
-    Double_t fTime;
-    Double_t fTriggerTime;
-    double fQdc;
+    int fBarId = 0;
+    int fSide = 0;
+    double fTime = 0.;
+    double fTriggerTime = 0.;
+    double fQdc = 0.;
 
     ClassDefOverride(R3BNeulandCalData, 2)
 };
 
-std::ostream& operator<<(std::ostream&, const R3BNeulandCalData&); // Support easy printing
-
-#endif // R3BNEULANDCALDATA_H
+auto operator<<(std::ostream&, const R3BNeulandCalData&) -> std::ostream&; // Support easy printing

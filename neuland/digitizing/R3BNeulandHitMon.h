@@ -27,6 +27,10 @@
 #include "R3BDataMonitor.h"
 #include "R3BIOConnector.h"
 #include "R3BNeulandHit.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string>
+#include <string_view>
 
 class TH1D;
 class TH2D;

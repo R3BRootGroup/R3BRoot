@@ -48,19 +48,18 @@ auto R3BNeulandHit::GetBeta() const -> double { return position.Mag() / (time * 
 auto R3BNeulandHit::GetEToF(const double mass) const -> double
 {
     const auto beta = GetBeta();
-    const auto gamma = 1. / std::sqrt(1. - beta * beta);
+    const auto gamma = 1. / std::sqrt(1. - (beta * beta));
     const auto etof = (gamma - 1.) * mass;
     return 1.81522 + 0.984612 * etof; // TODO: EToF is ever so slightly off. Maybe some rounding/mass error?
 }
 
 auto operator<<(std::ostream& os_stream, const R3BNeulandHit& hit) -> std::ostream&
 {
-    os_stream << "R3BNeulandHit: NeuLAND Hit in Paddle " << hit.module_id << std::endl
-              << "    TdcL: " << hit.tdc_left << "    TdcR: " << hit.tdc_right << "    Time: " << hit.time << std::endl
-              << "    QdcL: " << hit.qdc_left << "    QdcR: " << hit.qdc_right << "    Energy: " << hit.energy
-              << std::endl
+    os_stream << "R3BNeulandHit: NeuLAND Hit in Paddle " << hit.module_id << "\n"
+              << "    TdcL: " << hit.tdc_left << "    TdcR: " << hit.tdc_right << "    Time: " << hit.time << "\n"
+              << "    QdcL: " << hit.qdc_left << "    QdcR: " << hit.qdc_right << "    Energy: " << hit.energy << "\n"
               << "    Position XYZ: " << hit.position.X() << "    " << hit.position.Y() << "    "
-              << hit.GetPosition().Z() << std::endl;
+              << hit.GetPosition().Z() << "\n";
     return os_stream;
 }
 

@@ -12,12 +12,18 @@
  ******************************************************************************/
 
 #include "R3BNeulandOnlineSpectra2.h"
+#include "R3BLogger.h"
+#include "R3BNeulandCalibrationTask.h"
+#include "R3BNeulandOnlineCanvas.h"
+#include <FairRootManager.h>
 #include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 #include <R3BDataMonitor.h>
 #include <R3BUcesbSource2.h>
-#include <TH2.h>
+#include <Rtypes.h>
 #include <THttpServer.h>
-#include <fmt/format.h>
+#include <fmt/core.h>
+#include <string_view>
 
 namespace R3B::Neuland
 {

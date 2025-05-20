@@ -13,20 +13,26 @@
 
 #include "R3BNeulandHitCalibrationBar.h"
 #include "R3BLogger.h"
+#include "R3BNeulandCommon.h"
 #include "R3BNeulandHitModulePar.h"
-#include "R3BNeulandHitPar.h"
-
-#include "FairLogger.h"
-
 #include "TCanvas.h"
 #include "TDirectory.h"
 #include "TGaxis.h"
 #include "TGraph.h"
 #include "TPad.h"
-
-#include <limits>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TGraphErrors.h>
+#include <TH2.h>
+#include <TString.h>
+#include <TVirtualPad.h>
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <fairlogger/Logger.h>
+#include <fmt/core.h>
 #include <numeric>
-#include <string>
+#include <vector>
 
 using DPair = std::array<Double_t, 2>;
 

@@ -16,6 +16,8 @@
 
 #include <FairParSet.h>
 #include <FairRuntimeDb.h>
+#include <Rtypes.h>
+#include <string_view>
 
 namespace R3B::Neuland
 {

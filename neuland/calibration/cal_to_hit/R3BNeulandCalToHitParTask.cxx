@@ -67,7 +67,7 @@ namespace R3B::Neuland
     {
         cal_data_.init();
 
-        const auto plane_num = base_par_->GetNumOfPlanes();
+        const auto plane_num = base_par_->get_num_of_planes();
         if (plane_num == 0)
         {
             throw R3B::runtime_error("Plane number extracted from Map2CalPar is 0!");

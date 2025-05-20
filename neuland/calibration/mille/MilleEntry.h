@@ -13,8 +13,9 @@
 
 #pragma once
 
+#include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
+#include <utility>
 #include <vector>
 namespace R3B
 {

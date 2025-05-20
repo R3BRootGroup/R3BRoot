@@ -28,6 +28,10 @@
 #include "Filterable.h"
 #include "R3BNeulandCluster.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TString.h>
+#include <vector>
 
 class TH1D;
 class TH2D;

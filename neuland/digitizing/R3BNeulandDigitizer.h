@@ -26,7 +26,6 @@
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandHit.h"
 #include "R3BNeulandPoint.h"
-#include <R3BIOConnector.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <TClonesArray.h>

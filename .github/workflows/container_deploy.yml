@@ -60,11 +60,12 @@ jobs:
           apptainer remote logout SylabsCloud
           mkdir -p ${{ github.workspace }}/tmp
           # apptainer remote add --no-login SylabsCloud cloud.sycloud.io
-          echo "${{ secrets.SYLABS_TOKEN }}" | apptainer remote login SylabsCloud
+          echo "${{ secrets.SYLABS_TOKEN }}" | singualarity remote login
+          apptainer remote status
           apptainer delete -F library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag} || true
           df -h
           apptainer build --notest -F neuland.sif ./util/container/neuland.def
-          apptainer push -D "For testing" -U neuland.sif library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag}
+          apptainer push -D "neuland cli" -U neuland.sif library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag}
         shell: bash
         env:
           image_tag: 'neuland:latest'

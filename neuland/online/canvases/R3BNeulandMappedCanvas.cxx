@@ -1,4 +1,4 @@
-/******************************************************************************
+/*************16:59:11**********************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
  *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
  *                                                                            *
@@ -12,8 +12,10 @@
  ******************************************************************************/
 
 #include "R3BNeulandMappedCanvas.h"
-#include <R3BLogger.h>
+#include "R3BDataMonitor.h"
 #include <R3BNeulandCommon.h>
+#include <Rtypes.h>
+#include <TH1.h>
 
 namespace R3B::Neuland
 {

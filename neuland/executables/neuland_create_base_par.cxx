@@ -12,18 +12,26 @@
  ******************************************************************************/
 
 #include "FairParRootFileIo.h"
+#include "R3BNeulandBaseParJson.h" //NOLINT
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandMapToCalPar.h"
 #include <FairBaseParSet.h>
 #include <FairGeoParSet.h>
+#include <FairLogger.h>
 #include <FairParSet.h>
-#include <FairRtdbRun.h>
+#include <FairRuntimeDb.h>
 #include <R3BException.h>
-#include <R3BLogger.h>
 #include <R3BNeulandBasePar.h>
 #include <R3BProgramOptions.h>
+#include <cstdlib>
+#include <exception>
+#include <fmt/core.h>
 #include <fstream>
-#include <regex>
+#include <memory>
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
+#include <string>
+#include <string_view>
 
 namespace nlh = nlohmann;
 
@@ -43,27 +51,30 @@ namespace nlh = nlohmann;
 //     return nlh::json::parse(response.text);
 // }
 
-auto get_json_from_file(std::string_view filepath) -> nlh::json
+namespace
 {
-    fmt::print("Reading trigIDMap from file {} ...\n", filepath);
-    auto istream = std::ifstream{ filepath.data() };
-    if (not istream.is_open())
+    auto get_json_from_file(std::string_view filepath) -> nlh::ordered_json
     {
-        throw R3B::runtime_error(fmt::format("Cannot open JSON file {}", filepath));
+        fmt::print("Reading trigIDMap from file {} ...\n", filepath);
+        auto istream = std::ifstream{ filepath.data() };
+        if (not istream.is_open())
+        {
+            throw R3B::runtime_error(fmt::format("Cannot open JSON file {}", filepath));
+        }
+        return nlh::ordered_json::parse(istream);
     }
-    return nlh::json::parse(istream);
-}
 
-inline auto is_http_address(const std::string& name) { return std::regex_search(name, std::regex{ "^http" }); }
+    // inline auto is_http_address(const std::string& name) { return std::regex_search(name, std::regex{ "^http" }); }
 
-void add_parameter(FairParSet* par, FairRuntimeDb* rtdb)
-{
-    par->setChanged();
-    if (rtdb->addContainer(par); par == nullptr)
+    void add_parameter(FairParSet* par, FairRuntimeDb* rtdb)
     {
-        throw R3B::runtime_error("Calibration parameter becomes nullptr!");
+        par->setChanged();
+        if (rtdb->addContainer(par); par == nullptr)
+        {
+            throw R3B::runtime_error("Calibration parameter becomes nullptr!");
+        }
     }
-}
+} // namespace
 
 auto main(int argc, char** argv) -> int
 {
@@ -82,7 +93,7 @@ auto main(int argc, char** argv) -> int
 
     try
     {
-        auto json_obj = get_json_from_file(source());
+        const auto json_obj = get_json_from_file(source());
         auto base_par = std::make_unique<R3B::Neuland::CalibrationBasePar>();
         json_obj.get_to(*base_par);
 

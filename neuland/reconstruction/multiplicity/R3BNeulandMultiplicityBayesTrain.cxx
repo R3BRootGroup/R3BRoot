@@ -1,6 +1,14 @@
 #include "R3BNeulandMultiplicityBayesTrain.h"
 #include "FairRuntimeDb.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicityBayesPar.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cstddef>
+#include <fairlogger/Logger.h>
 #include <numeric>
+#include <string_view>
 
 R3BNeulandMultiplicityBayesTrain::R3BNeulandMultiplicityBayesTrain(std::string_view clusters, std::string_view tracks)
     : FairTask("R3BNeulandMultiplicityBayesTrain")

@@ -21,21 +21,16 @@
 #include "R3BShared.h"
 #include "R3BValueError.h"
 #include <FairRootManager.h>
-#include <FairRuntimeDb.h>
 #include <R3BEventHeader.h>
 #include <R3BException.h>
 #include <R3BLogger.h>
 #include <TH1.h>
-#include <TH1D.h>
 #include <TH2.h>
-#include <TH2D.h>
 #include <algorithm>
 #include <cmath>
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <iterator>
-#include <range/v3/all.hpp>
 #include <range/v3/view/map.hpp>
 #include <string_view>
 #include <vector>
@@ -124,7 +119,7 @@ namespace R3B::Neuland
 
     void Map2CalTask::set_pmt_num()
     {
-        if (plane_num_ = base_par_->GetNumOfPlanes(); plane_num_ == 0)
+        if (plane_num_ = base_par_->get_num_of_planes(); plane_num_ == 0)
         {
             R3BLOG(warn, "plane number obtained from the calibration parameters is 0!");
         }
@@ -192,7 +187,7 @@ namespace R3B::Neuland
     auto Map2CalTask::get_trigger_time(unsigned int module_num, Side side) const -> ValueError<double>
     {
 
-        const auto& triggerMap = base_par_->GetTrigIDMap();
+        const auto& triggerMap = base_par_->get_trig_id_map();
         auto triggerIDPair = triggerMap.find(module_num);
         if (triggerIDPair == triggerMap.end())
         {

@@ -12,9 +12,24 @@
  ******************************************************************************/
 
 #include "R3BNeulandCalToHitTask.h"
+#include "R3BDataMonitor.h"
+#include "R3BException.h"
+#include "R3BNeulandCalData2.h"
+#include "R3BNeulandCalToHitPar.h"
+#include "R3BNeulandCalibrationTask.h"
+#include "R3BNeulandCommon.h"
+#include "R3BNeulandHit.h"
+#include "R3BValueError.h"
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 #include <R3BLogger.h>
 #include <R3BNeulandSignalMatcher.h>
 #include <R3BShared.h>
+#include <TVector3.h>
+#include <cmath>
+#include <fmt/core.h>
+#include <string_view>
+#include <vector>
 
 namespace
 {

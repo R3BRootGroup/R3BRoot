@@ -13,11 +13,12 @@
 
 #include "R3BEventHeader.h"
 #include "R3BEventHeaderPropagator.h"
+#include "R3BException.h"
 #include "R3BFileSource2.h"
-#include "R3BNeulandHitPar.h"
-#include "R3BNeulandMapToCalParTask.h"
 #include "R3BNeulandMapToCalTask.h"
-#include "R3BTCalContFact.h"
+#include "R3BNeulandTriggerTypes.h"
+#include "R3BShared.h"
+#include <FairLogger.h>
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRunAna.h>
@@ -25,14 +26,15 @@
 #include <R3BLogger.h>
 #include <R3BNeulandCalToHitParTask.h>
 #include <R3BProgramOptions.h>
-#include <R3BTCalPar.h>
-#include <TObjString.h>
-#include <TROOT.h>
 #include <TStopwatch.h>
+#include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <fmt/core.h>
-#include <fmt/std.h>
+#include <fmt/format.h>
 #include <iostream>
+#include <memory>
+#include <string>
 
 namespace fs = std::filesystem;
 constexpr int DEFAULT_EVENT_NUM = -1;
@@ -141,8 +143,8 @@ auto main(int argc, char** argv) -> int
         timer.Stop();
         std::cout << "Cal level data written to file " << outputfile_path << "\n";
         std::cout << "Cal level parameter written to file " << outputParFileName << "\n";
-        std::cout << "Macro finished successfully." << std::endl;
-        std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << std::endl;
+        std::cout << "Macro finished successfully.\n";
+        std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s\n";
     }
     catch (R3B::runtime_error& ex)
     {

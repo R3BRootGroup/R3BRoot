@@ -28,7 +28,7 @@
  * @author Yanzhao Wang
  * @since April 12, 2023
  */
-// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 namespace
 {
     namespace Digitizing = R3B::Digitizing;
@@ -106,7 +106,7 @@ namespace
         Pair<GMockChannel*> channels_ = { nullptr, nullptr };
     };
 
-    TEST_F(testNeulandPaddle, check_inputN_to_channel) // NOLINT
+    TEST_F(testNeulandPaddle, check_inputN_to_channel)
     {
         auto* paddle = GetPaddle();
         paddle->DepositLight(PaddleSignal{ 10., 20., 0. });
@@ -234,4 +234,4 @@ namespace
     //     ASSERT_EQ(signals.size(), 1) << "recursive paring is not prohibited!";
     // }
 } // namespace
-// NOLINTEND(cppcoreguidelines-avoid-magic-numbers)
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)

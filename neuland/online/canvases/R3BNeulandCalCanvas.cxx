@@ -12,8 +12,7 @@
  ******************************************************************************/
 
 #include "R3BNeulandCalCanvas.h"
-#include <R3BNeulandCommon.h>
-#include <R3BNeulandOnlineSpectra2.h>
+#include "R3BDataMonitor.h"
 #include <TH2.h>
 
 namespace R3B::Neuland

@@ -1,17 +1,19 @@
 #include "R3BNeulandAppOptionJson.h"
-#include "JsonParse/ParticleFilterJson.h" //NOLINT
+#include "JsonParse/GeneratorFactoryJson.h" // NOLINT
+#include "JsonParse/ParticleFilterJson.h"   //NOLINT
 #include "R3BDigitizingTamex.h"
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandDigitizer.h"
+#include "R3BNeulandJsonHeader.h"
 #include "R3BNeulandSimApp.h"
 #include <R3BROOTTypeJson.h> //NOLINT
 #include <fmt/core.h>
-#include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <string>
 
 using json = nlohmann::ordered_json;

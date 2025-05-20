@@ -1,3 +1,7 @@
+#include "R3BException.h"
+#include "R3BNeulandTriggerTypes.h"
+#include "R3BShared.h"
+#include <FairLogger.h>
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRunAna.h>
@@ -7,12 +11,16 @@
 #include <R3BFileSource2.h>
 #include <R3BLogger.h>
 #include <R3BNeulandCalToHitTask.h>
-#include <R3BNeulandHitPar.h>
 #include <R3BProgramOptions.h>
 #include <TStopwatch.h>
+#include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <fmt/core.h>
-#include <fmt/std.h>
+#include <fmt/format.h>
+#include <iostream>
+#include <memory>
+#include <string>
 
 namespace fs = std::filesystem;
 constexpr int DEFAULT_EVENT_NUM = 0;
@@ -40,10 +48,10 @@ auto main(int argc, char** argv) -> int
     }
 
     FairLogger::GetLogger()->SetLogScreenLevel(logLevel().c_str());
-    const auto outputDir = R3B::GetParentDir(output_file());
+    // const auto outputDir = R3B::GetParentDir(output_file());
     const auto outputfile_path = fs::path{ output_file() };
-    const auto outputParFileName =
-        outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
+    // const auto outputParFileName =
+    //     outputDir / fmt::format("{}.par.{}", outputfile_path.stem(), outputfile_path.extension());
     const auto input_filenames = R3B::GetFilesFromRegex(input_file());
 
     R3BLOG(debug, fmt::format("input data file: {}", fmt::join(input_filenames, ";")).c_str());

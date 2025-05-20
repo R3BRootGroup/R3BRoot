@@ -27,7 +27,8 @@ Checks: >
   performance-*,
   readability-*,
   -hicpp-new-delete-operators,
-  -modernize-use-trailing-return-type
+  -modernize-use-trailing-return-type,
+  -bugprone-suspicious-stringview-data-usage
 
 CheckOptions:
   - key: bugprone-argument-comment.StrictMode

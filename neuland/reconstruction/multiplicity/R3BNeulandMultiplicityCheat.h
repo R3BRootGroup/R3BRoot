@@ -1,10 +1,14 @@
-#ifndef R3BROOT_R3BNEULANDMULTIPLICITYCHEAT_H
-#define R3BROOT_R3BNEULANDMULTIPLICITYCHEAT_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandHit.h"
 #include "R3BNeulandMultiplicity.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <memory>
+#include <string>
+#include <string_view>
 
 class R3BNeulandMultiplicityCheat : public FairTask
 {
@@ -20,9 +24,7 @@ class R3BNeulandMultiplicityCheat : public FairTask
     std::string fOutputName;
 
     auto Init() -> InitStatus override;
-    void Exec(Option_t*) override;
+    void Exec(Option_t* /*option*/) override;
 
     ClassDefOverride(R3BNeulandMultiplicityCheat, 1)
 };
-
-#endif // R3BROOT_R3BNEULANDMULTIPLICITYCHEAT_H

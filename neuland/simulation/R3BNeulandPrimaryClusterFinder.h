@@ -17,6 +17,9 @@
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
 #include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string_view>
 
 class R3BNeulandPrimaryClusterFinder : public FairTask
 {

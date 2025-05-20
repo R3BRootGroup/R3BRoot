@@ -1,7 +1,11 @@
-#include "R3BEventHeaderPropagator.h"
+#include "R3BLogger.h"
 #include "R3BNeulandMapToCalParTask.h"
+#include "R3BNeulandTriggerTypes.h"
+#include "R3BShared.h"
+#include "R3BUcesbMappingFlag.h"
 #include "ext_h101_unpack.h"
-#include "ext_h101_wrmaster.h"
+// #include "ext_h101_wrmaster.h"
+#include <FairLogger.h>
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRunOnline.h>
@@ -15,15 +19,19 @@
 #include <R3BUcesbSource2.h>
 #include <R3BUnpackReader.h>
 #include <R3BWhiterabbitMasterReader.h>
-#include <TROOT.h>
 #include <TStopwatch.h>
-#include <TSystem.h>
+#include <bits/basic_string.h>
+#include <cstddef>
+#include <cstdlib>
 #include <ext_h101_tpat.h>
+#include <fairlogger/Logger.h>
 #include <filesystem>
 #include <fmt/core.h>
 #include <iostream>
+#include <memory>
 #include <regex>
-#include <string_view>
+#include <stdexcept>
+#include <string>
 
 namespace fs = std::filesystem;
 
@@ -88,7 +96,7 @@ auto main(int argc, char** argv) -> int
         R3BLOG(error, "ucesb_dir is not defined!");
         return 1;
     }
-    const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
+    // const auto upexps_dir = std::string{ ucesb_dir } + "/../upexps"s;
     const auto upexps_exe = fs::path{ unpacker_path.value() };
     const auto ntuple_options =
         (time_stich.value() > 0) ? fmt::format("RAW,time-stitch={}", time_stich.value()) : fmt::format("RAW");
@@ -160,13 +168,13 @@ auto main(int argc, char** argv) -> int
     {
         run->Init();
         run->Run(-1, eventNum());
-        std::cout << "Analysis finished succesfully." << std::endl;
-        std::cout << "Output file is " << output_file() << std::endl;
+        std::cout << "Analysis finished succesfully.\n";
+        std::cout << "Output file is " << output_file() << "\n";
 
         timer.Stop();
         const double rtime = timer.RealTime();
         const double ctime = timer.CpuTime();
-        std::cout << "Real time " << rtime << " s, CPU time " << ctime << " s" << std::endl;
+        std::cout << "Real time " << rtime << " s, CPU time " << ctime << " s\n";
     }
     catch (fair::FatalException& ex)
     {

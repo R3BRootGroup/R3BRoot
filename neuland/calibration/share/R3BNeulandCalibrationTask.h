@@ -13,11 +13,18 @@
  ******************************************************************************/
 
 #include "R3BDataMonitor.h"
+#include "R3BException.h"
 #include "R3BNeulandBasePar.h"
 #include "R3BNeulandTriggerTypes.h"
+#include <FairRun.h>
 #include <FairRuntimeDb.h>
 #include <FairTask.h>
 #include <R3BEventHeader.h>
+#include <RtypesCore.h>
+#include <TH1.h>
+#include <cstdint>
+#include <string_view>
+#include <vector>
 
 class FairParSet;
 

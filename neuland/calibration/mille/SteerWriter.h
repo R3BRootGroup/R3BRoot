@@ -13,10 +13,15 @@
 
 #pragma once
 
+#include <cstdint>
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <fstream>
 #include <map>
 #include <string>
+#include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 constexpr auto DEFAULT_MILLEPEDE_PARAMETER_FILE = "parameters.txt";
@@ -28,7 +33,7 @@ namespace R3B
     class SteerWriter
     {
       public:
-        enum class Method
+        enum class Method : uint8_t
         {
             inversion,
             diagonalization,

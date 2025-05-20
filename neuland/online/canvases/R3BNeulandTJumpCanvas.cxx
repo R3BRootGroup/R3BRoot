@@ -12,10 +12,13 @@
  ******************************************************************************/
 
 #include "R3BNeulandTJumpCanvas.h"
-#include <R3BNeulandCommon.h>
+#include "R3BDataMonitor.h"
 #include <R3BNeulandOnlineSpectra2.h>
 #include <TH2.h>
-#include <range/v3/view.hpp>
+#include <cmath>
+#include <range/v3/view/concat.hpp>
+#include <range/v3/view/join.hpp>
+#include <range/v3/view/transform.hpp>
 
 constexpr auto EVENT_NUM_MAX = 10000000;
 

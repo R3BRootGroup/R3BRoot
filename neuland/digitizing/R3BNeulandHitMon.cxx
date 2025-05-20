@@ -14,10 +14,18 @@
 #include "R3BNeulandHitMon.h"
 #include "FairRootManager.h"
 #include "R3BNeulandHit.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TFile.h>
 #include <TH3.h>
+#include <TString.h>
 #include <algorithm>
+#include <cstdlib>
+#include <fairlogger/Logger.h>
+#include <map>
 #include <numeric>
+#include <string_view>
 #include <utility>
 
 R3BNeulandHitMon::R3BNeulandHitMon(std::string_view hits_name, const Option_t* option)
