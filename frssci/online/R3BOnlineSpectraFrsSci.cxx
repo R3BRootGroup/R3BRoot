@@ -207,6 +207,11 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         cTcal_Tof->Divide(1, fNbTofs);
         fh1_Tcal1Hit_TofRaw = new TH1D*[fNbTofs];
 
+        sprintf(Name1, "Tcal1Hit_Delta_Tcal_Tref");
+        cTcal_DTcal = new TCanvas(Name1, Name1, 10, 10, 800, 700);
+        cTcal_DTcal->Divide(fNbDets, fNbPmts - 1);
+        fh1_Tcal1Hit_DeltaTcal = new TH1D*[fNbDets * (fNbPmts - 1)];
+
         for (UShort_t i = 0; i < fNbDets; i++)
         {
             // === TH1F: Raw Position in Ns if mult1 RIGHT and LEFT === //
@@ -226,6 +231,24 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
             fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitleSize(0.05);
             cTcal_Pos->cd(i + 1);
             fh1_Tcal1Hit_PosRaw[i]->Draw();
+
+            // === TH1F: DeltaTcal = Tcal_Pmt - Tcal_Tref
+            for (UShort_t j = 0; j < fNbPmts - 1; j++)
+            { // Tref has the last index
+                sprintf(Name1, "FrsSci%i_Delta_TcalPmt%i_Tref_MULT1", i + 1, j + i);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j] = new TH1D(Name1, Name1, 600000, -5000, 1000);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetXaxis()->SetTitle(
+                    "DeltaTcal=Tref-Tpmt [ns]. 10ps/bin");
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetYaxis()->SetTitle("number of counts with mult1");
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetXaxis()->CenterTitle(true);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetYaxis()->CenterTitle(true);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetXaxis()->SetLabelSize(0.05);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetXaxis()->SetTitleSize(0.05);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetYaxis()->SetLabelSize(0.05);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->GetYaxis()->SetTitleSize(0.05);
+                cTcal_DTcal->cd(i * (fNbPmts - 2) + j + 1);
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->Draw();
+            }
         }
 
         if (fNbTofs > 0)
@@ -530,6 +553,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
         TFolder* mainfolTcal = new TFolder("FrsSciTcal", "FrsSci Tcal info");
         mainfolTcal->Add(cTcal_Pos);
         mainfolTcal->Add(cTcal_Tof);
+        mainfolTcal->Add(cTcal_DTcal);
         run->AddObject(mainfolTcal);
     }
     if (fPosCal || fTofCal)
@@ -574,7 +598,12 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
         }
 
         if (fTcal)
+        {
             fh1_Tcal1Hit_PosRaw[i]->Reset();
+            for (UShort_t j = 0; j < fNbPmts - 1; j++)
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) * j]->Reset();
+        }
+
         if (fPosCal)
         {
             fh1_Cal_PosRaw[i]->Reset();
@@ -694,6 +723,11 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                         if (multTcal[i * fNbPmts] == 1 && multTcal[i * fNbPmts + 1] == 1)
                         {
                             fh1_Tcal1Hit_PosRaw[i]->Fill((Float_t)(Traw[i * fNbPmts] - Traw[i * fNbPmts + 1]));
+                            for (UShort_t j = 0; j < fNbPmts - 1; j++)
+                            {
+                                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->Fill(
+                                    Traw[i * (fNbPmts - 1) + j] - Traw[i * (fNbPmts - 1) + fNbPmts - 1]);
+                            }
                         }
                     }
                     // TofRaw [ns] relatively to Tref
@@ -819,6 +853,10 @@ void R3BOnlineSpectraFrsSci::FinishTask()
             for (UShort_t i = 0; i < fNbDets; i++)
             {
                 fh1_Tcal1Hit_PosRaw[i]->Write();
+                for (UShort_t j = 0; j < fNbPmts - 1; j++)
+                {
+                    fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->Write();
+                }
             }
             for (UShort_t i = 0; i < fNbTofs; i++)
             {
