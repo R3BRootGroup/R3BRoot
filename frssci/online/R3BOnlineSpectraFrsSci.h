@@ -143,10 +143,12 @@ class R3BOnlineSpectraFrsSci : public FairTask
     // Canvas at Tcal level
     TCanvas* cTcal_Pos;
     TCanvas* cTcal_Tof;
+    TCanvas* cTcal_DTcal;
 
     // Histograms at Tcal level
-    TH1D** fh1_Tcal1Hit_PosRaw; // [fNbDets]
-    TH1D** fh1_Tcal1Hit_TofRaw; // [fNbTofs]
+    TH1D** fh1_Tcal1Hit_PosRaw;    // [fNbDets]
+    TH1D** fh1_Tcal1Hit_TofRaw;    // [fNbTofs]
+    TH1D** fh1_Tcal1Hit_DeltaTcal; // [fNbDets*(NbPmts-1)] TPmt_i -TPmt_ref
 
     // Canvas at Cal level
     TCanvas* cCal_PosRaw;
