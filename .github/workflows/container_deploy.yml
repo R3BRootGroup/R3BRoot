@@ -19,7 +19,21 @@ on:
 
 jobs:
   docker-build:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: 
+          - 'r3bdev:r3broot'
+          - 'r3bdev:r3broot-arm'
+        include:
+          - repo: 'r3bdev:r3broot'
+            build-repo: 'r3bdev:fedora-latest'
+            build-env: 'ubuntu-latest'
+          - repo: 'r3bdev:r3broot-arm'
+            build-repo: 'r3bdev:fedora-latest-arm'
+            build-env: 'ubuntu-24.04-arm'
+
+    runs-on: ${{ matrix.build-env }}
 
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +52,9 @@ jobs:
         with:
           push: true
           context: util/container
-          tags: ${{ vars.DOCKER_USERNAME }}/${{ vars.DOCKER_REPO }}
+          tags: ${{ vars.DOCKER_USERNAME }}/${{ matrix.repo }}
           build-args: |
+            BUILD_REPO=${{ matrix.build-repo }}
             THREAD_NUM=4 
             R3B_BRNAME=${{ github.head_ref || github.ref_name }}
 
@@ -60,11 +75,11 @@ jobs:
           apptainer remote logout SylabsCloud
           mkdir -p ${{ github.workspace }}/tmp
           # apptainer remote add --no-login SylabsCloud cloud.sycloud.io
-          echo "${{ secrets.SYLABS_TOKEN }}" | singualarity remote login
+          echo "${{ secrets.SYLABS_TOKEN }}" | singularity remote login
           apptainer remote status
           apptainer delete -F library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag} || true
-          df -h
           apptainer build --notest -F neuland.sif ./util/container/neuland.def
+          apptainer sign --keyidx 0 neuland.sif
           apptainer push -D "neuland cli" -U neuland.sif library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag}
         shell: bash
         env:
@@ -77,3 +92,4 @@ jobs:
           apptainer remote logout SylabsCloud
           apptainer cache clean -f
           rm -rf ${{ github.workspace }}/tmp
+          df -h

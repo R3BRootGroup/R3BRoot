@@ -22,22 +22,22 @@ namespace R3B::Neuland
     // =============================================================================================
     // general options:
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const Application::Options& option);
+    void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options& option);
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, Application::Options& option);
+    void from_json(const nlohmann::ordered_json& json_obj, CLIApplication::Options& option);
 
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const Application::Options::Input& option);
+    void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options::Input& option);
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, Application::Options::Input& option);
+    void from_json(const nlohmann::ordered_json& json_obj, CLIApplication::Options::Input& option);
 
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const Application::Options::Output& option);
+    void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options::Output& option);
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, Application::Options::Output& option);
+    void from_json(const nlohmann::ordered_json& json_obj, CLIApplication::Options::Output& option);
 
     // =============================================================================================
     // Anaysis options:

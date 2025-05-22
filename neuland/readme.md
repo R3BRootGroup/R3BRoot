@@ -17,6 +17,7 @@ Code for the NeuLAND Detector is split into different components:
 
 Other related documentations:
 
+- \subpage neuland_container "Running programs in containers"
 - \subpage NEULANDHPC
 - \subpage neuland_style
 

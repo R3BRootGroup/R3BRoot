@@ -12,6 +12,7 @@ class CompressorRecipe(ConanFile):
         self.requires("gtest/cci.20210126")
         self.requires("nlohmann_json/3.12.0")
         self.requires("magic_enum/0.9.7")
+        self.requires("cli11/2.5.0")
 
     def generate(self):
         tc = CMakeToolchain(self)

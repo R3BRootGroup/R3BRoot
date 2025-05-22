@@ -1,5 +1,6 @@
 #pragma once
 
+#include <R3BNeulandCLIAbstract.h>
 #include <TStopwatch.h>
 #include <algorithm>
 #include <fmt/core.h>
@@ -28,7 +29,7 @@ namespace R3B::Neuland
     constexpr auto DEFAULT_EVENT_NUM = 100;
     constexpr auto DEFAULT_RUN_ID = 999;
     const auto DEFAULT_JSON_FILENAME = "config.json";
-    class Application
+    class CLIApplication : public CLIAbstract
     {
       public:
         struct Options
@@ -54,19 +55,16 @@ namespace R3B::Neuland
             } output;
         };
 
-        explicit Application(std::string_view name,
-                             std::unique_ptr<FairRun> run,
-                             std::reference_wrapper<Options> option);
-        Application(const Application&) = delete;
-        Application(Application&&) = delete;
-        auto operator=(const Application&) -> Application& = delete;
-        auto operator=(Application&&) -> Application& = delete;
-        virtual ~Application();
+        explicit CLIApplication(std::string_view name,
+                                std::unique_ptr<FairRun> run,
+                                std::reference_wrapper<Options> option);
+        CLIApplication(const CLIApplication&) = delete;
+        CLIApplication(CLIApplication&&) = delete;
+        auto operator=(const CLIApplication&) -> CLIApplication& = delete;
+        auto operator=(CLIApplication&&) -> CLIApplication& = delete;
+        ~CLIApplication() override;
 
         // common APIs:
-
-        void setup_options(CLI::App& program_options);
-        void post_parse();
 
         template <typename CLIAPP, typename OptionType>
         void setup_common_options(CLIAPP& program_options, OptionType& options);
@@ -100,30 +98,17 @@ namespace R3B::Neuland
         {
             std::copy(input_filename.begin(), input_filename.end(), std::back_inserter(option_.get().input.tree_data));
         }
-        void set_num_of_procs(int val) { num_of_procs_ = val; }
-        void set_rank_num(int val) { rank_num_ = val; }
-        void set_fail(bool is_failed) { is_failed_ = is_failed; }
 
         // Getters:
 
         auto get_run() -> FairRun* { return run_.get(); }
         auto has_mpi() -> bool { return option_.get().enable_mpi; }
 
-        void print_options() { print_json_options(); }
-        [[nodiscard]] auto has_print_default_options() const -> bool { return has_print_default_options_; }
-        [[nodiscard]] auto has_dump() const -> bool { return is_dump_; }
-        void dump_options() { dump_json_options(dump_json_filename_); }
-
-        void init();
-        void run();
-
       protected:
         template <typename OptionType>
         void ParseApplicationOptionImp(const std::vector<std::string>& filename, OptionType& options);
 
       private:
-        bool is_failed_ = false;
-        bool is_inited_ = false;
         bool is_already_parsed_ = false; // guards for callbacks.
         bool is_dump_ = false;           // guards for callbacks.
         bool has_print_default_options_ = false;
@@ -135,6 +120,18 @@ namespace R3B::Neuland
         std::reference_wrapper<Options> option_;
         TStopwatch timer_;
         std::vector<std::pair<std::string, bool>> input_files_;
+
+        // private overriden virtual function:
+        void set_num_of_procs(int val) override { num_of_procs_ = val; }
+        void set_rank_num(int val) override { rank_num_ = val; }
+        void dump_options() override { dump_json_options(dump_json_filename_); }
+        void init() override;
+        void run() override;
+        void print_options() override { print_json_options(); }
+        [[nodiscard]] auto has_print_default_options() const -> bool override { return has_print_default_options_; }
+        [[nodiscard]] auto has_dump() const -> bool override { return is_dump_; }
+        void setup_options(CLI::App& program_options) override;
+        void post_parse() override;
 
         // private virtual methods:
         virtual void pre_init(FairRun* run) = 0;
@@ -157,7 +154,7 @@ namespace R3B::Neuland
     };
 
     template <typename OptionType>
-    void Application::print_json_options(const OptionType& options)
+    void CLIApplication::print_json_options(const OptionType& options)
     {
         using json = nlohmann::ordered_json;
         auto json_obj = json{ options };
@@ -172,7 +169,7 @@ namespace R3B::Neuland
     }
 
     template <typename OptionType>
-    void Application::dump_json_options(const OptionType& options, const std::string& filename)
+    void CLIApplication::dump_json_options(const OptionType& options, const std::string& filename)
     {
         using json = nlohmann::ordered_json;
         auto file = std::ofstream{ filename, std::ios::trunc };
@@ -189,8 +186,8 @@ namespace R3B::Neuland
     }
 
     template <typename OptionType>
-    void Application::ParseApplicationOptionImp(const std::vector<std::string>& filenames_or_options,
-                                                OptionType& options)
+    void CLIApplication::ParseApplicationOptionImp(const std::vector<std::string>& filenames_or_options,
+                                                   OptionType& options)
     {
         auto json_obj = [&options]()
         {

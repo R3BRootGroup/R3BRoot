@@ -1,232 +1,213 @@
-# NeuLAND program with HPC clusters {#NEULANDHPC}
+# NeuLAND Program With Containers {#neuland_container}
 
-HPC clusters consist of an enormous number of computation cores (CPUs), that can be utilized as a whole during the execution of computing heavy programs. To put it in a simple way, HPC clusters can be thought of as a large number of "computers" connecting with each other and sharing the computation payload through the connections. Each "computer" is called a _node_ and each node possesses a certain number of processors.
-
-Simulations related to the NeuLAND detectors usually takes a significantly amount of times due to the heavy computations of the particle interactions from the Geant4 simulation framework. They could take days or even weeks if more than a million events need to be simulated. The solution to reduce the computation time is to run the simulation in the HPC clusters such that each core runs only a fraction of the total events independently and simultaneously. For example, if the simulation is run with 20 nodes and each node uses 50 cores, the real simulation time would be 1000 ( = 20 x 50 ) times shorter.
+Most of low/middle level data analysis relating to NeuLAND detector are done in the program R3BRoot, which requires many third-party libraries and tool-kits, such as FairSoft, FairRoot and UCESB etc. These software, on the other hand, requires newer versions of compilers and even operating systems. Therefore, to compile the R3BRoot oneself is an insurmountable task and may take quite lot of unnecessary times. To solve this problem and relief some burdens of high level data analysts, several containers containing the pre-built R3BRoot program are available. One only has to download the container and run the program with the data in your local machine or servers. Since containers doesn't care about your local operating system, you could use containers to run R3BRoot in Linux, MacOS and even Windows.
 
 [TOC]
 
-## How to do
+## Run R3BRoot in containers
 
-Here are the steps to run the NeuLAND cli application in HPC clusters:
+### In GSI servers
 
-1. **Login to a submit node:**
+If you have access to GSI Linux server, there are some powerful server nodes, namely `lustre.hpc.gsi.de`, with the data storage cluster mounted in `/lustre` folder.
 
-   ```shell
-   ssh username@virgo.hpc.gsi.de
+1. To login, simply do (you have to be inside GSI network first)
+
+   ```bash
+   ssh username@lustre.hpc.gsi.de
    ```
 
-   See [this subsection below](#SubmitNode) about how to get access to the HPC submit node.
+2. Go to your personal data folder under `/lustre`. If you don't have it, please contact your colleagues to create one for you.
 
-2. **Download NeuLAND Apptainer image in any folder _under_ `/lustre`:**
-
-   Before pulling the image, please make sure Sylabs has been added to the remote if it has not been done before:
-
-   ```shell
-   apptainer remote add --no-login SylabsCloud cloud.sycloud.io
+   ```bash
+   cd /lustre/r3b/username
    ```
 
-   Then pull the image to your current folder:
+3. Download the Apptainer container in one of the folders, e.g. `containers`
 
-   ```shell
+   ```bash
+   cd containers
+
    apptainer pull -F neuland library://yanzhaow/r3bdev/neuland:latest
    ```
 
-   This could take few minutes if you have a slow internet. See [this section below](#NeulandApptainer) for more details about Apptainer images.
+   Depending on the downloading speed, it may take several minutes. You may use other name instead of `neuland` after the `-F` flag.
 
-3. **Create a submit script:**
-   The file should contain the following content:
-
-   ```bash
-   #!/bin/bash
-   #SBATCH --nodes=[number of nodes]
-   #SBATCH --ntasks-per-node=[number of cores per node]
-   #SBATCH --account=[slurm account name]
-   #SBATCH --job-name=[job name]
-   #SBATCH --output=[STDOUT output text file name]
-   #SBATCH --chdir=[path to working directory]
-
-   srun [path to image dir]/neuland sim -c neuland_sim_config.json
-   ```
-
-   The location of the submit script as well as all the paths specified inside the script must all under the folder `/lustre`. See [this section below](#SubmitScript) for the explanations of each option.
-
-4. **Submit the task:**
+4. Once downloaded, you could treat the download file `neuland` as an executable, identical to `neuland` %CLI (see @ref neuland_exe):
 
    ```bash
-   sbatch -p [partition] submit_script.txt
+   ./neuland sim
    ```
 
-   The `[partition]` option could be either `debug`, `main`, `long` or `new`.
-
-5. **Check the status of the running task:**
+   or if you want to run a %ROOT macro file, you could enter the shell environment of the container:
 
    ```bash
-   squeue --me
+   apptainer shell ./neuland
+
+   root -l -q your_macro.C
    ```
 
-## NeuLAND program as an Apptainer image {#NeulandApptainer}
+   Here you don't need to source the `config.sh` file as it's automatically done when entering the container.
 
-> [!caution]
-> The usage of NeuLAND Apptainer image requires the software `apptainer` already installed in the server. If not, please contact and ask the IT department to install the software.
+   Or as a high level data analyst, you most likely need to run jupyterlab in a conda environment (make sure you have conda environment already setup):
 
-An Apptainer image could be thought of as a bundle which contains the program and everything that program needs, such as the operating system, compilers and third party libraries. The operating system used in the NeuLAND Apptainer image is [Fedora 41](https://hub.docker.com/_/fedora) with `gcc14` as the main C++ compiler. Here is the list of version information of the contained compilers and libraries:
+   ```bash
+   apptainer shell ./neuland
 
-- `gcc`: 14.2
-- `FairSoft`: jan24p4
-- `FairRoot`: `dev` branch
-- `ucesb`: `dev` branch
+   conda activate r3b
+   jupyter lab --port 10000
+   ```
 
-The `dev` branch from the above list contains the latest commit up to the time when the container was built.
+**Further remarks:**
 
-### How the image is built
+- Please regularly check the update from [this image repository website](https://cloud.sylabs.io/library/yanzhaow/r3bdev/neuland). If there is a new version (look at the date of the creation), please repeat the first step.
 
-The build processes of the NeuLAND Apptainer image can be summarized in the following steps:
+- The R3BRoot version pre-built in the container may not be the latest `dev` branch. If you need latest features, please open [a new issue](https://github.com/YanzhaoW/R3BRoot/issues) in the Github website.
 
-1. Build the docker image `yanzhaowang/r3bdev:fedora41`, containing the compiler and `FairSoft`, using the [Fedora 41 base image](https://hub.docker.com/_/fedora/tags). The build script (i.e. `Dockerfile`) can be found [here](https://github.com/YanzhaoW/Dockerfiles/blob/master/r3bdev/fedora41/Dockerfile).
-2. Build the docker image `yanzhaowang/r3bdev:r3broot`, which contains the `dev` version of `FairRoot` and the `edwin_dev` version of `R3BRoot`, using the previous `r3bdev:fedora41` as the base image. Its build script can be found in this [webpage](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/util/container/Dockerfile).
-3. Build the Apptainer image `yanzhaow/r3bdev/neuland:latest`, which specifies the execution script of the image, using the previous docker image `r3bdev:r3broot` as the base image. The Apptainer build script can be found from the file, [neuland.def](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/util/container/neuland.def).
+- All the new files and changes you have created inside the _Apptainer_ container will also be available outside the container. They will also not be deleted if the whole container is deleted. (Be careful! This is not the case for Docker containers!)
 
-The step 2 and 3 are _automatically done_ by the [this CI/CD workflow](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/.github/workflows/container_deploy.yml) whenever a new commit is pushed to `edwin_dev` branch. Both the docker images, `r3bdev:fedora` and `r3bdev:r3broot`, can be found in [this dockerhub repo](https://hub.docker.com/r/yanzhaowang/r3bdev/tags) and the Apptainer image can be found in [this sylabs repo](https://cloud.sylabs.io/library/yanzhaow/r3bdev/neuland).
+### In your laptop or PC
 
-### Testing the validity of the image
+You could [install the Apptainer software](https://apptainer.org/docs/admin/main/installation.html) in your PC and do the same things as in GSI servers. But it's highly recommended to use Docker containers as they are more reliable and have more features. The following steps show how to run the R3BRoot program in docker container:
 
-To test whether the image still works, first download the image if not yet done:
+1. Install Docker Engine from your system package manager (e.g. `dnf`, `apt`) according to [this website](https://docs.docker.com/engine/install/). But if you are using Windows or MacOS, the best solution is to install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
 
-```shell
-apptainer pull -F neuland library://yanzhaow/r3bdev/neuland:latest
-```
+2. If your operating system supports CLI (such as MacOS and Linux), pull the latest R3BRoot image from the [dockerhub](https://hub.docker.com/r/yanzhaowang/r3bdev/tags). To create the container, one way is to use `docker run`:
 
-then run a simple simulation like:
+   If your computer is using x86_64 architecture (Most of Windows PCs), you could do:
 
-```shell
-./neuland sim
-```
+   ```bash
+   docker run -it -v .:/root/test:rw --name r3b yanzhaowang/r3bdev:r3broot
+   ```
 
-## HPC submit node and Slurm {#SubmitNode}
+   If your computer is using ARM architecture (MacBook with Apple Silicon), you should use:
 
-HPC clusters have some special nodes that are only used to submit the tasks from users. These nodes are called "submit nodes". Please visit [this website](https://hpc.gsi.de/virgo/user-guide/access/submit-nodes.html) to check all the available nodes in GSI. All the actions, such as submitting a task and querying the status are done with a software called _Slurm_. Available commands from the Slurm can be found in the [official Slurm documentation](https://slurm.schedmd.com/documentation.html).
+   ```bash
+   docker run -it -v .:/root/test:rw --name r3b yanzhaowang/r3bdev:r3broot-arm
+   ```
 
-### Registration
+   Further remarks about running a container:
 
-To get access to the submit node, users have to complete the registration using this [link](https://git.gsi.de/hpc/cluster/access-request/-/issues/new?issuable_template=slurm_user_request&issue%5Bconfidential%5D=true&issue%5Btitle%5D=Request+User+Access) (GSI Web account is acquired). During the registration, please provide the following information:
+   - You can use whatever name you want instead of "r3b".
+   - If you want to go back to your local system, you could either do `exit` or press `Ctrl-p` and `Ctrl-q`. The former stops the container and the latter still keeps the container running. To go back to the running container, simply do `docker attach r3b`. To start and run the stopped container, do `docker start r3b`.
+   - The option behind the flag `-v` specifies the shared (mounted) folders between your local(host) machine and the container. The first path, e.g. current folder `.`, is in your local machine. The second path is the folder in the container. The third option `rw` represents read and write. You could use `ro` for read-only.
+   - If you need to share other directories after the container is created, you have to delete the container and recreate it. **Deleting a container will wipe out all the data inside except those in the shared folders.**
 
-- **Linux group**: land
-- **Collaboration/Experiment/Department**: r3b
-- **Slurm account name**: r3b
-- **Slurm account coordinator**: Spokesperson's name
+3. Run the program:
 
-### Login to a submit node
+   ```bash
+   neuland sim
+   ```
 
-> [!NOTE]
-> All available HPC submit nodes, such as `virgo.hpc.gsi.de` are behind the GSI network firewall and can only be accessed from other servers (as a jump server, e.g. `lx-pool.gsi.de`) in the GSI network.
+   or
 
-To login with a jump server:
+   ```bash
+   root -l -q your_macro.C
+   ```
 
-```shell
-ssh -J username@lx-pool.gsi.de username@virgo.hpc.gsi.de
-```
+## Developing R3BRoot in the container
 
-A simpler way to login to submit node is to add the following configuration to `~/.ssh/config` file (please create one if not existed):
+Developing the R3BRoot program can also be done inside the container. Again there are two containers for x86_64 and ARM machines, which include almost all compilers, software and third party libraries needed to compile R3BRoot.
 
-```text
-Host gsigate
-    HostName lx-pool.gsi.de
-    User username
+> [!note]
+> upexp is not installed in the container as it's badly designed and completely chaotic. If you need to use experimental data, use those already mapped data in .root files.
 
-Host gsihpc
-    HostName virgo.hpc.gsi.de
-    User username
-    ProxyJump gsigate
-    ForwardAgent no
-```
+### In GSI servers
 
-Then, login can be simply done with:
-
-```shell
-ssh gsihpc
-```
-
-### Submit script {#SubmitScript}
-
-The submit script specifies the configuration information needed to run a task, such as the number of nodes or account information and the execution command that launches the program. Each configuration must starts with `#SBATCH`, followed by an option and its value:
-
-```text
-  #!/bin/bash
-  #SBATCH --nodes=[number]
-  #SBATCH --ntasks-per-node=[number]
-  #SBATCH --account=[string]
-  #SBATCH --job-name=[string]
-  #SBATCH --output=[string]
-  #SBATCH --chdir=[string]
-```
-
-The meanings of these options are:
-
-- `--nodes`: The number of nodes for the task.
-- `--ntasks-per-node`: The number of cores used in the each node.
-- `--account`: The Slurm account used in the registration.
-- `--job-name`: The name of your task (job).
-- `--output`: The name the output file, which contains all `STDOUT` prints from the program.
-- `--chdir`: The path to the _working directory_ when the task is run in HPC clusters.
-
-All other Slurm options can be found in its [official documentation website](https://slurm.schedmd.com/sbatch.html).
-
-After the specification of options, user needs to specify the execution command to run the program:
+Choose any GSI servers (e.g. `lustre.hpc.gsi.de`) which have `apptainer` available. Then create a Apptainer container with:
 
 ```bash
-  srun [path to image dir]/neuland sim -c neuland_sim_config.json
+apptainer build --fix-perms fedora.sif docker://yanzhaowang/r3bdev:fedora-latest
 ```
 
-Again, all the files and folders mentioned above must be under `/lustre` as it's the only file partition that is mounted to the GSI Cluster nodes.
+in a folder under `/lustre`
 
-> [!important]
-> To run the NeuLAND program simultaneously and independently in each core, `enable-mpi` from the [general JSON configuration](#GeneralJsonConfig) must be true.
-
-### Job status
-
-The command
+Then enter the shell environment with:
 
 ```bash
-squeue --me
+apptainer shell --bind /lustre,/u fedora.sif
 ```
 
-returns the information of the running jobs belonging to you. The `ST` and `NODELIST(REASON)` columns indicate the status of the job and the "reason" why job is at the corresponding status.
+if you don't want to do run this command every time, you could put it in your `.bashrc` file. If you would like to run the container as a `sudo`, please refer to this [gist](https://gist.github.com/YanzhaoW/7b8fc17bf4da854bd47f1f0757e8ff56).
 
-The status of job can be one of:
+### In your laptop or PC
 
-| Status     | code | Explanation                                                           |
-| :--------- | :--: | :-------------------------------------------------------------------- |
-| COMPLETED  | `CD` | The job has completed successfully.                                   |
-| COMPLETING | `CG` | The job is finishing but some processes are still active.             |
-| FAILED     | `F`  | The job terminated with a non-zero exit code and failed to execute.   |
-| PENDING    | `PD` | The job is waiting for resource allocation. It will eventually run.   |
-| PREEMPTED  | `PR` | The job was terminated because of preemption by another job.          |
-| RUNNING    | `R`  | The job currently is allocated to a node and is running.              |
-| SUSPENDED  | `S`  | A running job has been stopped with its cores released to other jobs. |
-| STOPPED    | `ST` | A running job has been stopped with its cores retained.               |
+To create the container, another easier way is to use `docker compose` and ssh into the container. So instead of writing out a long command to specify mounting, binding and port forwarding, a single command would do the trick:
 
-Job reason code could be one of:
+```bash
+docker compose up -d
+```
 
-| Reason Code               | Explanation                                                                                     |
-| :------------------------ | :---------------------------------------------------------------------------------------------- |
-| `Priority`                | One or more higher priority jobs is in queue for running. Your job will eventually run.         |
-| `Dependency`              | This job is waiting for a dependent job to complete and will run afterward.                     |
-| `Resources`               | The job is waiting for resources to become available and will eventually run.                   |
-| `InvalidAccount`          | The job’s account is invalid. Cancel the job and rerun with the correct account.                |
-| `InvalidQoS`              | The job’s QoS is invalid. Cancel the job and rerun with the correct account.                    |
-| `QOSGrpCpuLimit`          | All CPUs assigned to your job’s specified QoS are in use; the job will run eventually.          |
-| `QOSGrpMaxJobsLimit`      | Maximum number of jobs for your job’s QoS have been met; the job will run eventually.           |
-| `QOSGrpNodeLimit`         | All nodes assigned to your job’s specified QoS are in use; the job will run eventually.         |
-| `PartitionCpuLimit`       | All CPUs assigned to your job’s specified partition are in use; the job will run eventually.    |
-| `PartitionMaxJobsLimit`   | Maximum number of jobs for your job’s partition have been met; the job will run eventually.     |
-| `PartitionNodeLimit`      | All nodes assigned to your job’s specified partition are in use; the job will run eventually.   |
-| `AssociationCpuLimit`     | All CPUs assigned to your job’s specified association are in use; the job will run eventually.  |
-| `AssociationMaxJobsLimit` | Maximum number of jobs for your job’s association have been met; the job will run eventually.   |
-| `AssociationNodeLimit`    | All nodes assigned to your job’s specified association are in use; the job will run eventually. |
+But before running this command, several things should be done first:
 
-_note: Tables above are copied from [this website](https://curc.readthedocs.io/en/latest/running-jobs/squeue-status-codes.html)._
+1. Create a `docker-compose.yaml` file (the filename should not be changed) which contains:
 
-## Example
+   ```yaml
+   services:
+     r3broot:
+       image: yanzhaowang/r3bdev:fedora-latest-arm
+       hostname: r3b-docker
+       volumes:
+         - ${HOME}/.zshenv:/root/.zshenv:ro # Optional. Load your local zsh envs
+         - ${HOME}/.config/zsh:/root/.config/zsh:ro # Optional. Load your local zsh config
+         - ${HOME}/.config/tmux:/root/.config/tmux:ro # Optional. Load your local tmux config
+         - ${HOME}/Docker/r3bdev/r3b:/root/:rw # Required. Home folder to host data
+         - ${HOME}/Docker/r3bdev/system_ssh:/etc/ssh:rw # Required.
+       ports:
+         - "3100:22" # You can change 3100 to other port number as you like
+       command:
+         - /bin/bash
+         - -c
+         - /usr/sbin/sshd -D
+   ```
 
-TO be added ...
+   Here you specifies the folder mounting under the `volumes` section. The port number `3100` can be changed to other port number larger than 1024. This number will be used for ssh login.
+
+2. Create the mounted local folders (if not existed):
+
+   ```bash
+   mkdir -p ${HOME}/Docker/r3bdev/r3b ${HOME}/Docker/r3bdev/system_ssh
+   ```
+
+   Again you could use other folders as well.
+
+3. Run the `docker compose up -d` in the folder that contains the `docker-compose.yaml` file.
+
+4. SSH into the container with:
+
+   ```bash
+   ssh root@localhost -p 3100
+   ```
+
+   The initial password for the login is also "root". You should change it by using the command `chpasswd` after the login. But the best way is to send your local ssh key to the container such that password is not needed for the login.
+
+   If you don't want to always remember the port number, add the following config in `~/.ssh/config` file (create it if not existed):
+
+   ```text
+   Host r3b
+   HostName localhost
+   User root
+   Port 3100
+   ForwardX11 yes
+   ```
+
+   then just do
+
+   ```bash
+   ssh r3b
+   ```
+
+### Conda environment
+
+It's helpful to develop the program in a conda environment, where the python version is matched well with the %ROOT version. To create such environment, in the container, clone this repository and source the bash file as:
+
+```bash
+git clone --depth 1 https://github.com/YanzhaoW/R3BRoot.git
+source R3BRoot/util/init_r3b_env.sh
+conda activate r3bdev
+```
+
+## Creation of containers (for developers)
+
+### Developing environment
+
+### R3BRoot

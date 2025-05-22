@@ -2,7 +2,7 @@
 #include "R3BException.h"
 #include "R3BFileSource2.h"
 #include "R3BShared.h"
-#include <CLI/CLI.hpp> // NOLINT
+#include <CLI/CLI.hpp>
 #include <FairParRootFileIo.h>
 #include <FairRootFileSink.h>
 #include <FairRun.h>
@@ -96,9 +96,9 @@ namespace
 namespace R3B::Neuland
 {
     using json = nlohmann::ordered_json;
-    Application::Application(std::string_view name,
-                             std::unique_ptr<FairRun> run,
-                             std::reference_wrapper<Options> option)
+    CLIApplication::CLIApplication(std::string_view name,
+                                   std::unique_ptr<FairRun> run,
+                                   std::reference_wrapper<Options> option)
         : app_name_{ name }
         , dump_json_filename_{ fmt::format("{}_{}", name, DEFAULT_JSON_FILENAME) }
         , run_(std::move(run))
@@ -108,20 +108,17 @@ namespace R3B::Neuland
         timer_.Start();
     }
 
-    Application::~Application() // NOLINT: an unknown place may throw
+    CLIApplication::~CLIApplication() // NOLINT: an unknown place may throw
     {
-        if (is_inited_)
+        timer_.Stop();
+
+        if (has_inited())
         {
             LOGP(info, "Writting all parameters to files");
             run_->GetRuntimeDb()->writeContainers();
             run_->GetSink()->Close();
-        }
 
-        timer_.Stop();
-
-        if (is_inited_)
-        {
-            if (is_failed_)
+            if (has_failed())
             {
                 fmt::print(fmt::emphasis::bold | fg(fmt::color::red),
                            "\nNeuland Application finished with a failure!\n\n");
@@ -135,7 +132,7 @@ namespace R3B::Neuland
         }
     }
 
-    void Application::setup_logger()
+    void CLIApplication::setup_logger()
     {
         auto spec1 = fair::VerbositySpec::Make(fair::VerbositySpec::Info::severity,
                                                fair::VerbositySpec::Info::file_line_function);
@@ -149,16 +146,16 @@ namespace R3B::Neuland
         fair::Logger::SetConsoleColor(true);
     }
 
-    void Application::post_parse()
+    void CLIApplication::post_parse()
     {
         fair::Logger::SetConsoleSeverity(option_.get().log_level);
         fair::Logger::SetVerbosity(option_.get().verbose_level);
     }
 
-    void Application::init()
+    void CLIApplication::init()
     {
         LOGP(info, "Initializaing application ...");
-        is_inited_ = true;
+        set_inited(true);
         add_inout_files();
         add_inout_pars();
         pre_init(run_.get());
@@ -167,13 +164,13 @@ namespace R3B::Neuland
         LOGP(info, "Application is initialized.");
     }
 
-    void Application::setup_options(CLI::App& program_options)
+    void CLIApplication::setup_options(CLI::App& program_options)
     {
         setup_common_options(program_options);
         setup_application_options(program_options);
     }
 
-    void Application::setup_common_options(CLI::App& program_options)
+    void CLIApplication::setup_common_options(CLI::App& program_options)
     {
         auto dump_config_callback = [this](const std::string& filename)
         {
@@ -234,7 +231,7 @@ namespace R3B::Neuland
             ->group("Output options");
     }
 
-    void Application::add_inout_files()
+    void CLIApplication::add_inout_files()
     {
         const auto& option = option_.get();
 
@@ -266,7 +263,7 @@ namespace R3B::Neuland
         }
     }
 
-    void Application::add_inout_pars()
+    void CLIApplication::add_inout_pars()
     {
         auto file_path = fs::path{};
         const auto& input_option = option_.get().input;
@@ -308,7 +305,7 @@ namespace R3B::Neuland
         }
     }
 
-    void Application::run()
+    void CLIApplication::run()
     {
         auto max_event = option_.get().event_num;
         max_event = max_event > 0 ? max_event : 0;
@@ -319,9 +316,9 @@ namespace R3B::Neuland
         run_action(run_.get(), max_event);
     }
 
-    void Application::run_action(FairRun* run, int num_of_events) { run->Run(0, num_of_events); }
+    void CLIApplication::run_action(FairRun* run, int num_of_events) { run->Run(0, num_of_events); }
 
-    void Application::add_input_filename(R3BFileSource2* filesource)
+    void CLIApplication::add_input_filename(R3BFileSource2* filesource)
     {
         extract_input_files();
         auto input_span = option_.get().enable_mpi ? get_partition_from(input_files_, num_of_procs_, rank_num_)
@@ -332,7 +329,7 @@ namespace R3B::Neuland
         }
     }
 
-    void Application::extract_input_files()
+    void CLIApplication::extract_input_files()
     {
         auto file_path = fs::path{};
         const auto& working_dir = option_.get().input.working_dir;
@@ -356,8 +353,8 @@ namespace R3B::Neuland
         }
     }
 
-    void Application::patch_files_or_strings(nlohmann::ordered_json& json_obj,
-                                             const std::vector<std::string>& filenames_or_options)
+    void CLIApplication::patch_files_or_strings(nlohmann::ordered_json& json_obj,
+                                                const std::vector<std::string>& filenames_or_options)
     {
         for (const auto& filename_or_option : filenames_or_options)
         {

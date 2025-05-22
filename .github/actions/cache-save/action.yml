@@ -16,7 +16,7 @@ runs:
         path: |
           ${{ env.UCESB_DIR }}
           ${{ github.workspace }}/build/_deps
-        key: build-deps-${{ matrix.os }}
+        key: build-deps-${{ matrix.os }}-${{ matrix.repos }}
 
     - name: cache atima
       id: cache-atima
@@ -33,4 +33,4 @@ runs:
       uses: actions/cache/save@v5
       with:
         path: .ccache
-        key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}
+        key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}-${{ matrix.repos }}

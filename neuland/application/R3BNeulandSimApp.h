@@ -16,12 +16,12 @@ namespace R3B::Neuland
     constexpr auto DEFAULT_NEULAND_Z_POS = 1650.; // cm
     constexpr auto DEFAULT_NEULAND_ENERGY = 0.6;  // GeV
 
-    class SimulationApplication : public Application
+    class SimulationApplication : public CLIApplication
     {
       public:
         struct Options
         {
-            Application::Options general;
+            CLIApplication::Options general;
             struct Simulation
             {
                 int event_print_num = 1;

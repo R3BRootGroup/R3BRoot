@@ -28,14 +28,14 @@ namespace R3B::Neuland
     constexpr auto DEFAULT_N_CLUSTER_OFF_OPT = MinimizerLimVar{ 2., 1., 0., 10. };
     constexpr auto DEFAULT_MIN_STAT = 10;
 
-    class AnalysisApplication : public Application
+    class AnalysisApplication : public CLIApplication
     {
       public:
         using TamexChannel = Tamex::Channel;
 
         struct Options
         {
-            Application::Options general;
+            CLIApplication::Options general;
             struct Tasks
             {
                 R3B::Neuland::DigiTaskOptions digi;

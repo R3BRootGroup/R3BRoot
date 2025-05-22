@@ -302,6 +302,7 @@ if(CONAN_ENABLED)
     find_package(range-v3 REQUIRED)
     find_package(Microsoft.GSL REQUIRED)
     find_package(nlohmann_json REQUIRED)
+    find_package(CLI11 REQUIRED)
     set(JSON_ImplicitConversions
         OFF
         CACHE BOOL "disable implicit conversion of JSON" FORCE)

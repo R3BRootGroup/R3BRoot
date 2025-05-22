@@ -22,7 +22,8 @@ runs:
           ${{ env.ATIMAPATH }}
         key: build-deps-${{ matrix.os }}
         restore-keys: |
-          build-deps-${{ matrix.os }}
+          build-deps-${{ matrix.os }}-${{ matrix.repos }}
+          build-deps-${{ matrix.os }}-
 
     - name: cache r3b
       if: inputs.cache-name != 'false' && github.event_name == 'pull_request'
@@ -30,10 +31,10 @@ runs:
       uses: actions/cache/restore@v5
       with:
         path: .ccache
-        key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}
+        key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}-${{ matrix.repos }}
         restore-keys: |
+          r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}-${{ matrix.repos }}
           r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}
-          r3b-build-
           r3b-build-
 
     - name: build ucesb

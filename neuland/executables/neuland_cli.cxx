@@ -1,10 +1,9 @@
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
-#include "R3BNeulandApp.h"
+#include "R3BNeulandAppOptionJson.h" // NOLINT
+#include "R3BNeulandCLIAbstract.h"
 #include "R3BNeulandSimApp.h"
-#include <CLI/App.hpp>               // NOLINT
-#include <CLI/CLI.hpp>               // NOLINT
-#include <R3BNeulandAppOptionJson.h> // NOLINT
+#include <CLI/CLI.hpp>
 #include <cstddef>
 #include <cstdlib>
 #include <exception>
@@ -27,7 +26,7 @@ auto main(int argc, char** argv) -> int
     MPI_Comm_rank(MPI_COMM_WORLD, &num_rank);
 #endif
 
-    auto app = std::unique_ptr<R3B::Neuland::Application>{};
+    auto app = std::unique_ptr<R3B::Neuland::CLIAbstract>{};
     try
     {
         auto program_options = CLI::App{ "Neuland command line interface" };
@@ -38,11 +37,13 @@ auto main(int argc, char** argv) -> int
             {
                 app = std::make_unique<R3B::Neuland::SimulationApplication>();
                 app->setup_options(*program_options.get_subcommand("sim"));
+                return;
             }
             if (program_options.got_subcommand("ana"))
             {
                 app = std::make_unique<R3B::Neuland::AnalysisApplication>();
                 app->setup_options(*program_options.get_subcommand("ana"));
+                return;
             }
         };
 
@@ -52,12 +53,12 @@ auto main(int argc, char** argv) -> int
 
         CLI11_PARSE(program_options, argc, argv);
 
-        app->post_parse();
-
         if (app == nullptr)
         {
             throw R3B::runtime_error("Application is not instantiated!");
         }
+
+        app->post_parse();
 
         if (app->has_print_default_options())
         {
@@ -79,6 +80,12 @@ auto main(int argc, char** argv) -> int
     {
         fmt::println("");
         LOGP(error, "Exception ocurred: \n\n{}\n", ex.what());
+
+        if (app == nullptr)
+        {
+            return EXIT_FAILURE;
+        }
+
         is_failed = true;
         app->set_fail(is_failed);
     }

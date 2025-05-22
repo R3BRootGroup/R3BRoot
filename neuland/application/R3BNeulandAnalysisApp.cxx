@@ -2,7 +2,7 @@
 #include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandCommonFunc.h"
 #include "R3BNeulandSimCalToCal.h"
-#include <CLI/CLI.hpp> // NOLINT
+#include <CLI/CLI.hpp>
 #include <FairRun.h>
 #include <FairRunAna.h>
 #include <R3BEventHeader.h>
@@ -33,7 +33,7 @@ namespace R3B::Neuland
     using Options = AnalysisApplication::Options;
 
     AnalysisApplication::AnalysisApplication()
-        : Application{ "neuland_ana", std::make_unique<FairRunAna>(), std::ref(options_.general) }
+        : CLIApplication{ "neuland_ana", std::make_unique<FairRunAna>(), std::ref(options_.general) }
     {
         options_.general.input.data.emplace_back("sim.output.root");
         options_.general.input.par = "sim.par.root";
@@ -193,7 +193,7 @@ namespace R3B::Neuland
 
     void AnalysisApplication::dump_json_options(const std::string& filename)
     {
-        Application::dump_json_options(options_, filename);
+        CLIApplication::dump_json_options(options_, filename);
     }
 
     void AnalysisApplication::ParseApplicationOption(const std::vector<std::string>& filename)

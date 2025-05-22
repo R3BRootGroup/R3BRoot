@@ -77,7 +77,7 @@ namespace R3B::Neuland
     // =============================================================================================
     // general options:
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const Application::Options& option)
+    void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options& option)
     {
         json_obj = nlohmann::ordered_json{
             { "run-id", option.run_id },
@@ -91,7 +91,7 @@ namespace R3B::Neuland
     }
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, Application::Options& option)
+    void from_json(const nlohmann::ordered_json& json_obj, CLIApplication::Options& option)
     {
         json_obj.at("run-id").get_to(option.run_id);
         json_obj.at("number-of-events").get_to(option.event_num);
@@ -103,7 +103,7 @@ namespace R3B::Neuland
     }
 
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const Application::Options::Input& option)
+    void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options::Input& option)
     {
         json_obj = nlohmann::ordered_json{
             { "working-dir", option.working_dir }, { "data", option.data },        { "tree-data", option.tree_data },
@@ -112,7 +112,7 @@ namespace R3B::Neuland
     }
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, Application::Options::Input& option)
+    void from_json(const nlohmann::ordered_json& json_obj, CLIApplication::Options::Input& option)
     {
         json_obj.at("working-dir").get_to(option.working_dir);
         json_obj.at("data").get_to(option.data);
@@ -122,7 +122,7 @@ namespace R3B::Neuland
     }
 
     template <>
-    void to_json(nlohmann::ordered_json& json_obj, const Application::Options::Output& option)
+    void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options::Output& option)
     {
         json_obj = nlohmann::ordered_json{
             { "working-dir", option.working_dir },
@@ -132,7 +132,7 @@ namespace R3B::Neuland
     }
 
     template <>
-    void from_json(const nlohmann::ordered_json& json_obj, Application::Options::Output& option)
+    void from_json(const nlohmann::ordered_json& json_obj, CLIApplication::Options::Output& option)
     {
         json_obj.at("working-dir").get_to(option.working_dir);
         json_obj.at("data").get_to(option.data);

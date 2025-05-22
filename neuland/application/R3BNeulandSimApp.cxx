@@ -19,7 +19,7 @@
 namespace R3B::Neuland
 {
     SimulationApplication::SimulationApplication()
-        : Application{ "neuland_sim", std::make_unique<FairRunSim>(), std::ref(options_.general) }
+        : CLIApplication{ "neuland_sim", std::make_unique<FairRunSim>(), std::ref(options_.general) }
     {
         options_.general.input.par.clear();
         options_.general.input.data.clear();
@@ -97,11 +97,11 @@ namespace R3B::Neuland
         ParseApplicationOptionImp(filename, options_);
     }
 
-    void SimulationApplication::print_json_options() { Application::print_json_options(options_); }
+    void SimulationApplication::print_json_options() { CLIApplication::print_json_options(options_); }
 
     void SimulationApplication::dump_json_options(const std::string& filename)
     {
-        Application::dump_json_options(options_, filename);
+        CLIApplication::dump_json_options(options_, filename);
     }
 
     void SimulationApplication::run_action(FairRun* run, int num_of_events) { run->Run(num_of_events); }
