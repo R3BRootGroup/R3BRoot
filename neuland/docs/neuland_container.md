@@ -139,7 +139,7 @@ docker compose up -d
 
 But before running this command, several things should be done first:
 
-1. Create a `docker-compose.yaml` file (the filename should not be changed) which contains:
+1. Create a `docker-compose.yaml` file in any folder (the filename should not be changed) which contains:
 
    ```yaml
    services:
@@ -147,20 +147,28 @@ But before running this command, several things should be done first:
        image: yanzhaowang/r3bdev:fedora-latest-arm
        hostname: r3b-docker
        volumes:
-         - ${HOME}/.zshenv:/root/.zshenv:ro # Optional. Load your local zsh envs
-         - ${HOME}/.config/zsh:/root/.config/zsh:ro # Optional. Load your local zsh config
-         - ${HOME}/.config/tmux:/root/.config/tmux:ro # Optional. Load your local tmux config
-         - ${HOME}/Docker/r3bdev/r3b:/root/:rw # Required. Home folder to host data
+         - ${HOME}/.zshenv:/home/admin/.zshenv:ro # Optional. Load your local zsh envs
+         - ${HOME}/.config/zsh:/home/admin/.config/zsh:ro # Optional. Load your local zsh config
+         - ${HOME}/.config/tmux:/home/admin/.config/tmux:ro # Optional. Load your local tmux config
+         - ${HOME}/Docker/r3bdev/r3b:/home/admin/:rw # Required. Home folder to host data
          - ${HOME}/Docker/r3bdev/system_ssh:/etc/ssh:rw # Required.
        ports:
          - "3100:22" # You can change 3100 to other port number as you like
        command:
          - /bin/bash
          - -c
-         - /usr/sbin/sshd -D
+         - |
+           useradd -m admin
+           echo "admin:admin" | chpasswd
+           usermod -s /usr/bin/zsh admin
+           /usr/sbin/sshd -D
    ```
 
-   Here you specifies the folder mounting under the `volumes` section. The port number `3100` can be changed to other port number larger than 1024. This number will be used for ssh login.
+   _Further remarks:_
+
+   - Here you specifies the folder mounting under the `volumes` section.
+   - The port number `3100` can be changed to other port number larger than 1024. This number will be used for ssh login.
+   - The non-root user "admin" also has the password "admin". If you want a difference name for the non-root account, please change it both in the `command` and the `volumes` section.
 
 2. Create the mounted local folders (if not existed):
 
@@ -175,17 +183,17 @@ But before running this command, several things should be done first:
 4. SSH into the container with:
 
    ```bash
-   ssh root@localhost -p 3100
+   ssh admin@localhost -p 3100
    ```
 
-   The initial password for the login is also "root". You should change it by using the command `chpasswd` after the login. But the best way is to send your local ssh key to the container such that password is not needed for the login.
+   The initial password for the login is set in the `docker-compose.yaml` file. You could change it by using the command `chpasswd` after the login. But the best way is to send your local ssh key to the container such that password is not needed for the login. You could also login with root account with the password "root".
 
    If you don't want to always remember the port number, add the following config in `~/.ssh/config` file (create it if not existed):
 
    ```text
    Host r3b
    HostName localhost
-   User root
+   User admin
    Port 3100
    ForwardX11 yes
    ```
