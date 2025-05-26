@@ -121,7 +121,9 @@ class R3BAlpideOnlineSpectra : public FairTask
     TH1F* fh1_Calmult_total;
     TH2F* fh2_sensor_pixelsize;
     TH2F* fh2_theta_phi;
-    TH2F* fh2_y_x;
+    std::vector<TH2F*> fh2_y_x;
+    std::vector<TH2F*> fh2_y_x_cor_det;
+    TH2F* fh2_max_clusters;
 
     TCanvas* cCalPixelSize = nullptr;
     TCanvas* cHit_angcor = nullptr;
