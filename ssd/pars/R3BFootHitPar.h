@@ -51,13 +51,18 @@ class R3BFootHitPar : public FairParGenericSet
 
     // Accessor functions
     [[nodiscard]] inline const int GetNumDets() const { return fNumDets; }
-
+    [[nodiscard]] inline const int GetNumParsFit() const { return fNumParsFit; }
     inline void SetNumDets(int ndet) { fNumDets = ndet; }
+    TArrayF* GetCharCalParams() { return fCharCalPar; }
 
-    /** Create more Methods if you need them! **/
+    // Method for setting the calibration parameters
+    inline void SetCharCalPars(float value, int index) { fCharCalPar->AddAt(value, index); }
+    inline void SetNumParsFit(int npar) { fNumParsFit = npar; }
 
   private:
-    int fNumDets = 8; // Number of detectors
+    int fNumDets = 8;     // Number of detectors
+    int fNumParsFit = 2;  // Number of parameters of for the calibration
+    TArrayF* fCharCalPar; // Parameters for the calibration charge vs energy
 
     const R3BFootHitPar& operator=(const R3BFootHitPar&);
     R3BFootHitPar(const R3BFootHitPar&);

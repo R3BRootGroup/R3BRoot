@@ -23,12 +23,14 @@
 #include <FairTask.h>
 
 #include <Rtypes.h>
+#include <TArrayF.h>
 #include <TVector3.h>
 #include <vector>
 
 class TClonesArray;
 class TH1F;
 class R3BFootMappingPar;
+class R3BFootHitPar;
 
 class R3BFootStripCal2Hit : public FairTask
 {
@@ -80,12 +82,15 @@ class R3BFootStripCal2Hit : public FairTask
     double fTimesSigmas = 3.;
     int fMaxNumDet = 16;
     int fMaxNumClusters = 10;
+    int fNumParsFit = 2;
     std::vector<double> fDistTarget;
     std::vector<double> fAngleTheta;
     std::vector<double> fAnglePhi;
     std::vector<double> fOffsetX;
     std::vector<double> fOffsetY;
+    std::vector<double> fCharCalPar;
     std::vector<TH1F*> hssd;
+    TArrayF* HitCalParams = nullptr;
 
     std::vector<int> ClusterMult;                 // Cluster multiplicity
     std::vector<std::vector<double>> ClusterPos;  // Position of Cluster from Weighted Average
@@ -97,8 +102,10 @@ class R3BFootStripCal2Hit : public FairTask
     std::vector<std::vector<std::vector<double>>> ClusterE; // Energy of Strip in Cluster
 
     R3BFootMappingPar* fMap_Par = nullptr; // Parameter container with mapping
-    TClonesArray* fFootCalData = nullptr;  // Array with FOOT Cal-input data
-    TClonesArray* fFootHitData = nullptr;  // Array with FOOT Hit-output data
+    R3BFootHitPar* fHit_Par = nullptr;     // Parameter container with hit params
+
+    TClonesArray* fFootCalData = nullptr; // Array with FOOT Cal-input data
+    TClonesArray* fFootHitData = nullptr; // Array with FOOT Hit-output data
 
     bool fOnline = false; // Don't store data for online
     Double_t* fChannelPeaks;
@@ -110,7 +117,8 @@ class R3BFootStripCal2Hit : public FairTask
                                TVector3 master,
                                double energy_s,
                                uint16_t mulS,
-                               double eta);
+                               double eta,
+                               double charge);
 
   public:
     // Class definition

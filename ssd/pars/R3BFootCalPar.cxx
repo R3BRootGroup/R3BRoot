@@ -63,7 +63,7 @@ void R3BFootCalPar::putParams(FairParamList* list)
     Int_t array_size = fNumDets * fNumStrips;
     LOG(info) << "Array Size: " << array_size;
 
-    fStripCalParams->Set(array_size);
+    fStripCalParams->Set(array_size * fNumParsFit);
 
     list->add("footDetNumberPar", fNumDets);
     list->add("footStripNumberPar", fNumStrips);

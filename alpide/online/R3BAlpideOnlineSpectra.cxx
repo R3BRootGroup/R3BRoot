@@ -179,7 +179,8 @@ InitStatus R3BAlpideOnlineSpectra::Init()
         }
         mainfol->Add(calfol);
 
-        fh1_Calmult_total = R3B::root_owned<TH1F>("fh1_mulcal_sensor_total", "Cal_mult for all sensors", 70, 0, 70);
+        fh1_Calmult_total =
+            R3B::root_owned<TH1F>("fh1_mulcal_sensor_total", "Cal_mult for all sensors", 70, -0.5, 69.5);
         fh1_Calmult_total->GetXaxis()->SetTitle("Pixel multiplicity");
         fh1_Calmult_total->GetYaxis()->SetTitle("Counts");
         fh1_Calmult_total->GetYaxis()->SetTitleOffset(1.1);
@@ -231,7 +232,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             cHit->Divide(2, 1);
             sprintf(Name1, "fh2_pos_hit_sensor_%d", s + 1);
             sprintf(Name2, "Hit-position for sensor: %d", s + 1);
-            fh2_PosHit[s] = R3B::root_owned<TH2F>(Name1, Name2, 200, -15.0, 15.0, 100, -7.5, 7.5);
+            fh2_PosHit[s] = R3B::root_owned<TH2F>(Name1, Name2, 200, 0, 30., 100, 0, 15.);
             fh2_PosHit[s]->GetXaxis()->SetTitle("Posl [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitle("Post [mm]");
             fh2_PosHit[s]->GetYaxis()->SetTitleOffset(1.1);
@@ -270,6 +271,34 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh1_Clustermult[s]->Draw();
             hitfol->Add(cHitm);
         }
+
+        auto cHitmTot = new TCanvas("Cluster_multiplicity_total", "mult hit info", 10, 10, 500, 500);
+        fh1_Clustermult_total =
+            R3B::root_owned<TH1F>("Cluster_multiplicity_total", "Total cluster multiplicity", 60, 0, 60);
+        fh1_Clustermult_total->GetXaxis()->SetTitle("Cluster multiplicity");
+        fh1_Clustermult_total->GetYaxis()->SetTitle("Counts");
+        fh1_Clustermult_total->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Clustermult_total->GetXaxis()->CenterTitle(true);
+        fh1_Clustermult_total->GetYaxis()->CenterTitle(true);
+        fh1_Clustermult_total->SetLineColor(1);
+        fh1_Clustermult_total->SetFillColor(31);
+        cHitmTot->cd();
+        fh1_Clustermult_total->Draw();
+        hitfol->Add(cHitmTot);
+
+        auto cSizemTot = new TCanvas("Size_multiplicity_total", "size hit info", 10, 10, 500, 500);
+        fh1_Clustersize_total = R3B::root_owned<TH1F>("Size_multiplicity_total", "Total size multiplicity", 60, 0, 60);
+        fh1_Clustersize_total->GetXaxis()->SetTitle("Size multiplicity");
+        fh1_Clustersize_total->GetYaxis()->SetTitle("Counts");
+        fh1_Clustersize_total->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Clustersize_total->GetXaxis()->CenterTitle(true);
+        fh1_Clustersize_total->GetYaxis()->CenterTitle(true);
+        fh1_Clustersize_total->SetLineColor(1);
+        fh1_Clustersize_total->SetFillColor(31);
+        cSizemTot->cd();
+        fh1_Clustersize_total->Draw();
+        hitfol->Add(cSizemTot);
+
         mainfol->Add(hitfol);
 
         cHit_angcor = new TCanvas("Theta_vs_Phi", "Correlation theta vs phi", 10, 10, 500, 500);
@@ -458,8 +487,16 @@ void R3BAlpideOnlineSpectra::Reset_Histo()
         {
             hist->Reset();
         }
+
         fh2_theta_phi->Reset();
         fh2_max_clusters->Reset();
+
+        for (auto& hist : fh2_y_x)
+        {
+            hist->Reset();
+        }
+        fh1_Clustermult_total->Reset();
+        fh1_Clustersize_total->Reset();
     }
 
     return;
@@ -539,6 +576,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
         std::vector<double> y_max(2, NAN);
         std::vector<int> cls_size(2, 0);
 
+        fh1_Clustermult_total->Fill(nHits);
         for (size_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BAlpideHitData*>(fHitItems->At(ihit));
@@ -547,6 +585,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
             auto senid = hit->GetSensorId() - 1;
             fh1_Clustersize[senid]->Fill(hit->GetClusterSize());
             fh2_PosHit[senid]->Fill(hit->GetPosl(), hit->GetPost());
+            fh1_Clustersize_total->Fill(hit->GetClusterSize());
             if (fMap_Par->GetGeoVersion() == 202505)
             {
                 fh2_theta_phi->Fill(hit->GetPhi() * TMath::RadToDeg(), hit->GetTheta() * TMath::RadToDeg());
@@ -575,6 +614,7 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
                     }
                 }
             }
+
             mult[senid]++;
         }
         for (size_t s = 0; s < fNbSensors; s++)
@@ -585,12 +625,16 @@ void R3BAlpideOnlineSpectra::Exec(Option_t* /*option*/)
         {
             if (std::isfinite(x_max[0]) && std::isfinite(x_max[1]))
                 fh2_y_x_cor_det[0]->Fill(x_max[0], x_max[1]);
+
             if (std::isfinite(y_max[0]) && std::isfinite(y_max[1]))
                 fh2_y_x_cor_det[1]->Fill(y_max[0], y_max[1]);
+
             if (std::isfinite(x_max[0]) && std::isfinite(y_max[1]))
                 fh2_y_x_cor_det[2]->Fill(x_max[0], y_max[1]);
-            if (std::isfinite(x_max[2]) && std::isfinite(y_max[0]))
+
+            if (std::isfinite(x_max[1]) && std::isfinite(y_max[0]))
                 fh2_y_x_cor_det[3]->Fill(x_max[1], y_max[0]);
+
             if (cls_size[0] > 0 && cls_size[1] > 0)
                 fh2_max_clusters->Fill(cls_size[0], cls_size[1]);
         }
@@ -639,6 +683,7 @@ void R3BAlpideOnlineSpectra::FinishTask()
     if (fHitItems)
     {
         fh2_theta_phi->Write();
+
         fh2_max_clusters->Write();
         for (const auto& hist : fh2_y_x)
         {
@@ -648,6 +693,9 @@ void R3BAlpideOnlineSpectra::FinishTask()
         {
             hist->Write();
         }
+
+        fh1_Clustermult_total->Write();
+        fh1_Clustersize_total->Write();
     }
 }
 ClassImp(R3BAlpideOnlineSpectra)
