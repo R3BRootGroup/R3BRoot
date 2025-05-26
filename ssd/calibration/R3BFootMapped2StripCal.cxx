@@ -294,6 +294,13 @@ void R3BFootMapped2StripCal::SetPedestals(Int_t thr, TString conf)
                 Float_t ped = h1_peds->GetBinContent(istrip + 1);
                 Float_t sig = h1_sigma->GetBinContent(istrip + 1);
 
+                // Do not update dead strip
+                if (sigmas[iDet][istrip] == -1)
+                {
+                    sig = -1.;
+                    ped = -1.;
+                }
+
                 sigmas[iDet][istrip] = sig;
                 pedestals[iDet][istrip] = ped;
 
@@ -312,7 +319,16 @@ void R3BFootMapped2StripCal::SetPedestals(Int_t thr, TString conf)
                 fine_sigmas[iDet][istrip] = h1_sigma->GetBinContent(istrip + 1);
                 fCal_Par->SetFineSigma(fine_sigmas[iDet][istrip], iDet * fNStrip + istrip);
                 fCal_Par->setChanged(kTRUE);
-                sigmas[iDet][istrip] = fine_sigmas[iDet][istrip];
+                Float_t sig;
+                if (sigmas[iDet][istrip] == -1)
+                {
+                    sig = -1.;
+                }
+                else
+                {
+                    sig = fine_sigmas[iDet][istrip];
+                }
+                sigmas[iDet][istrip] = sig;
             }
         }
 
@@ -423,7 +439,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* /*option*/)
             h2_fine[detId]->Fill(stripId + 1, energies[detId][stripId]);
         }
 
-        if (energies[detId][stripId] > 0. && pedestals[detId][stripId] != -1)
+        if (energies[detId][stripId] > 0. && sigmas[detId][stripId] != -1)
             StripCounter[detId]++;
     }
 
@@ -432,9 +448,11 @@ void R3BFootMapped2StripCal::Exec(Option_t* /*option*/)
         detId = data->GetDetId() - 1;
         stripId = data->GetStripId() - 1;
 
-        if (pedestals[detId][stripId] != -1 &&
+        if (sigmas[detId][stripId] != -1 &&
             StripCounter[detId] < fNStrip) // allow also negative values for the energies
+        {
             AddCalData(detId + 1, stripId + 1, energies[detId][stripId], fine_sigmas[detId][stripId]);
+        }
     }
 }
 

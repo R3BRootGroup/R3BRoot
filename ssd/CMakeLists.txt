@@ -35,10 +35,11 @@ set(SRCS
     calibration/R3BAmsStripCal2Hit.cxx
     online/R3BAmsOnlineSpectra.cxx
     online/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
+    online/R3BFootVsAlpideOnlineSpectra.cxx
     online/R3BFootOnlineSpectra.cxx
     pars/R3BFootMappingPar.cxx
     pars/R3BFootCalPar.cxx
-    pars/R3BFootHitPar.cxx
+	pars/R3BFootHitPar.cxx
     calibration/R3BFootMapped2StripCal.cxx
     calibration/R3BFootStripCal2Hit.cxx)
 
@@ -66,10 +67,11 @@ set(HEADERS
     calibration/R3BAmsStripCal2Hit.h
     online/R3BAmsOnlineSpectra.h
     online/R3BAmsCalifaCorrelatedOnlineSpectra.h
+	online/R3BFootVsAlpideOnlineSpectra.h
     online/R3BFootOnlineSpectra.h
     pars/R3BFootMappingPar.h
     pars/R3BFootCalPar.h
-    pars/R3BFootHitPar.h
+	pars/R3BFootHitPar.h
     calibration/R3BFootMapped2StripCal.h
     calibration/R3BFootStripCal2Hit.h)
 

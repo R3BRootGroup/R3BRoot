@@ -35,6 +35,7 @@
 // FOOT headers
 #include "R3BFootCalData.h"
 #include "R3BFootHitData.h"
+#include "R3BFootHitPar.h"
 #include "R3BFootMappingPar.h"
 #include "R3BFootStripCal2Hit.h"
 #include "R3BLogger.h"
@@ -70,6 +71,17 @@ void R3BFootStripCal2Hit::SetParContainers()
     {
         R3BLOG(info, "footMappingPar found");
     }
+
+    R3BLOG(info, "Calling SetParContainers()");
+    fHit_Par = dynamic_cast<R3BFootHitPar*>(rtdb->getContainer("footHitPar"));
+    if (!fHit_Par)
+    {
+        R3BLOG(error, "SetParContainers(): footHitPar not found");
+    }
+    else
+    {
+        R3BLOG(info, "SetParContainers(): footHitPar loaded correctly");
+    }
 }
 
 void R3BFootStripCal2Hit::SetParameter()
@@ -92,6 +104,28 @@ void R3BFootStripCal2Hit::SetParameter()
         fOffsetY.push_back(fMap_Par->GetOffsetY(i + 1));
     }
     fMap_Par->printParams();
+
+    if (!fHit_Par)
+    {
+        R3BLOG(error, "SetParameter(): fHit_Par is NULL");
+    }
+    else
+    {
+        R3BLOG(info, TString::Format("SetParameter(): fHit_Par is VALID, NumParsFit = %d", fHit_Par->GetNumParsFit()));
+    }
+
+    fNumParsFit = fHit_Par->GetNumParsFit();
+    HitCalParams = fHit_Par->GetCharCalParams();
+    Int_t array_size = fMaxNumDet * fNumParsFit;
+    HitCalParams->Set(array_size);
+
+    for (int d = 0; d < fMaxNumDet; d++)
+    {
+        for (int j = 0; j < fNumParsFit; j++)
+        {
+            fCharCalPar.push_back(HitCalParams->GetAt(d * fNumParsFit + j));
+        }
+    }
 }
 
 // -----   Public method Init   -------------------------------------------------
@@ -224,9 +258,6 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
             int k = j + 1;
             while (k < StripE[i].size())
             {
-                if (StripI[i][k] - StripI[i][k - 1] != 1)
-                    break;
-
                 if (StripE[i][k] < fTimesSigmas * StripS[i][k])
                     break;
 
@@ -333,9 +364,25 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
             TVector3 master(x, y, z);
             // TODO: Eta correction not used at the moment
 
+            // Charge calibration (charge = m * energy + n)
+            double m = 1;
+            double n = 0;
+
+            if (fCharCalPar.size() > 0)
+            {
+                if (fCharCalPar[i * fNumParsFit] != 0)
+                {
+                    m = fCharCalPar[i * fNumParsFit];
+                    n = fCharCalPar[i * fNumParsFit + 1];
+                }
+            }
+
+            double charge = m * ClusterESum[i][j] + n;
+
             if (ClusterESum[i][j] > fThSum && j < fMaxNumClusters)
             {
-                AddHitData(i + 1, ClusterNStrip[i][j], pos, master, ClusterESum[i][j], ClusterMult[i], Eta[i][j]);
+                AddHitData(
+                    i + 1, ClusterNStrip[i][j], pos, master, ClusterESum[i][j], ClusterMult[i], Eta[i][j], charge);
             }
             else
             {
@@ -375,11 +422,12 @@ R3BFootHitData* R3BFootStripCal2Hit::AddHitData(uint8_t detid,
                                                 TVector3 master,
                                                 double energy_s,
                                                 uint16_t mulS,
-                                                double eta)
+                                                double eta,
+                                                double charge)
 {
     TClonesArray& clref = *fFootHitData;
     int size = clref.GetEntriesFast();
-    return new (clref.ConstructedAt(size)) R3BFootHitData(detid, numhit, pos, master, energy_s, mulS, eta);
+    return new (clref.ConstructedAt(size)) R3BFootHitData(detid, numhit, pos, master, energy_s, mulS, eta, charge);
 }
 
 ClassImp(R3BFootStripCal2Hit)

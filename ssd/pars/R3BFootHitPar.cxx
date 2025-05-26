@@ -30,12 +30,14 @@ R3BFootHitPar::R3BFootHitPar(const char* name, const char* title, const char* co
     : FairParGenericSet(name, title, context)
 {
     detName = "FootHit";
+    fCharCalPar = new TArrayF(fNumDets * fNumParsFit);
 }
 
 // ----  Destructor ------------------------------------------------------------
 R3BFootHitPar::~R3BFootHitPar()
 {
     this->clear(); // NOLINT
+    delete fCharCalPar;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -55,7 +57,14 @@ void R3BFootHitPar::putParams(FairParamList* list)
         return;
     }
 
+    Int_t array_size = fNumDets;
+    LOG(info) << "Array Size: " << array_size;
+
+    fCharCalPar->Set(array_size * fNumParsFit);
+
     list->add("footDetNbPar", fNumDets);
+    list->add("footCharCalPar", *fCharCalPar);
+    list->add("footNumberParsFit", fNumParsFit);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -73,6 +82,22 @@ Bool_t R3BFootHitPar::getParams(FairParamList* list)
         R3BLOG(error, "Could not initialize footDetNbPar");
         return kFALSE;
     }
+
+    if (!list->fill("footNumberParsFit", &fNumParsFit))
+    {
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footNumberParsFit";
+        return kFALSE;
+    }
+
+    Int_t array_size = fNumDets;
+    fCharCalPar->Set(array_size * fNumParsFit);
+
+    if (!(list->fill("footCharCalPar", fCharCalPar)))
+    {
+        LOG(fatal) << "R3BFootCalPar::Could not initialize footCharCalPar";
+        return kFALSE;
+    }
+
     return kTRUE;
 }
 
@@ -84,6 +109,11 @@ void R3BFootHitPar::print()
     for (Int_t d = 0; d < fNumDets; d++)
     {
         R3BLOG(info, "Foot detector number: " << d + 1);
+
+        for (Int_t j = 0; j < fNumParsFit; j++)
+        {
+            LOG(info) << "FitParam(" << j + 1 << ") = " << fCharCalPar->GetAt(d * fNumParsFit + j);
+        }
     }
 }
 
