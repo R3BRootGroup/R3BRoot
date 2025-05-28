@@ -109,6 +109,8 @@ class R3BFootOnlineSpectra : public FairTask
         fBinsE = binsE;
     }
 
+    void SetMaxSize(double max) { fMaxSize = max; }
+
     /**
      * Method to set the number of detectors
      */
@@ -130,13 +132,16 @@ class R3BFootOnlineSpectra : public FairTask
     int fTrigger = -1; // Trigger value.
     int fTpat = 0;
     int fNEvents = 0; // Event counter.
-    int fNbDet = 16;  // Number of Foot detectors.
+    int fNbDet = 8;   // Number of Foot detectors.
     int eventNumber = 0;
     int fSigmaRefreshRate = 5000;
 
     double fMinE = -100.;
     double fMaxE = 5000.;
     double fBinsE = 1000;
+    double fMaxSize = 10;
+    int dim = 6;
+    std::vector<int> corrNdx;
 
     // Histograms for map data
     std::vector<TH2F*> fh2_EnergyVsStrip;
@@ -146,8 +151,12 @@ class R3BFootOnlineSpectra : public FairTask
     // Histograms for hit data
     std::vector<TH1F*> fh1_pos;
     std::vector<TH1F*> fh1_ene;
-
     std::vector<TH2F*> fh2_eta;
+
+    std::vector<TH1F*> fh1_posMax;
+    std::vector<TH1F*> fh1_eneMax;
+    std::vector<TH2F*> fh2_etaMax;
+
     std::vector<TH2F*> fh2_foot_corr;
     std::vector<TH1F*> fh1_mult;
     std::vector<TH1F*> fh1_size;
@@ -155,6 +164,10 @@ class R3BFootOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_energy_corr;
     std::vector<TH2F*> fh2_pos_charge;
     std::vector<TH2F*> fh2_energy_corr_max;
+
+    std::vector<TH2F*> fh2_XY_max_corr;
+    std::vector<TH2F*> fh2_XX_max_corr;
+    std::vector<TH2F*> fh2_YY_max_corr;
 
   public:
     ClassDefOverride(R3BFootOnlineSpectra, 1)

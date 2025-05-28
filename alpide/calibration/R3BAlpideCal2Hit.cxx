@@ -350,13 +350,13 @@ void R3BAlpideCal2Hit::FindClusters()
 
                     TVector3 labpos;
                     if (s < 3)
-                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -45. - localpos.Y(), 0.0);
+                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -localpos.Y(), 0.0);
                     else if (s < 6)
-                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), -45. + localpos.Y(), 0.0);
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), localpos.Y(), 0.0);
                     else if (s < 9)
-                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -45. - localpos.Y(), 73.);
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 6), -localpos.Y(), 73.);
                     else
-                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), -45. + localpos.Y(), 73.);
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 9), localpos.Y(), 73.);
 
                     AddHitData(s + 1, mult[s][i], labpos.X(), labpos.Y(), labpos.Z(), localpos.X(), localpos.Y());
                 }
