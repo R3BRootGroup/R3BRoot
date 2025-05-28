@@ -206,9 +206,17 @@ InitStatus R3BFootOnlineSpectra::Init()
 
     //================ HIT data ==========================
 
+    int n = fNbDet / 2;
+    int r = 2;
+    dim = TMath::Factorial(n) / (TMath::Factorial(r) * TMath::Factorial(n - r));
+
     // General canvas info (cluster position and energy)
     auto cHit = new TCanvas("FOOT_hit", "hit general info", 10, 10, 500, 500);
     cHit->Divide(4, 4);
+
+    // General canvas info (cluster position and energy)
+    auto cHitMax = new TCanvas("FOOT_hitMax", "hit general info (max energy)", 10, 10, 500, 500);
+    cHitMax->Divide(4, 4);
 
     // Correlation position between detectors
     auto cHit_PosCorr = new TCanvas("FOOT_posCorr", "hit position correlation info", 10, 10, 500, 500);
@@ -217,6 +225,10 @@ InitStatus R3BFootOnlineSpectra::Init()
     // Eta
     auto cHit_Eta = new TCanvas("FOOT_eta", "hit eta plot info", 10, 10, 500, 500);
     cHit_Eta->Divide(4, 2);
+
+    // Eta
+    auto cHit_EtaMax = new TCanvas("FOOT_etaMax", "hit eta plot info (max energy)", 10, 10, 500, 500);
+    cHit_EtaMax->Divide(4, 2);
 
     // Multiplicity and cluster size
     auto cHit_MultSize = new TCanvas("FOOT_mulSize", "hit multiplicity and size info", 10, 10, 500, 500);
@@ -235,18 +247,30 @@ InitStatus R3BFootOnlineSpectra::Init()
     cHit_Charge->Divide(4, 2);
 
     // position vs energy
-
     auto cHit_position_charge = new TCanvas("FOOT_position_charge", "charge info", 10, 10, 500, 500);
     cHit_position_charge->Divide(4, 2);
 
+    // Max pos correlation
+    auto cHit_XYCorrMax = new TCanvas("FOOT_XYCorrMax", "Position correlation XY (max energy)", 10, 10, 500, 500);
+    cHit_XYCorrMax->Divide(2, 2);
+
+    // Max pos correlation
+    auto cHit_SameCorrMax =
+        new TCanvas("FOOT_SameCorrMax", "Position correlation XX and YY (max energy)", 10, 10, 500, 500);
+    cHit_SameCorrMax->Divide(4, 3);
+
     hitfol->Add(cHit);
+    hitfol->Add(cHitMax);
     hitfol->Add(cHit_PosCorr);
     hitfol->Add(cHit_Eta);
+    hitfol->Add(cHit_EtaMax);
     hitfol->Add(cHit_MultSize);
     hitfol->Add(cHit_EnergyCorr);
     hitfol->Add(cHit_MaxEnergyCorr);
     hitfol->Add(cHit_Charge);
+    hitfol->Add(cHit_XYCorrMax);
     hitfol->Add(cHit_position_charge);
+    hitfol->Add(cHit_SameCorrMax);
 
     if (fHitItems)
     {
@@ -255,14 +279,61 @@ InitStatus R3BFootOnlineSpectra::Init()
         i_pad_corr = 1;
         fh1_pos.resize(fNbDet);
         fh1_ene.resize(fNbDet);
+        fh1_posMax.resize(fNbDet);
+        fh1_eneMax.resize(fNbDet);
         fh1_mult.resize(fNbDet);
         fh1_size.resize(fNbDet);
         fh1_charge.resize(fNbDet);
         fh2_pos_charge.resize(fNbDet);
+        fh2_etaMax.resize(fNbDet);
         fh2_eta.resize(fNbDet);
         fh2_foot_corr.resize(fNbDet / 2);
         fh2_energy_corr.resize(fNbDet / 2);
         fh2_energy_corr_max.resize(fNbDet / 2);
+
+        fh2_XY_max_corr.resize(fNbDet / 2);
+
+        fh2_XX_max_corr.resize(dim);
+        fh2_YY_max_corr.resize(dim);
+
+        for (int i = 0; i < fNbDet / 2 - 1; i++)
+        {
+            for (int j = i + 1; j < fNbDet / 2; j++)
+            {
+                corrNdx.push_back(i + 1);
+                corrNdx.push_back(j + 1);
+            }
+        }
+
+        for (int i = 0; i < dim; i++)
+        {
+            int det1 = corrNdx[2 * i] - 1;
+            int det2 = corrNdx[2 * i + 1] - 1;
+
+            sprintf(Name1, "fh2_XX_corr_max_dets_%d_%d", 2 * i, 2 * i + 1);
+            sprintf(Name2, "Cluster XX correlation for FOOTs: %d and %d (max frag)", 2 * det1 + 1, 2 * det2 + 1);
+            fh2_XX_max_corr[i] = R3B::root_owned<TH2F>(Name1, Name2, 100, -50., 50., 100, -50, 50);
+            fh2_XX_max_corr[i]->GetXaxis()->SetTitle(Form("x - Position [mm] (det %d)", 2 * det1 + 1));
+            fh2_XX_max_corr[i]->GetYaxis()->SetTitle(Form("x - Position [mm] (det %d)", 2 * det2 + 1));
+            fh2_XX_max_corr[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh2_XX_max_corr[i]->GetXaxis()->CenterTitle(true);
+            fh2_XX_max_corr[i]->GetYaxis()->CenterTitle(true);
+
+            sprintf(Name1, "fh2_YY_corr_max_dets_%d_%d", 2 * i, 2 * i + 1);
+            sprintf(Name2, "Cluster YY correlation for FOOTs: %d and %d (max frag)", 2 * det1 + 2, 2 * det2 + 2);
+            fh2_YY_max_corr[i] = R3B::root_owned<TH2F>(Name1, Name2, 100, -50., 50., 100, -50, 50);
+            fh2_YY_max_corr[i]->GetXaxis()->SetTitle(Form("y - Position [mm] (det %d)", 2 * det1 + 2));
+            fh2_YY_max_corr[i]->GetYaxis()->SetTitle(Form("y - Position [mm] (det %d)", 2 * det2 + 2));
+            fh2_YY_max_corr[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh2_YY_max_corr[i]->GetXaxis()->CenterTitle(true);
+            fh2_YY_max_corr[i]->GetYaxis()->CenterTitle(true);
+
+            cHit_SameCorrMax->cd(i + 1);
+            fh2_XX_max_corr[i]->Draw();
+
+            cHit_SameCorrMax->cd(i + 7);
+            fh2_YY_max_corr[i]->Draw();
+        }
 
         for (Int_t i = 0; i < fNbDet; i++)
         { // one histo per detector
@@ -284,6 +355,24 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh1_ene[i]->GetXaxis()->CenterTitle(true);
             fh1_ene[i]->GetYaxis()->CenterTitle(true);
 
+            sprintf(Name1, "fh1_pos_det_max_%d", i + 1);
+            sprintf(Name2, "Cluster position for FOOT Det (max energy): %d", i + 1);
+            fh1_posMax[i] = R3B::root_owned<TH1F>(Name1, Name2, 600, -50., 50.);
+            fh1_posMax[i]->GetXaxis()->SetTitle("Position [mm]");
+            fh1_posMax[i]->GetYaxis()->SetTitle("Counts");
+            fh1_posMax[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh1_posMax[i]->GetXaxis()->CenterTitle(true);
+            fh1_posMax[i]->GetYaxis()->CenterTitle(true);
+
+            sprintf(Name1, "fh1_ene_det_max_%d", i + 1);
+            sprintf(Name2, "Cluster energy for FOOT Det (max energy): %d", i + 1);
+            fh1_eneMax[i] = R3B::root_owned<TH1F>(Name1, Name2, fBinsE, fMinE, fMaxE);
+            fh1_eneMax[i]->GetXaxis()->SetTitle("Energy");
+            fh1_eneMax[i]->GetYaxis()->SetTitle("Counts");
+            fh1_eneMax[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh1_eneMax[i]->GetXaxis()->CenterTitle(true);
+            fh1_eneMax[i]->GetYaxis()->CenterTitle(true);
+
             sprintf(Name1, "fh2_eta_vs_strip_det_%d", i + 1);
             sprintf(Name2, "Eta parameter for FOOT Det: %d", i + 1);
             fh2_eta[i] = R3B::root_owned<TH2F>(Name1, Name2, 100, 0, 1, fBinsE, 0, fMaxE);
@@ -292,6 +381,15 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh2_eta[i]->GetYaxis()->SetTitleOffset(1.4);
             fh2_eta[i]->GetXaxis()->CenterTitle(true);
             fh2_eta[i]->GetYaxis()->CenterTitle(true);
+
+            sprintf(Name1, "fh2_eta_vs_strip_det_max_%d", i + 1);
+            sprintf(Name2, "Eta parameter for FOOT Det (max energy): %d", i + 1);
+            fh2_etaMax[i] = R3B::root_owned<TH2F>(Name1, Name2, 100, 0, 1, fBinsE, 0, fMaxE);
+            fh2_etaMax[i]->GetXaxis()->SetTitle("Eta");
+            fh2_etaMax[i]->GetYaxis()->SetTitle("Energy [channels]");
+            fh2_etaMax[i]->GetYaxis()->SetTitleOffset(1.4);
+            fh2_etaMax[i]->GetXaxis()->CenterTitle(true);
+            fh2_etaMax[i]->GetYaxis()->CenterTitle(true);
 
             sprintf(Name1, "fh1_mult_det_%d", i + 1);
             sprintf(Name2, "Cluster multiplicity for FOOT Det: %d", i + 1);
@@ -340,6 +438,15 @@ InitStatus R3BFootOnlineSpectra::Init()
                 fh2_foot_corr[i / 2]->GetXaxis()->CenterTitle(true);
                 fh2_foot_corr[i / 2]->GetYaxis()->CenterTitle(true);
 
+                sprintf(Name1, "fh2_XY_corr_max_dets_%d_%d", i + 1, i + 2);
+                sprintf(Name2, "Cluster XY correlation for FOOTs: %d and %d (max frag)", i + 1, i + 2);
+                fh2_XY_max_corr[i / 2] = R3B::root_owned<TH2F>(Name1, Name2, 100, -50., 50., 100, -50, 50);
+                fh2_XY_max_corr[i / 2]->GetXaxis()->SetTitle("x - Position [mm]");
+                fh2_XY_max_corr[i / 2]->GetYaxis()->SetTitle("y - Position [mm]");
+                fh2_XY_max_corr[i / 2]->GetYaxis()->SetTitleOffset(1.4);
+                fh2_XY_max_corr[i / 2]->GetXaxis()->CenterTitle(true);
+                fh2_XY_max_corr[i / 2]->GetYaxis()->CenterTitle(true);
+
                 sprintf(Name1, "fh2_energ_corr_dets_%d_%d", i + 1, i + 2);
                 sprintf(Name2, "Cluster energy correlation for FOOTs: %d and %d", i + 1, i + 2);
                 fh2_energy_corr[i / 2] = R3B::root_owned<TH2F>(Name1, Name2, fBinsE, 0, fMaxE, fBinsE, 0, fMaxE);
@@ -375,6 +482,11 @@ InitStatus R3BFootOnlineSpectra::Init()
                 cHit->cd(i_pad_double + 1);
                 fh1_pos[i]->Draw();
 
+                cHitMax->cd(i_pad_double);
+                fh1_eneMax[i]->Draw();
+                cHitMax->cd(i_pad_double + 1);
+                fh1_posMax[i]->Draw();
+
                 if ((foot_num % 2) == 1)
                 {
                     if (foot_num < 12) // do not change!
@@ -388,12 +500,18 @@ InitStatus R3BFootOnlineSpectra::Init()
                         cHit_MaxEnergyCorr->cd(i_pad_corr);
                         fh2_energy_corr_max[i / 2]->Draw();
 
+                        cHit_XYCorrMax->cd(i_pad_corr);
+                        fh2_XY_max_corr[i / 2]->Draw();
+
                         i_pad_corr++;
                     }
                 }
 
                 cHit_Eta->cd(i_pad);
                 fh2_eta[i]->Draw();
+
+                cHit_EtaMax->cd(i_pad);
+                fh2_etaMax[i]->Draw();
 
                 cHit_Charge->cd(i_pad);
                 fh1_charge[i]->Draw();
@@ -461,9 +579,12 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
         {
             fh1_pos[i]->Reset();
             fh1_ene[i]->Reset();
+            fh1_posMax[i]->Reset();
+            fh1_eneMax[i]->Reset();
             fh1_mult[i]->Reset();
             fh1_size[i]->Reset();
             fh2_eta[i]->Reset();
+            fh2_etaMax[i]->Reset();
             fh1_charge[i]->Reset();
             fh2_pos_charge[i]->Reset();
 
@@ -472,7 +593,15 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
                 fh2_foot_corr[i / 2]->Reset();
                 fh2_energy_corr[i / 2]->Reset();
                 fh2_energy_corr_max[i / 2]->Reset();
+
+                fh2_XY_max_corr[i / 2]->Reset();
             }
+        }
+
+        for (Int_t i = 0; i < dim; i++)
+        {
+            fh2_XX_max_corr[i]->Reset();
+            fh2_YY_max_corr[i]->Reset();
         }
     }
     return;
@@ -522,6 +651,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
     std::vector<int> mult(fNbDet, 0);
     std::vector<std::vector<double>> energies(fNbDet);
     std::vector<std::vector<double>> positions(fNbDet);
+    std::vector<std::vector<double>> etas(fNbDet);
 
     // Fill hit data
     if (fHitItems && fHitItems->GetEntriesFast() > 0)
@@ -531,6 +661,8 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         {
             R3BFootHitData* hit = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
             if (!hit)
+                continue;
+            if ((hit->GetMulStrip() > fMaxSize) || (fMaxSize > 0))
                 continue;
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
             fh1_ene[hit->GetDetId() - 1]->Fill(hit->GetEnergy());
@@ -547,6 +679,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             fh2_eta[hit->GetDetId() - 1]->Fill(hit->GetEta(), hit->GetEnergy());
             energies[hit->GetDetId() - 1].push_back(hit->GetEnergy());
             positions[hit->GetDetId() - 1].push_back(hit->GetPos());
+            etas[hit->GetDetId() - 1].push_back(hit->GetEta());
         }
     }
 
@@ -562,12 +695,28 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
     }
 
     std::vector<double> maxEnergy(fNbDet, 0.0);
-    // Fill maximum energy correlation
+    std::vector<int> maxNdx(fNbDet, -1);
+
     for (int i = 0; i < fNbDet; i++)
     {
-        if (!energies[i].empty())
+        for (int j = 0; j < energies[i].size(); j++)
         {
-            maxEnergy[i] = *std::max_element(energies[i].begin(), energies[i].end());
+            if (energies[i][j] > maxEnergy[i])
+            {
+                maxEnergy[i] = energies[i][j];
+                maxNdx[i] = j;
+            }
+        }
+    }
+
+    for (int i = 0; i < fNbDet; i++)
+    {
+
+        if (maxNdx[i] > -1)
+        {
+            fh1_eneMax[i]->Fill(energies[i][maxNdx[i]]);
+            fh1_posMax[i]->Fill(positions[i][maxNdx[i]]);
+            fh2_etaMax[i]->Fill(etas[i][maxNdx[i]], energies[i][maxNdx[i]]);
         }
     }
 
@@ -579,7 +728,6 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             fh2_energy_corr_max[i / 2]->Fill(maxEnergy[i], maxEnergy[i + 1]);
         }
 
-        // std::cout << energies[i].size() << " " << energies[i+1].size() << "\n";
         //  Correlation between pairs of FOOTs
         if ((!energies[i].empty()) && (!energies[i + 1].empty()))
         {
@@ -588,9 +736,32 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
                 for (int j2 = 0; j2 < energies[i + 1].size(); j2++)
                 {
                     fh2_energy_corr[i / 2]->Fill(energies[i][j1], energies[i + 1][j2]);
-                    fh2_foot_corr[i / 2]->Fill(positions[i + 1][j2], positions[i][j1]);
+                    fh2_foot_corr[i / 2]->Fill(positions[i][j1], positions[i + 1][j2]);
                 }
             }
+
+            // X vs Y
+            fh2_XY_max_corr[i / 2]->Fill(positions[i][maxNdx[i]], positions[i + 1][maxNdx[i + 1]]);
+        }
+    }
+
+    for (int i = 0; i < dim; i++)
+    {
+
+        int det1 = corrNdx[2 * i] - 1;
+        int det2 = corrNdx[2 * i + 1] - 1;
+
+        if ((positions[2 * det1].size() > 0) && (positions[2 * det2].size() > 0))
+        {
+
+            fh2_XX_max_corr[i]->Fill(positions[2 * det1][maxNdx[2 * det1]], positions[2 * det2][maxNdx[2 * det2]]);
+        }
+
+        if ((positions[2 * det1 + 1].size() > 0) && (positions[2 * det2 + 1].size() > 0))
+        {
+
+            fh2_YY_max_corr[i]->Fill(positions[2 * det1 + 1][maxNdx[2 * det1 + 1]],
+                                     positions[2 * det2 + 1][maxNdx[2 * det2 + 1]]);
         }
     }
 
@@ -640,9 +811,12 @@ void R3BFootOnlineSpectra::FinishTask()
         {
             fh1_pos[i]->Write();
             fh1_ene[i]->Write();
+            fh1_posMax[i]->Write();
+            fh1_eneMax[i]->Write();
             fh1_mult[i]->Write();
             fh1_size[i]->Write();
             fh2_eta[i]->Write();
+            fh2_etaMax[i]->Write();
             fh1_charge[i]->Write();
 
             if ((i % 2) == 0)
@@ -650,7 +824,14 @@ void R3BFootOnlineSpectra::FinishTask()
                 fh2_foot_corr[i / 2]->Write();
                 fh2_energy_corr[i / 2]->Write();
                 fh2_energy_corr_max[i / 2]->Write();
+                fh2_XY_max_corr[i / 2]->Write();
             }
+        }
+
+        for (Int_t i = 0; i < dim; i++)
+        {
+            fh2_XX_max_corr[i]->Write();
+            fh2_YY_max_corr[i]->Write();
         }
     }
     return;
