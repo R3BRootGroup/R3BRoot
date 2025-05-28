@@ -51,12 +51,14 @@ typedef struct EXT_STR_h101_LOS_t
     uint32_t LOS1VTCME[8 EXT_STRUCT_CTRL(LOS1VTCM)] /* [1,256] */;
     uint32_t LOS1VTC /* [0,256] */;
     uint32_t LOS1VTCv[256 EXT_STRUCT_CTRL(LOS1VTC)] /* [0,65535] */;
-    uint32_t LOS1VTRIGF /* [0,1] */;
-    uint32_t LOS1VTRIGFI[1 EXT_STRUCT_CTRL(LOS1VTRIGF)] /* [1,1] */;
-    uint32_t LOS1VTRIGFv[1 EXT_STRUCT_CTRL(LOS1VTRIGF)] /* [0,65535] */;
-    uint32_t LOS1VTRIGC /* [0,1] */;
-    uint32_t LOS1VTRIGCI[1 EXT_STRUCT_CTRL(LOS1VTRIGC)] /* [1,1] */;
-    uint32_t LOS1VTRIGCv[1 EXT_STRUCT_CTRL(LOS1VTRIGC)] /* [0,65535] */;
+    uint32_t LOS1VTRIGF /* [0,2] */;
+    uint32_t LOS1VTRIGFI[2 EXT_STRUCT_CTRL(LOS1VTRIGF)] /* [1,2] */;
+    uint32_t LOS1VTRIGFv[2 EXT_STRUCT_CTRL(LOS1VTRIGF)] /* [0,65535] */;
+    uint32_t LOS1VTRIGC /* [0,2] */;
+    uint32_t LOS1VTRIGCI[2 EXT_STRUCT_CTRL(LOS1VTRIGC)] /* [1,2] */;
+    uint32_t LOS1VTRIGCv[2 EXT_STRUCT_CTRL(LOS1VTRIGC)] /* [0,65535] */;
+    uint32_t LOS1VZEROF1 /* [0,65535] */;
+    uint32_t LOS1VZEROC1 /* [0,65535] */;
     uint32_t LOS1TTFLM /* [1,8] */;
     uint32_t LOS1TTFLMI[8 EXT_STRUCT_CTRL(LOS1TTFLM)] /* [1,8] */;
     uint32_t LOS1TTFLME[8 EXT_STRUCT_CTRL(LOS1TTFLM)] /* [1,256] */;
@@ -114,11 +116,13 @@ typedef struct EXT_STR_h101_LOS_onion_t
         uint32_t VTC;
         uint32_t VTCv[256 /* VTC */];
         uint32_t VTRIGF;
-        uint32_t VTRIGFI[1 /* VTRIGF */];
-        uint32_t VTRIGFv[1 /* VTRIGF */];
+        uint32_t VTRIGFI[2 /* VTRIGF */];
+        uint32_t VTRIGFv[2 /* VTRIGF */];
         uint32_t VTRIGC;
-        uint32_t VTRIGCI[1 /* VTRIGC */];
-        uint32_t VTRIGCv[1 /* VTRIGC */];
+        uint32_t VTRIGCI[2 /* VTRIGC */];
+        uint32_t VTRIGCv[2 /* VTRIGC */];
+        uint32_t VZEROF[1];
+        uint32_t VZEROC[1];
         uint32_t TTFLM;
         uint32_t TTFLMI[8 /* TTFLM */];
         uint32_t TTFLME[8 /* TTFLM */];
@@ -178,16 +182,20 @@ typedef struct EXT_STR_h101_LOS_onion_t
         EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, LOS1VTC, UINT32, "LOS1VTC", 256, 0 /*flags*/);     \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, LOS1VTCv, UINT32, "LOS1VTCv", "LOS1VTC", 0 /*flags*/);                \
-        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, LOS1VTRIGF, UINT32, "LOS1VTRIGF", 1, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, LOS1VTRIGF, UINT32, "LOS1VTRIGF", 2, 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, LOS1VTRIGFI, UINT32, "LOS1VTRIGFI", "LOS1VTRIGF", 0 /*flags*/);       \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, LOS1VTRIGFv, UINT32, "LOS1VTRIGFv", "LOS1VTRIGF", 0 /*flags*/);       \
-        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, LOS1VTRIGC, UINT32, "LOS1VTRIGC", 1, 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, LOS1VTRIGC, UINT32, "LOS1VTRIGC", 2, 0 /*flags*/); \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, LOS1VTRIGCI, UINT32, "LOS1VTRIGCI", "LOS1VTRIGC", 0 /*flags*/);       \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, LOS1VTRIGCv, UINT32, "LOS1VTRIGCv", "LOS1VTRIGC", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, LOS1VZEROF1, UINT32, "LOS1VZEROF1", 65535, 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, LOS1VZEROC1, UINT32, "LOS1VZEROC1", 65535, 0 /*flags*/);              \
         EXT_STR_ITEM_INFO2_LIM(ok, si, offset, struct_t, printerr, LOS1TTFLM, UINT32, "LOS1TTFLM", 8, 0 /*flags*/);   \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
             ok, si, offset, struct_t, printerr, LOS1TTFLMI, UINT32, "LOS1TTFLMI", "LOS1TTFLM", 0 /*flags*/);          \
