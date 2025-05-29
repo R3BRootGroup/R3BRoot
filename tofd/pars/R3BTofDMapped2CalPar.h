@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 class R3BTCalPar;
 class TClonesArray;
@@ -40,7 +40,7 @@ class R3BTofDMapped2CalPar : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTofDMapped2CalPar(const char*, Int_t = 1);
+    explicit R3BTofDMapped2CalPar(const char*, int = 1);
 
     /**
      * Destructor.
@@ -54,26 +54,26 @@ class R3BTofDMapped2CalPar : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    void Exec(Option_t*);
+    void Exec(Option_t*) override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    void FinishTask();
+    void FinishTask() override;
 
     /**
      * Method for setting the update rate for control histograms
      * @param rate an update rate value (events).
      */
-    void SetUpdateRate(Int_t);
+    inline void SetUpdateRate(UInt_t);
 
     /**
      * Method for setting minimum required statistics per module.
@@ -82,28 +82,28 @@ class R3BTofDMapped2CalPar : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    void SetMinStats(Int_t);
+    inline void SetMinStats(UInt_t);
 
     /**
      * Method for setting number of TofD detectors and paddles.
      */
-    void SetNofModules(Int_t, Int_t);
+    inline void SetNofModules(Int_t, Int_t);
 
   private:
-    Int_t fUpdateRate; /**< An update rate. */
-    Int_t fMinStats;   /**< Minimum statistics required per module. */
-    Int_t Icount[5][48][4];
+    UInt_t fUpdateRate = 1000000; // An update rate
+    UInt_t fMinStats = 100;       // Minimum statistics required per module
+    UInt_t Icount[5][48][4];      // NOLINT
 
-    UInt_t fNofPlanes;       /**< Number of planes. */
-    UInt_t fPaddlesPerPlane; /**< Number of bars per plane. */
-    UInt_t fNofModules;      /**< Total number of modules (=edges) to calibrate */
+    UInt_t fNofPlanes = 5;
+    UInt_t fPaddlesPerPlane = 48;
+    UInt_t fNofModules = fNofPlanes * fPaddlesPerPlane * 4;
 
-    R3BTCalPar* fCalPar;          /**< Parameter container. */
-    TClonesArray* fMapped;        /**< Array with mapped data - input data. */
-    TClonesArray* fMappedTrigger; /**< Array with mapped trigger data - input data. */
+    R3BTCalPar* fCalPar = nullptr;
+    TClonesArray* fMapped = nullptr;
+    TClonesArray* fMappedTrigger = nullptr;
 
-    R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
+    R3BTCalEngine* fEngine = nullptr;
 
   public:
-    ClassDef(R3BTofDMapped2CalPar, 1)
+    ClassDefOverride(R3BTofDMapped2CalPar, 1); // NOLINT
 };

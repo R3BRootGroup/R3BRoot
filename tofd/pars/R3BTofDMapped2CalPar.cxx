@@ -19,10 +19,10 @@
 #include "R3BTofDMapped2CalPar.h"
 #include <FairRootManager.h>
 
-#include "TClonesArray.h"
+#include <TClonesArray.h>
 
-#include "FairLogger.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRuntimeDb.h>
 
 #include "R3BLogger.h"
 #include "R3BTCalEngine.h"
@@ -34,17 +34,8 @@ R3BTofDMapped2CalPar::R3BTofDMapped2CalPar()
 {
 }
 
-R3BTofDMapped2CalPar::R3BTofDMapped2CalPar(const char* name, Int_t iVerbose)
+R3BTofDMapped2CalPar::R3BTofDMapped2CalPar(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
-    , fUpdateRate(1000000)
-    , fMinStats(1)
-    , fNofPlanes(4)
-    , fPaddlesPerPlane(44)
-    , fNofModules(fNofPlanes * fPaddlesPerPlane * 4)
-    , fCalPar(nullptr)
-    , fMapped(nullptr)
-    , fMappedTrigger(nullptr)
-    , fEngine(nullptr)
 {
 }
 
@@ -94,8 +85,8 @@ InitStatus R3BTofDMapped2CalPar::Init()
 
     fEngine = new R3BTCalEngine(fCalPar, fMinStats);
 
-    for (UInt_t d = 0; d < 5; d++)
-        for (UInt_t i = 0; i < 48; i++)
+    for (UInt_t d = 0; d < fNofPlanes; d++)
+        for (UInt_t i = 0; i < fPaddlesPerPlane; i++)
             for (UInt_t k = 0; k < 4; k++)
             {
                 Icount[d][i][k] = 0;
@@ -104,7 +95,7 @@ InitStatus R3BTofDMapped2CalPar::Init()
     return kSUCCESS;
 }
 
-void R3BTofDMapped2CalPar::Exec(Option_t* option)
+void R3BTofDMapped2CalPar::Exec(Option_t*)
 {
     Int_t nHits = fMapped->GetEntriesFast();
     // Loop over mapped hits
@@ -156,12 +147,11 @@ void R3BTofDMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
     fCalPar->setChanged();
-    fCalPar->printParams();
 
     R3BLOG(info, "Calibration of TofD detector");
-    for (Int_t p = 0; p < 5; p++)
-        for (Int_t i = 0; i < 48; i++)
-            for (Int_t k = 0; k < 4; k++)
+    for (size_t p = 0; p < fNofPlanes; p++)
+        for (size_t i = 0; i < fPaddlesPerPlane; i++)
+            for (size_t k = 0; k < 4; k++)
                 if (Icount[p][i][k] > fMinStats)
                 {
                     if (p < 4)
@@ -175,9 +165,9 @@ void R3BTofDMapped2CalPar::FinishTask()
                 }
 }
 
-void R3BTofDMapped2CalPar::SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
+void R3BTofDMapped2CalPar::SetUpdateRate(UInt_t rate) { fUpdateRate = rate; }
 
-void R3BTofDMapped2CalPar::SetMinStats(Int_t minStats) { fMinStats = minStats; }
+void R3BTofDMapped2CalPar::SetMinStats(UInt_t minStats) { fMinStats = minStats; }
 
 void R3BTofDMapped2CalPar::SetNofModules(Int_t nDets, Int_t nCh)
 {
@@ -186,4 +176,4 @@ void R3BTofDMapped2CalPar::SetNofModules(Int_t nDets, Int_t nCh)
     fNofModules = nDets * nCh * 4;
 }
 
-ClassImp(R3BTofDMapped2CalPar);
+ClassImp(R3BTofDMapped2CalPar)
