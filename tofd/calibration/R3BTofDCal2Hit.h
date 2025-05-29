@@ -92,15 +92,26 @@ class R3BTofDCal2Hit : public FairTask
 
     virtual void CreateHistograms(Int_t iPlane, Int_t iBar);
 
+    virtual void CreateHistogramsCal();
+
     /**
      * Method for setting the nuclear charge of main beam
      */
     inline void SetTofdQ(Double_t Q) { fTofdQ = Q; }
 
     /**
+     * Method for setting the max. charge for histograms
+     */
+    void SetMaxQ(Double_t Q) { fMaxQ = Q; }
+
+    /**
      * Method for setting histograms
      */
     inline void SetTofdHisto() { fTofdHisto = kTRUE; }
+    /**
+     * Method for setting histograms for calibrations
+     */
+    inline void SetTofdHistoCal() { fTofdHistoCal = kTRUE; }
     /**
      * Method for setting y calculation via ToT instead of tdiff
      */
@@ -126,6 +137,11 @@ class R3BTofDCal2Hit : public FairTask
         fPaddlesPerPlane = bars;
     }
 
+    /**
+     * Methods for setting ASYEOS mode (required for VETO in plane 3 & 4)
+     */
+    inline void SetASYEOS() { isASYEOS = kTRUE; }
+
     // Method to setup online mode
     void SetOnline(Bool_t option) { fOnline = option; }
 
@@ -136,6 +152,7 @@ class R3BTofDCal2Hit : public FairTask
      * Method for walk calculation.
      */
     Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3, Double_t par4, Double_t par5);
+    Double_t walk(Double_t Q, Double_t par1, Double_t par2, Double_t par3);
 
     std::unique_ptr<R3BCoarseTimeStitch> fTimeStitch;
     R3BEventHeader* header; /**< Event header - input data. */
@@ -152,7 +169,9 @@ class R3BTofDCal2Hit : public FairTask
     Int_t fTpat1;
     Int_t fTpat2;
     Double_t fTofdQ;
+    Double_t fMaxQ = 500.;
     Bool_t fTofdHisto;
+    Bool_t fTofdHistoCal;
     Bool_t fTofdTotPos;
     UInt_t fnEvents;
     UInt_t lasttpatevent;
@@ -178,6 +197,7 @@ class R3BTofDCal2Hit : public FairTask
     UInt_t goodpair5;
     UInt_t goodpair6;
     UInt_t goodpair7;
+    Bool_t isASYEOS;
 
     // arrays of control histograms
     TH1F* fhTpat;
@@ -192,7 +212,27 @@ class R3BTofDCal2Hit : public FairTask
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQ0Qt[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTvsQ[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhWalkBot[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhWalkTop[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+
+    // fTofdHistoCal
+    TH2F* fh_tofd_TotPm[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhLogTot1vsLogTot2[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhSqrtQvsPosRaw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhSqrtQvsPos[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhSqrtQvsPosToTRaw[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhSqrtQvsPosToT[N_TOFD_HIT_PLANE_MAX][N_TOFD_HIT_PADDLE_MAX];
+    TH2F* fhWalk;
+    TH2F* fhWalkTotal[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTdiffRaw[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTdiffWalk[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTdiffOffset[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhposVeff[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhToTdiffWalk[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhToTdiffOffset[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhposLambda[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhposFinal[N_TOFD_HIT_PLANE_MAX];
 
   public:
-    ClassDef(R3BTofDCal2Hit, 1)
+    ClassDef(R3BTofDCal2Hit, 2)
 };

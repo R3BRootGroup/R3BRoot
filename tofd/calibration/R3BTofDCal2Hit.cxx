@@ -73,6 +73,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , fPaddlesPerPlane(44)
     , fTofdQ(0)
     , fTofdHisto(false)
+    , fTofdHistoCal(false)
     , fTofdTotPos(false)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
@@ -97,8 +98,10 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , goodpair5(0)
     , goodpair6(0)
     , goodpair7(0)
+    , isASYEOS(kFALSE)
 {
     fhNoTpat = nullptr;
+    fhWalk = nullptr;
     for (Int_t i = 0; i < N_TOFD_HIT_PLANE_MAX; i++)
     {
         fhQ[i] = nullptr;
@@ -111,7 +114,33 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
         for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
         {
             fhQvsPos[i][j] = nullptr;
+            fhWalkBot[i][j] = nullptr;
+            fhWalkTop[i][j] = nullptr;
         }
+
+        // fTofdHistoCal
+        fh_tofd_TotPm[i] = nullptr;
+        for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+        {
+            fhLogTot1vsLogTot2[i][j] = nullptr;
+            fhSqrtQvsPosRaw[i][j] = nullptr;
+            fhSqrtQvsPos[i][j] = nullptr;
+            fhSqrtQvsPosToTRaw[i][j] = nullptr;
+            fhSqrtQvsPosToT[i][j] = nullptr;
+        }
+        fhWalkTotal[i] = nullptr;
+
+        fhTdiffRaw[i] = nullptr;
+
+        fhTdiffWalk[i] = nullptr;
+        fhTdiffOffset[i] = nullptr;
+        fhposVeff[i] = nullptr;
+
+        fhToTdiffWalk[i] = nullptr;
+        fhToTdiffOffset[i] = nullptr;
+        fhposLambda[i] = nullptr;
+
+        fhposFinal[i] = nullptr;
     }
 }
 
@@ -140,8 +169,53 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
                 if (fhQvsPos[i][j])
+                {
                     delete fhQvsPos[i][j];
+                    delete fhWalkBot[i][j];
+                    delete fhWalkTop[i][j];
+                }
             }
+        }
+    }
+    if (fTofdHistoCal)
+    {
+        if (fhWalk)
+            delete fhWalk;
+        for (Int_t i = 0; i < fNofPlanes; i++)
+        {
+            if (fh_tofd_TotPm[i])
+                delete fh_tofd_TotPm[i];
+            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+            {
+                if (fhLogTot1vsLogTot2[i][j])
+                    delete fhLogTot1vsLogTot2[i][j];
+                if (fhSqrtQvsPosRaw[i][j])
+                    delete fhSqrtQvsPosRaw[i][j];
+                if (fhSqrtQvsPos[i][j])
+                    delete fhSqrtQvsPos[i][j];
+                if (fhSqrtQvsPosToTRaw[i][j])
+                    delete fhSqrtQvsPosToTRaw[i][j];
+                if (fhSqrtQvsPosToT[i][j])
+                    delete fhSqrtQvsPosToT[i][j];
+            }
+            if (fhWalkTotal[i])
+                delete fhWalkTotal[i];
+            if (fhTdiffRaw[i])
+                delete fhTdiffRaw[i];
+            if (fhTdiffWalk[i])
+                delete fhTdiffWalk[i];
+            if (fhTdiffOffset[i])
+                delete fhTdiffOffset[i];
+            if (fhposVeff[i])
+                delete fhposVeff[i];
+            if (fhToTdiffWalk[i])
+                delete fhToTdiffWalk[i];
+            if (fhToTdiffOffset[i])
+                delete fhToTdiffOffset[i];
+            if (fhposLambda[i])
+                delete fhposLambda[i];
+            if (fhposFinal[i])
+                delete fhposFinal[i];
         }
     }
     if (fHitItems)
@@ -159,7 +233,7 @@ void R3BTofDCal2Hit::SetParContainers()
     fHitPar = dynamic_cast<R3BTofDHitPar*>(FairRuntimeDb::instance()->getContainer("tofdHitPar"));
     if (!fHitPar)
     {
-        R3BLOG(warn, "Could not get access to tofdHitPar container");
+        R3BLOG(error, "Could not get access to tofdHitPar container");
         fNofHitPars = 0;
         return;
     }
@@ -210,6 +284,10 @@ InitStatus R3BTofDCal2Hit::Init()
         for (Int_t i = 1; i <= fNofPlanes; i++)
             for (Int_t j = 1; j <= N_TOFD_HIT_PADDLE_MAX; j++)
                 CreateHistograms(i, j);
+    }
+    if (fTofdHistoCal)
+    {
+        CreateHistogramsCal();
     }
 
     // Definition of a time stich object to correlate times coming from different systems
@@ -276,6 +354,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     Double_t timeP0 = 0.;
     Double_t randx;
 
+    Double_t wedge_left_ns = 0. / 0.;
+    Double_t wedge_right_ns = 0. / 0.;
+
     UInt_t vmultihits[N_PLANE_MAX + 1][N_TOFD_HIT_PADDLE_MAX + 1];
     for (Int_t i = 0; i <= fNofPlanes; i++)
     {
@@ -296,7 +377,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
         Double_t tof;
     };
 
-    //    std::cout<<"new event!*************************************\n";
+    // std::cout<<"new event!*************************************\n";
 
     std::vector<hit> event;
 
@@ -319,6 +400,10 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
         size_t idx = (hit->GetDetectorId() - 1) * fPaddlesPerPlane + (hit->GetBarId() - 1);
         auto ret = bar_map.insert(std::pair<size_t, Entry>(idx, Entry()));
         auto& vec = 1 == hit->GetSideId() ? ret.first->second.bot : ret.first->second.top;
+        // if (hit->GetBarId()==48)
+        //    cout << "BarID: " << hit->GetBarId() <<endl;
+        LOG(debug) << "repeat cal data: plane: " << hit->GetDetectorId() << " Bar: " << hit->GetBarId()
+                   << " time: " << hit->GetTimeLeading_ns();
         vec.push_back(hit);
         events_in_cal_level++;
     }
@@ -338,12 +423,56 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
     bool s_was_trig_missing = false;
     // Find coincident PMT hits.
     // std::cout << "Print:\n";
+
+    if (fTofdHistoCal)
+    {
+        for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
+        {
+            auto const& top_vec = it->second.top;
+            size_t top_i = 0;
+            for (; top_i < top_vec.size();)
+            {
+                auto top = top_vec.at(top_i);
+
+                Int_t top_trig_i = 0;
+                if (fMapPar)
+                {
+                    top_trig_i = fMapPar->GetTrigMap(top->GetDetectorId(), top->GetBarId(), top->GetSideId());
+                }
+
+                Double_t top_trig_ns = 0;
+                if (top_trig_i < trig_map.size() && trig_map.at(top_trig_i))
+                {
+                    auto top_trig = trig_map.at(top_trig_i);
+                    top_trig_ns = top_trig->GetTimeLeading_ns();
+                }
+
+                auto top_ns = fTimeStitch->GetTime(top->GetTimeLeading_ns() - top_trig_ns);
+
+                LOG(debug) << "Searching for wedge data: plane: " << top->GetDetectorId() << " Bar: " << top->GetBarId()
+                           << " time: " << top->GetTimeLeading_ns();
+
+                if (top->GetBarId() == 48 && top->GetDetectorId() == 1 && IS_NAN(wedge_left_ns))
+                {
+                    wedge_left_ns = top_ns;
+                    // cout << "wedge left: " << wedge_left_ns << endl;
+                }
+                if (top->GetBarId() == 48 && top->GetDetectorId() == 2 && IS_NAN(wedge_right_ns))
+                {
+                    wedge_right_ns = top_ns;
+                    // cout << "wedge rigt: " << wedge_right_ns << endl;
+                }
+                ++top_i;
+            }
+        }
+    }
     for (auto it = bar_map.begin(); bar_map.end() != it; ++it)
     {
         auto const& top_vec = it->second.top;
         auto const& bot_vec = it->second.bot;
         size_t top_i = 0;
         size_t bot_i = 0;
+
         for (; top_i < top_vec.size() && bot_i < bot_vec.size();)
         {
             auto top = top_vec.at(top_i);
@@ -365,7 +494,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 auto bot_trig = trig_map.at(bot_trig_i);
                 top_trig_ns = top_trig->GetTimeLeading_ns();
                 bot_trig_ns = bot_trig->GetTimeLeading_ns();
-
+                R3BLOG(debug, "Trigger times: top: " << top_trig_ns << "  bot: " << bot_trig_ns);
                 ++n1;
             }
             else
@@ -384,18 +513,22 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
             // this way the trigger time will be at 0.
             auto top_ns = fTimeStitch->GetTime(top->GetTimeLeading_ns() - top_trig_ns);
             auto bot_ns = fTimeStitch->GetTime(bot->GetTimeLeading_ns() - bot_trig_ns);
+            // before it was auto dt = top_ns - bot_ns;
+            auto dt = bot_ns - top_ns;
+            R3BLOG(debug, "Now we have times: top: " << top_ns << "  bot: " << bot_ns);
 
-            auto dt = top_ns - bot_ns;
             // Handle wrap-around.
-            auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
-            if (dt < 0)
-            {
-                // We're only interested in the short time-differences, so we
-                // want to move the upper part of the coarse counter range close
-                // to the lower range, i.e. we cut the middle of the range and
-                // glue zero and the largest values together.
-                dt_mod -= c_range_ns;
-            }
+            // auto dt_mod = fmod(dt + c_range_ns, c_range_ns);
+            auto dt_mod = dt;
+            // Check if these lines are still necessary
+            // if (dt < 0)
+            //{
+            // We're only interested in the short time-differences, so we
+            // want to move the upper part of the coarse counter range close
+            // to the lower range, i.e. we cut the middle of the range and
+            // glue zero and the largest values together.
+            // dt_mod -= c_range_ns;
+            //}
             // std::cout << top_i << ' ' << bot_i << ": " << top_ns << ' ' << bot_ns << " = " << dt << ' ' <<
             // std::abs(dt_mod) << '\n';
             if (std::abs(dt_mod) < c_bar_coincidence_ns)
@@ -404,7 +537,11 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 // Hit!
                 Int_t iPlane = top->GetDetectorId(); // 1..n
                 Int_t iBar = top->GetBarId();        // 1..n
-                if (iPlane > fNofPlanes)             // this also errors for iDetector==0
+
+                if (iBar > 44)
+                    continue;
+
+                if (iPlane > fNofPlanes) // this also errors for iDetector==0
                 {
                     R3BLOG(error, "More detectors than expected! Det: " << iPlane << " allowed are 1.." << fNofPlanes);
                     continue;
@@ -424,41 +561,77 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
-
+                Double_t Offset1 = 0.;
+                Double_t Offset2 = 0.;
+                Double_t sync = 0.;
+                Double_t veff = 1.;
+                Double_t TotOffset1 = 1.;
+                Double_t TotOffset2 = 1.;
+                Double_t lambda = 1.;
                 auto par = fHitPar->GetModuleParAt(iPlane, iBar);
                 if (!par)
                 {
                     R3BLOG(error, "Hit par not found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
-                    continue;
-                }
-
-                // walk corrections
-                if (par->GetPar1Walk() == 0. || par->GetPar2Walk() == 0. || par->GetPar3Walk() == 0. ||
-                    par->GetPar4Walk() == 0. || par->GetPar5Walk() == 0.)
-                {
-                    R3BLOG(debug, "TofD walk correction not found");
+                    // No parameter file present, break
+                    break;
                 }
                 else
                 {
-                    auto bot_ns_walk = bot_ns - walk(bot_tot,
-                                                     par->GetPar1Walk(),
-                                                     par->GetPar2Walk(),
-                                                     par->GetPar3Walk(),
-                                                     par->GetPar4Walk(),
-                                                     par->GetPar5Walk());
-                    auto top_ns_walk = top_ns - walk(top_tot,
-                                                     par->GetPar1Walk(),
-                                                     par->GetPar2Walk(),
-                                                     par->GetPar3Walk(),
-                                                     par->GetPar4Walk(),
-                                                     par->GetPar5Walk());
-                }
+                    // we have paramters, but maybe not all
+                    R3BLOG(debug, "Hit par found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
+                    Offset1 = par->GetOffset1();
+                    Offset2 = par->GetOffset2();
+                    sync = par->GetSync();
+                    veff = par->GetVeff();
+                    TotOffset1 = par->GetToTOffset1();
+                    TotOffset2 = par->GetToTOffset2();
+                    lambda = par->GetLambda();
 
-                // calculate tdiff
-                auto tdiff = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2()));
+                    // cout << par->GetPar1Walk1() << "    " << par->GetPar2Walk1() << "    " << par->GetPar3Walk1() <<
+                    // endl;
+
+                    Double_t bot_ns_walk = 0;
+                    Double_t top_ns_walk = 0;
+
+                    // walk corrections
+                    if (!std::isnan(par->GetPar1Walk()) && !std::isnan(par->GetPar2Walk()) &&
+                        !std::isnan(par->GetPar3Walk()) && !std::isnan(par->GetPar4Walk()) &&
+                        !std::isnan(par->GetPar5Walk()))
+                    {
+                        bot_ns_walk = bot_ns - walk(bot_tot,
+                                                    par->GetPar1Walk(),
+                                                    par->GetPar2Walk(),
+                                                    par->GetPar3Walk(),
+                                                    par->GetPar4Walk(),
+                                                    par->GetPar5Walk());
+                        top_ns_walk = top_ns - walk(top_tot,
+                                                    par->GetPar1Walk(),
+                                                    par->GetPar2Walk(),
+                                                    par->GetPar3Walk(),
+                                                    par->GetPar4Walk(),
+                                                    par->GetPar5Walk());
+                    }
+                    else if (!std::isnan(par->GetPar1Walk1()) && !std::isnan(par->GetPar2Walk1()) &&
+                             !std::isnan(par->GetPar3Walk1()) && !std::isnan(par->GetPar1Walk2()) &&
+                             !std::isnan(par->GetPar2Walk2()) && !std::isnan(par->GetPar3Walk2()))
+                    {
+                        bot_ns_walk =
+                            bot_ns - walk(bot_tot, par->GetPar1Walk1(), par->GetPar2Walk1(), par->GetPar3Walk1());
+                        top_ns_walk =
+                            top_ns - walk(top_tot, par->GetPar1Walk2(), par->GetPar2Walk2(), par->GetPar3Walk2());
+                    }
+
+                    // use walk correction:
+                    bot_ns = bot_ns_walk;
+                    top_ns = top_ns_walk;
+                }
+                // calculate tdiff corrected with offsets
+                auto tdiff = ((bot_ns + Offset1) - (top_ns + Offset2));
+                // calculate ToTdiff corrected with ToTOffsets
+                auto ToTdiff = TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
 
                 // calculate time of hit
-                Double_t THit = (bot_ns + top_ns) / 2. - par->GetSync();
+                Double_t THit = (bot_ns + top_ns) / 2. - sync;
                 if (std::isnan(THit))
                 {
                     R3BLOG(fatal, "TofD THit not found");
@@ -467,15 +640,18 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     timeP0 = THit;
 
                 // calculate y-position
-                auto pos = ((bot_ns + par->GetOffset1()) - (top_ns + par->GetOffset2())) * par->GetVeff();
-
+                auto posTime = veff * ((bot_ns + Offset1) - (top_ns + Offset2));
                 // calculate y-position from ToT
-                auto posToT =
-                    par->GetLambda() * log((top_tot * par->GetToTOffset2()) / (bot_tot * par->GetToTOffset1()));
+                auto posToT = lambda * TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
 
+                Double_t pos = 0.0;
                 if (fTofdTotPos)
                 {
                     pos = posToT;
+                }
+                else
+                {
+                    pos = posTime;
                 }
 
                 Float_t paddle_width = 2.700;
@@ -498,7 +674,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                          gRandom->Uniform(-paddle_width / 2., paddle_width / 2.);
                 }
 
-                Double_t para[4];
+                Double_t para[4] = { 0 };
                 Double_t qb = 0.;
                 if (fTofdQ > 0)
                 {
@@ -537,12 +713,13 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 {
                     qb = TMath::Sqrt(top_tot * bot_tot);
                 }
-
-                Double_t parz[3];
-                parz[0] = par->GetPar1za();
-                parz[1] = par->GetPar1zb();
-                parz[2] = par->GetPar1zc();
-
+                Double_t parz[3] = { 0 };
+                if (par)
+                {
+                    parz[0] = par->GetPar1za();
+                    parz[1] = par->GetPar1zb();
+                    parz[2] = par->GetPar1zc();
+                }
                 if (parz[0] > 0 && parz[2] > 0)
                     LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
                                << iPlane << " ibar " << iBar;
@@ -563,21 +740,98 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // Tof with respect LOS detector
                 auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
-                auto tof_corr = tof - par->GetTofSyncOffset();
-
+                Double_t tof_corr = 0.;
+                if (par)
+                {
+                    tof_corr = tof - par->GetTofSyncOffset();
+                }
                 event.push_back(
                     { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
-
                 if (fTofdHisto)
                 {
                     // fill control histograms
                     fhTsync[iPlane - 1]->Fill(iBar, THit);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+
+                    if (!IS_NAN(wedge_left_ns) && !IS_NAN(wedge_right_ns))
+                    {
+                        if (isASYEOS)
+                        {
+                            // for ASYEOS 2025_s122 planes 3 & 4 are veto, so they are excluded from the walk correction
+                            if (iPlane == 1 || iPlane == 2)
+                            {
+                                // cout << wedge_left_ns << "  " << wedge_right_ns << "  " << qb
+                                //	<< "  "  << bot_ns << "  " << bot_ns-(wedge_left_ns+wedge_right_ns)/2. << endl;
+                                fhWalkBot[iPlane - 1][iBar - 1]->Fill(bot_tot,
+                                                                      bot_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                                fhWalkTop[iPlane - 1][iBar - 1]->Fill(top_tot,
+                                                                      top_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                            }
+                        }
+                        else
+                        {
+                            fhWalkBot[iPlane - 1][iBar - 1]->Fill(bot_tot,
+                                                                  bot_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                            fhWalkTop[iPlane - 1][iBar - 1]->Fill(top_tot,
+                                                                  top_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                        }
+                    }
                     // fhQvsTHit[iPlane - 1][iBar - 1]->Fill(qb, THit);
                     // fhTvsTHit[iPlane - 1][iBar - 1]->Fill(dt_mod, THit);
                 }
+                if (fTofdHistoCal)
+                {
+                    fh_tofd_TotPm[iPlane - 1]->Fill(iBar, top_tot);
+                    fh_tofd_TotPm[iPlane - 1]->Fill(-iBar - 1, bot_tot);
 
+                    fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->Fill(TMath::Log(top_tot), TMath::Log(bot_tot));
+
+                    fhSqrtQvsPosRaw[iPlane - 1][iBar - 1]->Fill(bot_ns - top_ns, sqrt(top_tot * bot_tot));
+                    fhSqrtQvsPos[iPlane - 1][iBar - 1]->Fill(posTime, sqrt(top_tot * bot_tot));
+
+                    fhSqrtQvsPosToTRaw[iPlane - 1][iBar - 1]->Fill(TMath::Log(bot_tot / top_tot),
+                                                                   sqrt(top_tot * bot_tot));
+                    fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->Fill(posToT, sqrt(top_tot * bot_tot));
+
+                    // for ASYEOS 2025_s122 planes 3 & 4 are veto for NeuLand, thus they are excluded from the walk
+                    // correction
+                    if (iPlane == 1 || iPlane == 2)
+                    {
+                        fhWalk->Fill(top_tot, top_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                        fhWalk->Fill(bot_tot, bot_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+
+                        fhWalkTotal[iPlane - 1]->Fill(top_tot, top_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                        fhWalkTotal[iPlane - 1]->Fill(bot_tot, bot_ns - (wedge_left_ns + wedge_right_ns) / 2.);
+                    }
+
+                    auto tdiffRaw = dt_mod;
+                    fhTdiffRaw[iPlane - 1]->Fill(iBar, tdiffRaw);
+
+                    if (qb > 500 && qb < 900)
+                    {
+                        auto tdiffWalk = bot_ns - top_ns;
+                        fhTdiffWalk[iPlane - 1]->Fill(iBar, tdiffWalk);
+
+                        auto tdiffOffset = tdiff;
+                        fhTdiffOffset[iPlane - 1]->Fill(iBar, tdiffOffset);
+
+                        auto postime = posTime;
+                        fhposVeff[iPlane - 1]->Fill(iBar, postime);
+
+                        auto ToTdiffWalk = TMath::Log(bot_tot / top_tot);
+                        fhToTdiffWalk[iPlane - 1]->Fill(iBar, ToTdiffWalk);
+
+                        auto ToTdiffOffset = ToTdiff; // TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
+                        fhToTdiffOffset[iPlane - 1]->Fill(iBar, ToTdiffOffset);
+
+                        auto postot = posToT; // lambda * TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
+                        fhposLambda[iPlane - 1]->Fill(iBar, postot);
+
+                        auto posFinal = pos;
+                        fhposFinal[iPlane - 1]->Fill(iBar, posFinal);
+                    }
+                }
                 for (Int_t e = 0; e < event.size(); e++)
                 {
                     LOG(debug) << event[e].charge << " " << event[e].time << " " << event[e].xpos << " "
@@ -826,14 +1080,13 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
 void R3BTofDCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 80.;
+    Double_t max_charge = 100.;
     // create histograms if not already existing
     if (NULL == fhNoTpat)
     {
         fhNoTpat = new TH1F("NoTpat", "NoTpat", 200, 0, 200);
         fhNoTpat->GetXaxis()->SetTitle("No Tpat event dist");
     }
-
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
@@ -873,6 +1126,23 @@ void R3BTofDCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
         fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
     }
+    if (NULL == fhWalkBot[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Walk_bottom_Plane_%d_Bar_%d", iPlane, iBar);
+        fhWalkBot[iPlane - 1][iBar - 1] = new TH2F(strName, "", 100, 0., 1000, 400, -100, 100);
+        fhWalkBot[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("dt in ns");
+        fhWalkBot[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
+    }
+    if (NULL == fhWalkTop[iPlane - 1][iBar - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Walk_top_Plane_%d_Bar_%d", iPlane, iBar);
+        fhWalkTop[iPlane - 1][iBar - 1] = new TH2F(strName, "", 100, 0., 1000, 400, -100, 100);
+        fhWalkTop[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("dt in ns");
+        fhWalkTop[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT in ns");
+    }
+
     /*
     if (NULL == fhQvsTHit[iPlane - 1][iBar - 1])
     {
@@ -948,6 +1218,166 @@ void R3BTofDCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
         fhQ0Qt[iPlane - 1]->GetXaxis()->SetTitle("Charge first particle");
     }
 }
+void R3BTofDCal2Hit::CreateHistogramsCal()
+{
+    Double_t max_charge = fMaxQ;
+    if (NULL == fhWalk)
+    {
+        fhWalk = new TH2F("Walk_Total_PMTS", "Walk of all PMTs together", 100, 0., 1000, 400, -100, 100);
+        fhWalk->GetXaxis()->SetTitle("ToT in ns");
+        fhWalk->GetYaxis()->SetTitle("dt in ns");
+    }
+    for (Int_t iPlane = 1; iPlane <= fNofPlanes; iPlane++)
+    {
+        if (NULL == fh_tofd_TotPm[iPlane - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Tofd_ToT_plane_%d", iPlane);
+            char strName2[255];
+            sprintf(strName2, "Tofd ToT plane %d", iPlane);
+            fh_tofd_TotPm[iPlane - 1] = new TH2F(strName, strName2, 100, -50, 50, 2000, 0., 1000.);
+            fh_tofd_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar ");
+            fh_tofd_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT / ns");
+        }
+        for (Int_t iBar = 1; iBar <= N_TOFD_HIT_PADDLE_MAX; iBar++)
+        {
+            if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
+            {
+                char strName[255];
+                sprintf(strName, "Plane_%d_Bar_%d_LogToT1vsLogToT2", iPlane, iBar);
+                fhLogTot1vsLogTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 600, 1., 7., 600, 1., 7.);
+                fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Log(ToT) of PM2");
+                fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Log(ToT) of PM1");
+            }
+            if (NULL == fhSqrtQvsPosRaw[iPlane - 1][iBar - 1])
+            {
+                char strName[255];
+                sprintf(strName, "SqrtQ_vs_PosTimeRaw_Plane_%d_Bar_%d", iPlane, iBar);
+                fhSqrtQvsPosRaw[iPlane - 1][iBar - 1] =
+                    new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
+                fhSqrtQvsPosRaw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+                fhSqrtQvsPosRaw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from Time in cm");
+            }
+            if (NULL == fhSqrtQvsPos[iPlane - 1][iBar - 1])
+            {
+                char strName[255];
+                sprintf(strName, "SqrtQ_vs_PosTime_Plane_%d_Bar_%d", iPlane, iBar);
+                fhSqrtQvsPos[iPlane - 1][iBar - 1] =
+                    new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
+                fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+                fhSqrtQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from Time in cm");
+            }
+            if (NULL == fhSqrtQvsPosToTRaw[iPlane - 1][iBar - 1])
+            {
+                char strName[255];
+                sprintf(strName, "SqrtQ_vs_PosToTRaw_Plane_%d_Bar_%d", iPlane, iBar);
+                fhSqrtQvsPosToTRaw[iPlane - 1][iBar - 1] =
+                    new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
+                fhSqrtQvsPosToTRaw[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+                fhSqrtQvsPosToTRaw[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
+            }
+            if (NULL == fhSqrtQvsPosToT[iPlane - 1][iBar - 1])
+            {
+                char strName[255];
+                sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
+                fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
+                    new TH2F(strName, "", 2000, -100, 100, max_charge * 4, 0., max_charge * 4);
+                fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+                fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
+            }
+        }
+        if (NULL == fhWalkTotal[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Walk_Total_Plane_%d", iPlane);
+            sprintf(strName2, "Walk Total Plane %d", iPlane);
+            fhWalkTotal[iPlane - 1] = new TH2F(strName1, strName2, 100, 0., 1000, 400, -100, 100);
+            fhWalkTotal[iPlane - 1]->GetXaxis()->SetTitle("ToT in ns");
+            fhWalkTotal[iPlane - 1]->GetYaxis()->SetTitle("dt in ns");
+        }
+        if (NULL == fhTdiffRaw[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Time_Diff_Plane_%d_Raw", iPlane);
+            sprintf(strName2, "Time Diff Plane %d Raw", iPlane);
+            fhTdiffRaw[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -50., 50.);
+            fhTdiffRaw[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhTdiffRaw[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
+        }
+        if (NULL == fhTdiffWalk[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Time_Diff_Plane_%d_Walk", iPlane);
+            sprintf(strName2, "Time Diff Plane %d Walk", iPlane);
+            fhTdiffWalk[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -50., 50.);
+            fhTdiffWalk[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhTdiffWalk[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
+        }
+        if (NULL == fhTdiffOffset[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Time_Diff_Plane_%d_Offset", iPlane);
+            sprintf(strName2, "Time Diff Plane %d Offset", iPlane);
+            fhTdiffOffset[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -50., 50.);
+            fhTdiffOffset[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhTdiffOffset[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
+        }
+        if (NULL == fhposVeff[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Pos_Plane_%d_Veff", iPlane);
+            sprintf(strName2, "Pos Plane %d Veff", iPlane);
+            fhposVeff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, -50., 50.);
+            fhposVeff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhposVeff[iPlane - 1]->GetYaxis()->SetTitle("Position from Time diff in cm");
+        }
+        if (NULL == fhToTdiffWalk[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "ToT_Diff_Plane_%d_Walk", iPlane);
+            sprintf(strName2, "ToT Diff Plane %d Walk", iPlane);
+            fhToTdiffWalk[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -5., 5.);
+            fhToTdiffWalk[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhToTdiffWalk[iPlane - 1]->GetYaxis()->SetTitle("Log(ToT) difference (PM1 - PM2) in ns");
+        }
+        if (NULL == fhToTdiffOffset[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "ToT_Diff_Plane_%d_Offset", iPlane);
+            sprintf(strName2, "ToT Diff Plane %d Offset", iPlane);
+            fhToTdiffOffset[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 2000, -5., 5.);
+            fhToTdiffOffset[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhToTdiffOffset[iPlane - 1]->GetYaxis()->SetTitle("Log(ToT) difference (PM1 - PM2) in ns");
+        }
+        if (NULL == fhposLambda[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Pos_Plane_%d_Lambda", iPlane);
+            sprintf(strName2, "Pos Plane %d Lambda", iPlane);
+            fhposLambda[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, -50., 50.);
+            fhposLambda[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhposLambda[iPlane - 1]->GetYaxis()->SetTitle("Position from Log(ToT) diff in cm");
+        }
+        if (NULL == fhposFinal[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Time_Diff_Plane_%d_Final", iPlane);
+            sprintf(strName2, "Time Diff Plane %d Final", iPlane);
+            fhposFinal[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, -50., 50.);
+            fhposFinal[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhposFinal[iPlane - 1]->GetYaxis()->SetTitle("Position in cm");
+        }
+    }
+}
 void R3BTofDCal2Hit::FinishEvent()
 {
     if (fHitItems)
@@ -986,6 +1416,10 @@ void R3BTofDCal2Hit::FinishTask()
                 // control histogram time particles
                 if (fhQvsPos[i][j])
                     fhQvsPos[i][j]->Write();
+                if (fhWalkBot[i][j])
+                    fhWalkBot[i][j]->Write();
+                if (fhWalkTop[i][j])
+                    fhWalkTop[i][j]->Write();
                 /*
                 if (fhQvsTHit[i][j])
                     fhQvsTHit[i][j]->Write();
@@ -997,7 +1431,47 @@ void R3BTofDCal2Hit::FinishTask()
             }
         }
     }
-
+    if (fTofdHistoCal)
+    {
+        if (fhWalk)
+            fhWalk->Write();
+        for (Int_t i = 0; i < fNofPlanes; i++)
+        {
+            if (fh_tofd_TotPm[i])
+                fh_tofd_TotPm[i]->Write();
+            for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
+            {
+                if (fhLogTot1vsLogTot2[i][j])
+                    fhLogTot1vsLogTot2[i][j]->Write();
+                if (fhSqrtQvsPosRaw[i][j])
+                    fhSqrtQvsPosRaw[i][j]->Write();
+                if (fhSqrtQvsPos[i][j])
+                    fhSqrtQvsPos[i][j]->Write();
+                if (fhSqrtQvsPosToTRaw[i][j])
+                    fhSqrtQvsPosToTRaw[i][j]->Write();
+                if (fhSqrtQvsPosToT[i][j])
+                    fhSqrtQvsPosToT[i][j]->Write();
+            }
+            if (fhWalkTotal[i])
+                fhWalkTotal[i]->Write();
+            if (fhTdiffRaw[i])
+                fhTdiffRaw[i]->Write();
+            if (fhTdiffWalk[i])
+                fhTdiffWalk[i]->Write();
+            if (fhTdiffOffset[i])
+                fhTdiffOffset[i]->Write();
+            if (fhposVeff[i])
+                fhposVeff[i]->Write();
+            if (fhToTdiffWalk[i])
+                fhToTdiffWalk[i]->Write();
+            if (fhToTdiffOffset[i])
+                fhToTdiffOffset[i]->Write();
+            if (fhposLambda[i])
+                fhposLambda[i]->Write();
+            if (fhposFinal[i])
+                fhposFinal[i]->Write();
+        }
+    }
     std::stringstream sprint;
     sprint << "\n\nSome statistics:\n";
     sprint << "Total number of events in tree    " << maxevent << "\n";
@@ -1030,6 +1504,15 @@ void R3BTofDCal2Hit::FinishTask()
     sprint << "n1=" << n1 << " n2=" << n2;
 
     R3BLOG(info, sprint.str());
+}
+
+Double_t R3BTofDCal2Hit::walk(Double_t Q, Double_t par1, Double_t par2,
+                              Double_t par3) // new method
+{
+    Double_t y = 0;
+    // y = -30.2 + par1 * TMath::Power(Q, par2) + par3 / Q + par4 * Q + par5 * Q * Q;
+    y = par1 + par2 * TMath::Power(Q, par3);
+    return y;
 }
 
 Double_t R3BTofDCal2Hit::walk(Double_t Q,

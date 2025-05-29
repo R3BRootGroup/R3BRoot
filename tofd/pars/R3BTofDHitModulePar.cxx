@@ -56,6 +56,8 @@ void R3BTofDHitModulePar::printParams()
     LOG(info) << "   fParaZ: " << fPar1za << "  " << fPar1zb << "  " << fPar1zc;
     LOG(info) << "   fParaWalk: " << fPar1walk << "  " << fPar2walk << "  " << fPar3walk << "  " << fPar4walk << "  "
               << fPar5walk;
+    LOG(info) << "   fParaWalk1: " << fPar1walk1 << "  " << fPar2walk1 << "  " << fPar3walk1;
+    LOG(info) << "   fParaWalk2: " << fPar1walk2 << "  " << fPar2walk2 << "  " << fPar3walk2;
 }
 
 ClassImp(R3BTofDHitModulePar)
