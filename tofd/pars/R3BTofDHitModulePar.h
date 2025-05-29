@@ -88,11 +88,18 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Double_t GetPar1za() const { return fPar1za; }
     Double_t GetPar1zb() const { return fPar1zb; }
     Double_t GetPar1zc() const { return fPar1zc; }
+
     Double_t GetPar1Walk() const { return fPar1walk; }
     Double_t GetPar2Walk() const { return fPar2walk; }
     Double_t GetPar3Walk() const { return fPar3walk; }
     Double_t GetPar4Walk() const { return fPar4walk; }
     Double_t GetPar5Walk() const { return fPar5walk; }
+    Double_t GetPar1Walk1() const { return fPar1walk1; }
+    Double_t GetPar2Walk1() const { return fPar2walk1; }
+    Double_t GetPar3Walk1() const { return fPar3walk1; }
+    Double_t GetPar1Walk2() const { return fPar1walk2; }
+    Double_t GetPar2Walk2() const { return fPar2walk2; }
+    Double_t GetPar3Walk2() const { return fPar3walk2; }
     void SetPlane(Int_t i) { fPlane = i; }
     void SetPaddle(Int_t i) { fPaddle = i; }
     void SetSync(Double_t t) { fSync = t; }
@@ -123,6 +130,12 @@ class R3BTofDHitModulePar : public FairParGenericSet
     void SetPar3Walk(Double_t par3Walk) { fPar3walk = par3Walk; }
     void SetPar4Walk(Double_t par4Walk) { fPar4walk = par4Walk; }
     void SetPar5Walk(Double_t par5Walk) { fPar5walk = par5Walk; }
+    void SetPar1Walk1(Double_t par1Walk1) { fPar1walk1 = par1Walk1; }
+    void SetPar2Walk1(Double_t par2Walk1) { fPar2walk1 = par2Walk1; }
+    void SetPar3Walk1(Double_t par3Walk1) { fPar3walk1 = par3Walk1; }
+    void SetPar1Walk2(Double_t par1Walk2) { fPar1walk2 = par1Walk2; }
+    void SetPar2Walk2(Double_t par2Walk2) { fPar2walk2 = par2Walk2; }
+    void SetPar3Walk2(Double_t par3Walk2) { fPar3walk2 = par3Walk2; }
 
   private:
     Int_t fPlane = 0;             /**< Index of a plane. */
@@ -140,10 +153,14 @@ class R3BTofDHitModulePar : public FairParGenericSet
     Double_t fPar2a = 0., fPar2b = 0., fPar2c = 0.,
              fPar2d = 0.; /**< double exponential parameters for position dependent charge */
     Double_t fPola = 1., fPolb = 0., fPolc = 0., fPold = 0.; /**< polynomial parameters for position dependent charge */
-    Double_t fPar1za = 1., fPar1zb = 0., fPar1zc = 0., fPar1zd = 0.; /**< quench correction parameters */
-    Double_t fPar1walk = 0., fPar2walk = 0., fPar3walk = 0., fPar4walk = 0.,
-             fPar5walk = 0.; /**< walk correction parameters */
+    Double_t fPar1za = 1., fPar1zb = 0, fPar1zc = 0, fPar1zd = 0; /**< quench correction parameters */
+    Double_t fPar1walk = std::nan(""), fPar2walk = std::nan(""), fPar3walk = std::nan(""), fPar4walk = std::nan(""),
+             fPar5walk = std::nan(""); /**< walk correction parameters */
+    Double_t fPar1walk1 = std::nan(""), fPar2walk1 = std::nan(""),
+             fPar3walk1 = std::nan(""); /**< walk correction parameters */
+    Double_t fPar1walk2 = std::nan(""), fPar2walk2 = std::nan(""),
+             fPar3walk2 = std::nan(""); /**< walk correction parameters */
 
   public:
-    ClassDefOverride(R3BTofDHitModulePar, 3);
+    ClassDefOverride(R3BTofDHitModulePar, 4);
 };
