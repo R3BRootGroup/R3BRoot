@@ -326,7 +326,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x[0]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x[0]->Draw("colz");
-            fh2_y_x[0]->SetStats(0);
+            // fh2_y_x[0]->SetStats(0);
             mainfol->Add(cHit_xy);
         }
         else
@@ -342,7 +342,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x[0]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x[0]->Draw("colz");
-            fh2_y_x[0]->SetStats(0);
+            // fh2_y_x[0]->SetStats(0);
             cHit_xy->cd(2);
             fh2_y_x.push_back(R3B::root_owned<TH2F>(
                 "fh2_y_x_flex2", "Correlation Y vs X in mm for flex-2", 500, -50, 50, 200, -20, 20));
@@ -353,7 +353,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x[1]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x[1]->Draw("colz");
-            fh2_y_x[1]->SetStats(0);
+            // fh2_y_x[1]->SetStats(0);
             mainfol->Add(cHit_xy);
 
             auto cHit_xy_cor =
@@ -369,7 +369,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x_cor_det[0]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x_cor_det[0]->Draw("colz");
-            fh2_y_x_cor_det[0]->SetStats(0);
+            // fh2_y_x_cor_det[0]->SetStats(0);
 
             cHit_xy_cor->cd(2);
             fh2_y_x_cor_det.push_back(
@@ -381,7 +381,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x_cor_det[1]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x_cor_det[1]->Draw("colz");
-            fh2_y_x_cor_det[1]->SetStats(0);
+            // fh2_y_x_cor_det[1]->SetStats(0);
 
             cHit_xy_cor->cd(3);
             fh2_y_x_cor_det.push_back(
@@ -393,7 +393,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x_cor_det[2]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x_cor_det[2]->Draw("colz");
-            fh2_y_x_cor_det[2]->SetStats(0);
+            // fh2_y_x_cor_det[2]->SetStats(0);
 
             cHit_xy_cor->cd(4);
             fh2_y_x_cor_det.push_back(
@@ -405,7 +405,7 @@ InitStatus R3BAlpideOnlineSpectra::Init()
             fh2_y_x_cor_det[3]->GetYaxis()->CenterTitle(true);
             gPad->SetLogz();
             fh2_y_x_cor_det[3]->Draw("colz");
-            fh2_y_x_cor_det[3]->SetStats(0);
+            // fh2_y_x_cor_det[3]->SetStats(0);
             mainfol->Add(cHit_xy_cor);
 
             auto cHit_cluster =
