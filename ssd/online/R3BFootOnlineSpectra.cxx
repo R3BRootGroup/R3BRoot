@@ -208,6 +208,9 @@ InitStatus R3BFootOnlineSpectra::Init()
 
     int n = fNbDet / 2;
     int r = 2;
+
+    R3BLOG_IF(fatal, n > 100, Form("Number of FOOT is too high. Are you sure you have %d FOOTs?", 2 * n));
+
     dim = TMath::Factorial(n) / (TMath::Factorial(r) * TMath::Factorial(n - r));
 
     // General canvas info (cluster position and energy)
@@ -662,17 +665,19 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
             R3BFootHitData* hit = dynamic_cast<R3BFootHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
-            if ((hit->GetMulStrip() > fMaxSize) || (fMaxSize > 0))
+
+            if ((hit->GetMulStrip() > fMaxSize) && (fMaxSize > 0))
                 continue;
+
             fh1_pos[hit->GetDetId() - 1]->Fill(hit->GetPos());
             fh1_ene[hit->GetDetId() - 1]->Fill(hit->GetEnergy());
             fh1_size[hit->GetDetId() - 1]->Fill(hit->GetMulStrip());
-            fh2_pos_charge[hit->GetDetId() - 1]->Fill(hit->GetPos(), hit->GetEnergy());
 
             // Only calculate charge when it is on a constant eta-energy profile
             if ((hit->GetEta() < 0.7) && (hit->GetEta() > 0.3))
             {
                 fh1_charge[hit->GetDetId() - 1]->Fill(hit->GetZCharge());
+                fh2_pos_charge[hit->GetDetId() - 1]->Fill(hit->GetPos(), hit->GetEnergy());
             }
 
             mult[hit->GetDetId() - 1]++;

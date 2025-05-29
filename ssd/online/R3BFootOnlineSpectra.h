@@ -139,7 +139,7 @@ class R3BFootOnlineSpectra : public FairTask
     double fMinE = -100.;
     double fMaxE = 5000.;
     double fBinsE = 1000;
-    double fMaxSize = 10;
+    double fMaxSize = -1;
     int dim = 6;
     std::vector<int> corrNdx;
 
