@@ -16,17 +16,16 @@
 // -----         Created 13/04/22 by J.L. Rodriguez-Sanchez         -----
 // ----------------------------------------------------------------------
 
-#ifndef R3BFiberMappedData_H
-#define R3BFiberMappedData_H 1
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
 
 class R3BFiberMappedData : public TObject
 {
   public:
     R3BFiberMappedData();
     R3BFiberMappedData(UInt_t, UInt_t, Bool_t, Int_t, Int_t);
-    virtual ~R3BFiberMappedData(){};
+    virtual ~R3BFiberMappedData() = default;
 
     inline UInt_t GetSide() const { return fSide; }
     inline UInt_t GetChannel() const { return fChannel; }
@@ -53,7 +52,5 @@ class R3BFiberMappedData : public TObject
     Int_t fFine;
 
   public:
-    ClassDef(R3BFiberMappedData, 1)
+    ClassDef(R3BFiberMappedData, 1); // NOLINT
 };
-
-#endif /* R3BFiberMappedData_H */

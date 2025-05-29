@@ -13,8 +13,8 @@
 
 #pragma once
 
-#include "FairTask.h"
-#include <R3BTCalEngine.h>
+#include "R3BTCalEngine.h"
+#include <FairTask.h>
 
 class TClonesArray;
 class R3BTCalPar;
@@ -31,7 +31,7 @@ class R3BFiberMAPMTMapped2CalPar : public FairTask
      * @param a_update_rate a update rate for online histograms.
      * @param a_min_stats a minimum statistics for calibration.
      */
-    R3BFiberMAPMTMapped2CalPar(const char*, Int_t, Int_t = 1e6, Int_t = 1e5);
+    explicit R3BFiberMAPMTMapped2CalPar(const char*, Int_t = 1, Int_t = 1e6, Int_t = 1e3);
 
     /**
      * Destructor.
@@ -45,20 +45,20 @@ class R3BFiberMAPMTMapped2CalPar : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t*);
+    void Exec(Option_t*) override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Method for setting the update rate for control histograms
@@ -76,15 +76,15 @@ class R3BFiberMAPMTMapped2CalPar : public FairTask
     virtual void SetMinStats(Int_t);
 
   private:
-    TString fName;
-    TClonesArray* fMapped;
-    R3BTCalPar* fMAPMTTCalPar;
-    R3BTCalEngine* fMAPMTEngine;
-    R3BTCalPar* fMAPMTTrigTCalPar;
-    R3BTCalEngine* fMAPMTTrigEngine;
+    TString fName = "Fib30";
+    TClonesArray* fMapped = nullptr;
+    R3BTCalPar* fMAPMTTCalPar = nullptr;
+    R3BTCalEngine* fMAPMTEngine = nullptr;
+    R3BTCalPar* fMAPMTTrigTCalPar = nullptr;
+    R3BTCalEngine* fMAPMTTrigEngine = nullptr;
     Int_t fUpdateRate;
     Int_t fMinStats;
 
   public:
-    ClassDef(R3BFiberMAPMTMapped2CalPar, 1)
+    ClassDefOverride(R3BFiberMAPMTMapped2CalPar, 1); // NOLINT
 };

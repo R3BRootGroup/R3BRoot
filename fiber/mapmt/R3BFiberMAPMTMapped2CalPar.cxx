@@ -110,4 +110,4 @@ void R3BFiberMAPMTMapped2CalPar::SetUpdateRate(Int_t a_rate) { fUpdateRate = a_r
 
 void R3BFiberMAPMTMapped2CalPar::SetMinStats(Int_t a_min_stats) { fMinStats = a_min_stats; }
 
-ClassImp(R3BFiberMAPMTMapped2CalPar);
+ClassImp(R3BFiberMAPMTMapped2CalPar)
