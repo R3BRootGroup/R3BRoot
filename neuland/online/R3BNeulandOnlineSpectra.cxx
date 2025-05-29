@@ -104,28 +104,12 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         run->AddObject(canvasMapped);
     }
 
-    auto canvasJump = new TCanvas("NeulandJumps", "NeulandJumps", 10, 10, 850, 850);
-    canvasJump->Divide(1, 2);
-
     hJumpsvsEvnt = R3B::root_owned<TH2D>("hJumpsvsEvnt", "Jumps vs Evnt", 1000, 0, 10000000, 1000, -11000, 11000);
-    canvasJump->cd(1);
-    gPad->SetLogz();
-    hJumpsvsEvnt->Draw("colz");
-
     hJumpsvsEvntzoom =
         R3B::root_owned<TH2D>("hJumpsvsEvntzoom", "Jumps vs Evnt zoomed", 1000, 0, 10000000, 1000, -200, 200);
-    canvasJump->cd(2);
-    gPad->SetLogz();
-    hJumpsvsEvntzoom->Draw("colz");
-
-    canvasJump->cd(0);
-    if (fIsOnline)
-    {
-        run->AddObject(canvasJump);
-    }
-
+    
     auto canvasCal = new TCanvas("NeulandCal", "NeulandCal", 10, 10, 850, 850);
-    canvasCal->Divide(2, 3);
+    canvasCal->Divide(2, 2);
 
     hTstart = R3B::root_owned<TH1D>("hTstart", "Tstart", 1000, -10000., 50000.);
     canvasCal->cd(1);
@@ -140,22 +124,17 @@ InitStatus R3BNeulandOnlineSpectra::Init()
 
     ahCalTvsBar[0] = R3B::root_owned<TH2D>(
         "hCalT1vsBar", "CalLevel: Time1 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
-    canvasCal->cd(3);
-    ahCalTvsBar[0]->Draw("colz");
-
     ahCalTvsBar[1] = R3B::root_owned<TH2D>(
         "hCalT2vsBar", "CalLevel: Time2 vs Bars  ", fNBars, 0.5, fNBars + 0.5, 2000, -5000, 15000);
-    canvasCal->cd(4);
-    ahCalTvsBar[1]->Draw("colz");
 
     ahCalEvsBar[0] =
         R3B::root_owned<TH2D>("hCalE1vsBar", "CalLevel: Energy1 vs Bars", fNBars, 0.5, fNBars + 0.5, 600, 0, 600);
-    canvasCal->cd(5);
+    canvasCal->cd(3);
     ahCalEvsBar[0]->Draw("colz");
 
     ahCalEvsBar[1] =
         R3B::root_owned<TH2D>("hCalE2vsBar", "CalLevel: Energy2 vs Bars", fNBars, 0.5, fNBars + 0.5, 600, 0, 600);
-    canvasCal->cd(6);
+    canvasCal->cd(4);
     ahCalEvsBar[1]->Draw("colz");
 
     canvasCal->cd(0);
@@ -229,8 +208,6 @@ InitStatus R3BNeulandOnlineSpectra::Init()
         run->AddObject(canvasHitCosmics);
     }
 
-    auto canvasPlaneXY = new TCanvas("NeulandPlaneXY", "NeulandPlaneXY", 10, 10, 850, 850);
-    canvasPlaneXY->Divide(5, 6);
     for (unsigned int i = 0; i < fNPlanes; i++)
     {
         ahXYperPlane[i] = R3B::root_owned<TH2D>("hHitXYPlane" + TString::Itoa(i, 10),
@@ -241,13 +218,6 @@ InitStatus R3BNeulandOnlineSpectra::Init()
                                                 300,
                                                 -150,
                                                 150);
-        canvasPlaneXY->cd(i + 1);
-        ahXYperPlane[i]->Draw("colz");
-    }
-    canvasPlaneXY->cd(0);
-    if (fIsOnline)
-    {
-        run->AddObject(canvasPlaneXY);
     }
 
     auto canvasPlaneSofia = new TCanvas("Timing", "Timing", 10, 10, 850, 850);
@@ -301,11 +271,13 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
 
     const double start = fEventHeader->GetTStart();
 
+    /*
     if (((UInt_t)fEventHeader->GetEventno() % 10000000) < 10000)
     {
         hJumpsvsEvnt->Reset();
         hJumpsvsEvntzoom->Reset();
     }
+    */
 
     const auto mappedData = fNeulandMappedData.Retrieve();
     const auto calData = fNeulandCalData.Retrieve();
@@ -358,9 +330,9 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             if (barx != bar)
             {
                 hTestJump->Fill(barx, data->GetTime() - datax->GetTime());
-                hJumpsvsEvnt->Fill((UInt_t)fEventHeader->GetEventno() % 10000000, data->GetTime() - datax->GetTime());
-                hJumpsvsEvntzoom->Fill((UInt_t)fEventHeader->GetEventno() % 10000000,
-                                       data->GetTime() - datax->GetTime());
+                //hJumpsvsEvnt->Fill((UInt_t)fEventHeader->GetEventno() % 10000000, data->GetTime() - datax->GetTime());
+                //hJumpsvsEvntzoom->Fill((UInt_t)fEventHeader->GetEventno() % 10000000,
+                //                       data->GetTime() - datax->GetTime());
             }
         }
     }
@@ -461,8 +433,8 @@ void R3BNeulandOnlineSpectra::FinishTask()
     hNstart->Write();
 
     hTestJump->Write();
-    hJumpsvsEvnt->Write();
-    hJumpsvsEvntzoom->Write();
+    //hJumpsvsEvnt->Write();
+    //hJumpsvsEvntzoom->Write();
 
     ahCalTvsBar[0]->Write();
     ahCalTvsBar[1]->Write();
@@ -522,8 +494,8 @@ void R3BNeulandOnlineSpectra::ResetHistos()
     hNstart->Reset();
 
     hTestJump->Reset();
-    hJumpsvsEvnt->Reset();
-    hJumpsvsEvntzoom->Reset();
+    //hJumpsvsEvnt->Reset();
+    //hJumpsvsEvntzoom->Reset();
 
     ahCalTvsBar[0]->Reset();
     ahCalTvsBar[1]->Reset();
