@@ -16,8 +16,7 @@
 // -----      Adopted Feb 4th 2016 from Neuland by R. Plag    -----
 // ----------------------------------------------------------------
 
-#ifndef R3BLOSMAPPED2CALPAR_H
-#define R3BLOSMAPPED2CALPAR_H
+#pragma once
 
 #include "FairTask.h"
 
@@ -27,16 +26,11 @@ class R3BEventHeader;
 class R3BTCalEngine;
 
 /**
- * An analysis task for TCAL calibration of NeuLAND Tamex data.
- * This class fills TDC distribution for each Photomultiplier
- * of the NeuLAND detector and calculates the calibration
- * parameters using the R3BTCalEngine.
- * @author D. Kresan
- * @since September 7, 2015
+ * An analysis task for TCAL calibration of Tamex and VFTX modules
  */
+
 class R3BLosMapped2CalPar : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -50,7 +44,7 @@ class R3BLosMapped2CalPar : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLosMapped2CalPar(const char* name, Int_t iVerbose = 1);
+    explicit R3BLosMapped2CalPar(const char* name, int iVerbose = 1);
 
     /**
      * Destructor.
@@ -101,43 +95,38 @@ class R3BLosMapped2CalPar : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
-     * Method for setting number of LOS detectors and channels.
-     * @param nDets number of detectors.
-     * @param nCh number of channels per detector (4+master trigger?)
+     * Method for setting number of LOS detectors and channels
+     * @param nDets number of detectors
+     * @param nCh number of channels per detector
      */
     inline void SetNofModules(Int_t nDets, Int_t nCh)
     {
         fNofDetectors = nDets;
-        fNofChannels = nCh; // = 4 or 8 or 16
+        fNofChannels = nCh;
         fNofTypes = 3;
-        fNofModules = nDets * nCh * 3; // 4 or 8 los signals *3 times per channel 12 or 24 in total
+        fNofModules = nDets * nCh * fNofTypes;
     }
 
   private:
-    Int_t fUpdateRate; /**< An update rate. */
-    Int_t fMinStats;   /**< Minimum statistics required per module. */
-    Int_t fTrigger;    /**< Trigger value. */
-    Int_t Icounts1 = 0;
-    Int_t Icounts2 = 0;
-    Int_t Icounts3 = 0;
-    Int_t Icount[16][3];
+    Int_t fUpdateRate = 1000000;
+    Int_t fMinStats = 1000;
+    Int_t fTrigger = -1;
+    Int_t Icount[2][16][3];
     Int_t Icounttrig[16][3];
 
-    UInt_t fNofDetectors; /**< Number of LOS detectors. */
-    UInt_t fNofChannels;  /**< Number of channels per detector. */
-    UInt_t fNofTypes = 3; /**< Number of time-types per channel (VFTX, TAMEX leading/trailing). */
-    UInt_t fNofModules;   /**< Total number of modules (=edges) to calibrate */
+    UInt_t fNofDetectors = 1; // Number of LOS detectors
+    UInt_t fNofChannels = 8;  // Number of channels per detector
+    UInt_t fNofTypes = 3;     // Number of time-types per channel (VFTX, TAMEX leading/trailing)
+    UInt_t fNofModules = fNofDetectors * fNofChannels * fNofTypes; // Total number of modules (=edges) to calibrate
 
-    Int_t fNEvents;        /**< Event counter. */
-    R3BTCalPar* fCal_Par;  /**< Parameter container. */
-    TClonesArray* fMapped; /**< Array with mapped data - input data. */
-    TClonesArray* fMappedTriggerItems;
-    R3BEventHeader* header; /**< Event header - input data. */
+    unsigned int fNEvents = 0;
+    R3BTCalPar* fCal_Par = nullptr;
+    TClonesArray* fMapped = nullptr;
+    TClonesArray* fMappedTriggerItems = nullptr;
+    R3BEventHeader* header = nullptr;
 
-    R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
+    R3BTCalEngine* fEngine = nullptr;
 
   public:
-    ClassDef(R3BLosMapped2CalPar, 1)
+    ClassDef(R3BLosMapped2CalPar, 1); // NOLINT
 };
-
-#endif

@@ -11,29 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ----------------------------------------------------------------
-// -----            R3BLosMapped2CalPar (7ps VFTX)            -----
-// -----           Created Feb 4th 2016 by R.Plag             -----
-// ----------------------------------------------------------------
-
-/* Some notes:
- *
- * There are different versions of VFTX:
- * 10px delivering 8 leading edges in Ch 1-8 and 8 trailing edges in
- *      Ch 9-16. This one was used for LOS1 but is not used in the analysis
- *  7px delivering 8 leading edges only. Used for LOS2 and this is the
- *      LOS we use for analysis.
- *
- * For s438b we had no synchronisation between 50 MHz tacquila clock
- * and the 200 MHz VFTX clock so we need to always subtract the time
- * of the master trigger from the LOS time.
- * The master trigger is on the last channel of the VFTX and handled
- * as 5th los channel.
- *
- * This file handles 7ps VFTX and TAMEX2, hence we have three times per channel.
- *
- */
-
 #include "R3BLosMapped2CalPar.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
@@ -41,21 +18,19 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRtdbRun.h"
-#include "FairRunIdGenerator.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRtdbRun.h>
+#include <FairRunIdGenerator.h>
+#include <FairRuntimeDb.h>
 
-#include "TClonesArray.h"
-#include "TF1.h"
-#include "TH1F.h"
-#include "math.h"
+#include <TClonesArray.h>
+#include <TF1.h>
+#include <TH1F.h>
+#include <math.h>
 
 #include <iostream>
 #include <stdlib.h>
-
-using namespace std;
 
 R3BLosMapped2CalPar::R3BLosMapped2CalPar()
     : R3BLosMapped2CalPar("R3BLosMapped2CalPar", 1)
@@ -64,14 +39,6 @@ R3BLosMapped2CalPar::R3BLosMapped2CalPar()
 
 R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fUpdateRate(1000000)
-    , fMinStats(100000)
-    , fTrigger(-1)
-    , fNofDetectors(0)
-    , fNofChannels(0)
-    , fNofTypes(0)
-    , fNEvents(0)
-    , fCal_Par(NULL)
 {
 }
 
@@ -91,11 +58,12 @@ R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
 InitStatus R3BLosMapped2CalPar::Init()
 {
     R3BLOG(info, "");
-    for (UInt_t i = 0; i < 16; i++)
+    for (size_t i = 0; i < fNofChannels; i++)
     {
-        for (UInt_t k = 0; k < 3; k++)
+        for (size_t k = 0; k < fNofTypes; k++)
         {
-            Icount[i][k] = 0;
+            for (size_t d = 0; d < fNofDetectors; d++)
+                Icount[d][i][k] = 0;
             Icounttrig[i][k] = 0;
         }
     }
@@ -107,21 +75,10 @@ InitStatus R3BLosMapped2CalPar::Init()
     }
 
     header = dynamic_cast<R3BEventHeader*>(rm->GetObject("EventHeader."));
-    // may be = NULL!
-    if (!header)
-    {
-        R3BLOG(warn, "EventHeader. not found");
-        header = dynamic_cast<R3BEventHeader*>(rm->GetObject("R3BEventHeader"));
-    }
-    else
-        R3BLOG(info, "EventHeader. found");
+    R3BLOG_IF(error, !header, "EventHeader. not found");
 
     fMapped = dynamic_cast<TClonesArray*>(rm->GetObject("LosMapped"));
-    if (!fMapped)
-    {
-        R3BLOG(fatal, "LosMapped not found");
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, !fMapped, "LosMapped not found");
 
     // get access to Trigger Mapped data
     fMappedTriggerItems = dynamic_cast<TClonesArray*>(rm->GetObject("LosTriggerMapped"));
@@ -139,23 +96,21 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
-    UInt_t nHits = fMapped->GetEntries();
+    auto nHits = fMapped->GetEntriesFast();
     // Loop over mapped hits
-    for (UInt_t i = 0; i < nHits; i++)
+    for (size_t i = 0; i < nHits; i++)
     {
-
-        R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(fMapped->At(i));
+        auto hit = dynamic_cast<R3BLosMappedData*>(fMapped->At(i));
         if (!hit)
         {
             continue; // should not happen
         }
 
         // channel numbers are supposed to be 1-based (1..n)
-        UInt_t iDetector = hit->GetDetector() - 1; // now 0..n-1
-        UInt_t iChannel = hit->GetChannel() - 1;   // now 0..n-1
-        UInt_t iType = hit->GetType();             // 0,1,2,3
+        auto iDetector = hit->GetDetector() - 1; // now 0..n-1
+        auto iChannel = hit->GetChannel() - 1;   // now 0..n-1
+        auto iType = hit->GetType();             // 0,1,2,3
 
-        // cout<<"Mapped2CalPar "<<iDetector<<", "<<iChannel<<", "<<iType<<endl;
         if (iType < 3)
         {
             if (iDetector > (fNofDetectors - 1))
@@ -171,15 +126,12 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
                     "More channels than expected! Channel: " << (iChannel + 1) << " allowed are 1.." << fNofChannels);
                 continue;
             }
-
             if (iType > 3)
             {
                 R3BLOG(error, "More time-types than expected! Type: " << iType << " allowed are 0..3");
                 continue;
             }
-
-            Icount[iChannel][iType]++;
-
+            Icount[iDetector][iChannel][iType]++;
             fEngine->Fill(iDetector + 1, iChannel + 1, iType + 1, hit->GetTimeFine());
         }
     }
@@ -192,48 +144,54 @@ void R3BLosMapped2CalPar::Exec(Option_t* option)
         {
             auto mapped = dynamic_cast<R3BLosMappedData const*>(fMappedTriggerItems->At(mapped_i));
 
-            UInt_t iDetector = mapped->GetDetector() - 1; // now 0..n-1
-            UInt_t iChannel = mapped->GetChannel();
-            UInt_t iType = mapped->GetType() + 1; // 1,2,3...
+            auto iDetector = mapped->GetDetector() - 1; // now 0..n-1
+            auto iChannel = mapped->GetChannel();
+            auto iType = mapped->GetType() + 1; // 1,2,3...
             R3BLOG(debug1, "Det: " << iDetector << " channel" << iChannel << " raw " << mapped->GetTimeFine());
             fEngine->Fill(3 + iDetector, iChannel, iType, mapped->GetTimeFine());
             Icounttrig[iChannel - 1][iType - 1]++;
         }
     }
-
     // Increment events
-    fNEvents += 1;
+    fNEvents++;
 }
 
 void R3BLosMapped2CalPar::FinishTask()
 {
     fEngine->CalculateParamVFTX();
-    fCal_Par->printParams();
     fCal_Par->setChanged();
 
     R3BLOG(info, "Calibration of LOS detector");
-    for (Int_t i = 0; i < 16; i++)
+    for (size_t d = 0; d < fNofDetectors; d++)
     {
-        for (Int_t k = 0; k < 3; k++)
+        for (size_t i = 0; i < fNofChannels; i++)
         {
-            if (Icount[i][k] > fMinStats)
+            for (size_t k = 0; k < fNofTypes; k++)
             {
-                R3BLOG(info, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
+                if (Icount[d][i][k] > fMinStats)
+                {
+                    R3BLOG(info,
+                           "Detector: " << d + 1 << ", Channel: " << i + 1 << ", Type: " << k
+                                        << ", Count: " << Icount[d][i][k]);
+                }
             }
         }
     }
 
     R3BLOG(info, "Calibration of trigger signals from LOS detector");
-    for (Int_t i = 0; i < 16; i++)
+    for (size_t i = 0; i < fNofChannels; i++)
     {
-        for (Int_t k = 0; k < 3; k++)
+        for (size_t k = 0; k < fNofTypes; k++)
         {
             if (Icounttrig[i][k] > fMinStats)
             {
-                R3BLOG(info, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icounttrig[i][k]);
+                if (k == 0)
+                    R3BLOG(info, "VFTX channel: " << i + 1 << ", Counts: " << Icounttrig[i][k]);
+                else
+                    R3BLOG(info, "Tamex Channel: " << i + 1 << ", Type: " << k << ", Counts: " << Icounttrig[i][k]);
             }
         }
     }
 }
 
-ClassImp(R3BLosMapped2CalPar);
+ClassImp(R3BLosMapped2CalPar)
