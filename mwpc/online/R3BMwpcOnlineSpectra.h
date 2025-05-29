@@ -93,15 +93,27 @@ class R3BMwpcOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
-  private:
-    TClonesArray* fMapItemsMwpc = nullptr; // Array with mapped items
-    TClonesArray* fCalItemsMwpc = nullptr; /**< Array with cal items. */
-    TClonesArray* fHitItemsMwpc = nullptr; /**< Array with hit items. */
+    /**
+     * Method for setting the trigger value.
+     * @param trigger 1 - physics
+     */
+    inline void SetTrigger(int trigger) { fTrigger = trigger; }
+    inline void SetTpat(int tpat1, int tpat2)
+    {
+        fTpat1 = tpat1;
+        fTpat2 = tpat2;
+    }
 
-    // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header.      */
-    int fNEvents = 0;       /**< Event counter.     */
+  private:
+    TClonesArray* fMapItemsMwpc = nullptr;
+    TClonesArray* fCalItemsMwpc = nullptr;
+    TClonesArray* fHitItemsMwpc = nullptr;
+
+    R3BEventHeader* header = nullptr;
+    unsigned long long fNEvents = 0;
     TString fNameDet;
+    int fTrigger = -1;
+    int fTpat1 = -1, fTpat2 = -1;
 
     // Canvas
     TCanvas* cMwpc_nPads;
@@ -127,5 +139,5 @@ class R3BMwpcOnlineSpectra : public FairTask
     TH2F* fh2_XYpos;
 
   public:
-    ClassDefOverride(R3BMwpcOnlineSpectra, 1)
+    ClassDefOverride(R3BMwpcOnlineSpectra, 1); // NOLINT
 };
