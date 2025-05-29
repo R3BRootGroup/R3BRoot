@@ -273,7 +273,8 @@ void R3BFootVsAlpideOnlineSpectra::Exec(Option_t* option)
     if (alpideEnergies.size() == 0)
     {
         // R3BLOG("info", "Different number of hits in FOOT and ALPIDE");
-        std::cout << "No ALPIDE hits";
+        std::cout << "No ALPIDE hits"
+                  << "\n";
     }
     else
     {
