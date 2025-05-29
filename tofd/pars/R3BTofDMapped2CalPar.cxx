@@ -85,7 +85,7 @@ InitStatus R3BTofDMapped2CalPar::Init()
 
     fEngine = new R3BTCalEngine(fCalPar, fMinStats);
 
-    for (UInt_t d = 0; d < fNofPlanes; d++)
+    for (UInt_t d = 0; d < fNofPlanes + 1; d++)
         for (UInt_t i = 0; i < fPaddlesPerPlane; i++)
             for (UInt_t k = 0; k < 4; k++)
             {
@@ -149,7 +149,7 @@ void R3BTofDMapped2CalPar::FinishTask()
     fCalPar->setChanged();
 
     R3BLOG(info, "Calibration of TofD detector");
-    for (size_t p = 0; p < fNofPlanes; p++)
+    for (size_t p = 0; p < fNofPlanes + 1; p++)
         for (size_t i = 0; i < fPaddlesPerPlane; i++)
             for (size_t k = 0; k < 4; k++)
                 if (Icount[p][i][k] > fMinStats)
