@@ -202,22 +202,47 @@ InitStatus R3BIncomingTrackingFootOnlineSpectra::Init()
     l2->Draw();
     arrow->Draw();
 
-    // Hit data, Beam profile X-Y at target position
-    cBeamProfileTarget =
-        new TCanvas("Beam_profile_XY_at_target_" + fNameCut, "Beam profile XY info " + fNameCut, 10, 10, 800, 700);
-    Name1 = "fh2_beam_profile_XY_" + fNameCut;
-    Name2 = "Beam profile-XY (Lab.) at target position " + fNameCut;
-    fh2_target_PosXY = R3B::root_owned<TH2F>(Name1, Name2, 200, -100., 100., 200, -100., 100.);
-    fh2_target_PosXY->GetXaxis()->SetTitle("(Wixhausen) <---  X [mm]  ---> (Messel)");
-    fh2_target_PosXY->GetYaxis()->SetTitle("Y [mm]");
-    fh2_target_PosXY->GetYaxis()->SetTitleOffset(1.1);
-    fh2_target_PosXY->GetXaxis()->CenterTitle(true);
-    fh2_target_PosXY->GetYaxis()->CenterTitle(true);
-    fh2_target_PosXY->GetXaxis()->SetLabelSize(0.045);
-    fh2_target_PosXY->GetXaxis()->SetTitleSize(0.045);
-    fh2_target_PosXY->GetYaxis()->SetLabelSize(0.045);
-    fh2_target_PosXY->GetYaxis()->SetTitleSize(0.045);
-    fh2_target_PosXY->Draw("colz");
+    // Hit data, Beam profile X-Y at target position (with FOOT before target)
+    cBeamProfileBeforeTarget = new TCanvas("Beam_profile_XY_at_before_target_" + fNameCut,
+                                           "Beam profile XY (before target) info " + fNameCut,
+                                           10,
+                                           10,
+                                           800,
+                                           700);
+    Name1 = "fh2_beam_profile_XY_before" + fNameCut;
+    Name2 = "Beam profile-XY (Lab.) at before target position " + fNameCut;
+    fh2_before_target_PosXY = R3B::root_owned<TH2F>(Name1, Name2, 200, -100., 100., 200, -100., 100.);
+    fh2_before_target_PosXY->GetXaxis()->SetTitle("(Wixhausen) <---  X [mm]  ---> (Messel)");
+    fh2_before_target_PosXY->GetYaxis()->SetTitle("Y [mm]");
+    fh2_before_target_PosXY->GetYaxis()->SetTitleOffset(1.1);
+    fh2_before_target_PosXY->GetXaxis()->CenterTitle(true);
+    fh2_before_target_PosXY->GetYaxis()->CenterTitle(true);
+    fh2_before_target_PosXY->GetXaxis()->SetLabelSize(0.045);
+    fh2_before_target_PosXY->GetXaxis()->SetTitleSize(0.045);
+    fh2_before_target_PosXY->GetYaxis()->SetLabelSize(0.045);
+    fh2_before_target_PosXY->GetYaxis()->SetTitleSize(0.045);
+    fh2_before_target_PosXY->Draw("colz");
+
+    // Hit data, Beam profile X-Y at target position (with FOOT before target)
+    cBeamProfileAfterTarget = new TCanvas("Beam_profile_XY_at_after_target_" + fNameCut,
+                                          "Beam profile XY (after target) info " + fNameCut,
+                                          10,
+                                          10,
+                                          800,
+                                          700);
+    Name1 = "fh2_beam_profile_XY_after" + fNameCut;
+    Name2 = "Beam profile-XY (Lab.) at after target position " + fNameCut;
+    fh2_after_target_PosXY = R3B::root_owned<TH2F>(Name1, Name2, 200, -100., 100., 200, -100., 100.);
+    fh2_after_target_PosXY->GetXaxis()->SetTitle("(Wixhausen) <---  X [mm]  ---> (Messel)");
+    fh2_after_target_PosXY->GetYaxis()->SetTitle("Y [mm]");
+    fh2_after_target_PosXY->GetYaxis()->SetTitleOffset(1.1);
+    fh2_after_target_PosXY->GetXaxis()->CenterTitle(true);
+    fh2_after_target_PosXY->GetYaxis()->CenterTitle(true);
+    fh2_after_target_PosXY->GetXaxis()->SetLabelSize(0.045);
+    fh2_after_target_PosXY->GetXaxis()->SetTitleSize(0.045);
+    fh2_after_target_PosXY->GetYaxis()->SetLabelSize(0.045);
+    fh2_after_target_PosXY->GetYaxis()->SetTitleSize(0.045);
+    fh2_after_target_PosXY->Draw("colz");
 
     // AngleX and positionX on the target position
     auto cAPX = new TCanvas(
@@ -269,7 +294,8 @@ InitStatus R3BIncomingTrackingFootOnlineSpectra::Init()
     auto mainfol = new TFolder("Tracking_Cave" + fNameCut, "Tracking info " + fNameCut);
     mainfol->Add(cTrackingXZ);
     mainfol->Add(cTrackingYZ);
-    mainfol->Add(cBeamProfileTarget);
+    mainfol->Add(cBeamProfileBeforeTarget);
+    mainfol->Add(cBeamProfileAfterTarget);
     mainfol->Add(cAPX);
     mainfol->Add(cAPY);
 
@@ -290,13 +316,15 @@ void R3BIncomingTrackingFootOnlineSpectra::Reset_Histo()
     R3BLOG(info, "");
     fh2_tracking_planeXZ->Reset();
     fh2_tracking_planeYZ->Reset();
-    fh2_target_PosXY->Reset();
+    fh2_before_target_PosXY->Reset();
+    fh2_after_target_PosXY->Reset();
     fh2_angvsposx->Reset();
     fh2_angvsposy->Reset();
 }
 
 void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
 {
+
     double zrand = 0.;
     double xtarget = std::nan(""), ytarget = std::nan("");
 
@@ -320,15 +348,17 @@ void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
     if (fHitFootData && fHitFootData->GetEntriesFast() > 0 && fYearConf == 2025)
     {
         std::vector<double> footPos(fNbDet, std::nan(""));
-        auto nHits = fHitFootData->GetEntriesFast();
-        for (size_t ihit = 0; ihit < nHits; ihit++)
-        {
-            auto hit = dynamic_cast<R3BFootHitData*>(fHitFootData->At(ihit));
-            auto detId = hit->GetDetId() - 1;
-            if (detId >= fNbDet)
-                continue;
-            footPos[detId] = hit->GetPos();
-        }
+
+        auto hit = dynamic_cast<R3BFootHitData*>(fHitFootData->At(0));
+        auto detId = hit->GetDetId() - 1;
+
+        R3BLOG_IF(fatal, hit->GetDetId() - 1 > fNbDet, "You are selecting a FOOT that does not exist...");
+
+        if (std::find(fDetIdX.begin(), fDetIdX.end(), detId) != fDetIdX.end())
+            footPos[detId] = hit->GetPosLab()[0];
+
+        if (std::find(fDetIdY.begin(), fDetIdY.end(), detId) != fDetIdY.end())
+            footPos[detId] = hit->GetPosLab()[1];
 
         // Calculations for tracking with X before target
         if (std::isfinite(footPos[fDetIds[0]]) && std::isfinite(footPos[fDetIds[2]]))
@@ -356,10 +386,10 @@ void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
             }
         }
 
-        // Beam profile at target position
+        // Beam profile at target position (before)
         if (std::isfinite(xtarget) && std::isfinite(ytarget))
         {
-            fh2_target_PosXY->Fill(xtarget, ytarget);
+            fh2_before_target_PosXY->Fill(xtarget, ytarget);
         }
 
         // Calculations for tracking with X after target
@@ -370,7 +400,7 @@ void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
             {
                 zrand = gRandom->Uniform(fPosTarget, fDist_acelerator_glad);
                 fh2_tracking_planeXZ->Fill(zrand, footPos[fDetIds[7]] - angX * fFootZPos[7] * 10. + angX * zrand); // mm
-                // xtarget = footPos[fDetIds[7]] - angX * fFootZPos[7] * 10. + angX * fPosTarget;
+                xtarget = footPos[fDetIds[7]] - angX * fFootZPos[7] * 10. + angX * fPosTarget;
             }
         }
 
@@ -382,8 +412,14 @@ void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
             {
                 zrand = gRandom->Uniform(fPosTarget, fDist_acelerator_glad);
                 fh2_tracking_planeYZ->Fill(zrand, footPos[fDetIds[6]] - angY * fFootZPos[6] * 10. + angY * zrand); // mm
-                // ytarget = footPos[fDetIds[3]] - angY * fFootZPos[3] * 10. + angY * fPosTarget;
+                ytarget = footPos[fDetIds[6]] - angY * fFootZPos[6] * 10. + angY * fPosTarget;
             }
+        }
+
+        // Beam profile at target position (after)
+        if (std::isfinite(xtarget) && std::isfinite(ytarget))
+        {
+            fh2_after_target_PosXY->Fill(xtarget, ytarget);
         }
     }
 
@@ -414,7 +450,8 @@ void R3BIncomingTrackingFootOnlineSpectra::FinishTask()
     {
         cTrackingXZ->Write();
         cTrackingYZ->Write();
-        cBeamProfileTarget->Write();
+        cBeamProfileBeforeTarget->Write();
+        cBeamProfileAfterTarget->Write();
         fh2_angvsposx->Write();
         fh2_angvsposy->Write();
     }

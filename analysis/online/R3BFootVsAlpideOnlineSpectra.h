@@ -32,6 +32,7 @@
 
 class TClonesArray;
 class R3BEventHeader;
+class R3BFootMappingPar;
 
 /**
  *  This taks reads hit data from foot and alpide detectors and plots
@@ -67,32 +68,36 @@ class R3BFootVsAlpideOnlineSpectra : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    virtual InitStatus Init() override;
+
+    /** Virtual method SetParContainers **/
+    void SetParContainers() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    virtual void Exec(Option_t* option) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    virtual void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    virtual void FinishTask() override;
 
     /**
      * Method for setting the number of FOOT detectors
      */
     void SetNumDet(Int_t NbDet) { fNbDet = NbDet; }
+
     void SetTPat(Int_t tpat1, Int_t tpat2)
     {
         fTpat1 = tpat1;
@@ -103,8 +108,12 @@ class R3BFootVsAlpideOnlineSpectra : public FairTask
     void Reset_FOOT_ALPIDE_Histo();
 
   private:
+    void SetParameter();
+
     TClonesArray* fHitItemsFoot;   /**< Array with FOOT hit items. */
     TClonesArray* fHitItemsAlpide; /**< Array with ALPIDE hit items. */
+
+    R3BFootMappingPar* fMap_Par = nullptr; // Parameter container with mapping
 
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
 
@@ -116,6 +125,9 @@ class R3BFootVsAlpideOnlineSpectra : public FairTask
     Int_t fTpat2 = -1;
 
     TCanvas *cPosCorr, *cCharCorr;
+
+    std::vector<int> fXDet = { 0, 2, 5, 7 };
+    std::vector<int> fYDet = { 1, 3, 4, 6 };
 
     std::vector<TH2F*> fh2_foot_alpide_pos_corr;
     std::vector<TH2F*> fh2_foot_alpide_char_corr;

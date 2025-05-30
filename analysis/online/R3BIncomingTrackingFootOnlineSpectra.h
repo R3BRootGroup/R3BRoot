@@ -119,18 +119,22 @@ class R3BIncomingTrackingFootOnlineSpectra : public FairTask
     float fDist_acelerator_glad = 3880.0; // measured on 14/04/2025
     TString fNameCut = "";
     std::vector<uint16_t> fDetIds{ 0, 1, 2, 3, 4, 5, 6, 7 };
+    std::vector<uint16_t> fDetIdX{ 0, 2, 5, 7 };
+    std::vector<uint16_t> fDetIdY{ 1, 3, 4, 6 };
     std::vector<float> fFootZPos = std::vector<float>(fNbDet, 0.);
 
     // Canvas
     TCanvas* cTrackingXZ;
     TCanvas* cTrackingYZ;
-    TCanvas* cBeamProfileTarget;
+    TCanvas* cBeamProfileBeforeTarget;
+    TCanvas* cBeamProfileAfterTarget;
     TCanvas* cZvsBeta;
 
     // Histograms for Hit data
     TH2F* fh2_tracking_planeXZ;
     TH2F* fh2_tracking_planeYZ;
-    TH2F* fh2_target_PosXY;
+    TH2F* fh2_before_target_PosXY;
+    TH2F* fh2_after_target_PosXY;
     TH2F* fh2_angvsposx;
     TH2F* fh2_angvsposy;
     std::unique_ptr<TCutG> fCutIncoming = nullptr;

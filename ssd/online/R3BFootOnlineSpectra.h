@@ -33,6 +33,7 @@
 
 class TClonesArray;
 class R3BEventHeader;
+class R3BFootMappingPar;
 class TH1F;
 class TH2F;
 
@@ -70,6 +71,9 @@ class R3BFootOnlineSpectra : public FairTask
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
     InitStatus Init() override;
+
+    /** Virtual method SetParContainers **/
+    void SetParContainers() override;
 
     /**
      * Method for event loop implementation.
@@ -124,10 +128,14 @@ class R3BFootOnlineSpectra : public FairTask
     inline void SetTpat(int tpat) { fTpat = tpat; }
 
   private:
+    void SetParameter();
+
     R3BEventHeader* fEventHeader = nullptr; // // Pointer to the R3BEventHeader structure
     TClonesArray* fMappedItems = nullptr;   // Array with mapped items.
     TClonesArray* fCalItems = nullptr;      // Array with cal items.
     TClonesArray* fHitItems = nullptr;      // Array with hit items.
+
+    R3BFootMappingPar* fMap_Par = nullptr; // Parameter container with mapping
 
     int fTrigger = -1; // Trigger value.
     int fTpat = 0;
@@ -136,12 +144,24 @@ class R3BFootOnlineSpectra : public FairTask
     int eventNumber = 0;
     int fSigmaRefreshRate = 5000;
 
+    // Number of bins and limits for energy
     double fMinE = -100.;
     double fMaxE = 5000.;
     double fBinsE = 1000;
+
+    // Maximum size of the cluster (-1 for no maximum)
     double fMaxSize = -1;
+
+    // Number of posible combinations of correlations
     int dim = 6;
-    std::vector<int> corrNdx;
+
+    // Variables measured by each foot
+    std::vector<int> fXNdx = { 0, 2, 5, 7 };
+    std::vector<int> fYNdx = { 1, 3, 4, 6 };
+
+    // Different combinations for correlations
+    std::vector<int> fCorrNdxX;
+    std::vector<int> fCorrNdxY;
 
     // Histograms for map data
     std::vector<TH2F*> fh2_EnergyVsStrip;
