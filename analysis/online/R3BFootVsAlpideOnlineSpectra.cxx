@@ -26,6 +26,7 @@
 #include "R3BAlpideHitData.h"
 #include "R3BEventHeader.h"
 #include "R3BFootHitData.h"
+#include "R3BFootMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BShared.h"
 #include "THttpServer.h"
@@ -82,6 +83,56 @@ R3BFootVsAlpideOnlineSpectra::R3BFootVsAlpideOnlineSpectra(const TString& name, 
 
 R3BFootVsAlpideOnlineSpectra::~R3BFootVsAlpideOnlineSpectra() {}
 
+void R3BFootVsAlpideOnlineSpectra::SetParContainers()
+{
+    // Parameter Container
+    // Reading footMappingPar from FairRuntimeDb
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
+
+    fMap_Par = dynamic_cast<R3BFootMappingPar*>(rtdb->getContainer("footMappingPar"));
+    if (!fMap_Par)
+    {
+        R3BLOG(error, "Couldn't get handle on footMappingPar container");
+    }
+    else
+    {
+        R3BLOG(info, "footMappingPar found");
+    }
+}
+
+void R3BFootVsAlpideOnlineSpectra::SetParameter()
+{
+    if (!fMap_Par)
+    {
+        R3BLOG(warn, "Container footMappingPar not found");
+        return;
+    }
+    //--- Parameter Container ---
+    fNbDet = fMap_Par->GetNumDets(); // Number of foot detectors
+
+    R3BLOG(info, "NumDet from mapping " << fNbDet);
+
+    fXDet.clear();
+    fYDet.clear();
+
+    for (int i = 0; i < fNbDet; i++)
+    {
+
+        // X coordinate
+        if ((fMap_Par->GetAnglePhi(i + 1) == 0) || (fMap_Par->GetAnglePhi(i + 1) == 180))
+        {
+            fXDet.push_back(i);
+        }
+
+        // Y coordinate
+        if ((fMap_Par->GetAnglePhi(i + 1) == 90) || (fMap_Par->GetAnglePhi(i + 1) == 270))
+        {
+            fYDet.push_back(i);
+        }
+    }
+}
+
 InitStatus R3BFootVsAlpideOnlineSpectra::Init()
 {
 
@@ -113,6 +164,10 @@ InitStatus R3BFootVsAlpideOnlineSpectra::Init()
     {
         LOG(info) << "R3BFootVsAlpideOnlineSpectra::Init AlpideHitData not found";
     }
+
+    // Access parameter container
+    SetParContainers();
+    SetParameter();
 
     // Name variables
     char Name1[255];
@@ -243,8 +298,22 @@ void R3BFootVsAlpideOnlineSpectra::Exec(Option_t* option)
                 continue;
             if ((hit->GetEta() < 0.3) || (hit->GetEta() > 0.7))
                 continue;
+
+            int XorY = -1;
+            // X coordinate
+            if (std::find(fXDet.begin(), fXDet.end(), hit->GetDetId() - 1) != fXDet.end())
+            {
+                XorY = 0;
+            }
+
+            // Y coordinate
+            if (std::find(fYDet.begin(), fYDet.end(), hit->GetDetId() - 1) != fYDet.end())
+            {
+                XorY = 1;
+            }
+
             footEnergies[hit->GetDetId() - 1].push_back(hit->GetEnergy());
-            footPositions[hit->GetDetId() - 1].push_back(hit->GetPos());
+            footPositions[hit->GetDetId() - 1].push_back(hit->GetPosLab()[XorY]);
         }
     }
 
@@ -270,35 +339,28 @@ void R3BFootVsAlpideOnlineSpectra::Exec(Option_t* option)
     }
 
     // =============== Calculate the correlations =======
-    if (alpideEnergies.size() == 0)
+
+    for (int i = 0; i < alpidePositionsX.size(); i++)
     {
-        // R3BLOG("info", "Different number of hits in FOOT and ALPIDE");
-        std::cout << "No ALPIDE hits"
-                  << "\n";
-    }
-    else
-    {
-        for (int i = 0; i < alpidePositionsX.size(); i++)
+        for (int j = 0; j < fNbDet; j++)
         {
-            for (int j = 0; j < fNbDet; j++)
+            for (int k = 0; k < footPositions[j].size(); k++)
             {
-                for (int k = 0; k < footPositions[j].size(); k++)
+                fh2_foot_alpide_char_corr[j]->Fill(footEnergies[j][k], alpideEnergies[i]);
+
+                if (std::find(fYDet.begin(), fYDet.end(), j) != fYDet.end()) // Y
                 {
-                    fh2_foot_alpide_char_corr[j]->Fill(footEnergies[j][k], alpideEnergies[i]);
+                    fh2_foot_alpide_pos_corr[j]->Fill(footPositions[j][k], alpidePositionsY[i]);
+                }
 
-                    if ((j % 2) == 0) // Y
-                    {
-                        fh2_foot_alpide_pos_corr[j]->Fill(footPositions[j][k], alpidePositionsY[i]);
-                    }
-
-                    else
-                    {
-                        fh2_foot_alpide_pos_corr[j]->Fill(footPositions[j][k], alpidePositionsX[i]);
-                    }
+                else
+                {
+                    fh2_foot_alpide_pos_corr[j]->Fill(footPositions[j][k], alpidePositionsX[i]);
                 }
             }
         }
     }
+
     fNEvents += 1;
 }
 
