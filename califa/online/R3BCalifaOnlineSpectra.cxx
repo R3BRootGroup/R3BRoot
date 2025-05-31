@@ -31,6 +31,7 @@
 #include <TH1I.h>
 #include <TH2F.h>
 #include <THttpServer.h>
+#include <TLatex.h>
 #include <TMath.h>
 #include <TRandom.h>
 #include <TVector3.h>
@@ -431,12 +432,12 @@ InitStatus R3BCalifaOnlineSpectra::Init()
 
                         fh2_crystalsETot[s][r][p][j] = R3B::root_owned<TH2F>(ss3.str().c_str(),
                                                                              ss2.str().c_str(),
-                                                                             fBinsChannelFebex,
+                                                                             fBinsChannelFebex / 20,
                                                                              0,
-                                                                             fMaxBinChannelFebex,
-                                                                             fBinsChannelFebex,
+                                                                             30000,
+                                                                             fBinsChannelFebex / 20,
                                                                              0,
-                                                                             fMaxBinChannelFebex / 3);
+                                                                             fMaxBinChannelFebex * 2);
                         fh2_crystalsETot[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh2_crystalsETot[s][r][p][j]->GetXaxis()->SetTitle(Xaxis.c_str());
                         fh2_crystalsETot[s][r][p][j]->GetYaxis()->SetTitle("Tot");
@@ -481,12 +482,12 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                             << "_pr_evstot";
                         fh2_crystalsETot_p[s][r][p][j] = R3B::root_owned<TH2F>(ss3.str().c_str(),
                                                                                ss2.str().c_str(),
-                                                                               fBinsChannelFebex,
+                                                                               fBinsChannelFebex / 20,
                                                                                0,
-                                                                               fMaxBinChannelFebex,
-                                                                               fBinsChannelFebex,
+                                                                               30000,
+                                                                               fBinsChannelFebex / 20,
                                                                                0,
-                                                                               fMaxBinChannelFebex / 3);
+                                                                               fMaxBinChannelFebex * 2);
                         fh2_crystalsETot_p[s][r][p][j]->SetTitleSize(1.6, "t");
                         fh2_crystalsETot_p[s][r][p][j]->GetXaxis()->SetTitle(Xaxis.c_str());
                         fh2_crystalsETot_p[s][r][p][j]->GetYaxis()->SetTitle("Tot");
@@ -502,7 +503,30 @@ InitStatus R3BCalifaOnlineSpectra::Init()
                 }
             }
     }
+    TCanvas* cFebex_overview = new TCanvas("Febex overview", "Febex overview", 700, 500);
+    fh2_febex_side_febex_pc_sfp =
+        R3B::root_owned<TH2F>("Febex overview", "Entries febex overview", 100, 0, 100, 36, 0, 36);
+    fh2_febex_side_febex_pc_sfp->GetXaxis()->SetTitle("febex module");
+    fh2_febex_side_febex_pc_sfp->GetYaxis()->SetTitle("febex channel (top:mes, bottom:wix)");
+    fh2_febex_side_febex_pc_sfp->GetYaxis()->CenterTitle(true);
+    fh2_febex_side_febex_pc_sfp->Draw("colz");
+    TLatex latex;
+    latex.SetTextSize(0.05);
+    latex.SetTextAlign(13);
+    latex.DrawLatex(34, 19, "iphos");
+    latex.DrawLatex(4, 19, "barrel");
+    latex.DrawLatex(64, 19, "barrel");
+    latex.DrawLatex(80, 19, "cepa");
+    latex.DrawLatex(89, 20, "back");
+    latex.DrawLatex(88, 18, "barrel");
 
+    TCanvas* cWr_diff_febex = new TCanvas("WR diff febex", "WR diff febex", 700, 500);
+    fh2_wrts_diff_febex_pc_sfp = R3B::root_owned<TH2F>(
+        "WRTS difference (pc, sfp, febex)", "WR TS difference (pc, sfp, febex)", 200, 0, 200, 1000, -4000, 4000);
+    fh2_wrts_diff_febex_pc_sfp->GetXaxis()->SetTitle("febex_side_pc_sfp_mod_t");
+    fh2_wrts_diff_febex_pc_sfp->GetYaxis()->SetTitle("wrts_diff");
+
+    fh2_wrts_diff_febex_pc_sfp->Draw("colz");
     // Cal data
     for (Int_t s = 0; s < fNumSides; s++) // Side
     {
@@ -792,22 +816,35 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     Name2 = "fh1_WR_Califa";
     Name3 = "WR-Wixhausen - WR-Messel";
     cCalifa_wr = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
-    fh1_Califa_wr = R3B::root_owned<TH1I>(Name2.c_str(), Name3.c_str(), 4000, -4000, 4000);
-    fh1_Califa_wr->GetXaxis()->SetTitle("Difference of Califa WRs");
-    fh1_Califa_wr->GetYaxis()->SetTitle("Counts");
-    fh1_Califa_wr->GetYaxis()->SetTitleOffset(1.3);
-    fh1_Califa_wr->GetXaxis()->CenterTitle(true);
-    fh1_Califa_wr->GetYaxis()->CenterTitle(true);
-    fh1_Califa_wr->SetFillColor(29);
-    fh1_Califa_wr->SetLineColor(1);
-    fh1_Califa_wr->SetLineWidth(2);
-    fh1_Califa_wr->Draw("");
+    fh1_Califa_wr[0] = R3B::root_owned<TH1I>(
+        Name2.c_str(), "black:mes0-mes1, red:wix0-wix1, green:mes0-wix0, blue:mes1-wix1", 400, -400, 400);
+    fh1_Califa_wr[0]->GetXaxis()->SetTitle("ts diff");
+    fh1_Califa_wr[0]->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_wr[0]->GetYaxis()->SetTitleOffset(1.3);
+    fh1_Califa_wr[0]->GetXaxis()->CenterTitle(true);
+    fh1_Califa_wr[0]->GetYaxis()->CenterTitle(true);
+    // fh1_Califa_wr[0]->SetFillColor(29);
+    fh1_Califa_wr[0]->SetLineColor(1);
+    fh1_Califa_wr[0]->SetLineWidth(2);
+    fh1_Califa_wr[0]->Draw("");
+    fh1_Califa_wr[1] = R3B::root_owned<TH1I>(Name2.c_str(), "wix0-wix1", 400, -400, 400);
+    fh1_Califa_wr[2] = R3B::root_owned<TH1I>(Name2.c_str(), "mes0-wix0", 400, -400, 400);
+    fh1_Califa_wr[3] = R3B::root_owned<TH1I>(Name2.c_str(), "mes1-wix1", 400, -400, 400);
+    fh1_Califa_wr[1]->SetLineColor(2);
+    fh1_Califa_wr[2]->SetLineColor(3);
+    fh1_Califa_wr[3]->SetLineColor(4);
+    fh1_Califa_wr[1]->SetLineWidth(2);
+    fh1_Califa_wr[2]->SetLineWidth(2);
+    fh1_Califa_wr[3]->SetLineWidth(2);
+    fh1_Califa_wr[1]->Draw("same");
+    fh1_Califa_wr[2]->Draw("same");
+    fh1_Califa_wr[3]->Draw("same");
 
     // Difference between Califa-Master WRs
     Name1 = "WR_Master_Califa";
     cWrs = new TCanvas(Name1.c_str(), Name1.c_str(), 10, 10, 500, 500);
     Name2 = "fh1_WR_Master_Califa";
-    Name3 = "WR-Califa - WR-Master: Messel (blue), Wixhausen (red) - WR-Master";
+    Name3 = "WRCalifa - WRMaster mes0:red, mes1:blue, wix0:black, wix1:green";
     fh1_wrs[0] = R3B::root_owned<TH1I>(Name2.c_str(), Name3.c_str(), 4000, -4000, 4000);
     fh1_wrs[0]->SetStats(1);
     fh1_wrs[0]->GetXaxis()->SetTitle("WRTs difference");
@@ -818,10 +855,18 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh1_wrs[0]->SetLineColor(2);
     fh1_wrs[0]->SetLineWidth(3);
     fh1_wrs[0]->Draw("");
-    fh1_wrs[1] = R3B::root_owned<TH1I>("fh1_WR_Master_Califa_Messel", "", 4000, -4000, 4000);
+    fh1_wrs[1] = R3B::root_owned<TH1I>("fh1_WR_Master_Califa_Messel", "Mes0", 4000, -4000, 4000);
     fh1_wrs[1]->SetLineColor(4);
     fh1_wrs[1]->SetLineWidth(3);
     fh1_wrs[1]->Draw("same");
+    fh1_wrs[2] = R3B::root_owned<TH1I>("fh1_WR_Master_Califa_Wix1", "Wix1", 4000, -4000, 4000);
+    fh1_wrs[2]->SetLineColor(1);
+    fh1_wrs[2]->SetLineWidth(3);
+    fh1_wrs[2]->Draw("same");
+    fh1_wrs[3] = R3B::root_owned<TH1I>("fh1_WR_Master_Califa_Messel1", "Mes1", 4000, -4000, 4000);
+    fh1_wrs[3]->SetLineColor(3);
+    fh1_wrs[3]->SetLineWidth(3);
+    fh1_wrs[3]->Draw("same");
 
     // CANVAS energy vs wrs
     Name1 = "Califa_wr_vs_energy";
@@ -936,8 +981,11 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     auto mainfolCalifa = new TFolder("CALIFA", "CALIFA info");
     mainfolCalifa->Add(cCalifaMult);
     mainfolCalifa->Add(cCalifa_cry_energy);
+    mainfolCalifa->Add(cFebex_overview);
 
     auto folder_wrs = new TFolder("WRs", "CALIFA white-rabbit info");
+    folder_wrs->Add(cWr_diff_febex);
+
     auto tpatfolder = new TFolder("Corr_with_tpat", "Correlations with tpat info");
 
     if (fWRItemsCalifa && fWRItemsMaster)
@@ -1026,13 +1074,20 @@ void R3BCalifaOnlineSpectra::Reset_CALIFA_Histo()
     R3BLOG(info, "");
     if (fWRItemsCalifa)
     {
-        fh1_Califa_wr->Reset();
+        fh1_Califa_wr[0]->Reset();
+        fh1_Califa_wr[1]->Reset();
+        fh1_Califa_wr[2]->Reset();
+        fh1_Califa_wr[3]->Reset();
     }
 
     if (fWRItemsCalifa && fWRItemsMaster)
     {
         fh1_wrs[0]->Reset();
         fh1_wrs[1]->Reset();
+        fh1_wrs[2]->Reset();
+        fh1_wrs[3]->Reset();
+        fh2_wrts_diff_febex_pc_sfp->Reset();
+        fh2_febex_side_febex_pc_sfp->Reset();
         if (fHitItemsCalifa)
         {
             fh2_Cal_wr_energy_r->Reset();
@@ -1378,9 +1433,9 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
-    int64_t wr[2];
+    int64_t wr[4];
     int64_t wrm = 0.0;
-    for (int i = 0; i < 2; i++)
+    for (int i = 0; i < 4; i++)
         wr[i] = 0;
     // WR data
     if (fWRItemsCalifa && fWRItemsCalifa->GetEntriesFast() > 0)
@@ -1392,10 +1447,16 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             R3BWRData* hit = dynamic_cast<R3BWRData*>(fWRItemsCalifa->At(ihit));
             if (!hit)
                 continue;
-            wr[ihit] = hit->GetTimeStamp();
+            wr[ihit] = hit->GetTimeStamp(); // ihit 0,1,2,3: mes0, mes1, wix0, wix1
+                                            // std::cout << ihit << " " << wr[ihit] << std::endl;
         }
-        if (nHits == 2)
-            fh1_Califa_wr->Fill(wr[1] - wr[0]);
+        if (nHits == 4)
+        {
+            fh1_Califa_wr[0]->Fill(wr[0] - wr[1]);
+            fh1_Califa_wr[1]->Fill(wr[2] - wr[3]);
+            fh1_Califa_wr[2]->Fill(wr[0] - wr[2]);
+            fh1_Califa_wr[3]->Fill(wr[1] - wr[3]);
+        }
 
         // Master Ref. (exp. 2020)
         if (fWRItemsMaster && fWRItemsMaster->GetEntriesFast() > 0)
@@ -1451,12 +1512,30 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
 
             Int_t cryId = hit->GetCrystalId();
 
+            bool side = !(fMap_Par->GetHalf(cryId) % 2);
+            // std::cout << fMap_Par->GetHalf(cryId) << std::endl;
+            int sfp = fMap_Par->GetFebexSlot(cryId);
+            int pc = fMap_Par->GetFebexPC(cryId);
+            int febex_ch = fMap_Par->GetFebexChannel(cryId);
+            int febex_mod = fMap_Par->GetFebexMod(cryId);
             // compensate slave exploder delays:
             int64_t wrc = hit->GetWrts() + 245 * (fMap_Par->GetPreamp(cryId) > 8);
             if (wrm > 0.)
             {
-                bool side = !(fMap_Par->GetHalf(cryId) % 2);
-                fh1_wrs[side]->Fill(wrc - wrm);
+                float this_califa_wr = 0;
+                if (side == 1 && pc == 0)
+                    this_califa_wr = wr[0];
+                if (side == 1 && pc == 1)
+                    this_califa_wr = wr[1];
+                if (side == 0 && pc == 0)
+                    this_califa_wr = wr[2];
+                if (side == 0 && pc == 1)
+                    this_califa_wr = wr[3];
+
+                fh1_wrs[side + pc * 2]->Fill(wrc - wrm);
+                // fh1_wrs[side + pc*2]->Fill(this_califa_wr - wrm);
+                fh2_wrts_diff_febex_pc_sfp->Fill(side * 100 + sfp * 20 + pc * 80 + febex_mod, wrc - wrm);
+                // fh2_wrts_diff_febex_pc_sfp->Fill(side*100 + sfp*20 + pc*80 +febex_ch, this_califa_wr-wrm);
             }
 
             if ((fMap_Par->GetInUse(cryId) == 1 && cryId <= fNbCalifaCrystals / 2) ||
@@ -1465,6 +1544,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
                 Crymult++;
 
             fh2_Califa_cryId_energy->Fill(cryId, hit->GetEnergy());
+            fh2_febex_side_febex_pc_sfp->Fill(febex_mod + sfp * 20 + pc * 80, side * 20 + febex_ch);
 
             if (fMap_Par->GetHalf(cryId) == 2)
                 fh2_Preamp_vs_ch_L[fMap_Par->GetRing(cryId) - 1]->Fill(fMap_Par->GetPreamp(cryId),
@@ -1560,19 +1640,16 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
                 continue;
             theta = hit->GetTheta() * TMath::RadToDeg();
             phi = hit->GetPhi() * TMath::RadToDeg();
-            if (hit->GetClusterType() == 0) // proton
+            fh2_Califa_theta_phi->Fill(theta, phi);
+            if (!(hit->GetEnergy() < 20e3))
             {
                 califa_theta.push_back(theta);
                 califa_phi.push_back(phi);
                 califa_e.push_back(hit->GetEnergy());
-            }
-            fh2_Califa_theta_phi->Fill(theta, phi);
-            if (hit->GetClusterType() == 0) // proton
-            {
                 fh2_Califa_theta_energy_pr->Fill(theta, hit->GetEnergy() / 1000.); // MeV
                 fh1_Califa_total_energy_pr->Fill(hit->GetEnergy() / 1000.);        // MeV
             }
-            else if (hit->GetClusterType() == 1) // gamma
+            else
             {
                 fh2_Califa_theta_energy_gr->Fill(theta, hit->GetEnergy());
                 fh1_Califa_total_energy_gr->Fill(hit->GetEnergy());

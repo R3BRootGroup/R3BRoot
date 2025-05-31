@@ -219,9 +219,9 @@ class R3BCalifaOnlineSpectra : public FairTask
     int fMaxEnergyGR = 32000;  // Max. energy for the gamma range in keV
     int fMaxEnergyPR = 340;    // Max. energy for the proton range in MeV
     bool fLogScale = true;     // Selecting scale
-    bool fRaw2Cal = false;     // Mapped or Cal selector
+    bool fRaw2Cal = true;      // Mapped or Cal selector, originally false
     bool fFebex2Preamp = true; // Febex or Preamp selector
-    bool fTotHist = false;     // Tot histograms selector
+    bool fTotHist = true;      // Tot histograms selector, originally: false
     multi_array<int, 4> fFebexInfo;
 
     // Canvas
@@ -248,9 +248,9 @@ class R3BCalifaOnlineSpectra : public FairTask
 
     // WR data
     TCanvas* cCalifa_wr;
-    TH1I* fh1_Califa_wr;
+    TH1I* fh1_Califa_wr[4];
     TCanvas* cWrs;
-    TH1I* fh1_wrs[2];
+    TH1I* fh1_wrs[4];
     TCanvas* cCalifa_sync;
     TH1F* fh1_Califa_sync[3];
     TCanvas* cCalifa_wr_energy;
@@ -285,6 +285,8 @@ class R3BCalifaOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_Califa_NsNf;
     std::vector<TH2F*> fh2_Califa_EtrigCor;
     std::vector<TH1F*> fh1_Califa_Etrig;
+    TH2F* fh2_febex_side_febex_pc_sfp;
+    TH2F* fh2_wrts_diff_febex_pc_sfp;
 
   public:
     ClassDefOverride(R3BCalifaOnlineSpectra, 1); // NOLINT
