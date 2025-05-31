@@ -26,37 +26,39 @@ class R3BWhiterabbitCalifaReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA*, size_t, UInt_t, UInt_t);
+    R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA*, size_t, UInt_t, UInt_t, UInt_t = 0, UInt_t = 0);
 
     // Destructor
     virtual ~R3BWhiterabbitCalifaReader();
 
     // Setup structure information
-    virtual Bool_t Init(ext_data_struct_info*) override;
+    Bool_t Init(ext_data_struct_info*) override;
 
     // Read data from full event structure
-    virtual Bool_t R3BRead() override;
+    Bool_t R3BRead() override;
 
     // Reset
-    virtual void Reset() override;
+    void Reset() override;
 
     /** Accessor to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     // An event counter
-    UInt_t fNEvent;
+    UInt_t fNEvent = 0;
     // Reader specific data structure from ucesb
     EXT_STR_h101_WRCALIFA* fData;
     // Offset of detector specific data in full data structure
     size_t fOffset;
     // The whiterabbit subsystem ID
-    UInt_t fWhiterabbitId1;
-    UInt_t fWhiterabbitId2;
+    UInt_t fWhiterabbitId1 = 0;
+    UInt_t fWhiterabbitId2 = 0;
+    UInt_t fWhiterabbitId3 = 0;
+    UInt_t fWhiterabbitId4 = 0;
     // A pointer to the R3BEventHeader structure
-    R3BEventHeader* fEventHeader;
+    R3BEventHeader* fEventHeader = nullptr;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
     // Output array
     TClonesArray* fArray;
 

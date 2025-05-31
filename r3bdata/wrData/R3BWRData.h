@@ -16,11 +16,10 @@
 // -----          Created 28/02/2019 by J.L. Rodriguez                -----
 // ------------------------------------------------------------------------
 
-#ifndef R3BWRData_H
-#define R3BWRData_H 1
+#pragma once
 
-#include "TObject.h"
 #include <Rtypes.h>
+#include <TObject.h>
 
 class R3BWRData : public TObject
 {
@@ -32,21 +31,19 @@ class R3BWRData : public TObject
      *@param timestamp
      *@param id
      **/
-    R3BWRData(uint64_t timestamp, UInt_t id = 1);
+    explicit R3BWRData(uint64_t timestamp, UInt_t id = 0);
 
     // Destructor
-    virtual ~R3BWRData() {}
+    virtual ~R3BWRData() = default;
 
     // Getters
     inline const uint64_t& GetTimeStamp() const { return fTimeStamp; }
     inline const UInt_t& GetId() const { return fId; }
 
   protected:
-    UInt_t fId;
-    uint64_t fTimeStamp; // timestamp for master
+    UInt_t fId = 0;
+    uint64_t fTimeStamp = 0; // Timestamp
 
   public:
-    ClassDef(R3BWRData, 1)
+    ClassDef(R3BWRData, 1); // NOLINT
 };
-
-#endif /* R3BWRData_H */
