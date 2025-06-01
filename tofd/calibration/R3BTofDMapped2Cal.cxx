@@ -161,6 +161,7 @@ void R3BTofDMapped2Cal::Exec(Option_t*)
     }
 
     Int_t mapped_num = fMappedItems->GetEntriesFast();
+
     // Calibrate time to nanoseconds.
     struct Cal
     {
@@ -285,7 +286,7 @@ void R3BTofDMapped2Cal::Exec(Option_t*)
             }
 
             // Tcal parameters.
-            auto* par = fTcalPar->GetModuleParAt(mapped->GetDetectorId(), mapped->GetBarId(), mapped->GetEdgeId());
+            auto* par = fTcalPar->GetModuleParAt(mapped->GetDetectorId(), mapped->GetBarId(), 1);
             if (!par)
             {
                 R3BLOG(warn,
@@ -299,8 +300,7 @@ void R3BTofDMapped2Cal::Exec(Option_t*)
             // ... and subtract it from the next clock cycle.
             time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
 
-            if (mapped->GetEdgeId() == 1) // Only leading times
-                AddTriggerTCalData(mapped->GetDetectorId(), mapped->GetBarId(), time_ns);
+            AddTriggerTCalData(mapped->GetDetectorId(), mapped->GetBarId(), time_ns);
         }
     }
 }
@@ -340,15 +340,12 @@ R3BTofdCalData* R3BTofDMapped2Cal::AddTCalData(UInt_t detid,
 }
 
 // -----   Private method AddTriggerTCalData  --------------------------------------------
-R3BTofdCalData* R3BTofDMapped2Cal::AddTriggerTCalData(UInt_t detid,
-                                                      UInt_t barid,
-                                                      Double_t lead_time,
-                                                      Double_t trail_time)
+R3BTofdCalData* R3BTofDMapped2Cal::AddTriggerTCalData(UInt_t detid, UInt_t barid, Double_t lead_time)
 {
     // It fills the R3BTofdCalData
     TClonesArray& clref = *fCalTriggerItems;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BTofdCalData(detid, barid, 1, lead_time, trail_time);
+    return new (clref[size]) R3BTofdCalData(detid, barid, 1, lead_time, 0.);
 }
 
 ClassImp(R3BTofDMapped2Cal)

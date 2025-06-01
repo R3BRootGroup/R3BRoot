@@ -75,6 +75,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
     , fTofdHisto(false)
     , fTofdHistoCal(false)
     , fTofdTotPos(false)
+    , fExpCor(false)
     , fnEvents(0)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
     , maxevent(0)
@@ -557,6 +558,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 auto THit_raw = (bot->GetTimeLeading_ns() + top->GetTimeLeading_ns()) / 2.; // needed for TOF for ROLUs
 
+                LOG(debug) << "ToT: " << top_tot << " " << bot_tot;
+
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
                 Double_t Offset1 = 0.;
@@ -676,7 +679,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 Double_t qb = 0.;
                 if (fTofdQ > 0)
                 {
-                    if (fTofdTotPos)
+                    if (!fExpCor)
                     {
                         // via pol3
                         para[0] = par->GetPola();
@@ -686,6 +689,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                         qb = TMath::Sqrt(top_tot * bot_tot) /
                              (para[0] + para[1] * pos + para[2] * pow(pos, 2) + para[3] * pow(pos, 3));
                         qb = qb * fTofdQ;
+                        LOG(debug) << "ToT pol3: " << top_tot << " " << bot_tot;
                     }
                     else
                     {
@@ -705,11 +709,13 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                         q1 = q1 * fTofdQ;
                         q2 = q2 * fTofdQ;
                         qb = (q1 + q2) / 2.;
+                        LOG(debug) << "ToT exp: " << q1 << " " << q2;
                     }
                 }
                 else
                 {
                     qb = TMath::Sqrt(top_tot * bot_tot);
+                    LOG(debug) << "ToT qb: " << top_tot << " " << bot_tot;
                 }
                 Double_t parz[3] = { 0 };
                 if (par)
@@ -720,7 +726,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 }
                 if (parz[0] > 0 && parz[2] > 0)
                     LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
-                               << iPlane << " ibar " << iBar;
+                               << iPlane << " ibar " << iBar << " qb " << qb;
                 else
                     LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
                 LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
@@ -743,8 +749,8 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 {
                     tof_corr = tof - par->GetTofSyncOffset();
                 }
-                event.push_back(
-                    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                //   { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
                 if (fTofdHisto)
                 {
                     // fill control histograms
@@ -806,29 +812,29 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     auto tdiffRaw = dt_mod;
                     fhTdiffRaw[iPlane - 1]->Fill(iBar, tdiffRaw);
 
-                    if (qb > 500 && qb < 900)
-                    {
-                        auto tdiffWalk = bot_ns - top_ns;
-                        fhTdiffWalk[iPlane - 1]->Fill(iBar, tdiffWalk);
+                    // if (qb > 500 && qb < 900)
+                    //{
+                    auto tdiffWalk = bot_ns - top_ns;
+                    fhTdiffWalk[iPlane - 1]->Fill(iBar, tdiffWalk);
 
-                        auto tdiffOffset = tdiff;
-                        fhTdiffOffset[iPlane - 1]->Fill(iBar, tdiffOffset);
+                    auto tdiffOffset = tdiff;
+                    fhTdiffOffset[iPlane - 1]->Fill(iBar, tdiffOffset);
 
-                        auto postime = posTime;
-                        fhposVeff[iPlane - 1]->Fill(iBar, postime);
+                    auto postime = posTime;
+                    fhposVeff[iPlane - 1]->Fill(iBar, postime);
 
-                        auto ToTdiffWalk = TMath::Log(bot_tot / top_tot);
-                        fhToTdiffWalk[iPlane - 1]->Fill(iBar, ToTdiffWalk);
+                    auto ToTdiffWalk = TMath::Log(bot_tot / top_tot);
+                    fhToTdiffWalk[iPlane - 1]->Fill(iBar, ToTdiffWalk);
 
-                        auto ToTdiffOffset = ToTdiff; // TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
-                        fhToTdiffOffset[iPlane - 1]->Fill(iBar, ToTdiffOffset);
+                    auto ToTdiffOffset = ToTdiff; // TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
+                    fhToTdiffOffset[iPlane - 1]->Fill(iBar, ToTdiffOffset);
 
-                        auto postot = posToT; // lambda * TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
-                        fhposLambda[iPlane - 1]->Fill(iBar, postot);
+                    auto postot = posToT; // lambda * TMath::Log((bot_tot * TotOffset1) / (top_tot * TotOffset2));
+                    fhposLambda[iPlane - 1]->Fill(iBar, postot);
 
-                        auto posFinal = pos;
-                        fhposFinal[iPlane - 1]->Fill(iBar, posFinal);
-                    }
+                    auto posFinal = pos;
+                    fhposFinal[iPlane - 1]->Fill(iBar, posFinal);
+                    //}
                 }
                 for (Int_t e = 0; e < event.size(); e++)
                 {

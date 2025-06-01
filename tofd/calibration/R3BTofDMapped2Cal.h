@@ -121,7 +121,7 @@ class R3BTofDMapped2Cal : public FairTask
 
     R3BTofdCalData* AddTCalData(UInt_t detid, UInt_t barid, UInt_t sideid, Double_t lead_time, Double_t trail_time);
 
-    R3BTofdCalData* AddTriggerTCalData(UInt_t detid, UInt_t barid, Double_t lead_time, Double_t trail_time = 0.);
+    R3BTofdCalData* AddTriggerTCalData(UInt_t detid, UInt_t barid, Double_t lead_time);
 
   public:
     ClassDef(R3BTofDMapped2Cal, 1);
