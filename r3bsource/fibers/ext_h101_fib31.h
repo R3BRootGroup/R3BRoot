@@ -18,8 +18,7 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_FIB31_EXT_H101_FIB31_H__
-#define __GUARD_H101_FIB31_EXT_H101_FIB31_H__
+#pragma once
 
 #ifndef __CINT__
 #include <stdint.h>
@@ -87,11 +86,21 @@ typedef struct EXT_STR_h101_FIBEI_t
     uint32_t FIBEI_TRIGCME[8 EXT_STRUCT_CTRL(FIBEI_TRIGCM)] /* [1,8] */;
     uint32_t FIBEI_TRIGC /* [0,8] */;
     uint32_t FIBEI_TRIGCv[8 EXT_STRUCT_CTRL(FIBEI_TRIGC)] /* [0,65535] */;
+    uint32_t FIBEI_TRIGTCM /* [1,8] */;
+    uint32_t FIBEI_TRIGTCMI[8 EXT_STRUCT_CTRL(FIBEI_TRIGTCM)] /* [1,8] */;
+    uint32_t FIBEI_TRIGTCME[8 EXT_STRUCT_CTRL(FIBEI_TRIGTCM)] /* [1,8] */;
+    uint32_t FIBEI_TRIGTC /* [0,8] */;
+    uint32_t FIBEI_TRIGTCv[8 EXT_STRUCT_CTRL(FIBEI_TRIGTC)] /* [0,65535] */;
     uint32_t FIBEI_TRIGFM /* [1,8] */;
     uint32_t FIBEI_TRIGFMI[8 EXT_STRUCT_CTRL(FIBEI_TRIGFM)] /* [1,8] */;
     uint32_t FIBEI_TRIGFME[8 EXT_STRUCT_CTRL(FIBEI_TRIGFM)] /* [1,8] */;
     uint32_t FIBEI_TRIGF /* [0,8] */;
     uint32_t FIBEI_TRIGFv[8 EXT_STRUCT_CTRL(FIBEI_TRIGF)] /* [0,65535] */;
+    uint32_t FIBEI_TRIGTFM /* [1,8] */;
+    uint32_t FIBEI_TRIGTFMI[8 EXT_STRUCT_CTRL(FIBEI_TRIGTFM)] /* [1,8] */;
+    uint32_t FIBEI_TRIGTFME[8 EXT_STRUCT_CTRL(FIBEI_TRIGTFM)] /* [1,8] */;
+    uint32_t FIBEI_TRIGTF /* [0,8] */;
+    uint32_t FIBEI_TRIGTFv[8 EXT_STRUCT_CTRL(FIBEI_TRIGTF)] /* [0,65535] */;
 
 } EXT_STR_h101_FIBEI;
 
@@ -149,96 +158,184 @@ typedef struct EXT_STR_h101_FIBEI_onion_t
     uint32_t FIBEI_TRIGCME[8 /* FIBEI_TRIGCM */];
     uint32_t FIBEI_TRIGC;
     uint32_t FIBEI_TRIGCv[8 /* FIBEI_TRIGC */];
+    uint32_t FIBEI_TRIGTCM;
+    uint32_t FIBEI_TRIGTCMI[8 /* FIBEI_TRIGTCM */];
+    uint32_t FIBEI_TRIGTCME[8 /* FIBEI_TRIGTCM */];
+    uint32_t FIBEI_TRIGTC;
+    uint32_t FIBEI_TRIGTCv[8 /* FIBEI_TRIGTC */];
     uint32_t FIBEI_TRIGFM;
     uint32_t FIBEI_TRIGFMI[8 /* FIBEI_TRIGFM */];
     uint32_t FIBEI_TRIGFME[8 /* FIBEI_TRIGFM */];
     uint32_t FIBEI_TRIGF;
     uint32_t FIBEI_TRIGFv[8 /* FIBEI_TRIGF */];
+    uint32_t FIBEI_TRIGTFM;
+    uint32_t FIBEI_TRIGTFMI[8 /* FIBEI_TRIGTFM */];
+    uint32_t FIBEI_TRIGTFME[8 /* FIBEI_TRIGTFM */];
+    uint32_t FIBEI_TRIGTF;
+    uint32_t FIBEI_TRIGTFv[8 /* FIBEI_TRIGTF */];
 
 } EXT_STR_h101_FIBEI_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_FIBEI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                            \
-    do                                                                                                               \
-    {                                                                                                                \
-        ok = 1;                                                                                                      \
-        /* RAW */                                                                                                    \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBLCM, UINT32, "FIBEI_TBLCM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBLCMI, UINT32, "FIBEI_TBLCMI", "FIBEI_TBLCM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBLCME, UINT32, "FIBEI_TBLCME", "FIBEI_TBLCM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBLC, UINT32, "FIBEI_TBLC", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TBLCv, UINT32, "FIBEI_TBLCv", "FIBEI_TBLC"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBLFM, UINT32, "FIBEI_TBLFM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBLFMI, UINT32, "FIBEI_TBLFMI", "FIBEI_TBLFM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBLFME, UINT32, "FIBEI_TBLFME", "FIBEI_TBLFM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBLF, UINT32, "FIBEI_TBLF", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TBLFv, UINT32, "FIBEI_TBLFv", "FIBEI_TBLF"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBTCM, UINT32, "FIBEI_TBTCM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBTCMI, UINT32, "FIBEI_TBTCMI", "FIBEI_TBTCM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBTCME, UINT32, "FIBEI_TBTCME", "FIBEI_TBTCM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBTC, UINT32, "FIBEI_TBTC", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TBTCv, UINT32, "FIBEI_TBTCv", "FIBEI_TBTC"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBTFM, UINT32, "FIBEI_TBTFM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBTFMI, UINT32, "FIBEI_TBTFMI", "FIBEI_TBTFM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TBTFME, UINT32, "FIBEI_TBTFME", "FIBEI_TBTFM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TBTF, UINT32, "FIBEI_TBTF", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TBTFv, UINT32, "FIBEI_TBTFv", "FIBEI_TBTF"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTLCM, UINT32, "FIBEI_TTLCM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTLCMI, UINT32, "FIBEI_TTLCMI", "FIBEI_TTLCM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTLCME, UINT32, "FIBEI_TTLCME", "FIBEI_TTLCM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTLC, UINT32, "FIBEI_TTLC", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TTLCv, UINT32, "FIBEI_TTLCv", "FIBEI_TTLC"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTLFM, UINT32, "FIBEI_TTLFM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTLFMI, UINT32, "FIBEI_TTLFMI", "FIBEI_TTLFM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTLFME, UINT32, "FIBEI_TTLFME", "FIBEI_TTLFM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTLF, UINT32, "FIBEI_TTLF", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TTLFv, UINT32, "FIBEI_TTLFv", "FIBEI_TTLF"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTTCM, UINT32, "FIBEI_TTTCM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTTCMI, UINT32, "FIBEI_TTTCMI", "FIBEI_TTTCM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTTCME, UINT32, "FIBEI_TTTCME", "FIBEI_TTTCM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTTC, UINT32, "FIBEI_TTTC", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TTTCv, UINT32, "FIBEI_TTTCv", "FIBEI_TTTC"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTTFM, UINT32, "FIBEI_TTTFM", 512);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTTFMI, UINT32, "FIBEI_TTTFMI", "FIBEI_TTTFM");                \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TTTFME, UINT32, "FIBEI_TTTFME", "FIBEI_TTTFM");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TTTF, UINT32, "FIBEI_TTTF", 32768);          \
-        EXT_STR_ITEM_INFO_ZZP(ok, si, offset, struct_t, printerr, FIBEI_TTTFv, UINT32, "FIBEI_TTTFv", "FIBEI_TTTF"); \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TRIGCM, UINT32, "FIBEI_TRIGCM", 8);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TRIGCMI, UINT32, "FIBEI_TRIGCMI", "FIBEI_TRIGCM");             \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TRIGCME, UINT32, "FIBEI_TRIGCME", "FIBEI_TRIGCM");             \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TRIGC, UINT32, "FIBEI_TRIGC", 8);            \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TRIGCv, UINT32, "FIBEI_TRIGCv", "FIBEI_TRIGC");                \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TRIGFM, UINT32, "FIBEI_TRIGFM", 8);          \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TRIGFMI, UINT32, "FIBEI_TRIGFMI", "FIBEI_TRIGFM");             \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TRIGFME, UINT32, "FIBEI_TRIGFME", "FIBEI_TRIGFM");             \
-        EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, FIBEI_TRIGF, UINT32, "FIBEI_TRIGF", 8);            \
-        EXT_STR_ITEM_INFO_ZZP(                                                                                       \
-            ok, si, offset, struct_t, printerr, FIBEI_TRIGFv, UINT32, "FIBEI_TRIGFv", "FIBEI_TRIGF");                \
-                                                                                                                     \
+#define EXT_STR_h101_FIBEI_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                             \
+    do                                                                                                                \
+    {                                                                                                                 \
+        ok = 1;                                                                                                       \
+        /* RAW */                                                                                                     \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLCM, UINT32, "FIBEI_TBLCM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLCMI, UINT32, "FIBEI_TBLCMI", "FIBEI_TBLCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLCME, UINT32, "FIBEI_TBLCME", "FIBEI_TBLCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLC, UINT32, "FIBEI_TBLC", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLCv, UINT32, "FIBEI_TBLCv", "FIBEI_TBLC", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLFM, UINT32, "FIBEI_TBLFM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLFMI, UINT32, "FIBEI_TBLFMI", "FIBEI_TBLFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLFME, UINT32, "FIBEI_TBLFME", "FIBEI_TBLFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLF, UINT32, "FIBEI_TBLF", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBLFv, UINT32, "FIBEI_TBLFv", "FIBEI_TBLF", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTCM, UINT32, "FIBEI_TBTCM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTCMI, UINT32, "FIBEI_TBTCMI", "FIBEI_TBTCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTCME, UINT32, "FIBEI_TBTCME", "FIBEI_TBTCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTC, UINT32, "FIBEI_TBTC", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTCv, UINT32, "FIBEI_TBTCv", "FIBEI_TBTC", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTFM, UINT32, "FIBEI_TBTFM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTFMI, UINT32, "FIBEI_TBTFMI", "FIBEI_TBTFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTFME, UINT32, "FIBEI_TBTFME", "FIBEI_TBTFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTF, UINT32, "FIBEI_TBTF", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TBTFv, UINT32, "FIBEI_TBTFv", "FIBEI_TBTF", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLCM, UINT32, "FIBEI_TTLCM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLCMI, UINT32, "FIBEI_TTLCMI", "FIBEI_TTLCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLCME, UINT32, "FIBEI_TTLCME", "FIBEI_TTLCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLC, UINT32, "FIBEI_TTLC", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLCv, UINT32, "FIBEI_TTLCv", "FIBEI_TTLC", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLFM, UINT32, "FIBEI_TTLFM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLFMI, UINT32, "FIBEI_TTLFMI", "FIBEI_TTLFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLFME, UINT32, "FIBEI_TTLFME", "FIBEI_TTLFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLF, UINT32, "FIBEI_TTLF", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTLFv, UINT32, "FIBEI_TTLFv", "FIBEI_TTLF", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTCM, UINT32, "FIBEI_TTTCM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTCMI, UINT32, "FIBEI_TTTCMI", "FIBEI_TTTCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTCME, UINT32, "FIBEI_TTTCME", "FIBEI_TTTCM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTC, UINT32, "FIBEI_TTTC", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTCv, UINT32, "FIBEI_TTTCv", "FIBEI_TTTC", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTFM, UINT32, "FIBEI_TTTFM", 512, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTFMI, UINT32, "FIBEI_TTTFMI", "FIBEI_TTTFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTFME, UINT32, "FIBEI_TTTFME", "FIBEI_TTTFM", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTF, UINT32, "FIBEI_TTTF", 32768, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TTTFv, UINT32, "FIBEI_TTTFv", "FIBEI_TTTF", 0 /*flags*/);       \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGCM, UINT32, "FIBEI_TRIGCM", 8, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGCMI, UINT32, "FIBEI_TRIGCMI", "FIBEI_TRIGCM", 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGCME, UINT32, "FIBEI_TRIGCME", "FIBEI_TRIGCM", 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGC, UINT32, "FIBEI_TRIGC", 8, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGCv, UINT32, "FIBEI_TRIGCv", "FIBEI_TRIGC", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGTCM, UINT32, "FIBEI_TRIGTCM", 8, 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                    \
+                               si,                                                                                    \
+                               offset,                                                                                \
+                               struct_t,                                                                              \
+                               printerr,                                                                              \
+                               FIBEI_TRIGTCMI,                                                                        \
+                               UINT32,                                                                                \
+                               "FIBEI_TRIGTCMI",                                                                      \
+                               "FIBEI_TRIGTCM",                                                                       \
+                               0 /*flags*/);                                                                          \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                    \
+                               si,                                                                                    \
+                               offset,                                                                                \
+                               struct_t,                                                                              \
+                               printerr,                                                                              \
+                               FIBEI_TRIGTCME,                                                                        \
+                               UINT32,                                                                                \
+                               "FIBEI_TRIGTCME",                                                                      \
+                               "FIBEI_TRIGTCM",                                                                       \
+                               0 /*flags*/);                                                                          \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGTC, UINT32, "FIBEI_TRIGTC", 8, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGTCv, UINT32, "FIBEI_TRIGTCv", "FIBEI_TRIGTC", 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGFM, UINT32, "FIBEI_TRIGFM", 8, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGFMI, UINT32, "FIBEI_TRIGFMI", "FIBEI_TRIGFM", 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGFME, UINT32, "FIBEI_TRIGFME", "FIBEI_TRIGFM", 0 /*flags*/); \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGF, UINT32, "FIBEI_TRIGF", 8, 0 /*flags*/);                  \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGFv, UINT32, "FIBEI_TRIGFv", "FIBEI_TRIGF", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGTFM, UINT32, "FIBEI_TRIGTFM", 8, 0 /*flags*/);              \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                    \
+                               si,                                                                                    \
+                               offset,                                                                                \
+                               struct_t,                                                                              \
+                               printerr,                                                                              \
+                               FIBEI_TRIGTFMI,                                                                        \
+                               UINT32,                                                                                \
+                               "FIBEI_TRIGTFMI",                                                                      \
+                               "FIBEI_TRIGTFM",                                                                       \
+                               0 /*flags*/);                                                                          \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                    \
+                               si,                                                                                    \
+                               offset,                                                                                \
+                               struct_t,                                                                              \
+                               printerr,                                                                              \
+                               FIBEI_TRIGTFME,                                                                        \
+                               UINT32,                                                                                \
+                               "FIBEI_TRIGTFME",                                                                      \
+                               "FIBEI_TRIGTFM",                                                                       \
+                               0 /*flags*/);                                                                          \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGTF, UINT32, "FIBEI_TRIGTF", 8, 0 /*flags*/);                \
+        EXT_STR_ITEM_INFO2_ZZP(                                                                                       \
+            ok, si, offset, struct_t, printerr, FIBEI_TRIGTFv, UINT32, "FIBEI_TRIGTFv", "FIBEI_TRIGTF", 0 /*flags*/); \
+                                                                                                                      \
     } while (0);
-
-#endif /*__GUARD_H101_FIB31_EXT_H101_FIB31_H__*/
 
 /*******************************************************/
