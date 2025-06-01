@@ -68,7 +68,8 @@ void R3BLosProvideTStart::Exec(Option_t*)
         return;
     }
 
-    fEventHeader->SetTStart(GetTStart());
+    fEventHeader->SetTStart(GetTStart(0));
+    fEventHeader->SetTStartMaster(GetTStart(1));
     fEventHeader->SetTStartSimple(GetTStart_without_trigger());
 }
 
@@ -85,7 +86,7 @@ Double_t R3BLosProvideTStart::GetTStart_without_trigger() const
     }
 }
 
-Double_t R3BLosProvideTStart::GetTStart() const
+Double_t R3BLosProvideTStart::GetTStart(int trig) const
 {
     const auto losCalData = fLosCalData.Retrieve();
     const auto losTriggerCalData = fLosTriggerCalData.Retrieve();
@@ -101,12 +102,12 @@ Double_t R3BLosProvideTStart::GetTStart() const
     }
     else
     {
-        if (losTriggerCalData.back()->GetTimeV_ns(0) > 0.)
+        if (losTriggerCalData.back()->GetTimeV_ns(trig) > 0.)
         {
             R3BLOG(debug1, "CalData with VFTX trigger info for LOS");
 
             return fTimeStitch->GetTime(
-                losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeV_ns(0), "vftx", "vftx");
+                losCalData.back()->GetMeanTimeVFTX() - losTriggerCalData.back()->GetTimeV_ns(trig), "vftx", "vftx");
         }
         else
         {
@@ -143,6 +144,6 @@ Double_t R3BLosProvideTStart::GetTStartTrigHit() const
     return std::numeric_limits<Double_t>::quiet_NaN();
 }
 
-bool R3BLosProvideTStart::IsBeam() const { return !std::isnan(GetTStart()); }
+bool R3BLosProvideTStart::IsBeam() const { return !std::isnan(GetTStart(0)); }
 
 ClassImp(R3BLosProvideTStart)
