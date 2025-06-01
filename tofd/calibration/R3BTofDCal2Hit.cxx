@@ -557,8 +557,6 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 auto THit_raw = (bot->GetTimeLeading_ns() + top->GetTimeLeading_ns()) / 2.; // needed for TOF for ROLUs
 
-                // std::cout<<"ToT: "<<top_tot << " "<<bot_tot<<"\n";
-
                 // register multi hits
                 vmultihits[iPlane][iBar] += 1;
                 Double_t Offset1 = 0.;
