@@ -116,7 +116,10 @@ class R3BTofDCal2Hit : public FairTask
      * Method for setting y calculation via ToT instead of tdiff
      */
     inline void SetTofdTotPos(Bool_t ToTy) { fTofdTotPos = ToTy; }
-
+    /**
+     * Method for setting smiley correction, pol3 or exponential
+     */
+    inline void SetSmileyCorExp(Bool_t ExpCor) { fExpCor = ExpCor; }
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
@@ -172,6 +175,7 @@ class R3BTofDCal2Hit : public FairTask
     Double_t fMaxQ = 500.;
     Bool_t fTofdHisto;
     Bool_t fTofdHistoCal;
+    Bool_t fExpCor;
     Bool_t fTofdTotPos;
     UInt_t fnEvents;
     UInt_t lasttpatevent;
