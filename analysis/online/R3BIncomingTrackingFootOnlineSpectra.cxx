@@ -349,16 +349,22 @@ void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
     {
         std::vector<double> footPos(fNbDet, std::nan(""));
 
-        auto hit = dynamic_cast<R3BFootHitData*>(fHitFootData->At(0));
-        auto detId = hit->GetDetId() - 1;
+        auto nHits = fHitFootData->GetEntriesFast();
+        for (size_t ihit = 0; ihit < nHits; ihit++)
+        {
+            auto hit = dynamic_cast<R3BFootHitData*>(fHitFootData->At(ihit));
+            auto detId = hit->GetDetId() - 1;
+            if (detId >= fNbDet)
+                continue;
 
-        R3BLOG_IF(fatal, hit->GetDetId() - 1 > fNbDet, "You are selecting a FOOT that does not exist...");
+            if (std::find(fDetIdX.begin(), fDetIdX.end(), detId) != fDetIdX.end())
+                if (!std::isfinite(footPos[detId]))
+                    footPos[detId] = hit->GetPosLab()[0];
 
-        if (std::find(fDetIdX.begin(), fDetIdX.end(), detId) != fDetIdX.end())
-            footPos[detId] = hit->GetPosLab()[0];
-
-        if (std::find(fDetIdY.begin(), fDetIdY.end(), detId) != fDetIdY.end())
-            footPos[detId] = hit->GetPosLab()[1];
+            if (std::find(fDetIdY.begin(), fDetIdY.end(), detId) != fDetIdY.end())
+                if (!std::isfinite(footPos[detId]))
+                    footPos[detId] = hit->GetPosLab()[1];
+        }
 
         // Calculations for tracking with X before target
         if (std::isfinite(footPos[fDetIds[0]]) && std::isfinite(footPos[fDetIds[2]]))
