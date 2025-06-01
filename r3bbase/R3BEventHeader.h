@@ -29,6 +29,7 @@ class R3BEventHeader : public FairEventHeader
     inline void SetTimeStamp(const uint64_t timeStamp) { fTimeStamp = timeStamp; }
     inline void SetTpat(const int tpat) { fTpat = tpat; }
     inline void SetTStart(const double tStart) { fTStart = tStart; }
+    inline void SetTStartMaster(const double tStart) { fTStartMaster = tStart; }
     inline void SetTStartSimple(const double tStart) { fTStartSimple = tStart; }
     inline void SetTprev(const double tPrev) { fTprev = tPrev; }
     inline void SetTnext(const double tNext) { fTnext = tNext; }
@@ -48,6 +49,8 @@ class R3BEventHeader : public FairEventHeader
 
     [[nodiscard]] inline double GetTStart() const { return fTStart; }
 
+    [[nodiscard]] inline double GetTStartMaster() const { return fTStartMaster; }
+
     [[nodiscard]] inline double GetTStartSimple() const { return fTStartSimple; }
 
     [[nodiscard]] inline double GetTprev() const { return fTprev; }
@@ -63,6 +66,7 @@ class R3BEventHeader : public FairEventHeader
     uint64_t fTimeStamp = 0;
     int fTpat = 0;
     double fTStart = 0;
+    double fTStartMaster = 0;
     double fTStartSimple = 0;
     double fTprev = 0;
     double fTnext = 0;

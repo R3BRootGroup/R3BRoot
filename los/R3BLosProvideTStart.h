@@ -47,7 +47,7 @@ class R3BLosProvideTStart : public FairTask
     R3BCoarseTimeStitch* fTimeStitch;
 
     bool IsBeam() const;
-    Double_t GetTStart() const;
+    Double_t GetTStart(int trig) const;
     Double_t GetTStartTrigHit() const;
     Double_t GetTStart_without_trigger() const;
 
