@@ -81,6 +81,7 @@ set(SRCS
     mwpcData/R3BMwpcCalData.cxx
     mwpcData/R3BMwpcHitData.cxx
     mwpcData/R3BMwpcMappedData.cxx
+    mwpcData/R3BMwpcTimeMappedData.cxx
     mwpcData/R3BMwpcPoint.cxx
     neulandData/R3BNeulandCalData.cxx
     neulandData/R3BNeulandCluster.cxx
@@ -229,6 +230,7 @@ set(HEADERS
     mwpcData/R3BMwpcCalData.h
     mwpcData/R3BMwpcHitData.h
     mwpcData/R3BMwpcMappedData.h
+    mwpcData/R3BMwpcTimeMappedData.h
     mwpcData/R3BMwpcPoint.h
     neulandData/R3BNeulandCalData.h
     neulandData/R3BNeulandCluster.h

@@ -112,6 +112,7 @@ set(SRCS
     tttx/R3BTttxReader.cxx
     musli/R3BMusliReader.cxx
     mwpc/R3BMwpcReader.cxx
+    mwpc/R3BMwpcTimeReader.cxx
     sync_check/R3BSyncCheckReader.cxx
     actaf/R3BActafReader.cxx)
 
@@ -179,6 +180,7 @@ set(STRUCT_HEADERS
     tttx/ext_h101_ttt10.h
     musli/ext_h101_musli.h
     mwpc/ext_h101_mwpc.h
+    mwpc/ext_h101_mwpc_time.h
     trloii/ext_h101_samp.h
     trloii/ext_h101_samplos.h
     trloii/ext_h101_sampms.h
@@ -255,6 +257,7 @@ set(HEADERS
     twim/R3BTwimReader.h
     musli/R3BMusliReader.h
     mwpc/R3BMwpcReader.h
+    mwpc/R3BMwpcTimeReader.h
     sync_check/R3BSyncCheckReader.h
     actaf/R3BActafReader.h)
 

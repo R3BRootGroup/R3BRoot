@@ -81,6 +81,7 @@
 #pragma link C++ class R3BTttxReader+;
 #pragma link C++ class R3BMusliReader+;
 #pragma link C++ class R3BMwpcReader+;
+#pragma link C++ class R3BMwpcTimeReader+;
 #pragma link C++ class R3BSyncCheckReader+;
 #pragma link C++ class R3BMosaicReader+;
 #pragma link C++ class R3BActafReader+;
@@ -141,6 +142,7 @@
 #pragma link C++ class EXT_STR_h101_SOFTWIM_onion_t;
 #pragma link C++ class EXT_STR_h101_TTTX_onion_t;
 #pragma link C++ class EXT_STR_h101_SOFMWPC_onion_t;
+#pragma link C++ class EXT_STR_h101_SOFMWPC_TIME_onion_t;
 #pragma link C++ class EXT_STR_h101_MUSLI_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMP_onion_t;
 #pragma link C++ class EXT_STR_h101_SAMPLOS_onion_t;

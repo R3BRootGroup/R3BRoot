@@ -77,6 +77,7 @@
 #pragma link C++ class R3BMwpcCalData+;
 #pragma link C++ class R3BMwpcHitData+;
 #pragma link C++ class R3BMwpcPoint+;
+#pragma link C++ class R3BMwpcTimeMappedData+;
 
 #pragma link C++ class R3BTwimMappedData+;
 #pragma link C++ class R3BTwimCalData+;
