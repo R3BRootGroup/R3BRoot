@@ -17,13 +17,12 @@
 // ----- Convert mapped data to time calibrated data      -----
 // ------------------------------------------------------------
 
-#ifndef R3BLOSMAPPED2CAL
-#define R3BLOSMAPPED2CAL
+#pragma once
 
 #include <map>
 #include <vector>
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 class TClonesArray;
 class TH1F;
@@ -34,16 +33,8 @@ class R3BEventHeader;
 class R3BLosMappedData;
 class R3BLosCalData;
 
-/**
- * An analysis task to apply TCAL calibration for NeuLAND.
- * This class reads NeuLAND mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BLosMapped2CalFill task.
- */
 class R3BLosMapped2Cal : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -57,7 +48,7 @@ class R3BLosMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BLosMapped2Cal(const char* name, Int_t iVerbose = 1);
+    explicit R3BLosMapped2Cal(const char* name, int iVerbose = 1);
 
     /**
      * Destructor.
@@ -118,15 +109,15 @@ class R3BLosMapped2Cal : public FairTask
     }
 
     /** Accessor to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     size_t GetCalLookupIndex(R3BLosMappedData const&) const;
 
-    TClonesArray* fMappedItems; /**< Array with mapped items - input data. */
-    TClonesArray* fMappedTriggerItems;
-    TClonesArray* fCalItems; /**< Array with cal items - output data. */
-    TClonesArray* fCalTriggerItems;
+    TClonesArray* fMappedItems = nullptr; /**< Array with mapped items - input data. */
+    TClonesArray* fMappedTriggerItems = nullptr;
+    TClonesArray* fCalItems = nullptr; /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems = nullptr;
 
     Int_t fNofCalItems; /**< Number of produced time items per event. */
 
@@ -134,21 +125,19 @@ class R3BLosMapped2Cal : public FairTask
     UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
 
     // check for trigger should be done globablly (somewhere else)
-    R3BEventHeader* header; /**< Event header. */
-    Int_t fTrigger;         /**< Trigger value. */
+    R3BEventHeader* header = nullptr; /**< Event header. */
+    Int_t fTrigger = -1;              /**< Trigger value. */
 
-    UInt_t fNofDetectors; /**< Number of detectors. */
-    UInt_t fNofChannels;  /**< Number of channels per detector. */
-    Double_t fClockFreq;  /**< Clock cycle in [ns]. */
-    UInt_t fNEvent;
+    UInt_t fNofDetectors = 1; /**< Number of detectors. */
+    UInt_t fNofChannels = 8;  /**< Number of channels per detector. */
+    Double_t fClockFreq;      /**< Clock cycle in [ns]. */
+    UInt_t fNEvent = 0;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
 
     // Fast lookup for matching mapped data.
     std::vector<std::vector<R3BLosCalData*>> fCalLookup;
 
   public:
-    ClassDef(R3BLosMapped2Cal, 2)
+    ClassDef(R3BLosMapped2Cal, 2);
 };
-
-#endif

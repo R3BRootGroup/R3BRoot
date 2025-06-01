@@ -11,16 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTOFDCALITEM_H
-#define R3BTOFDCALITEM_H
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
 
 class R3BTofdCalData : public TObject
 {
   public:
     R3BTofdCalData();
-    R3BTofdCalData(UInt_t, UInt_t, UInt_t, Double_t, Double_t);
+    explicit R3BTofdCalData(UInt_t, UInt_t, UInt_t, Double_t, Double_t);
 
     UInt_t GetDetectorId() const;
     UInt_t GetBarId() const;
@@ -35,7 +34,5 @@ class R3BTofdCalData : public TObject
     Double_t fLeading_ns;
     Double_t fTrailing_ns;
 
-    ClassDef(R3BTofdCalData, 2)
+    ClassDef(R3BTofdCalData, 2);
 };
-
-#endif

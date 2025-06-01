@@ -15,7 +15,7 @@
 
 #include <vector>
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 class TClonesArray;
 class R3BTofDMappingPar;
@@ -39,7 +39,7 @@ class R3BTofDMapped2Cal : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BTofDMapped2Cal(const char*, Int_t = 1);
+    explicit R3BTofDMapped2Cal(const char*, Int_t = 1);
 
     /**
      * Destructor.
@@ -93,36 +93,36 @@ class R3BTofDMapped2Cal : public FairTask
     void SetNofModules(Int_t, Int_t);
 
     // Method to setup online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     void SetParameter();
     size_t GetCalLookupIndex(R3BTofdMappedData const&) const;
 
-    R3BTofDMappingPar* fMapPar;
+    R3BTofDMappingPar* fMapPar = nullptr;
 
-    TClonesArray* fMappedItems;        /**< Array with mapped items - input data. */
-    TClonesArray* fMappedTriggerItems; /**< Array with mapped items - input data. */
-    TClonesArray* fCalItems;           /**< Array with cal items - output data. */
-    TClonesArray* fCalTriggerItems;    /**< Array with cal trigger items - output data. */
+    TClonesArray* fMappedItems = nullptr;        /**< Array with mapped items - input data. */
+    TClonesArray* fMappedTriggerItems = nullptr; /**< Array with mapped items - input data. */
+    TClonesArray* fCalItems = nullptr;           /**< Array with cal items - output data. */
+    TClonesArray* fCalTriggerItems = nullptr;    /**< Array with cal trigger items - output data. */
 
-    R3BTCalPar* fTcalPar; /**< TCAL parameter container. */
-    UInt_t fNofTcalPars;  /**< Number of modules in parameter file. */
+    R3BTCalPar* fTcalPar = nullptr; /**< TCAL parameter container. */
+    UInt_t fNofTcalPars;            /**< Number of modules in parameter file. */
 
     UInt_t fNofPlanes;
-    UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
-    Double_t fClockFreq;     /**< Clock cycle in [ns]. */
-    R3BEventHeader* header;  /**< Event header. */
-    Int_t fTrigger;          /**< Trigger value. */
-    Bool_t fOnline;          // Don't store data for online
+    UInt_t fPaddlesPerPlane = 48;     /**< Number of paddles per plane. */
+    Double_t fClockFreq;              /**< Clock cycle in [ns]. */
+    R3BEventHeader* header = nullptr; /**< Event header. */
+    Int_t fTrigger = -1;              /**< Trigger value. */
+    bool fOnline = false;             // Don't store data for online
 
     // Fast lookup for matching mapped data.
     std::vector<std::vector<R3BTofdCalData*>> fCalLookup;
 
     R3BTofdCalData* AddTCalData(UInt_t detid, UInt_t barid, UInt_t sideid, Double_t lead_time, Double_t trail_time);
 
-    R3BTofdCalData* AddTriggerTCalData(UInt_t detid, UInt_t barid, Double_t lead_time);
+    R3BTofdCalData* AddTriggerTCalData(UInt_t detid, UInt_t barid, Double_t lead_time, Double_t trail_time = 0.);
 
   public:
-    ClassDef(R3BTofDMapped2Cal, 1)
+    ClassDef(R3BTofDMapped2Cal, 1);
 };

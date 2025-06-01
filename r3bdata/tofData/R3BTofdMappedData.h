@@ -11,16 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTOFDMAPPEDITEM_H
-#define R3BTOFDMAPPEDITEM_H
+#pragma once
 
-#include "TObject.h"
+#include <TObject.h>
 
 class R3BTofdMappedData : public TObject
 {
   public:
     R3BTofdMappedData();
-    R3BTofdMappedData(UInt_t, UInt_t, UInt_t, UInt_t, UInt_t, UInt_t);
+    explicit R3BTofdMappedData(UInt_t, UInt_t, UInt_t, UInt_t, UInt_t, UInt_t);
 
     UInt_t GetDetectorId() const;
     UInt_t GetSideId() const;
@@ -38,7 +37,5 @@ class R3BTofdMappedData : public TObject
     UInt_t fTimeFine;
 
   public:
-    ClassDef(R3BTofdMappedData, 1)
+    ClassDef(R3BTofdMappedData, 1);
 };
-
-#endif

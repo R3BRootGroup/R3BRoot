@@ -16,16 +16,6 @@
 // -----          Created Feb 4th 2016 by R.Plag          -----
 // ------------------------------------------------------------
 
-/* March 2016
- * Rewrote the Cal structure to provide individual leafs for the
- * left, top, right and bottom signals. This allows to plot
- * the time differences via cbmsim->Draw(...) interactively (aka without
- * looping over all channels) which is crucial for a quick check of the
- * detector status during the experiment.
- *
- *
- */
-
 #include "R3BLosMapped2Cal.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
@@ -34,21 +24,17 @@
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
-#include "TH1F.h"
-#include "TH2F.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 
-#include "TClonesArray.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TMath.h>
 
 #define LOS_COINC_WINDOW_V_NS 200;
 #define LOS_COINC_WINDOW_TL_NS 200; // leading
 #define LOS_COINC_WINDOW_TT_NS 400; // trailing, longer because of pileup
-#define LOS_COINC_WINDOW_M_NS 400;  // 200  // ???
+#define LOS_COINC_WINDOW_M_NS 400;
 #define IS_NAN(x) TMath::IsNaN(x)
 
 R3BLosMapped2Cal::R3BLosMapped2Cal()
@@ -56,7 +42,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal()
 {
 }
 
-R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
+R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, int iVerbose)
     : FairTask(name, iVerbose)
     , fMappedItems(NULL)
     , fMappedTriggerItems(NULL)
@@ -64,11 +50,7 @@ R3BLosMapped2Cal::R3BLosMapped2Cal(const char* name, Int_t iVerbose)
     , fCalTriggerItems(new TClonesArray("R3BLosCalData"))
     , fNofCalItems(0)
     , fNofTcalPars(0)
-    , fTcalPar(NULL)
-    , fTrigger(-1) // trigger 1 - onspill, 2 - offspill, -1 - all events
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
-    , fNEvent(0)
-    , fOnline(kFALSE)
 {
 }
 
@@ -140,19 +122,16 @@ InitStatus R3BLosMapped2Cal::ReInit()
     return kSUCCESS;
 }
 
-void R3BLosMapped2Cal::Exec(Option_t* option)
+void R3BLosMapped2Cal::Exec(Option_t*)
 {
     // check for requested trigger (Todo: should be done globablly / somewhere else)
-
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
-    Int_t nHits = fMappedItems->GetEntriesFast();
+    auto nHits = fMappedItems->GetEntriesFast();
 
     if (nHits == 0)
         return;
-
-    // if(nHits >0) cout<<"Mapped hits: "<<nHits<<", No det.: "<<fNofDetectors<<endl;
 
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_LOS * NTypes = 4 or 8 * 3
     {
@@ -167,16 +146,6 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         UInt_t iDet = hit->GetDetector(); // 1..
         UInt_t iCha = hit->GetChannel();  // 1..
         UInt_t iType = hit->GetType();    // 0,1,2,3
-
-        //   cout<<"Mapped info: "<<ihit<<"; "<<iDet<<", "<<iCha<<"; "<<iType<<", timeFine "<<hit->GetTimeFine()<<endl;
-
-        // if(fNEvent == 273 || fNEvent == 362 || fNEvent == 554)
-        //   cout<<"R3BLosMapped2Cal: Channel "<<iCha<<", type "<<iType<<", nHits "<<nHits<<", ihit "<<ihit<<", timeFine
-        //   "<<hit->GetTimeFine()<<endl;
-
-        //   if(nHits%8 != 0) return;
-
-        //   if(nHits != 24) return;
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
@@ -226,9 +195,6 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
             times_ns = hit->GetTimeFine() / 7.8 / 1000.; // range MTDC 3->7.8ps
         }
 
-        // cout<<"Mapped2Cal :"<<ihit<<"; "<<iDet<<", "<<iCha<<", "<<iType<<", "<<times_ns<<",
-        // "<<hit->GetTimeFine()<<endl;
-
         /* Note: we have multi-hit data...
          *
          * So the map needs to have one item per detector and (multi-)hit
@@ -252,10 +218,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
         int iCal;
         for (iCal = 0; iCal < fNofCalItems; iCal++)
         {
-            R3BLosCalData* aCalItem = dynamic_cast<R3BLosCalData*>(fCalItems->At(iCal));
-
-            //       cout<<"aCalItem->GetDetector() "<<aCalItem->GetDetector()<<"; "<<iDet<<endl;
-
+            auto aCalItem = dynamic_cast<R3BLosCalData*>(fCalItems->At(iCal));
             if (aCalItem->GetDetector() != iDet)
             {
                 // Do not consider an item for another detector.
@@ -304,91 +267,6 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
 
             if (LOS_COINC)
             {
-                // check if item is already set. If so, we need to skip this event!
-                switch (iCha)
-                {
-
-                    case 1:
-                    { // change to 1
-                        /*if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(0)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(0)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(0)))
-                            goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 3:
-                    { // change to 3
-                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(2)))
-                             goto skip_event_pileup;
-                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(2)))
-                             goto skip_event_pileup;
-                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(2)))
-                             goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 5:
-                    { // change to 5
-                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(4)))
-                             goto skip_event_pileup;
-                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(4)))
-                             goto skip_event_pileup;
-                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(4)))
-                             goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 7:
-                    { // change to 7
-                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(6)))
-                             goto skip_event_pileup;
-                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(6)))
-                             goto skip_event_pileup;
-                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(6)))
-                             goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 2:
-                    { // change to 2
-                        /* if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(1)))
-                             goto skip_event_pileup;
-                         if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(1)))
-                             goto skip_event_pileup;
-                         if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(1)))
-                             goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 4:
-                    { // change to 4
-                        /*if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(3)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(3)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(3)))
-                            goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 6:
-                    { // change to 6
-                        /*if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(5)))
-                            goto skip_event_pileup;
-                        if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(5)))
-                            goto skip_event_pileup;
-                        if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(5)))
-                            goto skip_event_pileup;*/
-                    }
-                    break;
-                    case 8:
-                    { // change to 8
-                      // if (iType == 0 && !IS_NAN(aCalItem->GetTimeV_ns(7)))
-                      //      goto skip_event_pileup;
-                      //  if (iType == 1 && !IS_NAN(aCalItem->GetTimeL_ns(7)))
-                      //      goto skip_event_pileup;
-                      //  if (iType == 2 && !IS_NAN(aCalItem->GetTimeT_ns(7)))
-                      //    goto skip_event_pileup;
-                    }
-                    break;
-                }
                 if (!calItem)
                     calItem = aCalItem;
             }
@@ -432,17 +310,7 @@ void R3BLosMapped2Cal::Exec(Option_t* option)
                 LOG(info) << "Problem with  fTimeM_ns: " << calItem->fTimeM_ns[iCha - 1] << " " << times_ns << " "
                           << endl;
         }
-
-        // if(fNEvent == 25383 || fNEvent == 322367 || fNEvent == 399481)
-
-        // if(fNEvent == 24733) cout<<"Mapped2Cal "<<fNEvent<<"; "<<fNofCalItems<<", "<<nHits<<", "<<iCha<<",
-        // "<<iType<<", "<<
-        //                            times_ns<<", "<<hit->GetTimeFine()<<", "<<hit->GetTimeCoarse()<<endl;
-
         continue;
-        // skip_event_pileup:
-        //   LOG(warn) << "R3BLosMapped2Cal::Exec : " << fNEvent << " iCha: " << iCha << " iType: " << iType
-        //              << " iCal: " << iCal << " Skip event because of pileup.";
     }
 
     // Calibrate trigger channels -----------------------------------------------
@@ -507,4 +375,4 @@ void R3BLosMapped2Cal::FinishEvent()
     }
 }
 
-ClassImp(R3BLosMapped2Cal);
+ClassImp(R3BLosMapped2Cal)
