@@ -130,7 +130,7 @@ InitStatus R3BIncomingBeta::Init()
     fHitLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     R3BLOG_IF(fatal, !fHitLos, "LosHit not found");
 
-    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
+    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118 || fHeader->GetExpId() == 249)
     {
         fCalLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCal"));
         R3BLOG_IF(fatal, !fCalLos, "LosCal not found");
@@ -258,7 +258,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
         nHits = fPosCalFrsSci->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFrsSciPosCalData* hittcal = dynamic_cast<R3BFrsSciPosCalData*>(fPosCalFrsSci->At(ihit));
+            auto hittcal = dynamic_cast<R3BFrsSciPosCalData*>(fPosCalFrsSci->At(ihit));
             numDet = hittcal->GetDetector();
             if (numDet > fNumDet)
             {
@@ -274,7 +274,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
         } // --- end of loop over hit data --- //
     }
 
-    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
+    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118 || fHeader->GetExpId() == 249)
     {
         // --- read hit from LOSCal data --- //
         if (fCalLos && fCalLos->GetEntriesFast() > 0)
@@ -350,7 +350,7 @@ void R3BIncomingBeta::Exec(Option_t* option)
                 {
                     ToFraw_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
                 }
-                else if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
+                else if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118 || fHeader->GetExpId() == 249)
                 {
                     ToFraw_m1 =
                         fTimeStitch->GetTime(timeLosV[0][i_L] - TimeSci2wTref_m1[i][i_2],
