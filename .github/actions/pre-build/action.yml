@@ -25,12 +25,13 @@ runs:
     - name: mount cvmfs
       run: |
         apt-get update
-        apt-get install --fix-missing -y sudo
+        apt-get install --fix-missing -y sudo wget gnupg lsb-release
         if [ "${{ matrix.os }}" == "debian10" ]; then
           sudo apt upgrade libc6
         fi
         sudo -H pip3 install -U conan
         wget https://cernbox.cern.ch/remote.php/dav/public-files/RmnTeeOZpYjCJQb/masterkey.gsi.de.pub
+        mkdir -p /etc/cvmfs/keys
         mv masterkey.gsi.de.pub /etc/cvmfs/keys
         cp .github/config/fairsoft.gsi.de.conf /etc/cvmfs/config.d
         echo "CVMFS_USER=$(whoami)" >> /etc/cvmfs/config.d/fairsoft.gsi.de.conf
