@@ -309,40 +309,93 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     }
 
     auto cMap_ECor = new TCanvas("Trigger_ECor", "Trigger_ECor", 10, 10, 800, 700);
-    cMap_ECor->Divide(2, 2);
+    cMap_ECor->Divide(4, 2);
 
     fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
-        "fh2Trigger_ECor", "Correlation of trigger energies (all triggers)", 2000, 0., 4000., 2000, 0., 4000.));
-    fh2_Califa_EtrigCor[0]->GetXaxis()->SetTitle("Energy messel side");
-    fh2_Califa_EtrigCor[0]->GetYaxis()->SetTitle("Energy wixhausen side");
+        "fh2Trigger_ECor_m0m1", "Correlation of trigger energies (mes0 vs mes1)", 2000, 0., 4000., 2000, 0., 4000.));
+    fh2_Califa_EtrigCor[0]->GetXaxis()->SetTitle("Energy mes0");
+    fh2_Califa_EtrigCor[0]->GetYaxis()->SetTitle("Energy mes1");
     fh2_Califa_EtrigCor[0]->GetYaxis()->SetTitleOffset(1.2);
     fh2_Califa_EtrigCor[0]->GetXaxis()->CenterTitle(true);
     fh2_Califa_EtrigCor[0]->GetYaxis()->CenterTitle(true);
     cMap_ECor->cd(1);
     fh2_Califa_EtrigCor[0]->Draw("colz");
 
+    fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
+        "fh2Trigger_ECor_m0w0", "Correlation of trigger energies (mes0 vs wix0)", 2000, 0., 4000., 2000, 0., 4000.));
+    fh2_Califa_EtrigCor[1]->GetXaxis()->SetTitle("Energy mes0");
+    fh2_Califa_EtrigCor[1]->GetYaxis()->SetTitle("Energy wix0");
+    fh2_Califa_EtrigCor[1]->GetYaxis()->SetTitleOffset(1.2);
+    fh2_Califa_EtrigCor[1]->GetXaxis()->CenterTitle(true);
+    fh2_Califa_EtrigCor[1]->GetYaxis()->CenterTitle(true);
+    cMap_ECor->cd(2);
+    fh2_Califa_EtrigCor[1]->Draw("colz");
+
+    fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
+        "fh2Trigger_ECor_m0w1", "Correlation of trigger energies (mes0 vs wix1)", 2000, 0., 4000., 2000, 0., 4000.));
+    fh2_Califa_EtrigCor[2]->GetXaxis()->SetTitle("Energy mes0");
+    fh2_Califa_EtrigCor[2]->GetYaxis()->SetTitle("Energy wix1");
+    fh2_Califa_EtrigCor[2]->GetYaxis()->SetTitleOffset(1.2);
+    fh2_Califa_EtrigCor[2]->GetXaxis()->CenterTitle(true);
+    fh2_Califa_EtrigCor[2]->GetYaxis()->CenterTitle(true);
+    cMap_ECor->cd(3);
+    fh2_Califa_EtrigCor[2]->Draw("colz");
+
+    fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
+        "fh2Trigger_ECor_m1w1", "Correlation of trigger energies (mes1 vs wix1)", 2000, 0., 4000., 2000, 0., 4000.));
+    fh2_Califa_EtrigCor[3]->GetXaxis()->SetTitle("Energy mes1");
+    fh2_Califa_EtrigCor[3]->GetYaxis()->SetTitle("Energy wix1");
+    fh2_Califa_EtrigCor[3]->GetYaxis()->SetTitleOffset(1.2);
+    fh2_Califa_EtrigCor[3]->GetXaxis()->CenterTitle(true);
+    fh2_Califa_EtrigCor[3]->GetYaxis()->CenterTitle(true);
+    cMap_ECor->cd(4);
+    fh2_Califa_EtrigCor[3]->Draw("colz");
+
     fh1_Califa_Etrig.push_back(
-        R3B::root_owned<TH1F>("fh1Trigger_Emessel", "Messel trigger energies (all triggers)", 2000, 0., 4000.));
-    fh1_Califa_Etrig[0]->GetXaxis()->SetTitle("Energy messel side");
+        R3B::root_owned<TH1F>("fh1Trigger_Emessel0", "Messel0 trigger energies (mes0)", 2000, 0., 4000.));
+    fh1_Califa_Etrig[0]->GetXaxis()->SetTitle("Energy mes0");
     fh1_Califa_Etrig[0]->GetYaxis()->SetTitle("Counts");
     fh1_Califa_Etrig[0]->GetYaxis()->SetTitleOffset(1.2);
     fh1_Califa_Etrig[0]->GetXaxis()->CenterTitle(true);
     fh1_Califa_Etrig[0]->GetYaxis()->CenterTitle(true);
     fh1_Califa_Etrig[0]->SetFillColor(31);
-    cMap_ECor->cd(2);
+    cMap_ECor->cd(5);
     fh1_Califa_Etrig[0]->Draw();
 
     fh1_Califa_Etrig.push_back(
-        R3B::root_owned<TH1F>("fh1Trigger_Ewixhausen", "Wixhausen trigger energies (all triggers)", 2000, 0., 4000.));
-    fh1_Califa_Etrig[1]->GetXaxis()->SetTitle("Energy wixhausen side");
+        R3B::root_owned<TH1F>("fh1Trigger_Emessel1", "Messel1 trigger energies (mes1)", 2000, 0., 4000.));
+    fh1_Califa_Etrig[1]->GetXaxis()->SetTitle("Energy mes1");
     fh1_Califa_Etrig[1]->GetYaxis()->SetTitle("Counts");
     fh1_Califa_Etrig[1]->GetYaxis()->SetTitleOffset(1.2);
     fh1_Califa_Etrig[1]->GetXaxis()->CenterTitle(true);
     fh1_Califa_Etrig[1]->GetYaxis()->CenterTitle(true);
     fh1_Califa_Etrig[1]->SetFillColor(31);
-    cMap_ECor->cd(3);
+    cMap_ECor->cd(6);
     fh1_Califa_Etrig[1]->Draw();
 
+    fh1_Califa_Etrig.push_back(
+        R3B::root_owned<TH1F>("fh1Trigger_Ewixhausen0", "Wixhausen trigger energies (wix0)", 2000, 0., 4000.));
+    fh1_Califa_Etrig[2]->GetXaxis()->SetTitle("Energy wix0");
+    fh1_Califa_Etrig[2]->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_Etrig[2]->GetYaxis()->SetTitleOffset(1.2);
+    fh1_Califa_Etrig[2]->GetXaxis()->CenterTitle(true);
+    fh1_Califa_Etrig[2]->GetYaxis()->CenterTitle(true);
+    fh1_Califa_Etrig[2]->SetFillColor(31);
+    cMap_ECor->cd(7);
+    fh1_Califa_Etrig[2]->Draw();
+
+    fh1_Califa_Etrig.push_back(
+        R3B::root_owned<TH1F>("fh1Trigger_Ewixhausen1", "Wixhausen trigger energies (wix1)", 2000, 0., 4000.));
+    fh1_Califa_Etrig[3]->GetXaxis()->SetTitle("Energy wix1");
+    fh1_Califa_Etrig[3]->GetYaxis()->SetTitle("Counts");
+    fh1_Califa_Etrig[3]->GetYaxis()->SetTitleOffset(1.2);
+    fh1_Califa_Etrig[3]->GetXaxis()->CenterTitle(true);
+    fh1_Califa_Etrig[3]->GetYaxis()->CenterTitle(true);
+    fh1_Califa_Etrig[3]->SetFillColor(31);
+    cMap_ECor->cd(8);
+    fh1_Califa_Etrig[3]->Draw();
+
+    /*
     fh2_Califa_EtrigCor.push_back(R3B::root_owned<TH2F>(
         "fh2Trigger_ECor_trg1", "Correlation of trigger energies (trigger 1)", 2000, 0., 4000., 2000, 0., 4000.));
     fh2_Califa_EtrigCor[1]->GetXaxis()->SetTitle("Energy messel side");
@@ -352,6 +405,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_EtrigCor[1]->GetYaxis()->CenterTitle(true);
     cMap_ECor->cd(4);
     fh2_Califa_EtrigCor[1]->Draw("colz");
+    */
 
     std::vector<std::string> side = { "Right", "Left" };
     for (int s = 0; s < fNumSides; s++) // Side
@@ -1476,9 +1530,9 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
     if (fTrigMappedItemsCalifa && fTrigMappedItemsCalifa->GetEntriesFast() > 0)
     {
         Int_t nHits = fTrigMappedItemsCalifa->GetEntriesFast();
-        Double_t e[2];
-        e[0] = 0.;
-        e[1] = 0.;
+        Double_t e[4];
+        for (Int_t i = 0; i < 4; i++)
+            e[i] = 0.;
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BCalifaMappedData*>(fTrigMappedItemsCalifa->At(ihit));
@@ -1487,16 +1541,25 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             Int_t ch = hit->GetCrystalId() - 1;
             e[ch] = hit->GetEnergy();
         }
-        if (e[0] > 0 && e[1] > 0)
+        if (e[0] > 0 || e[1] > 0)
             fh2_Califa_EtrigCor[0]->Fill(e[0], e[1]);
-        if (e[0] > 0 && e[1] > 0 && header && header->GetTrigger() == 1)
-            fh2_Califa_EtrigCor[1]->Fill(e[0], e[1]);
+        if (e[0] > 0 || e[2] > 0)
+            fh2_Califa_EtrigCor[1]->Fill(e[0], e[2]);
+        if (e[0] > 0 || e[3] > 0)
+            fh2_Califa_EtrigCor[2]->Fill(e[0], e[3]);
+        if (e[1] > 0 || e[3] > 0)
+            fh2_Califa_EtrigCor[3]->Fill(e[1], e[3]);
+        // if (e[0] > 0 && e[1] > 0 && header && header->GetTrigger() == 1)
+        //     fh2_Califa_EtrigCor[1]->Fill(e[0], e[1]);
 
         if (e[0] > 0)
             fh1_Califa_Etrig[0]->Fill(e[0]);
-
         if (e[1] > 0)
             fh1_Califa_Etrig[1]->Fill(e[1]);
+        if (e[2] > 0)
+            fh1_Califa_Etrig[2]->Fill(e[2]);
+        if (e[3] > 0)
+            fh1_Califa_Etrig[3]->Fill(e[3]);
     }
 
     // Mapped data
@@ -1765,8 +1828,12 @@ void R3BCalifaOnlineSpectra::FinishTask()
     {
         fh2_Califa_EtrigCor[0]->Write();
         fh2_Califa_EtrigCor[1]->Write();
+        fh2_Califa_EtrigCor[2]->Write();
+        fh2_Califa_EtrigCor[3]->Write();
         fh1_Califa_Etrig[0]->Write();
         fh1_Califa_Etrig[1]->Write();
+        fh1_Califa_Etrig[2]->Write();
+        fh1_Califa_Etrig[3]->Write();
     }
 
     // Write canvas for Mapped data
