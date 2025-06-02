@@ -348,13 +348,13 @@ void R3BLosMapped2Cal::Exec(Option_t*)
             {
                 time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
                 if (iType == 1)
-                    caltrigger->fTimeV_ns[0] = time_ns;
+                    caltrigger->fTimeV_ns[iChannel - 1] = time_ns;
                 else if (iType == 2)
-                    caltrigger->fTimeL_ns[0] = time_ns;
+                    caltrigger->fTimeL_ns[iChannel - 1] = time_ns;
                 else if (iType == 3)
-                    caltrigger->fTimeT_ns[0] = time_ns;
+                    caltrigger->fTimeT_ns[iChannel - 1] = time_ns;
                 else if (iType == 4)
-                    caltrigger->fTimeM_ns[0] = time_ns;
+                    caltrigger->fTimeM_ns[iChannel - 1] = time_ns;
             }
         }
     }
