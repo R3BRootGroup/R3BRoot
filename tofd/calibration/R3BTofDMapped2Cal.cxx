@@ -284,6 +284,9 @@ void R3BTofDMapped2Cal::Exec(Option_t*)
                 continue;
             }
 
+            if (mapped->GetEdgeId() != 1)
+                continue;
+
             // Tcal parameters.
             auto* par = fTcalPar->GetModuleParAt(mapped->GetDetectorId(), mapped->GetBarId(), mapped->GetEdgeId());
             if (!par)
@@ -298,9 +301,7 @@ void R3BTofDMapped2Cal::Exec(Option_t*)
             Double_t time_ns = par->GetTimeVFTX(mapped->GetTimeFine());
             // ... and subtract it from the next clock cycle.
             time_ns = (mapped->GetTimeCoarse() + 1) * fClockFreq - time_ns;
-
-            if (mapped->GetEdgeId() == 1) // Only leading times
-                AddTriggerTCalData(mapped->GetDetectorId(), mapped->GetBarId(), time_ns);
+            AddTriggerTCalData(mapped->GetDetectorId(), mapped->GetBarId(), time_ns);
         }
     }
 }
