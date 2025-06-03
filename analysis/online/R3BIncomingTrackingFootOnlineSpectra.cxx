@@ -116,7 +116,7 @@ InitStatus R3BIncomingTrackingFootOnlineSpectra::Init()
 
     // Get the Z position from the parameter container
     for (size_t i = 0; i < fFootZPos.size(); i++)
-        fFootZPos[i] = fFootMappingPar->GetDist2target(i + 1);
+        fFootZPos[i] = fFootMappingPar->GetDist2target(i + 1) + 228.;
 
     // Create histograms for detectors
     TString Name1;
@@ -373,7 +373,7 @@ void R3BIncomingTrackingFootOnlineSpectra::Exec(Option_t* /*option*/)
             if (TMath::Abs(angX) < 0.1)
             {
                 zrand = gRandom->Uniform(0., fPosTarget);
-                fh2_tracking_planeXZ->Fill(zrand, footPos[fDetIds[2]] - angX * fFootZPos[2] * 10. + angX * zrand); // mm
+                fh2_tracking_planeXZ->Fill(zrand, footPos[fDetIds[0]] - angX * fFootZPos[0] * 10. + angX * zrand); // mm
                 xtarget = footPos[fDetIds[2]] - angX * fFootZPos[2] * 10. + angX * fPosTarget;
                 fh2_angvsposx->Fill(xtarget, angX * 1000.);
             }
