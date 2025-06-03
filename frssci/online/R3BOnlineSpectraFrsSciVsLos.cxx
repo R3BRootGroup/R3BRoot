@@ -153,7 +153,7 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
 
             // AoQ
             sprintf(Name1, "FrsSci%i_AoQ", i + 1);
-            fh1_Tcal1Hit_AoQraw[i] = new TH1D(Name1, Name1, 7000, 2.2, 2.9);
+            fh1_Tcal1Hit_AoQraw[i] = new TH1D(Name1, Name1, 7000, 1.8, 2.9);
             fh1_Tcal1Hit_AoQraw[i]->GetXaxis()->SetTitle(Form("A/Q raw from FrsSci %i to Los, mult1", i + 1));
             fh1_Tcal1Hit_AoQraw[i]->GetYaxis()->SetTitle("Nb of counts, with Mult1");
             fh1_Tcal1Hit_AoQraw[i]->GetXaxis()->CenterTitle(true);
