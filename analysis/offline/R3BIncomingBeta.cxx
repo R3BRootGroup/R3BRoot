@@ -58,7 +58,7 @@ R3BIncomingBeta::R3BIncomingBeta(const char* name, Int_t iVerbose)
     , fNumDet(1)
     , fUseTref(kFALSE)
     , fUseMultHit(kFALSE)
-    , fUseFrsSci(kFALSE)
+    , fUseFrsSci(true)
 {
     fToFoffset = new TArrayF(fNumDet);
     fPosS2Left = new TArrayF(fNumDet);
@@ -130,7 +130,7 @@ InitStatus R3BIncomingBeta::Init()
     fHitLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     R3BLOG_IF(fatal, !fHitLos, "LosHit not found");
 
-    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118 || fHeader->GetExpId() == 249)
+    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
     {
         fCalLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCal"));
         R3BLOG_IF(fatal, !fCalLos, "LosCal not found");
@@ -170,274 +170,360 @@ InitStatus R3BIncomingBeta::ReInit()
     return kSUCCESS;
 }
 
-void R3BIncomingBeta::Exec(Option_t* option)
+void R3BIncomingBeta::Exec(Option_t*)
 {
     // Reset entries in output arrays
     Reset();
 
-    // --- local variables --- //
-    Double_t timeLosV[fNumDet][MAXMULT];
-    Double_t posLosX_cm[fNumDet][MAXMULT];
-    Double_t TimeSci2_m1[fNumDet][MAXMULT];
-    Double_t TimeSci2wTref_m1[fNumDet][MAXMULT];
-    Double_t TimeSci2_tcal[fNumDet * 3][MAXMULT];
-    Double_t PosSci2_m1[fNumDet][MAXMULT];
-    UInt_t nHits = 0;
-    Double_t ToFraw_m1 = 0.;
-    Double_t Velo_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0.;
-
-    Int_t multSci2[fNumDet], multSci2Tcal[fNumDet * 3];
-    Int_t multLos[fNumDet];
-
-    for (Int_t i = 0; i < fNumDet; i++)
+    if (fHeader->GetExpId() == 249)
     {
-        multSci2[i] = 0;
-        multLos[i] = 0;
-        for (Int_t m = 0; m < MAXMULT; m++)
+        Double_t TimeSci2_m1[fNumDet][MAXMULT];
+        Double_t TimeSci2wTref_m1[fNumDet][MAXMULT];
+        Double_t PosSci2_m1[fNumDet][MAXMULT];
+        Double_t posLosX_cm[fNumDet][MAXMULT];
+        Int_t multSci2[fNumDet];
+        Int_t multLos[fNumDet];
+
+        for (Int_t i = 0; i < fNumDet; i++)
         {
-            PosSci2_m1[i][m] = 0.;
-            TimeSci2_m1[i][m] = 0.;
-            TimeSci2wTref_m1[i][m] = 0.;
-            posLosX_cm[i][m] = 0.;
-            timeLosV[i][m] = 0.;
-            for (Int_t k = 0; k < 3; k++)
+            multSci2[i] = 0;
+            multLos[i] = 0;
+            for (Int_t m = 0; m < MAXMULT; m++)
             {
-                multSci2Tcal[i * 3 + k] = 0;
-                TimeSci2_tcal[i * 3 + k][m] = 0;
+                PosSci2_m1[i][m] = 0.;
+                TimeSci2_m1[i][m] = 0.;
+                TimeSci2wTref_m1[i][m] = 0.;
+                posLosX_cm[i][m] = 0.;
             }
         }
-    }
 
-    // --- read Tcal from Sci2 data --- //
-    if (fTcalSci2 && fTcalSci2->GetEntriesFast() > 0)
-    {
-        nHits = fTcalSci2->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BSci2TcalData* hittcal = dynamic_cast<R3BSci2TcalData*>(fTcalSci2->At(ihit));
-            UInt_t numDet = hittcal->GetDetector();
-            UInt_t ch = hittcal->GetChannel() - 1;
-            if (numDet > fNumDet)
-            {
-                R3BLOG(warn, "Sci2 detector id:" << numDet << " is out of range!");
-                continue;
-            }
-            if (multSci2Tcal[(numDet - 1) * 3 + ch] >= MAXMULT)
-                continue;
-            TimeSci2_tcal[(numDet - 1) * 3 + ch][multSci2Tcal[(numDet - 1) * 3 + ch]] = hittcal->GetRawTimeNs();
-            multSci2Tcal[(numDet - 1) * 3 + ch]++;
-        } // --- end of loop over Sci2 Tcal data --- //
-    }
-    // --- read hit from Sci2 data --- //
-    if (fHitSci2 && fHitSci2->GetEntriesFast() > 0)
-    {
-        Int_t numDet = 1;
-        nHits = fHitSci2->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BSci2HitData* hittcal = dynamic_cast<R3BSci2HitData*>(fHitSci2->At(ihit));
-            numDet = hittcal->GetSciId();
-            if (numDet > fNumDet)
-            {
-                R3BLOG(warn, "Sci2 detector id:" << numDet << " is out of range!");
-                continue;
-            }
-            if (multSci2[numDet - 1] >= MAXMULT)
-                continue;
-            PosSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetX();
-            TimeSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetTime();
-            TimeSci2wTref_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetTimeWithTref();
-            multSci2[numDet - 1]++;
-        } // --- end of loop over hit data --- //
-    }
-
-    // --- read hit from Sci2 data --- //
-    if (fPosCalFrsSci && fPosCalFrsSci->GetEntriesFast() > 0)
-    {
-        Int_t numDet = -1;
-        nHits = fPosCalFrsSci->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            auto hittcal = dynamic_cast<R3BFrsSciPosCalData*>(fPosCalFrsSci->At(ihit));
-            numDet = hittcal->GetDetector();
-            if (numDet > fNumDet)
-            {
-                R3BLOG(warn, "FrsSci detector id:" << numDet << " is out of range!");
-                continue;
-            }
-            if (multSci2[numDet - 1] >= MAXMULT)
-                continue;
-            PosSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetCalPosMm();
-            TimeSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetRawTimeNs();
-            TimeSci2wTref_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetRawTimeNsWithTref();
-            multSci2[numDet - 1]++;
-        } // --- end of loop over hit data --- //
-    }
-
-    if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118 || fHeader->GetExpId() == 249)
-    {
-        // --- read hit from LOSCal data --- //
-        if (fCalLos && fCalLos->GetEntriesFast() > 0)
-        {
-            nHits = fCalLos->GetEntriesFast();
-            if (nHits == 1 || (fCalLosTrig && fCalLosTrig->GetEntriesFast() == 1))
-            {
-                for (Int_t ihit = 0; ihit < nHits; ihit++)
-                {
-                    auto* hittcal = dynamic_cast<R3BLosCalData*>(fCalLos->At(ihit));
-                    auto* hittcaltrig = dynamic_cast<R3BLosCalData*>(fCalLosTrig->At(0));
-                    auto numDet = hittcal->GetDetector();
-                    if (multLos[numDet - 1] >= MAXMULT)
-                        break;
-                    auto los_tdiff = fTimeStitch->GetTime(
-                        hittcaltrig->GetTimeV_ns(0) - hittcal->GetTimeV_ns(fLosRefCh), "vftx", "vftx");
-                    if (los_tdiff < fLosCalTrig_Low || los_tdiff > fLosCalTrig_High)
-                    {
-                        continue;
-                    }
-                    timeLosV[numDet - 1][multLos[numDet - 1]] =
-                        hittcal->GetMeanTimeVFTX() - hittcal->GetTimeV_ns(fLosRefCh);
-                    // posLosX_cm[numDet - 1][multLos[numDet - 1]] = hittcal->GetX_cm();
-                    multLos[numDet - 1]++;
-                } // --- end of loop over hit data --- //
-            }
-        }
-    }
-    else
-    {
-        // --- read hit from LOS data --- //
+        // --- read hit from LOS data
         if (fHitLos && fHitLos->GetEntriesFast() > 0)
         {
             Int_t numDet = -1;
 
-            nHits = fHitLos->GetEntriesFast();
+            auto nHits = fHitLos->GetEntriesFast();
 
             for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
+                auto hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
                 numDet = hittcal->GetDetector();
 
                 if (multLos[numDet - 1] >= MAXMULT)
                     break;
-                timeLosV[numDet - 1][multLos[numDet - 1]] = hittcal->GetTime();
                 posLosX_cm[numDet - 1][multLos[numDet - 1]] = hittcal->GetX_cm();
                 multLos[numDet - 1]++;
             } // --- end of loop over hit data --- //
         }
-    }
 
-    // Note: If the objective is to use only Los Z, FRSdata can
-    // now easily be made multihit capable from this code itself,
-    // just save the Los Z and calculate the Brho and A/Q value here
-    // no need to run the separate R3BAnalysisIncomingID task which
-    // can currently take only single hits because the Z information
-    // is generally taken from other detectors
-    // -Nikhil
-    Double_t good_beta = NAN, good_pos_s2 = NAN, good_pos_los = NAN, good_tof = NAN;
-
-    for (int i = 0; i < fNumDet; i++)
-    {
-        if (fUseFrsSci && (fStoId != 0 || fStaId != i + 1))
+        // --- read hit from Sci2 data
+        if (fPosCalFrsSci && fPosCalFrsSci->GetEntriesFast() > 0)
         {
-            continue;
+            int numDet = 0;
+            auto nHits = fPosCalFrsSci->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hittcal = dynamic_cast<R3BFrsSciPosCalData*>(fPosCalFrsSci->At(ihit));
+                numDet = hittcal->GetDetector();
+                if (numDet > fNumDet || numDet < 1)
+                {
+                    R3BLOG(warn, "FrsSci detector id:" << numDet << " is out of range!");
+                    continue;
+                }
+                if (multSci2[numDet - 1] >= MAXMULT)
+                    continue;
+                PosSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetCalPosMm();
+                TimeSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetRawTimeNs();
+                TimeSci2wTref_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetRawTimeNsWithTref();
+                multSci2[numDet - 1]++;
+            } // --- end of loop over hit data --- //
         }
-        for (Int_t i_L = 0; i_L < multLos[0]; i_L++) // Here we assume there is only one LOS detector
+
+        Double_t ToFraw_m1 = 0., Velo_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0.;
+
+        // Only multi-one
+        ToFraw_m1 = fTimeStitch->GetTime(fHeader->GetTStartMaster() - TimeSci2wTref_m1[0][0], "vftx", "vftx");
+
+        Velo_m1 = 1. / (fTof2InvV_p0->GetAt(0) + fTof2InvV_p1->GetAt(0) * (fToFoffset->GetAt(0) + ToFraw_m1)); // [m/ns]
+
+        Beta_m1 = Velo_m1 / (TMath::C() / pow(10, 9));
+
+        if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
         {
-            Int_t num_tof_candidates = 0;
-            for (Int_t i_2 = 0; i_2 < multSci2[i]; i_2++)
+
+            AddData(0, 1, 0., 0., Beta_m1, 0., PosSci2_m1[0][0], posLosX_cm[0][0], 1);
+        }
+    }
+    else
+    {
+
+        // --- local variables --- //
+        Double_t timeLosV[fNumDet][MAXMULT];
+        Double_t posLosX_cm[fNumDet][MAXMULT];
+        Double_t TimeSci2_m1[fNumDet][MAXMULT];
+        Double_t TimeSci2wTref_m1[fNumDet][MAXMULT];
+        Double_t TimeSci2_tcal[fNumDet * 3][MAXMULT];
+        Double_t PosSci2_m1[fNumDet][MAXMULT];
+        UInt_t nHits = 0;
+        Double_t ToFraw_m1 = 0.;
+        Double_t Velo_m1 = 0., Beta_m1 = 0., Gamma_m1 = 0.;
+
+        Int_t multSci2[fNumDet], multSci2Tcal[fNumDet * 3];
+        Int_t multLos[fNumDet];
+
+        for (Int_t i = 0; i < fNumDet; i++)
+        {
+            multSci2[i] = 0;
+            multLos[i] = 0;
+            for (Int_t m = 0; m < MAXMULT; m++)
             {
-                if (fUseTref)
+                PosSci2_m1[i][m] = 0.;
+                TimeSci2_m1[i][m] = 0.;
+                TimeSci2wTref_m1[i][m] = 0.;
+                posLosX_cm[i][m] = 0.;
+                timeLosV[i][m] = 0.;
+                for (Int_t k = 0; k < 3; k++)
                 {
-                    ToFraw_m1 = fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
-                }
-                else if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118 || fHeader->GetExpId() == 249)
-                {
-                    ToFraw_m1 =
-                        fTimeStitch->GetTime(timeLosV[0][i_L] - TimeSci2wTref_m1[i][i_2],
-                                             "vftx",
-                                             "vftx"); // Ref time is subtracted already on timeLosV for this case
-                }
-                else
-                {
-                    ToFraw_m1 = fTimeStitch->GetTime(timeLosV[0][i_L] - TimeSci2_m1[i][i_2], "vftx", "vftx");
-                    if (ToFraw_m1 > 0. && fHeader->GetExpId() == 515)
-                        ToFraw_m1 = ToFraw_m1 - 40960.;
-                }
-                Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
-                                fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
-                Beta_m1 = Velo_m1 / (TMath::C() / pow(10, 9));
-                // Select good ToF hit with gating beta
-                if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
-                {
-                    good_beta = Beta_m1;
-                    good_tof = ToFraw_m1;
-                    good_pos_s2 = PosSci2_m1[i][i_2];
-                    good_pos_los = posLosX_cm[0][i_L];
-                    num_tof_candidates++;
+                    multSci2Tcal[i * 3 + k] = 0;
+                    TimeSci2_tcal[i * 3 + k][m] = 0;
                 }
             }
-            if (num_tof_candidates == 1)
+        }
+
+        // --- read Tcal from Sci2 data --- //
+        if (fTcalSci2 && fTcalSci2->GetEntriesFast() > 0)
+        {
+            nHits = fTcalSci2->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
             {
-                AddData(fStaId,
-                        fStoId,
-                        0.,
-                        0.,
-                        good_beta,
-                        0.,
-                        good_pos_s2,
-                        good_pos_los,
-                        good_tof); // NaN indicator of only one
-                if (!fUseMultHit)
-                    break;
-            }
-            if (num_tof_candidates == 0 && fHeader->GetExpId() == 509)
-            {
-                Int_t num_tof_ch = 0;
-                for (Int_t nCh = 0; nCh < 2; nCh++)
+                auto hittcal = dynamic_cast<R3BSci2TcalData*>(fTcalSci2->At(ihit));
+                UInt_t numDet = hittcal->GetDetector();
+                UInt_t ch = hittcal->GetChannel() - 1;
+                if (numDet > fNumDet)
                 {
-                    if (!(multSci2Tcal[i * 3 + 2] == 1))
-                        break;
-                    for (Int_t i0 = 0; i0 < multSci2Tcal[i * 3 + nCh]; i0++)
+                    R3BLOG(warn, "Sci2 detector id:" << numDet << " is out of range!");
+                    continue;
+                }
+                if (multSci2Tcal[(numDet - 1) * 3 + ch] >= MAXMULT)
+                    continue;
+                TimeSci2_tcal[(numDet - 1) * 3 + ch][multSci2Tcal[(numDet - 1) * 3 + ch]] = hittcal->GetRawTimeNs();
+                multSci2Tcal[(numDet - 1) * 3 + ch]++;
+            } // --- end of loop over Sci2 Tcal data --- //
+        }
+
+        // --- read hit from Sci2 data --- //
+        if (fHitSci2 && fHitSci2->GetEntriesFast() > 0)
+        {
+            Int_t numDet = 1;
+            nHits = fHitSci2->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BSci2HitData* hittcal = dynamic_cast<R3BSci2HitData*>(fHitSci2->At(ihit));
+                numDet = hittcal->GetSciId();
+                if (numDet > fNumDet)
+                {
+                    R3BLOG(warn, "Sci2 detector id:" << numDet << " is out of range!");
+                    continue;
+                }
+                if (multSci2[numDet - 1] >= MAXMULT)
+                    continue;
+                PosSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetX();
+                TimeSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetTime();
+                TimeSci2wTref_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetTimeWithTref();
+                multSci2[numDet - 1]++;
+            } // --- end of loop over hit data --- //
+        }
+
+        // --- read hit from Sci2 data --- //
+        if (fPosCalFrsSci && fPosCalFrsSci->GetEntriesFast() > 0)
+        {
+            Int_t numDet = -1;
+            nHits = fPosCalFrsSci->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hittcal = dynamic_cast<R3BFrsSciPosCalData*>(fPosCalFrsSci->At(ihit));
+                numDet = hittcal->GetDetector();
+                if (numDet > fNumDet)
+                {
+                    R3BLOG(warn, "FrsSci detector id:" << numDet << " is out of range!");
+                    continue;
+                }
+                if (multSci2[numDet - 1] >= MAXMULT)
+                    continue;
+                PosSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetCalPosMm();
+                TimeSci2_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetRawTimeNs();
+                TimeSci2wTref_m1[numDet - 1][multSci2[numDet - 1]] = hittcal->GetRawTimeNsWithTref();
+                multSci2[numDet - 1]++;
+            } // --- end of loop over hit data --- //
+        }
+
+        if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
+        {
+            // --- read hit from LOSCal data --- //
+            if (fCalLos && fCalLos->GetEntriesFast() > 0)
+            {
+                nHits = fCalLos->GetEntriesFast();
+                if (nHits == 1 || (fCalLosTrig && fCalLosTrig->GetEntriesFast() == 1))
+                {
+                    for (Int_t ihit = 0; ihit < nHits; ihit++)
                     {
-                        if (fUseTref)
+                        auto* hittcal = dynamic_cast<R3BLosCalData*>(fCalLos->At(ihit));
+                        auto* hittcaltrig = dynamic_cast<R3BLosCalData*>(fCalLosTrig->At(0));
+                        auto numDet = hittcal->GetDetector();
+                        if (multLos[numDet - 1] >= MAXMULT)
+                            break;
+                        auto los_tdiff = fTimeStitch->GetTime(
+                            hittcaltrig->GetTimeV_ns(0) - hittcal->GetTimeV_ns(fLosRefCh), "vftx", "vftx");
+                        if (los_tdiff < fLosCalTrig_Low || los_tdiff > fLosCalTrig_High)
                         {
-                            ToFraw_m1 = fTimeStitch->GetTime(
-                                fHeader->GetTStart() - (TimeSci2_tcal[i * 3 + nCh][i0] - TimeSci2_tcal[i * 3 + 2][0]),
-                                "vftx",
-                                "vftx");
+                            continue;
                         }
-                        else
-                        {
-                            ToFraw_m1 = fTimeStitch->GetTime(
-                                timeLosV[i][i_L] - (TimeSci2_tcal[i * 3 + nCh][i0]), "vftx", "vftx");
-                        }
-                        Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
-                                        fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
-                        Beta_m1 = Velo_m1 / (TMath::C() / pow(10, 9));
-                        // Select good ToF hit with gating beta
-                        if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
-                        {
-                            good_beta = Beta_m1;
-                            good_tof = ToFraw_m1;
-                            good_pos_los = posLosX_cm[i][i_L];
-                            num_tof_ch++;
-                        }
-                    }
-                    if (num_tof_ch > 0)
-                        break;
+                        timeLosV[numDet - 1][multLos[numDet - 1]] =
+                            hittcal->GetMeanTimeVFTX() - hittcal->GetTimeV_ns(fLosRefCh);
+                        // posLosX_cm[numDet - 1][multLos[numDet - 1]] = hittcal->GetX_cm();
+                        multLos[numDet - 1]++;
+                    } // --- end of loop over hit data --- //
                 }
-                if (num_tof_ch == 1)
+            }
+        }
+        else
+        {
+            // --- read hit from LOS data --- //
+            if (fHitLos && fHitLos->GetEntriesFast() > 0)
+            {
+                Int_t numDet = -1;
+
+                nHits = fHitLos->GetEntriesFast();
+
+                for (Int_t ihit = 0; ihit < nHits; ihit++)
                 {
-                    AddData(1, 2, 0., 0., good_beta, 0., NAN, good_pos_los,
+                    R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
+                    numDet = hittcal->GetDetector();
+
+                    if (multLos[numDet - 1] >= MAXMULT)
+                        break;
+                    timeLosV[numDet - 1][multLos[numDet - 1]] = hittcal->GetTime();
+                    posLosX_cm[numDet - 1][multLos[numDet - 1]] = hittcal->GetX_cm();
+                    multLos[numDet - 1]++;
+                } // --- end of loop over hit data --- //
+            }
+        }
+
+        // Note: If the objective is to use only Los Z, FRSdata can
+        // now easily be made multihit capable from this code itself,
+        // just save the Los Z and calculate the Brho and A/Q value here
+        // no need to run the separate R3BAnalysisIncomingID task which
+        // can currently take only single hits because the Z information
+        // is generally taken from other detectors
+        // -Nikhil
+        Double_t good_beta = NAN, good_pos_s2 = NAN, good_pos_los = NAN, good_tof = NAN;
+
+        for (int i = 0; i < fNumDet; i++)
+        {
+            if (fUseFrsSci && (fStoId != 0 || fStaId != i + 1))
+            {
+                continue;
+            }
+            for (Int_t i_L = 0; i_L < multLos[0]; i_L++) // Here we assume there is only one LOS detector
+            {
+                Int_t num_tof_candidates = 0;
+                for (Int_t i_2 = 0; i_2 < multSci2[i]; i_2++)
+                {
+                    if (fUseTref)
+                    {
+                        ToFraw_m1 =
+                            fTimeStitch->GetTime(fHeader->GetTStart() - TimeSci2wTref_m1[i][i_2], "vftx", "vftx");
+                    }
+                    else if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
+                    {
+                        ToFraw_m1 =
+                            fTimeStitch->GetTime(timeLosV[0][i_L] - TimeSci2wTref_m1[i][i_2],
+                                                 "vftx",
+                                                 "vftx"); // Ref time is subtracted already on timeLosV for this case
+                    }
+                    else
+                    {
+                        ToFraw_m1 = fTimeStitch->GetTime(timeLosV[0][i_L] - TimeSci2_m1[i][i_2], "vftx", "vftx");
+                        if (ToFraw_m1 > 0. && fHeader->GetExpId() == 515)
+                            ToFraw_m1 = ToFraw_m1 - 40960.;
+                    }
+                    Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
+                                    fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
+                    Beta_m1 = Velo_m1 / (TMath::C() / pow(10, 9));
+                    // Select good ToF hit with gating beta
+                    if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
+                    {
+                        good_beta = Beta_m1;
+                        good_tof = ToFraw_m1;
+                        good_pos_s2 = PosSci2_m1[i][i_2];
+                        good_pos_los = posLosX_cm[0][i_L];
+                        num_tof_candidates++;
+                    }
+                }
+                if (num_tof_candidates == 1)
+                {
+                    AddData(fStaId,
+                            fStoId,
+                            0.,
+                            0.,
+                            good_beta,
+                            0.,
+                            good_pos_s2,
+                            good_pos_los,
                             good_tof); // NaN indicator of only one
-                    // S2 pmt present
                     if (!fUseMultHit)
                         break;
                 }
-            }             // end: if (num_tof_candidates == 0 && fHeader->GetExpId() == 509)
-            if (fUseTref) // Tref defines when the trigger time is. And only one hit is recorded.
-                break;
-        } // End of loop with LOS mult
+                if (num_tof_candidates == 0 && fHeader->GetExpId() == 509)
+                {
+                    Int_t num_tof_ch = 0;
+                    for (Int_t nCh = 0; nCh < 2; nCh++)
+                    {
+                        if (!(multSci2Tcal[i * 3 + 2] == 1))
+                            break;
+                        for (Int_t i0 = 0; i0 < multSci2Tcal[i * 3 + nCh]; i0++)
+                        {
+                            if (fUseTref)
+                            {
+                                ToFraw_m1 = fTimeStitch->GetTime(
+                                    fHeader->GetTStart() -
+                                        (TimeSci2_tcal[i * 3 + nCh][i0] - TimeSci2_tcal[i * 3 + 2][0]),
+                                    "vftx",
+                                    "vftx");
+                            }
+                            else
+                            {
+                                ToFraw_m1 = fTimeStitch->GetTime(
+                                    timeLosV[i][i_L] - (TimeSci2_tcal[i * 3 + nCh][i0]), "vftx", "vftx");
+                            }
+                            Velo_m1 = 1. / (fTof2InvV_p0->GetAt(i) +
+                                            fTof2InvV_p1->GetAt(i) * (fToFoffset->GetAt(i) + ToFraw_m1)); // [m/ns]
+                            Beta_m1 = Velo_m1 / (TMath::C() / pow(10, 9));
+                            // Select good ToF hit with gating beta
+                            if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
+                            {
+                                good_beta = Beta_m1;
+                                good_tof = ToFraw_m1;
+                                good_pos_los = posLosX_cm[i][i_L];
+                                num_tof_ch++;
+                            }
+                        }
+                        if (num_tof_ch > 0)
+                            break;
+                    }
+                    if (num_tof_ch == 1)
+                    {
+                        AddData(1, 2, 0., 0., good_beta, 0., NAN, good_pos_los,
+                                good_tof); // NaN indicator of only one
+                        // S2 pmt present
+                        if (!fUseMultHit)
+                            break;
+                    }
+                }             // end: if (num_tof_candidates == 0 && fHeader->GetExpId() == 509)
+                if (fUseTref) // Tref defines when the trigger time is. And only one hit is recorded.
+                    break;
+            } // End of loop with LOS mult
+        }
     }
 
     // This part can be done by FrsSciTCal2Cal and resulting as FrsSciTofCalData.
