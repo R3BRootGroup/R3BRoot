@@ -54,20 +54,20 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_
     , fNEvents(0)
     , fTpat(-1)
     , fStaId(1)
-    , fMin_Z(0.)
-    , fMax_Z(20.)
-    , fMin_Aq(1.6)
-    , fMax_Aq(3.9)
+    , fMin_Z(0.5)
+    , fMax_Z(21.)
+    , fMin_Aq(2.0)
+    , fMax_Aq(3.)
     , fMin_Brho(6)
-    , fMax_Brho(10)
+    , fMax_Brho(13)
     , fMin_RawTof(-50000)
     , fMax_RawTof(50000)
     , fMin_Beta(0.)
     , fMax_Beta(1.)
-    , fMin_Z_gate(0.)
-    , fMax_Z_gate(20.)
-    , fMin_Aq_gate(1.6)
-    , fMax_Aq_gate(3.9)
+    , fMin_Z_gate(0.5)
+    , fMax_Z_gate(21.)
+    , fMin_Aq_gate(2.0)
+    , fMax_Aq_gate(3.0)
 {
 }
 
@@ -295,13 +295,13 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh2_IsoGated_xc_anglec->GetXaxis()->SetTitleSize(0.045);
     fh2_IsoGated_xc_anglec->GetYaxis()->SetLabelSize(0.045);
     fh2_IsoGated_xc_anglec->GetYaxis()->SetTitleSize(0.045);
-    fh2_IsoGated_xc_anglec->Draw("colz");
+    //    fh2_IsoGated_xc_anglec->Draw("colz");
 
     cLosE_Tof = new TCanvas("LosE_Tof", "DeltaE in LOS and Tof", 10, 10, 800, 700);
 
     Name1 = "LOS-E_vs_ToF";
     Name2 = "LOS Energy vs Raw ToF (S2-LOS);Raw ToF (S2-LOS) / ns;LOS Z";
-    fh2_LosE_Tof = new TH2F(Name1, Name2, 3000, 0, 3000, 900, 0, 30);
+    fh2_LosE_Tof = new TH2F(Name1, Name2, 10000, 1300, 1500, 900, 0, 30);
     fh2_LosE_Tof->GetYaxis()->SetTitleOffset(1.1);
     fh2_LosE_Tof->GetXaxis()->CenterTitle(true);
     fh2_LosE_Tof->GetYaxis()->CenterTitle(true);
@@ -313,6 +313,19 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
 
     cLosE_Tof2 = new TCanvas(
         "LosE_with_ToF_measurement", "LOS Energy distribution with (black) and without (red) S2", 10, 10, 800, 700);
+
+    Name1 = "LOS-Z_with_S2";
+    Name2 = "LOS Energy with (black) without (red) good S2 hit;LOS Z;Counts";
+    fh1_LosE_withTof = new TH1F(Name1, Name2, 900, 0, 30);
+    fh1_LosE_withTof->GetYaxis()->SetTitleOffset(1.1);
+    fh1_LosE_withTof->GetXaxis()->CenterTitle(true);
+    fh1_LosE_withTof->GetYaxis()->CenterTitle(true);
+    fh1_LosE_withTof->GetXaxis()->SetLabelSize(0.045);
+    fh1_LosE_withTof->GetXaxis()->SetTitleSize(0.045);
+    fh1_LosE_withTof->GetYaxis()->SetLabelSize(0.045);
+    fh1_LosE_withTof->GetYaxis()->SetTitleSize(0.045);
+    fh1_LosE_withTof->SetLineColor(kBlack);
+    fh1_LosE_withTof->Draw("");
 
     Name1 = "LOS-Z_without_S2";
     Name2 = "LOS Energy with (black) without (red) good S2 hit;LOS Z;Counts";
@@ -326,19 +339,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fh1_LosE_withoutTof->GetYaxis()->SetTitleSize(0.045);
     fh1_LosE_withoutTof->SetLineColor(kRed);
     fh1_LosE_withoutTof->SetLineWidth(2);
-    fh1_LosE_withoutTof->Draw("");
-
-    Name1 = "LOS-Z_with_S2";
-    Name2 = "LOS Energy with (black) without (red) good S2 hit;LOS Z;Counts";
-    fh1_LosE_withTof = new TH1F(Name1, Name2, 900, 0, 30);
-    fh1_LosE_withTof->GetYaxis()->SetTitleOffset(1.1);
-    fh1_LosE_withTof->GetXaxis()->CenterTitle(true);
-    fh1_LosE_withTof->GetYaxis()->CenterTitle(true);
-    fh1_LosE_withTof->GetXaxis()->SetLabelSize(0.045);
-    fh1_LosE_withTof->GetXaxis()->SetTitleSize(0.045);
-    fh1_LosE_withTof->GetYaxis()->SetLabelSize(0.045);
-    fh1_LosE_withTof->GetYaxis()->SetTitleSize(0.045);
-    fh1_LosE_withTof->Draw("same");
+    fh1_LosE_withoutTof->Draw("same");
 
     // MAIN FOLDER-INCOMINGID
     TFolder* mainfol = new TFolder("FRS-IncomingID", "FRS incomingID info");
@@ -391,14 +392,34 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
             auto hit = dynamic_cast<R3BFrsData*>(fHitFrs->At(ihit));
             if (!hit)
                 continue;
-            if (hit->GetStaId() != fStaId)
-                continue;
+            // if (hit->GetStaId() != fStaId)
+            //    continue;
             fh2_Pos2vsAoQ_m1->Fill(hit->GetXS2(), hit->GetAq());
             fh1_tof->Fill(hit->GetTof());
             fh1_beta->Fill(hit->GetBeta());
             fh1_brho->Fill(hit->GetBrho());
             fh2_Aqvsq->Fill(hit->GetAq(), hit->GetZ());
             fh2_Xs2vsbeta->Fill(hit->GetXS2(), hit->GetBeta());
+
+            if (fHeader->GetExpId() == 249)
+            {
+                auto nHits_Mw0 = fMwpc0HitDataCA->GetEntriesFast();
+
+                for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
+                {
+                    auto hit_mw0 = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(iMw0));
+                    if (!hit_mw0)
+                        continue;
+                    auto mwpc0x = hit_mw0->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
+
+                    fh2_Z_xc->Fill(mwpc0x, hit->GetZ());
+                    if (hit->GetAq() < fMin_Aq_gate || hit->GetAq() > fMax_Aq_gate || hit->GetZ() < fMin_Z_gate ||
+                        hit->GetZ() > fMax_Z_gate)
+                        continue;
+                    fh2_IsoGated_Z_xc->Fill(mwpc0x, hit->GetZ());
+                    fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), mwpc0x);
+                }
+            }
 
             if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
             {
