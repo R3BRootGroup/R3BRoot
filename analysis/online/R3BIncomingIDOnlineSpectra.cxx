@@ -50,7 +50,7 @@ R3BIncomingIDOnlineSpectra::R3BIncomingIDOnlineSpectra(const TString& name, Int_
     , fHitLos(NULL)
     , fMwpc0HitDataCA(NULL)
     , fMwpc1HitDataCA(NULL)
-    , header(nullptr)
+    , fHeader(nullptr)
     , fNEvents(0)
     , fTpat(-1)
     , fStaId(1)
@@ -108,8 +108,8 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 
-    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    R3BLOG_IF(error, !header, "Branch EventHeader. not found");
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    R3BLOG_IF(error, !fHeader, "Branch EventHeader. not found");
 
     // get access to mapped data of FRS
     fHitFrs = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
@@ -119,7 +119,7 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     fMwpc0HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc0HitData"));
     R3BLOG_IF(fatal, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
     fMwpc1HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc1HitData"));
-    R3BLOG_IF(fatal, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
+    R3BLOG_IF(warn, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
 
     // Create histograms for detectors
     TString Name1;
@@ -379,16 +379,16 @@ void R3BIncomingIDOnlineSpectra::Reset_Histo()
 
 void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
 {
-    if ((fTpat >= 0) && (header) && ((header->GetTpat() & fTpat) != fTpat))
+    if ((fTpat >= 0) && (fHeader) && ((fHeader->GetTpat() & fTpat) != fTpat))
         return;
 
     // Fill Hit data
     if (fHitFrs && fHitFrs->GetEntriesFast() > 0)
     {
-        Int_t nHits = fHitFrs->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        auto nHits = fHitFrs->GetEntriesFast();
+        for (size_t ihit = 0; ihit < nHits; ihit++)
         {
-            R3BFrsData* hit = dynamic_cast<R3BFrsData*>(fHitFrs->At(ihit));
+            auto hit = dynamic_cast<R3BFrsData*>(fHitFrs->At(ihit));
             if (!hit)
                 continue;
             if (hit->GetStaId() != fStaId)
@@ -400,41 +400,45 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
             fh2_Aqvsq->Fill(hit->GetAq(), hit->GetZ());
             fh2_Xs2vsbeta->Fill(hit->GetXS2(), hit->GetBeta());
 
-            auto nHits_Mw0 = fMwpc0HitDataCA->GetEntriesFast();
-            auto nHits_Mw1 = fMwpc1HitDataCA->GetEntriesFast();
-            for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
+            if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
             {
-                auto hit_mw0 = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(iMw0));
-                if (!hit_mw0)
-                    continue;
-                auto mwpc0x = hit_mw0->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
-                for (Int_t iMw1 = 0; iMw1 < nHits_Mw1; iMw1++)
+                auto nHits_Mw0 = fMwpc0HitDataCA->GetEntriesFast();
+                auto nHits_Mw1 = fMwpc1HitDataCA->GetEntriesFast();
+                for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
                 {
-                    auto hit_mw1 = dynamic_cast<R3BMwpcHitData*>(fMwpc1HitDataCA->At(iMw1));
-                    if (!hit_mw1)
+                    auto hit_mw0 = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(iMw0));
+                    if (!hit_mw0)
                         continue;
-                    auto mwpc1x = hit_mw1->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
-                    auto XCave = mwpc0x;
-                    auto AngleCave =
-                        (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10. * 1000.; // mrad
+                    auto mwpc0x = hit_mw0->GetX() + fMw0GeoPar->GetPosX() * 10.; // mm
+                    for (Int_t iMw1 = 0; iMw1 < nHits_Mw1; iMw1++)
+                    {
+                        auto hit_mw1 = dynamic_cast<R3BMwpcHitData*>(fMwpc1HitDataCA->At(iMw1));
+                        if (!hit_mw1)
+                            continue;
+                        auto mwpc1x = hit_mw1->GetX() + fMw1GeoPar->GetPosX() * 10.; // mm
+                        auto XCave = mwpc0x;
+                        auto AngleCave =
+                            (mwpc0x - mwpc1x) / (fMw0GeoPar->GetPosZ() - fMw1GeoPar->GetPosZ()) / 10. * 1000.; // mrad
 
-                    fh2_Z_xc->Fill(XCave, hit->GetZ());
-                    // Plot PID gated histograms below
-                    if (hit->GetAq() < fMin_Aq_gate || hit->GetAq() > fMax_Aq_gate || hit->GetZ() < fMin_Z_gate ||
-                        hit->GetZ() > fMax_Z_gate)
-                        continue;
-                    fh2_IsoGated_Z_xc->Fill(XCave, hit->GetZ());
-                    fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), XCave);
-                    fh2_IsoGated_xc_anglec->Fill(XCave, AngleCave);
+                        fh2_Z_xc->Fill(XCave, hit->GetZ());
+                        // Plot PID gated histograms below
+                        if (hit->GetAq() < fMin_Aq_gate || hit->GetAq() > fMax_Aq_gate || hit->GetZ() < fMin_Z_gate ||
+                            hit->GetZ() > fMax_Z_gate)
+                            continue;
+                        fh2_IsoGated_Z_xc->Fill(XCave, hit->GetZ());
+                        fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), XCave);
+                        fh2_IsoGated_xc_anglec->Fill(XCave, AngleCave);
+                    }
                 }
             }
+
             // making los pid
             if (fHitLos && fHitLos->GetEntriesFast() > 0)
             {
                 Int_t nHitsLos = fHitLos->GetEntriesFast();
                 for (Int_t ihitLos = 0; ihitLos < nHitsLos; ihitLos++)
                 {
-                    R3BLosHitData* hitLos = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihitLos));
+                    auto hitLos = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihitLos));
                     if (!hitLos)
                         continue;
                     fh2_LosE_Tof->Fill(hit->GetTof(), hitLos->GetZ());
