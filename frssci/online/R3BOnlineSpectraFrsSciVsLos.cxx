@@ -68,7 +68,6 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
     // --- ------------------ --- //
     // --- GET ACCESS TO DATA --- //
     // --- ------------------ --- //
-    
 
     // === get access to EventHeader for GetTStartMaster()=<T_LOS_VFTX>-TrefMASTER ===//
     fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
@@ -149,7 +148,6 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
     Double_t StartTraw = -1;
     Double_t TofRaw = -1;
 
-
     for (UShort_t i = 0; i < fFrsSciNbDets; i++)
     {
         for (UShort_t j = 0; j < fFrsSciNbPmts; j++)
@@ -182,12 +180,11 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
 
         for (UShort_t i = 0; i < fFrsSciNbDets; i++)
         {
-            if (multFrsSciTcal[i * fFrsSciNbPmts]     == 1 &&
-                multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 && 
-		multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
+            if (multFrsSciTcal[i * fFrsSciNbPmts] == 1 && multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 &&
+                multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
             {
                 StartTraw = 0.5 * (FrsSciTraw[i * fFrsSciNbPmts] + FrsSciTraw[i * fFrsSciNbPmts + 1]);
-                TofRaw = fHeader->GetTStartMaster() - StartTraw  + FrsSciTraw[i * fFrsSciNbPmts + 2];
+                TofRaw = fHeader->GetTStartMaster() - StartTraw + FrsSciTraw[i * fFrsSciNbPmts + 2];
                 fh1_Tcal1Hit_TofRaw[i]->Fill(TofRaw);
             }
         }

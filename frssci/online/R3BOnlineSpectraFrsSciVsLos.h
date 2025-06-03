@@ -86,10 +86,10 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     void SetFrsSciNbPmts(UShort_t npmts) { fFrsSciNbPmts = npmts; }
 
   private:
-    R3BEventHeader* fHeader; /**< Event header  */
-    TClonesArray* fFrsSci_Tcal;   /**< Array with R3BFrsSciTcalData */
+    R3BEventHeader* fHeader;    /**< Event header  */
+    TClonesArray* fFrsSci_Tcal; /**< Array with R3BFrsSciTcalData */
 
-    Int_t fNEvents;               /**< Event counter.     */
+    Int_t fNEvents; /**< Event counter.     */
     UShort_t fFrsSciNbDets;
     UShort_t fFrsSciNbPmts;
 
@@ -99,8 +99,6 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     // Histograms TofRaw
     TH1D** fh1_Tcal1Hit_TofRaw; // [fNumFrsSci] START=FrsSci, STOP=LOS
     TH1D** fh1_Tcal1Hit_TofCal; // [fNumFrsSci] START=FrsSci, STOP=LOS
-
-
 
   public:
     ClassDef(R3BOnlineSpectraFrsSciVsLos, 1)
