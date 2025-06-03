@@ -150,7 +150,7 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_pos_ToT[iloscount]->GetYaxis()->SetTitle("Y position / cm");
 
             fh_los_dt_hits_ToT[iloscount] = R3B::root_owned<TH2F>(
-                Form("%s_dt_ToT", detName), Form("%s ToT dt ", detName), 4000, -4., 4., 300, 0, 300.);
+                Form("%s_dt_ToT", detName), Form("%s ToT dt ", detName), 4000, -4., 4., 1000, 0, 1000.);
             fh_los_dt_hits_ToT[iloscount]->GetXaxis()->SetTitle("Time MCFD / ns"); // dt between two hits / ns
             fh_los_dt_hits_ToT[iloscount]->GetYaxis()->SetTitle("ToT / ns");       // ToT / ns
 
@@ -178,13 +178,13 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_tot[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
             fh_los_tot_mean[iloscount] =
-                R3B::root_owned<TH1F>(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 300.);
+                R3B::root_owned<TH1F>(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 1000.);
             fh_los_tot_mean[iloscount]->GetYaxis()->SetTitle("Counts");
             fh_los_tot_mean[iloscount]->GetXaxis()->SetTitle("ToT / ns");
             fh_los_tot_mean[iloscount]->SetFillColor(31);
 
             fh_los_ihit_ToT[iloscount] = R3B::root_owned<TH2F>(
-                Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 300.);
+                Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 1000.);
             fh_los_ihit_ToT[iloscount]->GetXaxis()->SetTitle("iHit");
             fh_los_ihit_ToT[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
@@ -193,9 +193,9 @@ InitStatus R3BLosOnlineSpectra::Init()
                                                                    10000,
                                                                    0,
                                                                    10000000,
-                                                                   300,
+                                                                   1000,
                                                                    0.,
-                                                                   300.);
+                                                                   1000.);
             fh_losToT_vs_Events[iloscount]->GetYaxis()->SetTitle("ToT / ns");
             fh_losToT_vs_Events[iloscount]->GetXaxis()->SetTitle("Event number");
 
@@ -791,8 +791,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* /*option*/)
                         fh_los_multihit[iDet - 1]->Fill(iPart + 1);
                     }
                 } // if iLosType
-            }     // for iPart
-        }         // for iDet
+            } // for iPart
+        } // for iDet
 
     } // if fCallItems
 
