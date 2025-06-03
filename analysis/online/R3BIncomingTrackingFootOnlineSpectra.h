@@ -114,7 +114,7 @@ class R3BIncomingTrackingFootOnlineSpectra : public FairTask
 
     unsigned long long fNEvents = 0;
     uint16_t fYearConf = 2025;
-    float fPosTarget = 2576.0;
+    float fPosTarget = 2638.7; // measured on 26/05/2025
     float fWidthTarget = 32.0;
     float fDist_acelerator_glad = 3880.0; // measured on 14/04/2025
     TString fNameCut = "";
