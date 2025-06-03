@@ -250,6 +250,7 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
             {
                 StartTraw = 0.5 * (FrsSciTraw[i * fFrsSciNbPmts] + FrsSciTraw[i * fFrsSciNbPmts + 1]);
                 TofRaw = fHeader->GetTStartMaster() - StartTraw + FrsSciTraw[i * fFrsSciNbPmts + 2];
+
                 Velocity = 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * TofRaw);
                 Beta = Velocity / 0.299792458;
                 Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
@@ -285,4 +286,4 @@ void R3BOnlineSpectraFrsSciVsLos::FinishTask()
         }
     }
 }
-ClassImp(R3BOnlineSpectraFrsSciVsLos);
+ClassImp(R3BOnlineSpectraFrsSciVsLos)
