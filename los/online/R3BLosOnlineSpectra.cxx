@@ -173,7 +173,7 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_tres_TAMEX[iloscount]->SetFillColor(31);
 
             fh_los_tot[iloscount] = R3B::root_owned<TH2F>(
-                Form("%s_tot", detName), Form("%s ToT vs PMT", detName), 10, 0, 10, 1500, 0., 300.);
+                Form("%s_tot", detName), Form("%s ToT vs PMT", detName), 10, 0, 10, 2000, 0., 1000.);
             fh_los_tot[iloscount]->GetXaxis()->SetTitle("PMT number");
             fh_los_tot[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
