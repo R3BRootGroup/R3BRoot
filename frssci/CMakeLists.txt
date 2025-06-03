@@ -52,5 +52,6 @@ add_library_with_dictionary(
     online
     parameters
     DEPENDENCIES
+    R3BAnalysis
     R3BData
     R3BTCal)
