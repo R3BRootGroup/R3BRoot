@@ -36,11 +36,9 @@ R3BOnlineSpectraFrsSciVsLos::R3BOnlineSpectraFrsSciVsLos()
 R3BOnlineSpectraFrsSciVsLos::R3BOnlineSpectraFrsSciVsLos(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
     , fFrsSci_Tcal(NULL)
-    , fLos_Cal(NULL)
     , fNEvents(0)
     , fFrsSciNbDets(1)
     , fFrsSciNbPmts(3)
-    , fLosTrefPmtId(8)
 {
 }
 
@@ -49,8 +47,6 @@ R3BOnlineSpectraFrsSciVsLos::~R3BOnlineSpectraFrsSciVsLos()
     LOG(debug) << "R3BOnlineSpectraFrsSciVsLos::Destructor";
     if (fFrsSci_Tcal)
         delete fFrsSci_Tcal;
-    if (fLos_Cal)
-        delete fLos_Cal;
 }
 
 InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
@@ -72,6 +68,10 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
     // --- ------------------ --- //
     // --- GET ACCESS TO DATA --- //
     // --- ------------------ --- //
+    
+
+    // === get access to EventHeader for GetTStartMaster()=<T_LOS_VFTX>-TrefMASTER ===//
+    fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
     // === get access to frssci tcal data ===//
     fFrsSci_Tcal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciTcalData"));
@@ -79,20 +79,14 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
     {
         LOG(info) << "R3BOnlineSpectraFrsSciVsLos::Init() :: FrsSciTcal not found";
     }
-    // === get access to los Cal data ===//
-    fLos_Cal = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCalData"));
-    if (!fLos_Cal)
-    {
-        LOG(info) << "R3BOnlineSpectraFrsSciVsLos::Init() :: LosCal not found";
-    }
 
     // --- ---------------------------- --- //
     // --- DECLARATION TCANVAS + HISTOS --- //
     // --- ---------------------------- --- //
 
-    if (fFrsSci_Tcal && fLos_Cal)
+    if (fFrsSci_Tcal && fHeader)
     {
-        sprintf(Name1, "SciVsLos_Tcal_TofRaw");
+        sprintf(Name1, "TofRaw_TcalLVL");
         cTcal_TofRaw = new TCanvas(Name1, Name1, 10, 10, 800, 700);
         cTcal_TofRaw->Divide(1, fFrsSciNbDets);
         fh1_Tcal1Hit_TofRaw = new TH1D*[fFrsSciNbDets];
@@ -119,14 +113,14 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
     // --- --------------- --- //
     TFolder* mainfol = new TFolder("FrsSciVsLos", "FrsSci vs Musli info");
 
-    if (fFrsSci_Tcal && fLos_Cal)
+    if (fFrsSci_Tcal && fHeader)
     {
         mainfol->Add(cTcal_TofRaw);
     }
     run->AddObject(mainfol);
 
     // Register command to reset histograms
-    run->GetHttpServer()->RegisterCommand("Reset_FRSSCIvsMUSLI_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_FrsSci_Tof_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
     return kSUCCESS;
 }
@@ -136,7 +130,7 @@ void R3BOnlineSpectraFrsSciVsLos::Reset_Histo()
 
     LOG(info) << "R3BOnlineSpectraFrsSciVsLos::Reset_Histo";
 
-    if (fFrsSci_Tcal && fLos_Cal)
+    if (fFrsSci_Tcal && fHeader)
     {
         for (UShort_t i = 0; i < fFrsSciNbDets; i++)
         {
@@ -153,12 +147,8 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
     UInt_t multFrsSciTcal[fFrsSciNbDets * fFrsSciNbPmts];
     Double_t FrsSciTraw[fFrsSciNbDets * fFrsSciNbPmts];
     Double_t StartTraw = -1;
-
-    UInt_t multLosCal = 0;
-    Double_t LosTref = -1;
-    Double_t LosTraw = -1;
-
     Double_t TofRaw = -1;
+
 
     for (UShort_t i = 0; i < fFrsSciNbDets; i++)
     {
@@ -176,7 +166,7 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
     }
 
     UInt_t nHits;
-    if (fFrsSci_Tcal && fLos_Cal)
+    if (fFrsSci_Tcal && fHeader)
     {
         nHits = fFrsSci_Tcal->GetEntriesFast();
         for (UInt_t ihit = 0; ihit < nHits; ihit++)
@@ -190,24 +180,14 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
             FrsSciTraw[iFrsSciDet * fFrsSciNbPmts + iFrsSciPmt] = hitscitcal->GetRawTimeNs();
         } // end of loop over tcal data
 
-        nHits = fLos_Cal->GetEntriesFast();
-        for (UInt_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BLosCalData* hitloscal = dynamic_cast<R3BLosCalData*>(fLos_Cal->At(ihit));
-            if (!hitloscal)
-                continue;
-            multLosCal++;
-            LosTref = hitloscal->GetTimeV_ns(fLosTrefPmtId - 1);
-            LosTraw = hitloscal->GetMeanTimeVFTX();
-        } // end of loop over tcal data
-
         for (UShort_t i = 0; i < fFrsSciNbDets; i++)
         {
-            if (multLosCal == 1 && multFrsSciTcal[i * fFrsSciNbPmts] == 1 &&
-                multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 && multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
+            if (multFrsSciTcal[i * fFrsSciNbPmts]     == 1 &&
+                multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 && 
+		multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
             {
                 StartTraw = 0.5 * (FrsSciTraw[i * fFrsSciNbPmts] + FrsSciTraw[i * fFrsSciNbPmts + 1]);
-                TofRaw = LosTraw - StartTraw - LosTref + FrsSciTraw[i * fFrsSciNbPmts + 2];
+                TofRaw = fHeader->GetTStartMaster() - StartTraw  + FrsSciTraw[i * fFrsSciNbPmts + 2];
                 fh1_Tcal1Hit_TofRaw[i]->Fill(TofRaw);
             }
         }
@@ -223,16 +203,12 @@ void R3BOnlineSpectraFrsSciVsLos::FinishEvent()
     {
         fFrsSci_Tcal->Clear();
     }
-    if (fLos_Cal)
-    {
-        fLos_Cal->Clear();
-    }
 }
 
 void R3BOnlineSpectraFrsSciVsLos::FinishTask()
 {
 
-    if (fFrsSci_Tcal && fLos_Cal)
+    if (fFrsSci_Tcal && fHeader)
     {
         for (UShort_t i = 0; i < fFrsSciNbDets; i++)
         {
