@@ -57,6 +57,8 @@ TString R3BOnlineSyncCheck::EnumName(int value)
             return { TString("RPC") };
         case S2_SC:
             return { TString("S2") };
+        case CALIFA_SC:
+            return { TString("CALIFA") };
         case FOOT1_SC:
             return { TString("FOOT1") };
         case FOOT2_SC:
@@ -155,6 +157,9 @@ void R3BOnlineSyncCheck::Exec(Option_t* option)
                 break;
             case S2_SC:
                 val = sdata->GetS2();
+                break;
+            case CALIFA_SC:
+                val = sdata->GetCalifa();
                 break;
             case FOOT1_SC:
                 val = sdata->GetFoot(1);

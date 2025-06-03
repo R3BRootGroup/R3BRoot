@@ -42,6 +42,7 @@ class R3BOnlineSyncCheck : public FairTask
         MUSIC_SC,
         RPC_SC,
         S2_SC,
+        CALIFA_SC,
         FOOT1_SC,
         FOOT2_SC,
         FOOT13_SC,
@@ -67,7 +68,7 @@ class R3BOnlineSyncCheck : public FairTask
     static constexpr auto XMAX = 16;
     static constexpr auto YMIN = 0;
     static constexpr auto YMAX = 300;
-    static constexpr auto NXPADS = 4;
+    static constexpr auto NXPADS = 5;
     static constexpr auto NYPADS = 3;
 
   public:
