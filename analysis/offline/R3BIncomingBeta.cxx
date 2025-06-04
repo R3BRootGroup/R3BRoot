@@ -250,8 +250,7 @@ void R3BIncomingBeta::Exec(Option_t*)
 
         if (Beta_m1 < fBeta_max && Beta_m1 > fBeta_min)
         {
-
-            AddData(0, 1, 0., 0., Beta_m1, 0., PosSci2_m1[0][0], posLosX_cm[0][0], 1);
+            AddData(0, 1, 0., 0., Beta_m1, 0., PosSci2_m1[0][0], posLosX_cm[0][0], ToFraw_m1);
         }
     }
     else

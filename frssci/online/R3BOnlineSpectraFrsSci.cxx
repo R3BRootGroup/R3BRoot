@@ -601,7 +601,7 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
         {
             fh1_Tcal1Hit_PosRaw[i]->Reset();
             for (UShort_t j = 0; j < fNbPmts - 1; j++)
-                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) * j]->Reset();
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->Reset();
         }
 
         if (fPosCal)

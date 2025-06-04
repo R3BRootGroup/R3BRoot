@@ -1548,16 +1548,12 @@ void R3BOnlineSpectra::Exec(Option_t* option)
 
         // Sorting VFTX data:
 
-        std::qsort(time_V,
-                   nPart,
-                   sizeof(*time_V),
-                   [](const void* arg1, const void* arg2) -> int
-                   {
-                       double const* lhs = static_cast<double const*>(arg1);
-                       double const* rhs = static_cast<double const*>(arg2);
+        std::qsort(time_V, nPart, sizeof(*time_V), [](const void* arg1, const void* arg2) -> int {
+            double const* lhs = static_cast<double const*>(arg1);
+            double const* rhs = static_cast<double const*>(arg2);
 
-                       return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
-                   });
+            return (lhs[0] < rhs[0]) ? -1 : ((rhs[0] < lhs[0]) ? 1 : 0);
+        });
         // End sorting
 
         signed long long time_first = -1;
