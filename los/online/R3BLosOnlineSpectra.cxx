@@ -791,8 +791,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* /*option*/)
                         fh_los_multihit[iDet - 1]->Fill(iPart + 1);
                     }
                 } // if iLosType
-            } // for iPart
-        } // for iDet
+            }     // for iPart
+        }         // for iDet
 
     } // if fCallItems
 
