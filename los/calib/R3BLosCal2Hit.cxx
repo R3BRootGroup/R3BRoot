@@ -602,8 +602,8 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                     tot[ihit][ipm] = time_T[ihit][ipm] - time_L[ihit][ipm];
                 }
 
-                if (tot[ihit][ipm] != 0. && !(IS_NAN(tot[ihit][ipm])))
-                    totsum[ihit] += tot[ihit][ipm];
+                // if (tot[ihit][ipm] != 0. && !(IS_NAN(tot[ihit][ipm])))
+                // totsum[ihit] += tot[ihit][ipm];
 
                 // Corrected for saturation and absorption
                 if (ihit > 0)
@@ -614,7 +614,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
                 else
                     tot_corr[ihit][ipm] = tot[ihit][ipm];
 
-                totsum_corr[ihit] += tot_corr[ihit][ipm];
+                // totsum_corr[ihit] += tot_corr[ihit][ipm];
 
                 if (time_L[ihit][ipm] > 0. && !(IS_NAN(time_L[ihit][ipm])))
                     timeLosT[ihit] += time_L[ihit][ipm];
@@ -629,8 +629,16 @@ void R3BLosCal2Hit::Exec(Option_t* option)
             timeLosM[ihit] = timeLosM[ihit] / static_cast<double>(nPMV);
             timeLosT[ihit] = timeLosT[ihit] / static_cast<double>(nPMT);
 
-            totsum[ihit] = totsum[ihit] / static_cast<double>(nPMT);
-            totsum_corr[ihit] = totsum_corr[ihit] / static_cast<double>(nPMT);
+            // totsum[ihit] = totsum[ihit] / static_cast<double>(nPMT);
+            totsum[ihit] = (sqrt(tot[ihit][0] * tot[ihit][4]) + sqrt(tot[ihit][2] * tot[ihit][6]) +
+                            sqrt(tot[ihit][1] * tot[ihit][5]) + sqrt(tot[ihit][3] * tot[ihit][7])) /
+                           4.;
+
+            // totsum_corr[ihit] = totsum_corr[ihit] / static_cast<double>(nPMT);
+            totsum_corr[ihit] =
+                (sqrt(tot_corr[ihit][0] * tot_corr[ihit][4]) + sqrt(tot_corr[ihit][2] * tot_corr[ihit][6]) +
+                 sqrt(tot_corr[ihit][1] * tot_corr[ihit][5]) + sqrt(tot_corr[ihit][3] * tot_corr[ihit][7])) /
+                4.;
 
             // Time resolution TAMEX
             LosTresT[ihit] = ((time_L[ihit][0] + time_L[ihit][2] + time_L[ihit][4] + time_L[ihit][6]) -
