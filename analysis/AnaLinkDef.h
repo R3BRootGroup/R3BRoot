@@ -60,5 +60,6 @@
 #pragma link C++ class R3BMSOffsetPar+;
 #pragma link C++ class R3BMSOffsetFinder+;
 #pragma link C++ class R3BTprevTnext+;
+#pragma link C++ class R3BDetEffOnlineSpectra+;
 
 #endif
