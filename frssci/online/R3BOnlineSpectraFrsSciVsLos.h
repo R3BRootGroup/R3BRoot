@@ -87,11 +87,13 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
 
     void SetFrsSciNbDets(UShort_t ndets) { fFrsSciNbDets = ndets; }
     void SetFrsSciNbPmts(UShort_t npmts) { fFrsSciNbPmts = npmts; }
+    void SetLosNbDets(UShort_t ndets) { fLosNbDets = ndets; }
 
   private:
     R3BEventHeader* fHeader;      /**< Event header  */
     TClonesArray* fFrsSci_Tcal;   /**< Array with R3BFrsSciTcalData */
     TClonesArray* fFrsSci_PosCal; /**< Array with R3BFrsSciPosCalData */
+    TClonesArray* fLos_Tcal;      /**< Array with R3BLosTcalData */
     TClonesArray* fLos_Hit;       /**< Array with R3BLosHitData */
 
     void SetParameters();
@@ -104,21 +106,29 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     Int_t fNEvents; /**< Event counter.     */
     UShort_t fFrsSciNbDets;
     UShort_t fFrsSciNbPmts;
+    UShort_t fLosNbDets;
 
     // Canvas Tof
     TCanvas* cTcal_TofRaw;
     TCanvas* cAoQ;
     TCanvas* cAoQ_vs_PosS2;
-    // TCanvas* cE_vs_AoQ;
     TCanvas* cZ_vs_AoQ;
+    // TCanvas Los
+    TCanvas* cLos_Mult;
+    TCanvas* cLos_ToT;
 
-    // Histograms TofRaw
+    // Histograms Tof
     TH1D** fh1_Tcal1Hit_TofRaw;          // [fNumFrsSci] START=FrsSci, STOP=LOS
     TH1D** fh1_Tcal1Hit_AoQraw;          // [fNumFrsSci] with Brho from FrsSci to Los
     TH1D** fh1_Tcal1Hit_AoQcal;          // [fNumFrsSci] with Brho from FrsSci to Los
     TH2D** fh2_Tcal1Hit_AoQcal_vs_PosS2; // [fNumFrsSci] with Brho from FrsSci to Los
     // TH2D** fh2_Tcal1Hit_E_vs_AoQcal;     // [fNumFrsSci] with Brho from FrsSci to Los
     TH2D** fh2_Tcal1Hit_Z_vs_AoQcal; // [fNumFrsSci] with Brho from FrsSci to Los
+
+    // Histograms Los
+    TH2I** fh2_MultLos_LE;
+    TH2I** fh2_MultLos_TE;
+    TH1D** fh1_MeanToT;
 
   public:
     ClassDef(R3BOnlineSpectraFrsSciVsLos, 1)
