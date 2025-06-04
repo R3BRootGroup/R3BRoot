@@ -24,10 +24,10 @@
 #include "TMath.h"
 
 #include "R3BEventHeader.h"
-#include "R3BFrsSciTcalData.h"
 #include "R3BFrsSciPosCalData.h"
-#include "R3BLosHitData.h"
+#include "R3BFrsSciTcalData.h"
 #include "R3BIncomingIDPar.h"
+#include "R3BLosHitData.h"
 #include "R3BOnlineSpectraFrsSciVsLos.h"
 
 R3BOnlineSpectraFrsSciVsLos::R3BOnlineSpectraFrsSciVsLos()
@@ -129,7 +129,8 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
     fLos_Hit = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
     if (!fLos_Hit)
     {
-        LOG(info) << "=============================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>R3BOnlineSpectraFrsSciVsLos::Init() :: LosHit not found";
+        LOG(info) << "=============================================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
+                     "R3BOnlineSpectraFrsSciVsLos::Init() :: LosHit not found";
     }
 
     // --- -------------------- --- //
@@ -193,54 +194,54 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
             fh1_Tcal1Hit_AoQraw[i]->GetXaxis()->SetTitleSize(0.05);
             fh1_Tcal1Hit_AoQraw[i]->GetYaxis()->SetLabelSize(0.05);
             fh1_Tcal1Hit_AoQraw[i]->GetYaxis()->SetTitleSize(0.05);
-            cAoQ->cd(2*i + 1);
+            cAoQ->cd(2 * i + 1);
             fh1_Tcal1Hit_AoQraw[i]->Draw();
 
-    	    if (fFrsSci_PosCal)
-    	    {
-            	// AoQcal
-            	sprintf(Name1, "FrsSci%i_AoQcal", i + 1);
-            	fh1_Tcal1Hit_AoQcal[i] = new TH1D(Name1, Name1, 9000, 2.0, 2.9);
-            	fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->SetTitle(Form("A/Q cal from FrsSci %i to Los, mult1", i + 1));
-            	fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->SetTitle("Nb of counts, with Mult1");
-            	fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->CenterTitle(true);
-            	fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->CenterTitle(true);
-            	fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->SetLabelSize(0.05);
-            	fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->SetTitleSize(0.05);
-            	fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->SetLabelSize(0.05);
-            	fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->SetTitleSize(0.05);
-            	cAoQ->cd(2*i + 2);
-            	fh1_Tcal1Hit_AoQcal[i]->Draw();
+            if (fFrsSci_PosCal)
+            {
+                // AoQcal
+                sprintf(Name1, "FrsSci%i_AoQcal", i + 1);
+                fh1_Tcal1Hit_AoQcal[i] = new TH1D(Name1, Name1, 9000, 2.0, 2.9);
+                fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->SetTitle(Form("A/Q cal from FrsSci %i to Los, mult1", i + 1));
+                fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->SetTitle("Nb of counts, with Mult1");
+                fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->CenterTitle(true);
+                fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->CenterTitle(true);
+                fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->SetLabelSize(0.05);
+                fh1_Tcal1Hit_AoQcal[i]->GetXaxis()->SetTitleSize(0.05);
+                fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->SetLabelSize(0.05);
+                fh1_Tcal1Hit_AoQcal[i]->GetYaxis()->SetTitleSize(0.05);
+                cAoQ->cd(2 * i + 2);
+                fh1_Tcal1Hit_AoQcal[i]->Draw();
 
-            	// AoQcal vs PosS2
-            	sprintf(Name1, "FrsSci%i_AoQcal_vs_PosS2", i + 1);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i] = new TH2D(Name1, Name1, 1100,-110,110,1500, 2.2, 2.8);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->SetTitle(Form("A/Q cal from FrsSci %i to Los, mult1", i + 1));
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->SetTitle("Nb of counts, with Mult1");
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->CenterTitle(true);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->CenterTitle(true);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->SetLabelSize(0.05);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->SetTitleSize(0.05);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->SetLabelSize(0.05);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->SetTitleSize(0.05);
-            	cAoQ_vs_PosS2->cd(i + 1);
-            	fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->Draw("col");
+                // AoQcal vs PosS2
+                sprintf(Name1, "FrsSci%i_AoQcal_vs_PosS2", i + 1);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i] = new TH2D(Name1, Name1, 1100, -110, 110, 1500, 2.2, 2.8);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->SetTitle(
+                    Form("A/Q cal from FrsSci %i to Los, mult1", i + 1));
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->SetTitle("Nb of counts, with Mult1");
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->CenterTitle(true);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->CenterTitle(true);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->SetLabelSize(0.05);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetXaxis()->SetTitleSize(0.05);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->SetLabelSize(0.05);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->GetYaxis()->SetTitleSize(0.05);
+                cAoQ_vs_PosS2->cd(i + 1);
+                fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->Draw("col");
 
-            	// AoQcal vs Z
-            	sprintf(Name1, "FrsSci%i_Z_vs_AoQcal", i + 1);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i] = new TH2D(Name1, Name1, 1500,2.2,2.8,1600,4,20);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->SetTitle(Form("A/Q cal from FrsSci %i to Los, mult1", i + 1));
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->SetTitle("nuclear charge from LOS");
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->CenterTitle(true);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->CenterTitle(true);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->SetLabelSize(0.05);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->SetTitleSize(0.05);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->SetLabelSize(0.05);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->SetTitleSize(0.05);
-            	cZ_vs_AoQ->cd(i + 1);
-            	fh2_Tcal1Hit_Z_vs_AoQcal[i]->Draw("col");
-	    }
-
+                // AoQcal vs Z
+                sprintf(Name1, "FrsSci%i_Z_vs_AoQcal", i + 1);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i] = new TH2D(Name1, Name1, 1500, 2.2, 2.8, 1600, 4, 20);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->SetTitle(Form("A/Q cal from FrsSci %i to Los, mult1", i + 1));
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->SetTitle("nuclear charge from LOS");
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->CenterTitle(true);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->CenterTitle(true);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->SetLabelSize(0.05);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetXaxis()->SetTitleSize(0.05);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->SetLabelSize(0.05);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->GetYaxis()->SetTitleSize(0.05);
+                cZ_vs_AoQ->cd(i + 1);
+                fh2_Tcal1Hit_Z_vs_AoQcal[i]->Draw("col");
+            }
         }
     }
 
@@ -253,8 +254,8 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
     {
         mainfol->Add(cTcal_TofRaw);
         mainfol->Add(cAoQ);
-	mainfol->Add(cAoQ_vs_PosS2);
-	mainfol->Add(cZ_vs_AoQ);
+        mainfol->Add(cAoQ_vs_PosS2);
+        mainfol->Add(cZ_vs_AoQ);
     }
     run->AddObject(mainfol);
 
@@ -302,7 +303,6 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
     Double_t PosCal_mm[fFrsSciNbDets];
     Double_t Zcharge[fFrsSciNbDets];
 
-
     for (UShort_t i = 0; i < fFrsSciNbDets; i++)
     {
         for (UShort_t j = 0; j < fFrsSciNbPmts; j++)
@@ -336,35 +336,35 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
             multFrsSciTcal[iFrsSciDet * fFrsSciNbPmts + iFrsSciPmt]++;
             FrsSciTraw[iFrsSciDet * fFrsSciNbPmts + iFrsSciPmt] = hitscitcal->GetRawTimeNs();
         } // end of loop over tcal data
-       
-	if (fFrsSci_PosCal)
-	{
-        	nHits = fFrsSci_PosCal->GetEntriesFast();
-        	for (UInt_t ihit = 0; ihit < nHits; ihit++)
-        	{
-        	    R3BFrsSciPosCalData* hitposcal = dynamic_cast<R3BFrsSciPosCalData*>(fFrsSci_PosCal->At(ihit));
-        	    if (!hitposcal)
-        	        continue;
-        	    iFrsSciDet = hitposcal->GetDetector() - 1;
-        	    multFrsSciPosCal[iFrsSciDet]++;
-        	    PosCal_mm[iFrsSciDet] = hitposcal->GetCalPosMm();
-        	} // end of loop over tcal data
-	}
-	if (fLos_Hit)
-	{
-        	nHits = fLos_Hit->GetEntriesFast();
-        	for (UInt_t ihit = 0; ihit < nHits; ihit++)
-        	{
-        	    R3BLosHitData* hitloshit = dynamic_cast<R3BLosHitData*>(fLos_Hit->At(ihit));
-        	    if (!hitloshit)
-        	        continue;
-        	    iFrsSciDet = hitloshit->GetDetector() - 1;
-        	    multLosHit[iFrsSciDet]++;
-        	    Zcharge[iFrsSciDet] = hitloshit->GetZ();
-        	} // end of loop over tcal data
-	}
 
-	for (UShort_t i = 0; i < fFrsSciNbDets; i++)
+        if (fFrsSci_PosCal)
+        {
+            nHits = fFrsSci_PosCal->GetEntriesFast();
+            for (UInt_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BFrsSciPosCalData* hitposcal = dynamic_cast<R3BFrsSciPosCalData*>(fFrsSci_PosCal->At(ihit));
+                if (!hitposcal)
+                    continue;
+                iFrsSciDet = hitposcal->GetDetector() - 1;
+                multFrsSciPosCal[iFrsSciDet]++;
+                PosCal_mm[iFrsSciDet] = hitposcal->GetCalPosMm();
+            } // end of loop over tcal data
+        }
+        if (fLos_Hit)
+        {
+            nHits = fLos_Hit->GetEntriesFast();
+            for (UInt_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BLosHitData* hitloshit = dynamic_cast<R3BLosHitData*>(fLos_Hit->At(ihit));
+                if (!hitloshit)
+                    continue;
+                iFrsSciDet = hitloshit->GetDetector() - 1;
+                multLosHit[iFrsSciDet]++;
+                Zcharge[iFrsSciDet] = hitloshit->GetZ();
+            } // end of loop over tcal data
+        }
+
+        for (UShort_t i = 0; i < fFrsSciNbDets; i++)
         {
             if (multFrsSciTcal[i * fFrsSciNbPmts] == 1 && multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 &&
                 multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
@@ -376,21 +376,23 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
                 Beta = Velocity / 0.299792458;
                 Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
                 AoQraw = fBrho0_S2toCC->GetAt(i) / (3.10716 * Beta * Gamma);
-		fh1_Tcal1Hit_TofRaw[i]->Fill(TofRaw);
+                fh1_Tcal1Hit_TofRaw[i]->Fill(TofRaw);
                 fh1_Tcal1Hit_AoQraw[i]->Fill(AoQraw);
-                if(multFrsSciPosCal[i]==1 && PosCal_mm[i]>-1000){
-                     Brho   = fBrho0_S2toCC->GetAt(i) * (1 + PosCal_mm[i] / fDispersionS2->GetAt(i));
-		     AoQcal = Brho / (3.10716 * Beta * Gamma);
-                     fh1_Tcal1Hit_AoQcal[i]->Fill(AoQcal);
-                     fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->Fill(PosCal_mm[i],AoQcal);
-		     //if(multLosHit[i]==1 && Zcharge[i]>0){
-		     if(Zcharge[i]>0){
-                        fh2_Tcal1Hit_Z_vs_AoQcal[i]->Fill(AoQcal,Zcharge[i]);
-		     }	
-		}
+                if (multFrsSciPosCal[i] == 1 && PosCal_mm[i] > -1000)
+                {
+                    Brho = fBrho0_S2toCC->GetAt(i) * (1 + PosCal_mm[i] / fDispersionS2->GetAt(i));
+                    AoQcal = Brho / (3.10716 * Beta * Gamma);
+                    fh1_Tcal1Hit_AoQcal[i]->Fill(AoQcal);
+                    fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->Fill(PosCal_mm[i], AoQcal);
+                    // if(multLosHit[i]==1 && Zcharge[i]>0){
+                    if (Zcharge[i] > 0)
+                    {
+                        fh2_Tcal1Hit_Z_vs_AoQcal[i]->Fill(AoQcal, Zcharge[i]);
+                    }
+                }
             }
         }
-    }// end of if (fFrsSci_Tcal)
+    } // end of if (fFrsSci_Tcal)
 
     fNEvents++;
 }
@@ -423,7 +425,7 @@ void R3BOnlineSpectraFrsSciVsLos::FinishTask()
             fh1_Tcal1Hit_AoQraw[i]->Write();
             fh1_Tcal1Hit_AoQcal[i]->Write();
             fh2_Tcal1Hit_AoQcal_vs_PosS2[i]->Write();
-            //fh2_Tcal1Hit_E_vs_AoQcal[i]->Write();
+            // fh2_Tcal1Hit_E_vs_AoQcal[i]->Write();
             fh2_Tcal1Hit_Z_vs_AoQcal[i]->Write();
         }
     }
