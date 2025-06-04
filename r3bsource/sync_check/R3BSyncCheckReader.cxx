@@ -78,15 +78,16 @@ Bool_t R3BSyncCheckReader::R3BRead()
     foot_input.push_back(fData->SYNC_CHECK_FT11V);
     foot_input.push_back(fData->SYNC_CHECK_FT12V);
     foot_input.push_back(fData->SYNC_CHECK_FT13V);
-    foot_input.push_back(fData->SYNC_CHECK_FT14V);
-    foot_input.push_back(fData->SYNC_CHECK_FT15V);
-    foot_input.push_back(fData->SYNC_CHECK_FT16V);
+    // foot_input.push_back(fData->SYNC_CHECK_FT14V);
+    // foot_input.push_back(fData->SYNC_CHECK_FT15V);
+    // foot_input.push_back(fData->SYNC_CHECK_FT16V);
 
     new ((*fArray)[fArray->GetEntriesFast()]) R3BSyncCheckData(fData->SYNC_CHECK_MASTER,
                                                                fData->SYNC_CHECK_MASTERRR,
                                                                fData->SYNC_CHECK_MUSIC,
                                                                fData->SYNC_CHECK_RPC,
                                                                fData->SYNC_CHECK_STWO,
+                                                               fData->CALIFA_TRGENE,
                                                                foot_input);
     fNEvent++;
     foot_input.clear();

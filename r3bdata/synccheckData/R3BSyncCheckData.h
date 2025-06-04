@@ -27,6 +27,7 @@ class R3BSyncCheckData : public TObject
                      uint32_t music,
                      uint32_t rpc,
                      uint32_t s2,
+                     uint32_t califa,
                      std::vector<uint32_t>& foot_input);
 
     virtual ~R3BSyncCheckData() {}
@@ -36,6 +37,7 @@ class R3BSyncCheckData : public TObject
     inline const uint32_t& GetMusic() const { return fMusic; }
     inline const uint32_t& GetRpc() const { return fRpc; }
     inline const uint32_t& GetS2() const { return fS2; }
+    inline const uint32_t& GetCalifa() const { return fCalifa; }
     const uint32_t& GetFoot(int num) const
     {
         R3BLOG_IF(fatal, (num <= 0 || num > NFOOTS), "Bad FOOT number!");
@@ -49,6 +51,7 @@ class R3BSyncCheckData : public TObject
     uint32_t fMusic;
     uint32_t fRpc;
     uint32_t fS2;
+    uint32_t fCalifa;
     static constexpr int NFOOTS = 16;
     std::vector<uint32_t> fFoot;
 
