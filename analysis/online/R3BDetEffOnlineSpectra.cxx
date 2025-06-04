@@ -88,7 +88,7 @@ InitStatus R3BDetEffOnlineSpectra::Init()
     fh1_det_eff->SetStats(0);
     for (size_t i = 0; i < fNames.size(); ++i)
     {
-        fh1_det_eff->GetXaxis()->SetBinLabel(i + 1, fNames[i]->Data());
+        fh1_det_eff->GetXaxis()->SetBinLabel(i + 1, fNames[i].Data());
     }
     fh1_det_eff->Draw();
 
