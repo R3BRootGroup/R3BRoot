@@ -61,16 +61,16 @@ InitStatus R3BDetEffOnlineSpectra::Init()
     R3BLOG_IF(fatal, fHeader == nullptr, "EventHeader. not found");
 
     // get access to mappped data
-    size_t index = 0;
     for (const auto& clone_name : fNames)
     {
-        fMapItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(clone_name)));
-        R3BLOG_IF(warn, !fMapItems[index], clone_name + " not found");
-        index++;
+        auto temp = dynamic_cast<TClonesArray*>(mgr->GetObject(clone_name));
+        if (temp)
+            fMapItems.push_back(temp);
+        R3BLOG_IF(warn, !temp, clone_name + " not found");
     }
 
-    counter.resize(fNames.size());
-    for (size_t i = 0; i < fNames.size(); i++)
+    counter.resize(fMapItems.size());
+    for (size_t i = 0; i < fMapItems.size(); i++)
         counter[i] = 0;
 
     // MAIN FOLDER
@@ -78,13 +78,18 @@ InitStatus R3BDetEffOnlineSpectra::Init()
 
     auto cDet = new TCanvas("Detector_efficiency", "detector efficiency info", 10, 10, 500, 500);
     fh1_det_eff = R3B::root_owned<TH1F>("fh1_det_eff", "Detector efficiency", fNames.size(), 0, fNames.size());
-    fh1_det_eff->GetXaxis()->SetTitle("Detectors");
+    // fh1_det_eff->GetXaxis()->SetTitle("Detectors");
     fh1_det_eff->GetYaxis()->SetTitle("Eff. (%)");
     fh1_det_eff->GetYaxis()->SetTitleOffset(1.1);
     fh1_det_eff->GetXaxis()->CenterTitle(true);
     fh1_det_eff->GetYaxis()->CenterTitle(true);
     fh1_det_eff->SetLineColor(1);
     fh1_det_eff->SetFillColor(31);
+    fh1_det_eff->SetStats(0);
+    for (size_t i = 0; i < fNames.size(); ++i)
+    {
+        fh1_det_eff->GetXaxis()->SetBinLabel(i + 1, fNames[i]->Data());
+    }
     fh1_det_eff->Draw();
 
     mainfol->Add(cDet);
@@ -138,7 +143,8 @@ void R3BDetEffOnlineSpectra::FinishEvent()
 {
     for (const auto& clone : fMapItems)
     {
-        clone->Clear();
+        if (clone)
+            clone->Clear();
     }
 }
 

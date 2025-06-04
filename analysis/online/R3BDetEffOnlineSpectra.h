@@ -96,9 +96,9 @@ class R3BDetEffOnlineSpectra : public FairTask
 
   private:
     std::vector<TClonesArray*> fMapItems;
-    std::vector<TString> fNames = { "FrsSciMappedData", "Mwpc0MappedData",  "LosMapped",   "LosTriggerMapped",
-                                    "FootMappedData",   "AlpideMappedData", "Fib30Mapped", "Fib31Mapped",
-                                    "Fib32Mapped",      "Fib33Mapped",      "TofdMapped",  "TofdTriggerMapped" };
+    std::vector<TString> fNames = { "FrsSciMappedData", "Mwpc0MappedData",  "LosMapped",  "LosTriggerMapped",
+                                    "FootMappedData",   "AlpideMappedData", "Fi30Mapped", "Fi31Mapped",
+                                    "Fi32Mapped",       "Fi33Mapped",       "TofdMapped", "TofdTriggerMapped" };
 
     std::vector<unsigned long long> counter;
 
