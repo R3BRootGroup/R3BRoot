@@ -65,7 +65,7 @@ InitStatus R3BDetEffOnlineSpectra::Init()
     for (const auto& clone_name : fNames)
     {
         fMapItems.push_back(dynamic_cast<TClonesArray*>(mgr->GetObject(clone_name)));
-        R3BLOG_IF(fatal, !fMapItems[index], clone_name + " not found");
+        R3BLOG_IF(warn, !fMapItems[index], clone_name + " not found");
         index++;
     }
 
