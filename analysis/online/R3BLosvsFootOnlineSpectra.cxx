@@ -96,7 +96,8 @@ InitStatus R3BLosvsFootOnlineSpectra::Init()
     {
         cCLF->cd(i + 1);
         gPad->SetLogz();
-        fh2_cor.push_back(R3B::root_owned<TH2F>(hist_names[i].c_str(), hist_titles[i].c_str(), 300, 0, 30, 300, 0, 30));
+        fh2_cor.push_back(
+            R3B::root_owned<TH2F>(hist_names[i].c_str(), hist_titles[i].c_str(), 300, 0, 5000, 300, 0, 5000));
         fh2_cor[i]->GetXaxis()->SetTitle(hist_xaxis_titles[i].c_str());
         fh2_cor[i]->GetYaxis()->SetTitle(hist_yaxis_titles[i].c_str());
         fh2_cor[i]->GetYaxis()->SetTitleOffset(1.2);
@@ -113,7 +114,7 @@ InitStatus R3BLosvsFootOnlineSpectra::Init()
         cCLF_max->cd(i + 1);
         gPad->SetLogz();
         fh2_cor_max.push_back(
-            R3B::root_owned<TH2F>(hist_names_max[i].c_str(), hist_titles_max[i].c_str(), 300, 0, 30, 300, 0, 30));
+            R3B::root_owned<TH2F>(hist_names_max[i].c_str(), hist_titles_max[i].c_str(), 300, 0, 5000, 300, 0, 5000));
         fh2_cor_max[i]->GetXaxis()->SetTitle(hist_xaxis_titles_max[i].c_str());
         fh2_cor_max[i]->GetYaxis()->SetTitle(hist_yaxis_titles[i].c_str());
         fh2_cor_max[i]->GetYaxis()->SetTitleOffset(1.2);
