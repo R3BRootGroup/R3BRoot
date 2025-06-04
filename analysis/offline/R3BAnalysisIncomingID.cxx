@@ -335,7 +335,7 @@ void R3BAnalysisIncomingID::Exec(Option_t* option)
             if (betaS2 < fBeta_max && betaS2 > fBeta_min)
             {
                 Gamma_m1 = 1. / (TMath::Sqrt(1. - TMath::Power(betaS2, 2)));
-                Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. - PosXS2 / fDispersionS2->GetAt(i));
+                Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. + PosXS2 / fDispersionS2->GetAt(i));
                 AoQ_m1 = Brho_m1 / (3.10716 * betaS2 * Gamma_m1);
                 AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
 

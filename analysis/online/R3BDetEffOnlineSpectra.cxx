@@ -79,7 +79,7 @@ InitStatus R3BDetEffOnlineSpectra::Init()
     auto cDet = new TCanvas("Detector_efficiency", "detector efficiency info", 10, 10, 500, 500);
     fh1_det_eff = R3B::root_owned<TH1F>("fh1_det_eff", "Detector efficiency", fNames.size(), 0, fNames.size());
     fh1_det_eff->GetXaxis()->SetTitle("Detectors");
-    fh1_det_eff->GetYaxis()->SetTitle("Counts");
+    fh1_det_eff->GetYaxis()->SetTitle("Eff. (%)");
     fh1_det_eff->GetYaxis()->SetTitleOffset(1.1);
     fh1_det_eff->GetXaxis()->CenterTitle(true);
     fh1_det_eff->GetYaxis()->CenterTitle(true);
@@ -130,7 +130,7 @@ void R3BDetEffOnlineSpectra::Exec(Option_t* /*option*/)
 
     for (size_t i = 0; i < fNames.size(); i++)
     {
-        fh1_det_eff->SetBinContent(i + 1, counter[i] / fNEvents);
+        fh1_det_eff->SetBinContent(i + 1, 100. * counter[i] / fNEvents);
     }
 }
 
