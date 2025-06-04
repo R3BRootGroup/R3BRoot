@@ -218,7 +218,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
             sprintf(Name1, "FrsSci%i_PosRaw_MULT1", i + 1);
             fh1_Tcal1Hit_PosRaw[i] = new TH1D(Name1,
                                               Name1,
-                                              static_cast<int>(20. * (fpos_range_max - fpos_range_min)),
+                                              static_cast<int>(200. * (fpos_range_max - fpos_range_min)),
                                               fpos_range_min,
                                               fpos_range_max);
             fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R. 50 ps per bin");
@@ -322,7 +322,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
             else
                 fh1_Cal_PosRaw[i] = new TH1D(Name1,
                                              Name1,
-                                             static_cast<int>(2. * (fpos_range_max - fpos_range_min)),
+                                             static_cast<int>(20. * (fpos_range_max - fpos_range_min)),
                                              fpos_range_min,
                                              fpos_range_max);
             fh1_Cal_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] in red CAL level, in blue TCAL-MULT1");
@@ -601,7 +601,7 @@ void R3BOnlineSpectraFrsSci::Reset_Histo()
         {
             fh1_Tcal1Hit_PosRaw[i]->Reset();
             for (UShort_t j = 0; j < fNbPmts - 1; j++)
-                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) * j]->Reset();
+                fh1_Tcal1Hit_DeltaTcal[i * (fNbPmts - 1) + j]->Reset();
         }
 
         if (fPosCal)

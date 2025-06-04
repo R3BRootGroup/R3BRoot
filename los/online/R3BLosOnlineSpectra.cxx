@@ -178,13 +178,13 @@ InitStatus R3BLosOnlineSpectra::Init()
             fh_los_tot[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
             fh_los_tot_mean[iloscount] =
-                R3B::root_owned<TH1F>(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 300.);
+                R3B::root_owned<TH1F>(Form("%s_tot_mean", detName), Form("%s mean ToT", detName), 1500, 0., 1000.);
             fh_los_tot_mean[iloscount]->GetYaxis()->SetTitle("Counts");
             fh_los_tot_mean[iloscount]->GetXaxis()->SetTitle("ToT / ns");
             fh_los_tot_mean[iloscount]->SetFillColor(31);
 
             fh_los_ihit_ToT[iloscount] = R3B::root_owned<TH2F>(
-                Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 300.);
+                Form("%s_tot_ihit", detName), Form("%s ToT vs ihit", detName), 10, 0, 10, 600, 0., 1000.);
             fh_los_ihit_ToT[iloscount]->GetXaxis()->SetTitle("iHit");
             fh_los_ihit_ToT[iloscount]->GetYaxis()->SetTitle("ToT / ns");
 
