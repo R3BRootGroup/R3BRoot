@@ -724,11 +724,10 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     parz[1] = par->GetPar1zb();
                     parz[2] = par->GetPar1zc();
                 }
-                if (parz[0] > 0 && parz[2] > 0)
-                    LOG(debug) << "Charges in this event " << parz[0] * TMath::Power(qb, parz[2]) + parz[1] << " plane "
-                               << iPlane << " ibar " << iBar << " qb " << qb;
-                else
-                    LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
+
+                qb = parz[0] * TMath::Power(qb, parz[2]) + parz[1]; // default are 1 0 1
+
+                LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
                 LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
                 if (iPlane == 1 || iPlane == 3)
                     LOG(debug) << "x in this event "
@@ -744,7 +743,10 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // Tof with respect LOS detector
                 auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
+
                 Double_t tof_corr = 0.;
+                LOG(debug) << "Los times: " << header->GetTStart();
+
                 if (par)
                 {
                     tof_corr = tof - par->GetTofSyncOffset();
@@ -754,7 +756,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 if (fTofdHisto)
                 {
                     // fill control histograms
-                    fhTsync[iPlane - 1]->Fill(iBar, THit);
+                    fhTsync[iPlane - 1]->Fill(iBar, tof_corr);
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
 

@@ -669,8 +669,8 @@ void R3BLosOnlineSpectra::Exec(Option_t* /*option*/)
                                 iLOSPileUp[iDet - 1][iPart] = true;
                         }
 
-                        if (tot[iDet - 1][iPart][ipm] != 0. && !(IS_NAN(tot[iDet - 1][iPart][ipm])))
-                            totsum[iDet - 1][iPart] += tot[iDet - 1][iPart][ipm];
+                        // if (tot[iDet - 1][iPart][ipm] != 0. && !(IS_NAN(tot[iDet - 1][iPart][ipm])))
+                        // totsum[iDet - 1][iPart] += tot[iDet - 1][iPart][ipm];
 
                         if (time_L[iDet - 1][iPart][ipm] > 0. && !(IS_NAN(time_L[iDet - 1][iPart][ipm])))
                             timeLosT[iDet - 1][iPart] += time_L[iDet - 1][iPart][ipm];
@@ -683,7 +683,12 @@ void R3BLosOnlineSpectra::Exec(Option_t* /*option*/)
                         }
                     }
 
-                    totsum[iDet - 1][iPart] = totsum[iDet - 1][iPart] / nPMT;
+                    // totsum[iDet - 1][iPart] = totsum[iDet - 1][iPart] / nPMT;
+                    totsum[iDet - 1][iPart] = (sqrt(tot[iDet - 1][iPart][0] * tot[iDet - 1][iPart][4]) +
+                                               sqrt(tot[iDet - 1][iPart][2] * tot[iDet - 1][iPart][6]) +
+                                               sqrt(tot[iDet - 1][iPart][1] * tot[iDet - 1][iPart][5]) +
+                                               sqrt(tot[iDet - 1][iPart][3] * tot[iDet - 1][iPart][7])) /
+                                              4.;
 
                     timeLosV[iDet - 1][iPart] = timeLosV[iDet - 1][iPart] / nPMV;
 
@@ -790,11 +795,10 @@ void R3BLosOnlineSpectra::Exec(Option_t* /*option*/)
                         fh_los_ihit_ToT[iDet - 1]->Fill(iPart + 1, totsum[iDet - 1][iPart]);
                         fh_los_multihit[iDet - 1]->Fill(iPart + 1);
                     }
-                } // if iLosType
-            }     // for iPart
-        }         // for iDet
-
-    } // if fCallItems
+                }
+            }
+        }
+    }
 
     fNEvents++;
 }

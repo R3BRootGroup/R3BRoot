@@ -1582,7 +1582,7 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
             int febex_ch = fMap_Par->GetFebexChannel(cryId);
             int febex_mod = fMap_Par->GetFebexMod(cryId);
             // compensate slave exploder delays:
-            int64_t wrc = hit->GetWrts() + 245 * (fMap_Par->GetPreamp(cryId) > 8);
+            int64_t wrc = hit->GetWrts();
             if (wrm > 0.)
             {
                 float this_califa_wr = 0;
