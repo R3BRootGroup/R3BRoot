@@ -22,11 +22,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-
-#define Nb_Sides 2
-#define Nb_Rings 5
-#define Nb_Preamps 16
-#define Nb_PreampCh 16
+#include "R3BCalifaOnlineSpectra.h"
 
 class TClonesArray;
 class TH1F;
