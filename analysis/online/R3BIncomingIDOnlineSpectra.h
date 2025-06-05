@@ -137,6 +137,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     TClonesArray* fHitLos; /**< Array with hit items. */
     TClonesArray* fMwpc0HitDataCA;
     TClonesArray* fMwpc1HitDataCA;
+    TClonesArray* fAlpideHits = nullptr;
 
     // Parameters
     R3BTGeoPar* fMw0GeoPar;
