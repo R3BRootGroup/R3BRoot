@@ -88,6 +88,11 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     void SetFrsSciNbDets(UShort_t ndets) { fFrsSciNbDets = ndets; }
     void SetFrsSciNbPmts(UShort_t npmts) { fFrsSciNbPmts = npmts; }
     void SetLosNbDets(UShort_t ndets) { fLosNbDets = ndets; }
+    void SetTofRawRange(float min, float max)
+    {
+        ftof_range_min = min;
+        ftof_range_max = max;
+    }
 
   private:
     R3BEventHeader* fHeader;      /**< Event header  */
@@ -107,6 +112,8 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     UShort_t fFrsSciNbDets;
     UShort_t fFrsSciNbPmts;
     UShort_t fLosNbDets;
+    Double_t ftof_range_min;
+    Double_t ftof_range_max;
 
     // Canvas Tof
     TCanvas* cTcal_TofRaw;
