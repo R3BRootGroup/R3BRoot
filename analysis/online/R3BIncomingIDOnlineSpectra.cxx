@@ -18,6 +18,7 @@
 // ------------------------------------------------------------
 
 #include "R3BIncomingIDOnlineSpectra.h"
+#include "R3BAlpideHitData.h"
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
 #include "R3BLogger.h"
@@ -120,6 +121,8 @@ InitStatus R3BIncomingIDOnlineSpectra::Init()
     R3BLOG_IF(fatal, !fMwpc0HitDataCA, "Branch fMwpc0HitDataCA not found");
     fMwpc1HitDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("Mwpc1HitData"));
     R3BLOG_IF(warn, !fMwpc1HitDataCA, "Branch fMwpc1HitDataCA not found");
+    fAlpideHits = dynamic_cast<TClonesArray*>(mgr->GetObject("AlpideHitData"));
+    R3BLOG_IF(warn, !fAlpideHits, "Branch AlpideHitData not found");
 
     // Create histograms for detectors
     TString Name1;
@@ -403,6 +406,7 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
 
             if (fHeader->GetExpId() == 249)
             {
+                /*
                 auto nHits_Mw0 = fMwpc0HitDataCA->GetEntriesFast();
 
                 for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
@@ -418,14 +422,32 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
                         continue;
                     fh2_IsoGated_Z_xc->Fill(mwpc0x, hit->GetZ());
                     fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), mwpc0x);
+                }*/
+
+                if (fAlpideHits && fAlpideHits->GetEntriesFast() > 0)
+                {
+                    auto nHits_alp = fAlpideHits->GetEntriesFast();
+                    for (size_t j = 0; j < nHits_alp; j++)
+                    {
+                        auto hit_alp = dynamic_cast<R3BAlpideHitData*>(fAlpideHits->At(j));
+                        if (!hit_alp)
+                            continue;
+                        auto senid = hit_alp->GetSensorId() - 1;
+
+                        if (hit->GetAq() < fMin_Aq_gate || hit->GetAq() > fMax_Aq_gate || hit->GetZ() < fMin_Z_gate ||
+                            hit->GetZ() > fMax_Z_gate || senid > 5 || hit_alp->GetClusterSize() < 7)
+                            continue;
+
+                        fh2_IsoGated_Z_xc->Fill(hit_alp->GetX(), hit->GetZ());
+                        fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), hit_alp->GetX());
+                    }
                 }
             }
-
-            if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
+            else if (fHeader->GetExpId() == 91 || fHeader->GetExpId() == 118)
             {
                 auto nHits_Mw0 = fMwpc0HitDataCA->GetEntriesFast();
                 auto nHits_Mw1 = fMwpc1HitDataCA->GetEntriesFast();
-                for (Int_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
+                for (size_t iMw0 = 0; iMw0 < nHits_Mw0; iMw0++)
                 {
                     auto hit_mw0 = dynamic_cast<R3BMwpcHitData*>(fMwpc0HitDataCA->At(iMw0));
                     if (!hit_mw0)
