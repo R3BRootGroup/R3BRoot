@@ -13,14 +13,13 @@
 
 #include "R3BDetEffOnlineSpectra.h"
 #include "R3BEventHeader.h"
-#include "R3BFootHitData.h"
+#include "R3BFiberMappedData.h"
 #include "R3BLogger.h"
-#include "R3BLosHitData.h"
 #include "R3BShared.h"
+#include <FairRunOnline.h>
 
 #include <FairLogger.h>
 #include <FairRootManager.h>
-#include <FairRunOnline.h>
 #include <FairRuntimeDb.h>
 
 #include <TCanvas.h>
@@ -73,24 +72,46 @@ InitStatus R3BDetEffOnlineSpectra::Init()
     for (size_t i = 0; i < fMapItems.size(); i++)
         counter[i] = 0;
 
+    trigcounter.resize(fTrigNames.size());
+    for (size_t i = 0; i < fTrigNames.size(); i++)
+        trigcounter[i] = 0;
+
     // MAIN FOLDER
     auto mainfol = new TFolder("Efficiency_det", "Detector efficiency info");
 
     auto cDet = new TCanvas("Detector_efficiency", "detector efficiency info", 10, 10, 500, 500);
-    fh1_det_eff = R3B::root_owned<TH1F>("fh1_det_eff", "Detector efficiency", fNames.size(), 0, fNames.size());
-    // fh1_det_eff->GetXaxis()->SetTitle("Detectors");
-    fh1_det_eff->GetYaxis()->SetTitle("Eff. (%)");
-    fh1_det_eff->GetYaxis()->SetTitleOffset(1.1);
-    fh1_det_eff->GetXaxis()->CenterTitle(true);
-    fh1_det_eff->GetYaxis()->CenterTitle(true);
-    fh1_det_eff->SetLineColor(1);
-    fh1_det_eff->SetFillColor(31);
-    fh1_det_eff->SetStats(0);
+    cDet->Divide(1, 2);
+    cDet->cd(1);
+    fh1_det_eff.push_back(R3B::root_owned<TH1F>("fh1_det_eff", "Detector efficiency", fNames.size(), 0, fNames.size()));
+    fh1_det_eff[0]->GetYaxis()->SetTitle("Eff. (%)");
+    fh1_det_eff[0]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_det_eff[0]->GetXaxis()->CenterTitle(true);
+    fh1_det_eff[0]->GetYaxis()->CenterTitle(true);
+    fh1_det_eff[0]->SetLineColor(1);
+    fh1_det_eff[0]->SetFillColor(31);
+    fh1_det_eff[0]->SetStats(0);
     for (size_t i = 0; i < fNames.size(); ++i)
     {
-        fh1_det_eff->GetXaxis()->SetBinLabel(i + 1, fNames[i].Data());
+        fh1_det_eff[0]->GetXaxis()->SetBinLabel(i + 1, fNames[i].Data());
     }
-    fh1_det_eff->Draw();
+    fh1_det_eff[0]->Draw();
+
+    cDet->cd(2);
+    fh1_det_eff.push_back(
+        R3B::root_owned<TH1F>("fh1_det_eff", "Detector efficiency", fTrigNames.size(), 0, fTrigNames.size()));
+    // fh1_det_eff->GetXaxis()->SetTitle("Detectors");
+    fh1_det_eff[1]->GetYaxis()->SetTitle("Eff. (%)");
+    fh1_det_eff[1]->GetYaxis()->SetTitleOffset(1.1);
+    fh1_det_eff[1]->GetXaxis()->CenterTitle(true);
+    fh1_det_eff[1]->GetYaxis()->CenterTitle(true);
+    fh1_det_eff[1]->SetLineColor(1);
+    fh1_det_eff[1]->SetFillColor(31);
+    fh1_det_eff[1]->SetStats(0);
+    for (size_t i = 0; i < fTrigNames.size(); ++i)
+    {
+        fh1_det_eff[1]->GetXaxis()->SetBinLabel(i + 1, fTrigNames[i].Data());
+    }
+    fh1_det_eff[1]->Draw();
 
     mainfol->Add(cDet);
 
@@ -116,7 +137,15 @@ InitStatus R3BDetEffOnlineSpectra::ReInit()
 void R3BDetEffOnlineSpectra::Reset_Histo()
 {
     R3BLOG(info, "");
-    fh1_det_eff->Reset();
+    for (const auto& hist : fh1_det_eff)
+    {
+        hist->Reset();
+    }
+    fNEvents = 0;
+    for (size_t i = 0; i < fTrigNames.size(); i++)
+        trigcounter[i] = 0;
+    for (size_t i = 0; i < fMapItems.size(); i++)
+        counter[i] = 0;
 }
 
 void R3BDetEffOnlineSpectra::Exec(Option_t* /*option*/)
@@ -125,17 +154,49 @@ void R3BDetEffOnlineSpectra::Exec(Option_t* /*option*/)
         return;
     fNEvents++;
 
-    size_t index = 0;
+    size_t index = 0, index_trig = 0;
     for (const auto& clone : fMapItems)
     {
-        if (clone->GetEntriesFast() > 0)
-            counter[index]++;
+        if (fNames[index] == "Fi30Mapped" || fNames[index] == "Fi31Mapped" || fNames[index] == "Fi32Mapped" ||
+            fNames[index] == "Fi33Mapped")
+        {
+            auto hits = clone->GetEntriesFast();
+            int good_sig = 0;
+            int good_trig_sig = 0;
+            for (auto i = 0; i < hits; i++)
+            {
+                auto mapped = dynamic_cast<R3BFiberMappedData*>(clone->At(i));
+                assert(mapped);
+                if (mapped->GetSide() == 1 || mapped->GetSide() == 2)
+                {
+                    good_sig++;
+                }
+                else if (mapped->GetSide() == 3)
+                    good_trig_sig++;
+            }
+            if (good_sig > 2)
+                counter[index]++;
+
+            if (good_trig_sig > 0)
+                trigcounter[index_trig]++;
+
+            index_trig++;
+        }
+        else
+        {
+            if (clone->GetEntriesFast() > 0)
+                counter[index]++;
+        }
         index++;
     }
 
     for (size_t i = 0; i < fNames.size(); i++)
     {
-        fh1_det_eff->SetBinContent(i + 1, 100. * counter[i] / fNEvents);
+        fh1_det_eff[0]->SetBinContent(i + 1, 100. * counter[i] / fNEvents);
+    }
+    for (size_t i = 0; i < fTrigNames.size(); i++)
+    {
+        fh1_det_eff[1]->SetBinContent(i + 1, 100. * trigcounter[i] / fNEvents);
     }
 }
 
