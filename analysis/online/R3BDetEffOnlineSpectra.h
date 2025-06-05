@@ -100,13 +100,16 @@ class R3BDetEffOnlineSpectra : public FairTask
                                     "FootMappedData",   "AlpideMappedData", "Fi30Mapped", "Fi31Mapped",
                                     "Fi32Mapped",       "Fi33Mapped",       "TofdMapped", "TofdTriggerMapped" };
 
+    std::vector<TString> fTrigNames = { "Fi30TrigMapped", "Fi31TrigMapped", "Fi32TrigMapped", "Fi33TrigMapped" };
+
     std::vector<unsigned long long> counter;
+    std::vector<unsigned long long> trigcounter;
 
     R3BEventHeader* fHeader = nullptr;
 
     unsigned long long fNEvents = 0;
     int fTpat = 0;
-    TH1F* fh1_det_eff;
+    std::vector<TH1F*> fh1_det_eff;
 
   public:
     ClassDefOverride(R3BDetEffOnlineSpectra, 1); // NOLINT
