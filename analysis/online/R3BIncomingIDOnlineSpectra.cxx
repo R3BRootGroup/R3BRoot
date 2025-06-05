@@ -437,7 +437,7 @@ void R3BIncomingIDOnlineSpectra::Exec(Option_t* option)
                         if (hit->GetAq() < fMin_Aq_gate || hit->GetAq() > fMax_Aq_gate || hit->GetZ() < fMin_Z_gate ||
                             hit->GetZ() > fMax_Z_gate || senid > 5 || hit_alp->GetClusterSize() < 7)
                             continue;
-
+                        fh2_Z_xc->Fill(hit_alp->GetX(), hit->GetZ());
                         fh2_IsoGated_Z_xc->Fill(hit_alp->GetX(), hit->GetZ());
                         fh2_IsoGated_xs2_xc->Fill(hit->GetXS2(), hit_alp->GetX());
                     }
