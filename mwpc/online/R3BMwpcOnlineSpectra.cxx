@@ -464,7 +464,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
-    if (fMapItemsMwpc && fMapItemsMwpc->GetEntriesFast() > 0)
+    if (header->GetTpat()<4000 && fMapItemsMwpc && fMapItemsMwpc->GetEntriesFast() > 0)
     {
         Int_t nPadsPerEvent[3];
         for (Int_t plane = 0; plane < 3; plane++)
@@ -493,7 +493,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Fill Cal data
-    if (fCalItemsMwpc && fCalItemsMwpc->GetEntriesFast() > 0)
+    if (header->GetTpat()<4000 && fCalItemsMwpc && fCalItemsMwpc->GetEntriesFast() > 0)
     {
         Int_t nHits = fCalItemsMwpc->GetEntriesFast();
         Int_t maxpadx = -1, maxpady = -1, maxqx = 0, maxqy = 0;
@@ -529,7 +529,7 @@ void R3BMwpcOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Fill Hit data
-    if (fHitItemsMwpc && fHitItemsMwpc->GetEntriesFast() > 0)
+    if (header->GetTpat()<4000 && fHitItemsMwpc && fHitItemsMwpc->GetEntriesFast() > 0)
     {
         Int_t nHits = fHitItemsMwpc->GetEntriesFast();
         for (Int_t ihit = 0; ihit < nHits; ihit++)
