@@ -86,6 +86,8 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
 
     virtual void SetParContainers();
 
+    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    inline void SetTpat(Int_t tpat) { fTpat = tpat; }
     void SetFrsSciNbDets(UShort_t ndets) { fFrsSciNbDets = ndets; }
     void SetFrsSciNbPmts(UShort_t npmts) { fFrsSciNbPmts = npmts; }
     void SetLosNbDets(UShort_t ndets) { fLosNbDets = ndets; }
@@ -93,11 +95,6 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     {
         ftof_range_min = min;
         ftof_range_max = max;
-    }
-    void SetPosRawRange(float min, float max)
-    {
-        fpos_range_min = min;
-        fpos_range_max = max;
     }
 
   private:
@@ -116,15 +113,17 @@ class R3BOnlineSpectraFrsSciVsLos : public FairTask
     R3BFrsSciCalPar* fCalPar; // cal parameters container - FrsSci
     TArrayF* fPosCal_Gain;
     TArrayF* fPosCal_Offset;
+    TArrayF* fpos_range_min;
+    TArrayF* fpos_range_max;
 
     Int_t fNEvents; /**< Event counter.     */
+    Int_t fTrigger = -1;
+    Int_t fTpat = -1;
     UShort_t fFrsSciNbDets;
     UShort_t fFrsSciNbPmts;
     UShort_t fLosNbDets;
     Double_t ftof_range_min;
     Double_t ftof_range_max;
-    Double_t fpos_range_min;
-    Double_t fpos_range_max;
 
     // Canvas Tof
     TCanvas* cTcal_TofRaw;
