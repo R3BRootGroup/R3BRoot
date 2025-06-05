@@ -49,13 +49,13 @@ R3BOnlineSpectraFrsSciVsLos::R3BOnlineSpectraFrsSciVsLos(const char* name, Int_t
     , fFrsSciNbDets(1)
     , fFrsSciNbPmts(3)
     , fLosNbDets(1)
-    , fpos_range_min(-5)
-    , fpos_range_max(5)
 {
     fTof2InvV_p0 = new TArrayF(fFrsSciNbDets);
     fTof2InvV_p1 = new TArrayF(fFrsSciNbDets);
     fDispersionS2 = new TArrayF(fFrsSciNbDets);
     fBrho0_S2toCC = new TArrayF(fFrsSciNbDets);
+    fpos_range_min = new TArrayF(fFrsSciNbDets);
+    fpos_range_max = new TArrayF(fFrsSciNbDets);
     fPosCal_Gain = new TArrayF(fFrsSciNbDets);
     fPosCal_Offset = new TArrayF(fFrsSciNbDets);
 }
@@ -103,6 +103,8 @@ void R3BOnlineSpectraFrsSciVsLos::SetParameters()
         fTof2InvV_p1->AddAt(fIncomingID_Par->GetTof2InvV_p1(i), i - 1);
         fDispersionS2->AddAt(fIncomingID_Par->GetDispersionS2(i), i - 1);
         fBrho0_S2toCC->AddAt(fIncomingID_Par->GetBrho0_S2toCC(i), i - 1);
+        fpos_range_min->AddAt(fCalPar->GetMinPosAtRank(i - 1), i - 1);
+        fpos_range_max->AddAt(fCalPar->GetMaxPosAtRank(i - 1), i - 1);
         fPosCal_Gain->AddAt(fCalPar->GetPosCalGainAtRank(i - 1), i - 1);
         fPosCal_Offset->AddAt(fCalPar->GetPosCalOffsetAtRank(i - 1), i - 1);
     }
@@ -204,7 +206,7 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
         fh2_MultLos_LE = new TH2I*[fLosNbDets];
         fh2_MultLos_TE = new TH2I*[fLosNbDets];
 
-        sprintf(Name1, "los_Mean_ToT");
+        sprintf(Name1, "los_MeanToT");
         cLos_ToT = new TCanvas(Name1, Name1, 10, 10, 800, 700);
         cLos_ToT->Divide(1, fLosNbDets);
         fh1_MeanToT = new TH1D*[fLosNbDets];
@@ -327,7 +329,7 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
                     fh2_Z_vs_AoQcal[i]->Draw("col");
                 }
             } // end of if fFrsSci_PosCal
-        }     // end of loop over the fFrsSciNbDets
+        } // end of loop over the fFrsSciNbDets
 
         if (fLos_Tcal)
         {
@@ -362,8 +364,8 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
                 // Mean Time-over-Threshold
                 sprintf(Name1, "Los%i_MeanToT_MULT1atLOS_TPAT1", i + 1);
                 fh1_MeanToT[i] = new TH1D(Name1, Name1, 5000, 0, 1000);
-                fh1_MeanToT[i]->GetXaxis()->SetTitle(Form("Mean Time-over_Threshold LOS%i [ns], mult1", i + 1));
-                fh1_MeanToT[i]->GetYaxis()->SetTitle("Nb of counts, with Mult1");
+                fh1_MeanToT[i]->GetXaxis()->SetTitle(Form("Mean Time-over_Threshold LOS%i [ns]", i + 1));
+                fh1_MeanToT[i]->GetYaxis()->SetTitle("Nb of counts");
                 fh1_MeanToT[i]->GetXaxis()->CenterTitle(true);
                 fh1_MeanToT[i]->GetYaxis()->CenterTitle(true);
                 fh1_MeanToT[i]->GetXaxis()->SetLabelSize(0.05);
@@ -373,7 +375,7 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
                 cLos_ToT->cd(i + 1);
                 fh1_MeanToT[i]->Draw();
             } // end of loop over the number of Los detectors
-        }     // end of if (fLos_Tcal)
+        } // end of if (fLos_Tcal)
     }
 
     // --- --------------- --- //
@@ -438,6 +440,11 @@ void R3BOnlineSpectraFrsSciVsLos::Reset_Histo()
 
 void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
 {
+
+    if ((fTrigger >= 0) && (fHeader != nullptr) && ((fHeader->GetTrigger() & fTrigger) != fTrigger))
+        return;
+    if ((fTpat > 0) && (fHeader != nullptr) && ((fHeader->GetTpat() & fTpat) != fTpat))
+        return;
 
     UShort_t iDet; // 0-based
     UShort_t iPmt; // 0-based
@@ -507,186 +514,182 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
     }
 
     UInt_t nHits;
-    if (fFrsSci_Tcal && fHeader)
+    if (fFrsSci_Tcal && fHeader->GetTpat() == 1)
     {
-        if (fHeader->GetTpat() == 1)
+        nHits = fFrsSci_Tcal->GetEntriesFast();
+        for (UInt_t ihit = 0; ihit < nHits; ihit++)
         {
-            nHits = fFrsSci_Tcal->GetEntriesFast();
+            R3BFrsSciTcalData* hitscitcal = dynamic_cast<R3BFrsSciTcalData*>(fFrsSci_Tcal->At(ihit));
+            if (!hitscitcal)
+                continue;
+            iDet = hitscitcal->GetDetector() - 1;
+            iPmt = hitscitcal->GetPmt() - 1;
+            FrsSciTraw[iDet * fFrsSciNbPmts + iPmt][multFrsSciTcal[iDet * fFrsSciNbPmts + iPmt]] =
+                hitscitcal->GetRawTimeNs();
+            multFrsSciTcal[iDet * fFrsSciNbPmts + iPmt]++;
+        } // end of loop over tcal data
+
+        if (fLos_Tcal)
+        {
+            nHits = fLos_Tcal->GetEntriesFast();
             for (UInt_t ihit = 0; ihit < nHits; ihit++)
             {
-                R3BFrsSciTcalData* hitscitcal = dynamic_cast<R3BFrsSciTcalData*>(fFrsSci_Tcal->At(ihit));
-                if (!hitscitcal)
+                R3BLosTCalData* hitlostcal = dynamic_cast<R3BLosTCalData*>(fLos_Tcal->At(ihit));
+                if (!hitlostcal)
                     continue;
-                iDet = hitscitcal->GetDetector() - 1;
-                iPmt = hitscitcal->GetPmt() - 1;
-                FrsSciTraw[iDet * fFrsSciNbPmts + iPmt][multFrsSciTcal[iDet * fFrsSciNbPmts + iPmt]] =
-                    hitscitcal->GetRawTimeNs();
-                multFrsSciTcal[iDet * fFrsSciNbPmts + iPmt]++;
+                iDet = hitlostcal->GetDetector() - 1;
+                iPmt = hitlostcal->GetChannel() - 1;
+                // fType : 0 (VFTX), 1 (TAMEX leading), 2 (TAMEX trailing)
+                if (hitlostcal->GetType() == 0)
+                    continue;
+                else if (hitlostcal->GetType() == 1)
+                {
+                    multLosTcal_LE[iDet * 8 + iPmt]++;
+                    LosTcal_LE[iDet * 8 + iPmt] = hitlostcal->GetRawTimeNs();
+                    if (multLosTcal_LE[iDet * 8 + iPmt] > 1)
+                        kLosMult2[iDet] = true;
+                    multTotLos_LE[iDet]++;
+                }
+                else if (hitlostcal->GetType() == 2)
+                {
+                    multLosTcal_TE[iDet * 8 + iPmt]++;
+                    LosTcal_TE[iDet * 8 + iPmt] = hitlostcal->GetRawTimeNs();
+                    ;
+                    if (multLosTcal_TE[iDet * 8 + iPmt] > 1)
+                        kLosMult2[iDet] = true;
+                    multTotLos_TE[iDet]++;
+                }
+                else
+                {
+                    LOG(info) << "R3BOnlineSpectraFrsSciVsLos::Exec TAMEX LOS DATA HAS A TYPE "
+                              << hitlostcal->GetType();
+                }
             } // end of loop over tcal data
 
-            if (fLos_Tcal)
+            for (UShort_t i = 0; i < fLosNbDets; i++)
             {
-                nHits = fLos_Tcal->GetEntriesFast();
-                for (UInt_t ihit = 0; ihit < nHits; ihit++)
+                for (UShort_t pmt = 0; pmt < 8; pmt++)
                 {
-                    R3BLosTCalData* hitlostcal = dynamic_cast<R3BLosTCalData*>(fLos_Tcal->At(ihit));
-                    if (!hitlostcal)
-                        continue;
-                    iDet = hitlostcal->GetDetector() - 1;
-                    iPmt = hitlostcal->GetChannel() - 1;
-                    // fType : 0 (VFTX), 1 (TAMEX leading), 2 (TAMEX trailing)
-                    if (hitlostcal->GetType() == 0)
-                        continue;
-                    else if (hitlostcal->GetType() == 1)
-                    {
-                        multLosTcal_LE[iDet * 8 + iPmt]++;
-                        LosTcal_LE[iDet * 8 + iPmt] = hitlostcal->GetRawTimeNs();
-                        if (multLosTcal_LE[iDet * 8 + iPmt] > 1)
-                            kLosMult2[iDet] = true;
-                        multTotLos_LE[iDet]++;
-                    }
-                    else if (hitlostcal->GetType() == 2)
-                    {
-                        multLosTcal_TE[iDet * 8 + iPmt]++;
-                        LosTcal_TE[iDet * 8 + iPmt] = hitlostcal->GetRawTimeNs();
-                        ;
-                        if (multLosTcal_TE[iDet * 8 + iPmt] > 1)
-                            kLosMult2[iDet] = true;
-                        multTotLos_TE[iDet]++;
-                    }
-                    else
-                    {
-                        LOG(info) << "R3BOnlineSpectraFrsSciVsLos::Exec TAMEX LOS DATA HAS A TYPE "
-                                  << hitlostcal->GetType();
-                    }
-                } // end of loop over tcal data
-
-                for (UShort_t i = 0; i < fLosNbDets; i++)
-                {
-                    for (UShort_t pmt = 0; pmt < 8; pmt++)
-                    {
-                        fh2_MultLos_LE[i]->Fill(pmt, multLosTcal_LE[i * 8 + pmt]);
-                        fh2_MultLos_TE[i]->Fill(pmt, multLosTcal_TE[i * 8 + pmt]);
-                    }
-                    if (multTotLos_LE[i] == 8 && multTotLos_TE[i] == 8 && kLosMult2[i] == false)
-                        kFlag_LosOk[i] = true;
+                    fh2_MultLos_LE[i]->Fill(pmt, multLosTcal_LE[i * 8 + pmt]);
+                    fh2_MultLos_TE[i]->Fill(pmt, multLosTcal_TE[i * 8 + pmt]);
                 }
-
-            } // end of if fLos_Tcal
-
-            if (fFrsSci_PosCal)
-            {
-                nHits = fFrsSci_PosCal->GetEntriesFast();
-                for (UInt_t ihit = 0; ihit < nHits; ihit++)
-                {
-                    R3BFrsSciPosCalData* hitposcal = dynamic_cast<R3BFrsSciPosCalData*>(fFrsSci_PosCal->At(ihit));
-                    if (!hitposcal)
-                        continue;
-                    iDet = hitposcal->GetDetector() - 1;
-                    multFrsSciPosCal[iDet]++;
-                    PosCal_mm[iDet] = hitposcal->GetCalPosMm();
-                    StartTraw_atCal[iDet] = hitposcal->GetRawTimeNsWithTref();
-                } // end of loop over tcal data
-            }
-            if (fLos_Hit)
-            {
-                nHits = fLos_Hit->GetEntriesFast();
-                for (UInt_t ihit = 0; ihit < nHits; ihit++)
-                {
-                    R3BLosHitData* hitloshit = dynamic_cast<R3BLosHitData*>(fLos_Hit->At(ihit));
-                    if (!hitloshit)
-                        continue;
-                    iDet = hitloshit->GetDetector() - 1;
-                    multLosHit[iDet]++;
-                    Zcharge[iDet] = hitloshit->GetZ();
-                } // end of loop over tcal data
+                if (multTotLos_LE[i] == 8 && multTotLos_TE[i] == 8 && kLosMult2[i] == false)
+                    kFlag_LosOk[i] = true;
             }
 
-            if (kFlag_LosOk[0] == true)
+        } // end of if fLos_Tcal
+
+        if (fFrsSci_PosCal)
+        {
+            nHits = fFrsSci_PosCal->GetEntriesFast();
+            for (UInt_t ihit = 0; ihit < nHits; ihit++)
             {
+                R3BFrsSciPosCalData* hitposcal = dynamic_cast<R3BFrsSciPosCalData*>(fFrsSci_PosCal->At(ihit));
+                if (!hitposcal)
+                    continue;
+                iDet = hitposcal->GetDetector() - 1;
+                multFrsSciPosCal[iDet]++;
+                PosCal_mm[iDet] = hitposcal->GetCalPosMm();
+                StartTraw_atCal[iDet] = hitposcal->GetRawTimeNsWithTref();
+            } // end of loop over tcal data
+        }
+        if (fLos_Hit)
+        {
+            nHits = fLos_Hit->GetEntriesFast();
+            for (UInt_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BLosHitData* hitloshit = dynamic_cast<R3BLosHitData*>(fLos_Hit->At(ihit));
+                if (!hitloshit)
+                    continue;
+                iDet = hitloshit->GetDetector() - 1;
+                multLosHit[iDet]++;
+                Zcharge[iDet] = hitloshit->GetZ();
+            } // end of loop over tcal data
+        }
 
-                for (UShort_t i = 0; i < fFrsSciNbDets; i++)
+        if (kFlag_LosOk[0] == true)
+        {
+
+            for (UShort_t i = 0; i < fFrsSciNbDets; i++)
+            {
+                // Calculate the ToT from first Los Detector
+                Double_t MeanToT = 0;
+                for (UShort_t pmt = 0; pmt < 8; pmt++)
                 {
-                    // Calculate the ToT from first Los Detector
-                    Double_t MeanToT = 0;
-                    for (UShort_t pmt = 0; pmt < 8; pmt++)
-                    {
-                        MeanToT += (LosTcal_TE[pmt] - LosTcal_LE[pmt]);
-                    }
-                    MeanToT = MeanToT / 8.;
-                    fh1_MeanToT[0]->Fill(MeanToT);
+                    MeanToT += (LosTcal_TE[pmt] - LosTcal_LE[pmt]);
+                }
+                MeanToT = MeanToT / 8.;
+                fh1_MeanToT[0]->Fill(MeanToT);
 
-                    // Raw time of flight to find the limits
-                    if (multFrsSciTcal[i * fFrsSciNbPmts] == 1 && multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 &&
-                        multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
-                    {
-                        // Calculate the A/Q
-                        StartTraw_atTcal =
-                            0.5 * (FrsSciTraw[i * fFrsSciNbPmts][0] + FrsSciTraw[i * fFrsSciNbPmts + 1][0]) -
-                            FrsSciTraw[i * fFrsSciNbPmts + 2][0];
-                        TofRaw = fHeader->GetTStartMaster() - StartTraw_atTcal;
+                // Raw time of flight to find the limits
+                if (multFrsSciTcal[i * fFrsSciNbPmts] == 1 && multFrsSciTcal[i * fFrsSciNbPmts + 1] == 1 &&
+                    multFrsSciTcal[i * fFrsSciNbPmts + 2] == 1)
+                {
+                    // Calculate the A/Q
+                    StartTraw_atTcal = 0.5 * (FrsSciTraw[i * fFrsSciNbPmts][0] + FrsSciTraw[i * fFrsSciNbPmts + 1][0]) -
+                                       FrsSciTraw[i * fFrsSciNbPmts + 2][0];
+                    TofRaw = fHeader->GetTStartMaster() - StartTraw_atTcal;
 
-                        Velocity = 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * TofRaw);
-                        Beta = Velocity / 0.299792458;
-                        Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
-                        AoQraw = fBrho0_S2toCC->GetAt(i) / (3.10716 * Beta * Gamma);
-                        fh1_Tcal1Hit_TofRaw[i]->Fill(TofRaw);
-                        fh1_Tcal1Hit_AoQraw[i]->Fill(AoQraw);
-                    } // end of if mult1 in FrsSci and First Los Detector
+                    Velocity = 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * TofRaw);
+                    Beta = Velocity / 0.299792458;
+                    Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
+                    AoQraw = fBrho0_S2toCC->GetAt(i) / (3.10716 * Beta * Gamma);
+                    fh1_Tcal1Hit_TofRaw[i]->Fill(TofRaw);
+                    fh1_Tcal1Hit_AoQraw[i]->Fill(AoQraw);
+                } // end of if mult1 in FrsSci and First Los Detector
 
-                    for (UShort_t hitr = 0; hitr < multFrsSciTcal[i * fFrsSciNbPmts]; hitr++)
-                    {
-                        for (UShort_t hitl = 0; hitl < multFrsSciTcal[i * fFrsSciNbPmts + i]; hitl++)
-                        {
-                            StartTraw_atTcal =
-                                0.5 * (FrsSciTraw[i * fFrsSciNbPmts][hitr] + FrsSciTraw[i * fFrsSciNbPmts + 1][hitl]) -
-                                FrsSciTraw[i * fFrsSciNbPmts + 2][0];
-                            TofRaw = fHeader->GetTStartMaster() - StartTraw_atTcal;
-                            PosRaw = FrsSciTraw[i * fFrsSciNbPmts][hitr] - FrsSciTraw[i * fFrsSciNbPmts + 1][hitl];
-                            if (ftof_range_min < TofRaw && TofRaw < ftof_range_max && fpos_range_min < PosRaw &&
-                                PosRaw < fpos_range_max)
-                            {
-                                indexr = hitr;
-                                indexl = hitl;
-                                multTofRaw[i]++;
-                            }
-                        }
-                    }
-                    fh1_multTofRaw[i]->Fill(multTofRaw[i]);
-                    if (Zcharge[i] > 3.5)
-                        fh1_multTofRaw_Zgt3[i]->Fill(multTofRaw[i]);
-                    if (indexr >= 0 && indexl >= 0 && multTofRaw[i] == 1)
+                for (UShort_t hitr = 0; hitr < multFrsSciTcal[i * fFrsSciNbPmts]; hitr++)
+                {
+                    for (UShort_t hitl = 0; hitl < multFrsSciTcal[i * fFrsSciNbPmts + i]; hitl++)
                     {
                         StartTraw_atTcal =
-                            0.5 * (FrsSciTraw[i * fFrsSciNbPmts][indexr] + FrsSciTraw[i * fFrsSciNbPmts + 1][indexl]) -
+                            0.5 * (FrsSciTraw[i * fFrsSciNbPmts][hitr] + FrsSciTraw[i * fFrsSciNbPmts + 1][hitl]) -
                             FrsSciTraw[i * fFrsSciNbPmts + 2][0];
                         TofRaw = fHeader->GetTStartMaster() - StartTraw_atTcal;
-                        PosRaw = FrsSciTraw[i * fFrsSciNbPmts][indexr] - FrsSciTraw[i * fFrsSciNbPmts + 1][indexl];
-                        PosCal = fPosCal_Gain->GetAt(i) * PosRaw + fPosCal_Offset->GetAt(i);
-                        Velocity = 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * TofRaw);
-                        Beta = Velocity / 0.299792458;
-                        Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
-                        Brho = fBrho0_S2toCC->GetAt(i) * (1 + PosCal / fDispersionS2->GetAt(i));
-                        AoQcal = Brho / (3.10716 * Beta * Gamma);
-                        fh1_TofRaw[i]->Fill(TofRaw);
-                        fh1_AoQcal[i]->Fill(AoQcal);
-                        fh2_AoQcal_vs_PosS2[i]->Fill(PosCal_mm[i], AoQcal);
-                        if (Zcharge[i] > 0)
+                        PosRaw = FrsSciTraw[i * fFrsSciNbPmts][hitr] - FrsSciTraw[i * fFrsSciNbPmts + 1][hitl];
+                        if (ftof_range_min < TofRaw && TofRaw < ftof_range_max && fpos_range_min->GetAt(i) < PosRaw &&
+                            PosRaw < fpos_range_max->GetAt(i))
                         {
-                            {
-                                fh2_Z_vs_AoQcal[i]->Fill(AoQcal, Zcharge[i]);
-                            }
+                            indexr = hitr;
+                            indexl = hitl;
+                            multTofRaw[i]++;
                         }
                     }
-                    else
+                }
+                fh1_multTofRaw[i]->Fill(multTofRaw[i]);
+                if (Zcharge[i] > 3.5)
+                    fh1_multTofRaw_Zgt3[i]->Fill(multTofRaw[i]);
+                if (indexr >= 0 && indexl >= 0 && multTofRaw[i] == 1)
+                {
+                    StartTraw_atTcal =
+                        0.5 * (FrsSciTraw[i * fFrsSciNbPmts][indexr] + FrsSciTraw[i * fFrsSciNbPmts + 1][indexl]) -
+                        FrsSciTraw[i * fFrsSciNbPmts + 2][0];
+                    TofRaw = fHeader->GetTStartMaster() - StartTraw_atTcal;
+                    PosRaw = FrsSciTraw[i * fFrsSciNbPmts][indexr] - FrsSciTraw[i * fFrsSciNbPmts + 1][indexl];
+                    PosCal = fPosCal_Gain->GetAt(i) * PosRaw + fPosCal_Offset->GetAt(i);
+                    Velocity = 1. / (fTof2InvV_p0->GetAt(i) + fTof2InvV_p1->GetAt(i) * TofRaw);
+                    Beta = Velocity / 0.299792458;
+                    Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
+                    Brho = fBrho0_S2toCC->GetAt(i) * (1 + PosCal / fDispersionS2->GetAt(i));
+                    AoQcal = Brho / (3.10716 * Beta * Gamma);
+                    fh1_TofRaw[i]->Fill(TofRaw);
+                    fh1_AoQcal[i]->Fill(AoQcal);
+                    fh2_AoQcal_vs_PosS2[i]->Fill(PosCal_mm[i], AoQcal);
+                    if (Zcharge[i] > 0)
                     {
-                        AoQcal = 4;
+                        {
+                            fh2_Z_vs_AoQcal[i]->Fill(AoQcal, Zcharge[i]);
+                        }
                     }
-                } // end of loop over the FrsSci detectors
-            }     // end of good data at LOS
-            fNEvents++;
-        } // end of if On Spill TPat
-    }     // end of if (fFrsSci_Tcal)
+                }
+                else
+                {
+                    AoQcal = 4;
+                }
+            } // end of loop over the FrsSci detectors
+        } // end of good data at LOS
+        fNEvents++;
+    } // end of if (fFrsSci_Tcal)
 }
 
 // -----   Public method Finish   -----------------------------------------------
