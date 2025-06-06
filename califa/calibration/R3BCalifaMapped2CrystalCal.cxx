@@ -56,7 +56,6 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     {
         R3BLOG(info, "califaCrystalCalPar container opened");
     }
-
     fTotCal_Par = dynamic_cast<R3BCalifaTotCalPar*>(rtdb->getContainer("CalifaTotCalPar"));
     if (!fTotCal_Par)
     {
@@ -108,8 +107,28 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     // (where barrel is always in [1, 1952]) with an old calibration
 
     constexpr int offset = 2432;
-    auto& cal = *fCalParams; // because (*ptr)[i] is ugly and error-prone
+
+    auto& cal = *fCalParams;
     auto& tot = *fCalTotParams;
+    bool hasDefault = false;
+    params_tot.reserve(tot.GetSize()); // optional optimization if vector size is known
+
+    for (int i = 0; i < tot.GetSize(); ++i)
+    {
+        auto value = tot.GetAt(i);
+
+        if (value == 0)
+            hasDefault = true;
+
+        int fallback = (i % 2 == 0) ? 10000 : 1000; // default thr=10MeV, tau=1000
+        params_tot.push_back(value != 0 ? value : fallback);
+    }
+
+    if (hasDefault)
+    {
+        R3BLOG(info, "Could not find some Tot params, set to default values");
+    }
+
     if (fNumParams != 2 || fNumCrystals < 2 * offset)
     {
         R3BLOG(warn, "Not checking calibration in former proton range.");
@@ -238,8 +257,8 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* /*option*/)
         double TotCal = Tot;
         if (fCalTotParams)
         {
-            double a0 = fCalTotParams->GetAt(fNumTotParams * (crystalId - 1));
-            double a1 = fCalTotParams->GetAt(fNumTotParams * (crystalId - 1) + 1);
+            double a0 = params_tot.at(fNumTotParams * (crystalId - 1));
+            double a1 = params_tot.at(fNumTotParams * (crystalId - 1) + 1);
             TotCal = a0 * TMath::Exp(Tot / a1);
         }
         AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);

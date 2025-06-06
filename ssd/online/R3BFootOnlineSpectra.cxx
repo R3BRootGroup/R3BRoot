@@ -255,6 +255,14 @@ InitStatus R3BFootOnlineSpectra::Init()
         {
             cSigma->cd(i_pad);
             fh2_SigmaVsStrip[i]->Draw("col");
+            for (int i_asic = 1; i_asic < 10; i_asic++)
+            {
+                TLine* l = new TLine(64.5 * i_asic, 0, 64.5 * i_asic, 15);
+                l->Draw("same");
+                l->SetLineStyle(7);
+                l->SetLineWidth(1);
+                l->SetLineColor(13);
+            }
             i_pad++;
         }
     }
