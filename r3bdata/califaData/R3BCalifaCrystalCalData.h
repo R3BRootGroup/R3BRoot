@@ -13,12 +13,12 @@
 
 #pragma once
 
+#include <TMath.h>
 #include <TObject.h>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <string>
-#include <TMath.h>
-#include <cmath>
 
 class R3BCalifaCrystalCalData : public TObject
 {
@@ -50,17 +50,15 @@ class R3BCalifaCrystalCalData : public TObject
 
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const uint16_t& GetCrystalId() const { return fCrystalId; }
-    //[[nodiscard]] inline double GetEnergy() const { return fEnergy ? fEnergy : 10*TMath::Exp(fToT_Energy/950); }
     [[nodiscard]] inline double GetEnergy() const
-{
-    if (!std::isnan(fEnergy))
-        return fEnergy;
-    else if (!std::isnan(fToT_Energy))
-        return fToT_Energy;
-    else
-    { std::cout << "tot was nan" << std::endl;
-	return 0.;}
-}
+    {
+        if (!std::isnan(fEnergy))
+            return fEnergy;
+        else if (!std::isnan(fToT_Energy))
+            return fToT_Energy;
+        else
+            return 0.;
+    }
     //[[nodiscard]] inline const double& GetEnergy() const { return fEnergy;}
     [[nodiscard]] inline const double& GetNf() const { return fNf; }
     [[nodiscard]] inline const double& GetNs() const { return fNs; }
