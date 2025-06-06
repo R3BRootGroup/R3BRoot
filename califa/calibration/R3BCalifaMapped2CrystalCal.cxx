@@ -115,10 +115,10 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
 
     for (int i = 0; i < tot.GetSize(); ++i)
     {
-    	auto value = tot.GetAt(i);
+        auto value = tot.GetAt(i);
 
-    	if (value == 0)
-           hasDefault = true;
+        if (value == 0)
+            hasDefault = true;
 
         int fallback = (i % 2 == 0) ? 10000 : 1000; // default thr=10MeV, tau=1000
         params_tot.push_back(value != 0 ? value : fallback);

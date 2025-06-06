@@ -687,14 +687,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifaCoinE->Divide(2, 1);
     cCalifaCoinE->cd(1);
 
-    fh2_Califa_coinE = R3B::root_owned<TH2F>("fh2_Califa_energy_correlations",
-                                             "Califa energy correlations",
-                                             400,
-                                             0,
-                                             500.,
-                                             400.,
-                                             0.,
-                                             500.);
+    fh2_Califa_coinE = R3B::root_owned<TH2F>(
+        "fh2_Califa_energy_correlations", "Califa energy correlations", 400, 0, 500., 400., 0., 500.);
     fh2_Califa_coinE->GetXaxis()->SetTitle("Energy (MeV)");
     fh2_Califa_coinE->GetYaxis()->SetTitle("Energy (MeV)");
     fh2_Califa_coinE->GetYaxis()->SetTitleOffset(1.2);
@@ -703,14 +697,8 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     fh2_Califa_coinE->Draw("COLZ");
 
     cCalifaCoinE->cd(2);
-    fh2_Califa_coinE_p2p = R3B::root_owned<TH2F>("fh2_Califa_energy_correlations_p2p",
-                                                 "Califa energy correlations for p2p",
-                                                 400,
-                                                 0.,
-                                                 500.,
-                                                 400.,
-                                                 0.,
-                                                 500.);
+    fh2_Califa_coinE_p2p = R3B::root_owned<TH2F>(
+        "fh2_Califa_energy_correlations_p2p", "Califa energy correlations for p2p", 400, 0., 500., 400., 0., 500.);
     fh2_Califa_coinE_p2p->GetXaxis()->SetTitle("Energy (MeV)");
     fh2_Califa_coinE_p2p->GetYaxis()->SetTitle("Energy (MeV)");
     fh2_Califa_coinE_p2p->GetYaxis()->SetTitleOffset(1.2);
@@ -775,7 +763,7 @@ InitStatus R3BCalifaOnlineSpectra::Init()
     cCalifa_theta_energy->cd(1);
     fh2_Califa_theta_energy_pr =
         R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 92, fMaxEnergyPR, 0, 3000.);
-        //R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 92, fMaxEnergyPR, 0, fMaxEnergyPR);
+    // R3B::root_owned<TH2F>(Name2.c_str(), Name3.c_str(), 500, 0, 92, fMaxEnergyPR, 0, fMaxEnergyPR);
     fh2_Califa_theta_energy_pr->GetXaxis()->SetTitle("Theta [deg]");
     fh2_Califa_theta_energy_pr->GetYaxis()->SetTitle("Energy [MeV]");
     fh2_Califa_theta_energy_pr->GetYaxis()->SetTitleOffset(1.4);
@@ -1735,55 +1723,59 @@ void R3BCalifaOnlineSpectra::Exec(Option_t* /*option*/)
                 maxEL = califa_e[i1];
             }
         }
-	/*bool coplanar = false;
-        if (maxEL/1000. > 50 && maxER/1000. > 50)
-        //if (maxEL > fMinProtonE && maxER > fMinProtonE)
-        {
-	std::cout << "maxER=" << maxEL << " maxER=" << maxER << std::endl; 
-            auto opa = master[0].Angle(master[1]) * TMath::RadToDeg();
-            //fh1_openangle->Fill(opa);
-            if (opa < 90. && opa > 68.)
-                fh2_Califa_coinE_p2p->Fill(maxEL / 1000., maxER / 1000.);
-            for (const auto& itpat : tpatindex)
-                fh2_openangle_tpat->Fill(itpat, master[0].Angle(master[1]) * TMath::RadToDeg());
-        }*/
+        /*bool coplanar = false;
+            if (maxEL/1000. > 50 && maxER/1000. > 50)
+            //if (maxEL > fMinProtonE && maxER > fMinProtonE)
+            {
+        std::cout << "maxER=" << maxEL << " maxER=" << maxER << std::endl;
+                auto opa = master[0].Angle(master[1]) * TMath::RadToDeg();
+                //fh1_openangle->Fill(opa);
+                if (opa < 90. && opa > 68.)
+                    fh2_Califa_coinE_p2p->Fill(maxEL / 1000., maxER / 1000.);
+                for (const auto& itpat : tpatindex)
+                    fh2_openangle_tpat->Fill(itpat, master[0].Angle(master[1]) * TMath::RadToDeg());
+            }*/
 
         // Comparison of hits to get energy, theta and phi correlations between them
         for (Int_t i1 = 0; i1 < califa_theta.size(); i1++)
-        { 
+        {
             master[0].SetMagThetaPhi(1., califa_theta[i1] * TMath::DegToRad(), califa_phi[i1] * TMath::DegToRad());
             for (Int_t i2 = i1 + 1; i2 < califa_theta.size(); i2++)
             {
                 master[1].SetMagThetaPhi(1., califa_theta[i2] * TMath::DegToRad(), califa_phi[i2] * TMath::DegToRad());
                 fh2_Califa_coinPhi->Fill(califa_phi[i1], califa_phi[i2]);
-		if (abs(abs(califa_phi[i1]-califa_phi[i2])-180)<30 && califa_e[i1]/1000.>100 && califa_e[i2]/1000.>100)
-		{
-		fh1_openangle->Fill(master[0].Angle(master[1])*TMath::RadToDeg());
-                if (gRandom->Uniform(0., 1.) < 0.5)
+                if (abs(abs(califa_phi[i1] - califa_phi[i2]) - 180) < 30 && califa_e[i1] / 1000. > 100 &&
+                    califa_e[i2] / 1000. > 100)
                 {
-                    fh2_Califa_coinE->Fill(califa_e[i1] / 1000., califa_e[i2] / 1000.);
-                    fh2_Califa_coinTheta->Fill(califa_theta[i1], califa_theta[i2]);
-
-                    if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 && master[0].Angle(master[1]) * TMath::RadToDeg() < 90)
-                    //if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 && master[0].Angle(master[1]) * TMath::RadToDeg() < 90)
+                    fh1_openangle->Fill(master[0].Angle(master[1]) * TMath::RadToDeg());
+                    if (gRandom->Uniform(0., 1.) < 0.5)
                     {
-                        fh2_Califa_coinTheta_cutOPA->Fill(califa_theta[i1], califa_theta[i2]);
-                       fh2_Califa_coinE_p2p->Fill(califa_e[i1] / 1000., califa_e[i2] / 1000.);
+                        fh2_Califa_coinE->Fill(califa_e[i1] / 1000., califa_e[i2] / 1000.);
+                        fh2_Califa_coinTheta->Fill(califa_theta[i1], califa_theta[i2]);
+
+                        if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 &&
+                            master[0].Angle(master[1]) * TMath::RadToDeg() < 90)
+                        // if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 && master[0].Angle(master[1]) *
+                        // TMath::RadToDeg() < 90)
+                        {
+                            fh2_Califa_coinTheta_cutOPA->Fill(califa_theta[i1], califa_theta[i2]);
+                            fh2_Califa_coinE_p2p->Fill(califa_e[i1] / 1000., califa_e[i2] / 1000.);
+                        }
+                    }
+                    else
+                    {
+                        fh2_Califa_coinE->Fill(califa_e[i2] / 1000., califa_e[i1] / 1000.);
+                        fh2_Califa_coinTheta->Fill(califa_theta[i2], califa_theta[i1]);
+                        // fh2_Califa_coinPhi->Fill(califa_phi[i2], califa_phi[i1]);
+
+                        if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 &&
+                            master[0].Angle(master[1]) * TMath::RadToDeg() < 90)
+                        {
+                            fh2_Califa_coinE_p2p->Fill(califa_e[i2] / 1000., califa_e[i1] / 1000.);
+                            fh2_Califa_coinTheta_cutOPA->Fill(califa_theta[i2], califa_theta[i1]);
+                        }
                     }
                 }
-                else
-                {
-                    fh2_Califa_coinE->Fill(califa_e[i2] / 1000., califa_e[i1] / 1000.);
-                    fh2_Califa_coinTheta->Fill(califa_theta[i2], califa_theta[i1]);
-                    //fh2_Califa_coinPhi->Fill(califa_phi[i2], califa_phi[i1]);
-
-                    if (master[0].Angle(master[1]) * TMath::RadToDeg() > 68 && master[0].Angle(master[1]) * TMath::RadToDeg() < 90)
-                    {
-                        fh2_Califa_coinE_p2p->Fill(califa_e[i2] / 1000., califa_e[i1] / 1000.);
-                        fh2_Califa_coinTheta_cutOPA->Fill(califa_theta[i2], califa_theta[i1]);
-                    }
-                }
-		}
             }
         }
     }
