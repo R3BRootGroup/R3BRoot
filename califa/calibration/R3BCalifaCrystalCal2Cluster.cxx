@@ -264,17 +264,6 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
         cryId = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i))->GetCrystalId();
         cryEnergy = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i))->GetEnergy();
 
-
-	if (std::isnan(cryEnergy))
-	{
-	    cryEnergy = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i))->GetToTEnergy();
-	    //cryEnergy = 10*TMath::Exp(cryEnergy/950.);
-	    std::cout << cryId << " was overflowed, now its value taken from tot " << cryEnergy << "\n"; 
-	    //cryEnergy = fProtonClusterThreshold;
-	    //std::cout << cryId << " was overflowed, now its value is set to threshold " << fProtonClusterThreshold << "\n"; 
-	}
-
-
         if (cryEnergy >= fCrystalThreshold)
             allCrystalVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
 
