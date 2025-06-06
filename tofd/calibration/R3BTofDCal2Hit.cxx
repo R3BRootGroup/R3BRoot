@@ -109,6 +109,7 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
         fhxy[i] = nullptr;
         fhQvsEvent[i] = nullptr;
         fhTdiff[i] = nullptr;
+        fhTsyncRaw[i] = nullptr;
         fhTsync[i] = nullptr;
         fhQ0Qt[i] = nullptr;
         fhTvsQ[i] = nullptr;
@@ -142,6 +143,9 @@ R3BTofDCal2Hit::R3BTofDCal2Hit(const char* name, Int_t iVerbose)
         fhposLambda[i] = nullptr;
 
         fhposFinal[i] = nullptr;
+
+        fhChargevsBarRaw[i] = nullptr;
+        fhChargevsBar[i] = nullptr;
     }
 }
 
@@ -161,6 +165,8 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
                 delete fhQvsEvent[i];
             if (fhTdiff[i])
                 delete fhTdiff[i];
+            if (fhTsyncRaw[i])
+                delete fhTsyncRaw[i];
             if (fhTsync[i])
                 delete fhTsync[i];
             if (fhQ0Qt[i])
@@ -217,6 +223,10 @@ R3BTofDCal2Hit::~R3BTofDCal2Hit()
                 delete fhposLambda[i];
             if (fhposFinal[i])
                 delete fhposFinal[i];
+            if (fhChargevsBarRaw[i])
+                delete fhChargevsBarRaw[i];
+            if (fhChargevsBar[i])
+                delete fhChargevsBar[i];
         }
     }
     if (fHitItems)
@@ -677,6 +687,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 Double_t para[4] = { 0 };
                 Double_t qb = 0.;
+                Double_t qb_raw = 0.;
                 if (fTofdQ > 0)
                 {
                     if (!fExpCor)
@@ -718,14 +729,18 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     LOG(debug) << "ToT qb: " << top_tot << " " << bot_tot;
                 }
                 Double_t parz[3] = { 0 };
-                if (par)
+                if (par) //[0]*pow(x,[2]) + [1]
                 {
                     parz[0] = par->GetPar1za();
                     parz[1] = par->GetPar1zb();
                     parz[2] = par->GetPar1zc();
+                    // cout << parz[0] << "    " << parz[1] << "    " << parz[2] << endl;
                 }
 
+                qb_raw = qb;
+                // cout << "charge val: " << qb << endl;
                 qb = parz[0] * TMath::Power(qb, parz[2]) + parz[1]; // default are 1 0 1
+                // cout << "charge val after calc: " << qb << endl;
 
                 LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
                 LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
@@ -743,20 +758,25 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                 // Tof with respect LOS detector
                 auto tof = fTimeStitch->GetTime((bot_ns + top_ns) / 2. - header->GetTStart(), "tamex", "vftx");
-
                 Double_t tof_corr = 0.;
                 LOG(debug) << "Los times: " << header->GetTStart();
-
                 if (par)
                 {
                     tof_corr = tof - par->GetTofSyncOffset();
                 }
                 event.push_back({ qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
-                //   { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
+                // cout << "---------------" << endl;
+                // cout << qb << "  " << THit << "  " << xp << "  " << pos << "  " << iPlane << "  " << iBar << "  " <<
+                // THit_raw << "  " << tof_corr << endl; cout << "Veff: " << veff << endl; cout << "Lambda: " << lambda
+                // << endl; cout << "posToT: " << posToT << "    posTime: " << posTime << endl; cout << "bot_ns: " <<
+                // bot_ns << "    top_ns: " << top_ns << endl;
+                //    { parz[0] + parz[1] * qb + parz[2] * qb * qb, THit, xp, pos, iPlane, iBar, THit_raw, tof_corr });
                 if (fTofdHisto)
                 {
                     // fill control histograms
-                    fhTsync[iPlane - 1]->Fill(iBar, tof_corr);
+                    // fhTsync[iPlane - 1]->Fill(iBar, THit);
+                    fhTsyncRaw[iPlane - 1]->Fill(iBar, tof);   // added by FR
+                    fhTsync[iPlane - 1]->Fill(iBar, tof_corr); // changed by MH
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
                     fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
 
@@ -836,6 +856,12 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
                     auto posFinal = pos;
                     fhposFinal[iPlane - 1]->Fill(iBar, posFinal);
+
+                    auto charge_raw = qb_raw; // charge value before ParaZ is applied
+                    fhChargevsBarRaw[iPlane - 1]->Fill(iBar, charge_raw);
+
+                    auto charge_final = qb;
+                    fhChargevsBar[iPlane - 1]->Fill(iBar, charge_final);
                     //}
                 }
                 for (Int_t e = 0; e < event.size(); e++)
@@ -1086,13 +1112,23 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
 void R3BTofDCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 100.;
+    Double_t max_charge = fMaxQ;
     // create histograms if not already existing
     if (NULL == fhNoTpat)
     {
         fhNoTpat = new TH1F("NoTpat", "NoTpat", 200, 0, 200);
         fhNoTpat->GetXaxis()->SetTitle("No Tpat event dist");
     }
+
+    if (NULL == fhTsyncRaw[iPlane - 1])
+    {
+        char strName[255];
+        sprintf(strName, "Time_Sync_Raw_Plane_%d", iPlane);
+        fhTsyncRaw[iPlane - 1] = new TH2F(strName, "", 50, 0, 50, 10000, -2000., 2000.);
+        fhTsyncRaw[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+        fhTsyncRaw[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
+    }
+
     if (NULL == fhTsync[iPlane - 1])
     {
         char strName[255];
@@ -1382,6 +1418,26 @@ void R3BTofDCal2Hit::CreateHistogramsCal()
             fhposFinal[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
             fhposFinal[iPlane - 1]->GetYaxis()->SetTitle("Position in cm");
         }
+        if (NULL == fhChargevsBarRaw[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Q_vs_Bar_Plane_%d_Raw", iPlane);
+            sprintf(strName2, "Q vs Bar Plane %d Raw", iPlane);
+            fhChargevsBarRaw[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 4, 0., max_charge);
+            fhChargevsBarRaw[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhChargevsBarRaw[iPlane - 1]->GetYaxis()->SetTitle("Charge-Z");
+        }
+        if (NULL == fhChargevsBar[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Q_vs_Bar_Plane_%d_Final", iPlane);
+            sprintf(strName2, "Q vs Bar Plane %d Final", iPlane);
+            fhChargevsBar[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, max_charge * 4, 0., max_charge);
+            fhChargevsBar[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhChargevsBar[iPlane - 1]->GetYaxis()->SetTitle("Charge-Z");
+        }
     }
 }
 void R3BTofDCal2Hit::FinishEvent()
@@ -1410,6 +1466,8 @@ void R3BTofDCal2Hit::FinishTask()
                 fhQvsEvent[i]->Write();
             if (fhTdiff[i])
                 fhTdiff[i]->Write();
+            if (fhTsyncRaw[i])
+                fhTsyncRaw[i]->Write();
             if (fhTsync[i])
                 fhTsync[i]->Write();
             if (fhQ0Qt[i])
@@ -1418,7 +1476,6 @@ void R3BTofDCal2Hit::FinishTask()
                 fhTvsQ[i]->Write();
             for (Int_t j = 0; j < N_TOFD_HIT_PADDLE_MAX; j++)
             {
-
                 // control histogram time particles
                 if (fhQvsPos[i][j])
                     fhQvsPos[i][j]->Write();
@@ -1476,6 +1533,10 @@ void R3BTofDCal2Hit::FinishTask()
                 fhposLambda[i]->Write();
             if (fhposFinal[i])
                 fhposFinal[i]->Write();
+            if (fhChargevsBarRaw[i])
+                fhChargevsBarRaw[i]->Write();
+            if (fhChargevsBar[i])
+                fhChargevsBar[i]->Write();
         }
     }
     std::stringstream sprint;
