@@ -56,7 +56,6 @@ void R3BCalifaMapped2CrystalCal::SetParContainers()
     {
         R3BLOG(info, "califaCrystalCalPar container opened");
     }
-
     fTotCal_Par = dynamic_cast<R3BCalifaTotCalPar*>(rtdb->getContainer("CalifaTotCalPar"));
     if (!fTotCal_Par)
     {
@@ -110,88 +109,107 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     constexpr int offset = 2432;
     auto& cal = *fCalParams; // because (*ptr)[i] is ugly and error-prone
     auto& tot = *fCalTotParams;
+    bool some_default = false;
+    for (int i=0;i<fCalTotParams->GetSize();i++)
+    {
+	    if (fCalTotParams->GetAt(i)==0) some_default = true;
+	    if (i%2)
+	    {
+	    if (fCalTotParams->GetAt(i)==0) {params_tot.push_back(10000);}
+	    if (fCalTotParams->GetAt(i)!=0) {params_tot.push_back(fCalTotParams->GetAt(i));}
+            }
+	    else
+            {
+	    
+	    if (fCalTotParams->GetAt(i)!=0) {params_tot.push_back(fCalTotParams->GetAt(i));}
+	    if (fCalTotParams->GetAt(i)==0) {params_tot.push_back(1000);}
+	    }
+    
+    }
+    if (some_default) {R3BLOG(info, "Could not find some Tot params, set to default values");}
+
     if (fNumParams != 2 || fNumCrystals < 2 * offset)
     {
-        R3BLOG(warn, "Not checking calibration in former proton range.");
-        return;
+	    R3BLOG(warn, "Not checking calibration in former proton range.");
+	    return;
     }
     auto invalid = [&cal](int id)
     {
-        auto a = cal.GetAt(2 * (id - 1) + 0);
-        auto b = cal.GetAt(2 * (id - 1) + 1);
-        return (std::isnan(a) || a == 0.0) && (std::isnan(a) || a == 0.0);
+	    auto a = cal.GetAt(2 * (id - 1) + 0);
+	    auto b = cal.GetAt(2 * (id - 1) + 1);
+	    return (std::isnan(a) || a == 0.0) && (std::isnan(a) || a == 0.0);
     };
 
     int replaced{};
     for (int id = 1; id <= 1952; id++) // barrel range, formerly barrel gamma range
-        if (invalid(id) && !invalid(id + offset))
-        {
-            ++replaced;
-            // Note:  (*a)[n]=...
-            for (int p = 0; p < fNumParams; p++)
-                cal[fNumParams * (id - 1) + p] = cal[fNumParams * (id - 1 + offset) + p];
-            for (int p = 0; p < fNumTotParams; p++)
-                tot[fNumTotParams * (id - 1) + p] = tot[fNumTotParams * (id - 1 + offset) + p];
-        }
+	    if (invalid(id) && !invalid(id + offset))
+	    {
+		    ++replaced;
+		    // Note:  (*a)[n]=...
+		    for (int p = 0; p < fNumParams; p++)
+			    cal[fNumParams * (id - 1) + p] = cal[fNumParams * (id - 1 + offset) + p];
+		    for (int p = 0; p < fNumTotParams; p++)
+		            tot[fNumTotParams * (id - 1) + p] = tot[fNumTotParams * (id - 1 + offset) + p];
+	    }
 
     R3BLOG_IF(warn,
-              replaced,
-              replaced << " missing calibrations for crIDs in [1, 1952] have been copied over from the legacy proton "
-                          "barrel range.");
+		    replaced,
+		    replaced << " missing calibrations for crIDs in [1, 1952] have been copied over from the legacy proton "
+		    "barrel range.");
 }
 
 InitStatus R3BCalifaMapped2CrystalCal::Init()
 {
-    R3BLOG(info, "");
+	R3BLOG(info, "");
 
-    FairRootManager* rootManager = FairRootManager::Instance();
-    R3BLOG_IF(fatal, rootManager == nullptr, "FairRootManager not found");
+	FairRootManager* rootManager = FairRootManager::Instance();
+	R3BLOG_IF(fatal, rootManager == nullptr, "FairRootManager not found");
 
-    // INPUT DATA
-    fCalifaMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("CalifaMappedData"));
-    R3BLOG_IF(fatal, fCalifaMappedDataCA == nullptr, "CalifaMappedData not found");
+	// INPUT DATA
+	fCalifaMappedDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("CalifaMappedData"));
+	R3BLOG_IF(fatal, fCalifaMappedDataCA == nullptr, "CalifaMappedData not found");
 
-    // OUTPUT DATA
-    fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData");
-    rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, !fOnline);
+	// OUTPUT DATA
+	fCalifaCryCalDataCA = new TClonesArray("R3BCalifaCrystalCalData");
+	rootManager->Register("CalifaCrystalCalData", "CALIFA Crystal Cal", fCalifaCryCalDataCA, !fOnline);
 
-    SetParameter();
-    return kSUCCESS;
+	SetParameter();
+	return kSUCCESS;
 }
 
 InitStatus R3BCalifaMapped2CrystalCal::ReInit()
 {
-    SetParContainers();
-    SetParameter();
-    return kSUCCESS;
+	SetParContainers();
+	SetParameter();
+	return kSUCCESS;
 }
 
 void R3BCalifaMapped2CrystalCal::Exec(Option_t* /*option*/)
 {
-    // Reset entries in output arrays, local arrays
-    Reset();
+	// Reset entries in output arrays, local arrays
+	Reset();
 
-    // Reading the Input -- Mapped Data --
-    auto nHits = fCalifaMappedDataCA->GetEntriesFast();
+	// Reading the Input -- Mapped Data --
+	auto nHits = fCalifaMappedDataCA->GetEntriesFast();
 
-    // Overflow (R3BROOT-speech "Errors") handling:
-    // If an error bit indicates that the data is invalid,
-    // the correct approach is to set the invalid fields to NaN, imho
+	// Overflow (R3BROOT-speech "Errors") handling:
+	// If an error bit indicates that the data is invalid,
+	// the correct approach is to set the invalid fields to NaN, imho
 
-    // source: mbs f_user dir, struct_event_115a.h
-    // bit      name        invalidates
+	// source: mbs f_user dir, struct_event_115a.h
+	// bit      name        invalidates
 
-    //   0      CFD         nothing, trigger branch overflow
-    //   1      Baseline    everything
-    //   2      MAU         everything
-    //   3      MWD         everything
+	//   0      CFD         nothing, trigger branch overflow
+	//   1      Baseline    everything
+	//   2      MAU         everything
+	//   3      MWD         everything
 
-    //   4      PeakSensing everything????
-    //   5      E->EvntBuf  Energy
-    //   6      Trace->EBuf nothing, traces are not handled by R3BROOT
-    //   7      Nf->EvntBuf Nf
+	//   4      PeakSensing everything????
+	//   5      E->EvntBuf  Energy
+	//   6      Trace->EBuf nothing, traces are not handled by R3BROOT
+	//   7      Nf->EvntBuf Nf
 
-    //   8      Ns->EvntBuf Ns
+	//   8      Ns->EvntBuf Ns
     //   9      ADC         everything
     //   a      ADC underfl everything
     //   b      QPID Nf     Nf
@@ -238,8 +256,8 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* /*option*/)
         double TotCal = Tot;
         if (fCalTotParams)
         {
-            double a0 = fCalTotParams->GetAt(fNumTotParams * (crystalId - 1));
-            double a1 = fCalTotParams->GetAt(fNumTotParams * (crystalId - 1) + 1);
+            double a0 = params_tot.at(fNumTotParams * (crystalId - 1));
+            double a1 = params_tot.at(fNumTotParams * (crystalId - 1) + 1);
             TotCal = a0 * TMath::Exp(Tot / a1);
         }
         AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);

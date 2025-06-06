@@ -68,6 +68,7 @@ class R3BCalifaMapped2CrystalCal : public FairTask
     UInt_t fNumTotParams = 2;
     TArrayF* fCalParams;
     TArrayF* fCalTotParams;
+    std::vector<float> params_tot;
     // Don't store data for online
     bool fOnline = false;
 
