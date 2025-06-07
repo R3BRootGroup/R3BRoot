@@ -213,6 +213,7 @@ class R3BTofDCal2Hit : public FairTask
     TH2F* fhxy[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQvsEvent[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTdiff[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhTsyncRaw[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTsync[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhQ0Qt[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhTvsQ[N_TOFD_HIT_PLANE_MAX];
@@ -236,6 +237,9 @@ class R3BTofDCal2Hit : public FairTask
     TH2F* fhToTdiffOffset[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhposLambda[N_TOFD_HIT_PLANE_MAX];
     TH2F* fhposFinal[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhChargevsBarRaw[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhChargevsBarPol3[N_TOFD_HIT_PLANE_MAX];
+    TH2F* fhChargevsBarFinal[N_TOFD_HIT_PLANE_MAX];
 
   public:
     ClassDef(R3BTofDCal2Hit, 2)
