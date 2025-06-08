@@ -364,10 +364,11 @@ void R3BFiberMAPMTCal2Hit::Exec(Option_t* /*option*/)
                     Double_t t_up = up_tot.lead_ns;
                     // Double_t dtime = fTimeStitch->GetTime(t_up - t_down, "clocktdc", "clocktdc");
                     Double_t dtime = t_up - t_down;
-                    Double_t tof =
-                        fHeader != nullptr
-                            ? fTimeStitch->GetTime((t_up + t_down) / 2. - fHeader->GetTStart(), "vftx", "clocktdc")
-                            : (t_up + t_down) / 2.;
+                    // Double_t tof =
+                    //     fHeader!=nullptr ? fTimeStitch->GetTime((t_up + t_down) / 2. - fHeader->GetTStart(), "vftx",
+                    //     "clocktdc")
+                    //             : (t_up + t_down) / 2.;
+                    Double_t tof = (t_up + t_down) / 2. - fHeader->GetTStart();
 
                     // Fill histograms for gain match, offset and sync.
                     if (fWrite)

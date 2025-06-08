@@ -172,7 +172,7 @@ class R3BTofDCal2Hit : public FairTask
     Int_t fTpat1;
     Int_t fTpat2;
     Double_t fTofdQ;
-    Double_t fMaxQ = 500.;
+    Double_t fMaxQ = 20.;
     Bool_t fTofdHisto;
     Bool_t fTofdHistoCal;
     Bool_t fExpCor;
