@@ -215,11 +215,11 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
                                             fNbfibersplot,
                                             1.,
                                             fNbfibersplot + 1.,
-                                            1000,
-                                            -10000,
-                                            10000);
+                                            2000,
+                                            -1000,
+                                            1000);
         fh_time_Fib->GetXaxis()->SetTitle("Fiber number");
-        fh_time_Fib->GetYaxis()->SetTitle("(tUp+tDown)/2 / ns");
+        fh_time_Fib->GetYaxis()->SetTitle("ToF to LOS [ns]");
 
         // calibrated position
         auto cxy = new TCanvas(fName + "_xy", fName + "_xy", 10, 10, 910, 910);
@@ -582,7 +582,7 @@ void R3BFiberMAPMTOnlineSpectra::Exec(Option_t* /*option*/)
             tDown = hit->GetBottomTime_ns();
             dtime = tUp - tDown;
 
-            // (tUp+tDown)/2:
+            // (tUp+tDown)/2 - LOS_time
             tfib = hit->GetTime();
 
             // ToT from up and down MAPMT:

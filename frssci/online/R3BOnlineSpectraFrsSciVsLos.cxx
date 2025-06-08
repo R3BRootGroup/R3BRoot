@@ -329,7 +329,7 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
                     fh2_Z_vs_AoQcal[i]->Draw("col");
                 }
             } // end of if fFrsSci_PosCal
-        } // end of loop over the fFrsSciNbDets
+        }     // end of loop over the fFrsSciNbDets
 
         if (fLos_Tcal)
         {
@@ -375,7 +375,7 @@ InitStatus R3BOnlineSpectraFrsSciVsLos::Init()
                 cLos_ToT->cd(i + 1);
                 fh1_MeanToT[i]->Draw();
             } // end of loop over the number of Los detectors
-        } // end of if (fLos_Tcal)
+        }     // end of if (fLos_Tcal)
     }
 
     // --- --------------- --- //
@@ -687,7 +687,7 @@ void R3BOnlineSpectraFrsSciVsLos::Exec(Option_t* option)
                     AoQcal = 4;
                 }
             } // end of loop over the FrsSci detectors
-        } // end of good data at LOS
+        }     // end of good data at LOS
         fNEvents++;
     } // end of if (fFrsSci_Tcal)
 }
