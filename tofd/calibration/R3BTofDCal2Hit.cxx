@@ -689,8 +689,9 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 }
 
                 Double_t para[4] = { 0 };
+
+                Double_t qb_corr = 0.;
                 Double_t qb = 0.;
-                Double_t qb_raw = 0.;
                 if (fTofdQ > 0)
                 {
                     if (!fExpCor)
@@ -732,18 +733,15 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     LOG(debug) << "ToT qb: " << top_tot << " " << bot_tot;
                 }
                 Double_t parz[3] = { 0 };
-                if (par) //[0]*pow(x,[2]) + [1]
+                if (par) // default are 1 0 1
                 {
                     parz[0] = par->GetPar1za();
                     parz[1] = par->GetPar1zb();
                     parz[2] = par->GetPar1zc();
                     // cout << parz[0] << "    " << parz[1] << "    " << parz[2] << endl;
                 }
-
-                qb_raw = qb;
-                // cout << "charge val: " << qb << endl;
-                qb = parz[0] * TMath::Power(qb, parz[2]) + parz[1]; // default are 1 0 1
-                // cout << "charge val after calc: " << qb << endl;
+                qb_corr = qb;                                       // charge value before applying parz[] correction
+                qb = parz[0] * TMath::Power(qb, parz[2]) + parz[1]; // Q' = [0] * pow(Q, [2]) + [1]
 
                 LOG(debug) << "Charges in this event " << qb << " plane " << iPlane << " ibar " << iBar;
                 LOG(debug) << "Times in this event " << THit << " plane " << iPlane << " ibar " << iBar;
@@ -781,7 +779,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     fhTsyncRaw[iPlane - 1]->Fill(iBar, tof);   // added by FR
                     fhTsync[iPlane - 1]->Fill(iBar, tof_corr); // changed by MH
                     fhTdiff[iPlane - 1]->Fill(iBar, tdiff);
-                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, parz[0] * TMath::Power(qb, parz[2]) + parz[1]);
+                    fhQvsPos[iPlane - 1][iBar - 1]->Fill(pos, qb); // changed by FR: qb has parz already applied
 
                     if (!IS_NAN(wedge_left_ns) && !IS_NAN(wedge_right_ns))
                     {
@@ -860,11 +858,11 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                     auto posFinal = pos;
                     fhposFinal[iPlane - 1]->Fill(iBar, posFinal);
 
-                    auto charge_raw = TMath::Sqrt(top_tot * bot_tot) / 150. *
-                                      fTofdQ; // this is just sqrt(top_tot * bot_tot)/tot of calibration beam
+                    auto charge_raw =
+                        TMath::Sqrt(top_tot * bot_tot) / (150) * fTofdQ; // charge value with rough correction
                     fhChargevsBarRaw[iPlane - 1]->Fill(iBar, charge_raw);
 
-                    auto charge_pol3 = qb_raw; // charge value with Pol3 parameters, before ParaZ is applied
+                    auto charge_pol3 = qb_corr; // charge value with Pol3 parameters, before ParaZ is applied
                     fhChargevsBarPol3[iPlane - 1]->Fill(iBar, charge_pol3);
 
                     auto charge_final = qb; // final evaluation of Charge
@@ -1119,7 +1117,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
 
 void R3BTofDCal2Hit::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 100.;
+    Double_t max_charge = fMaxQ;
     // create histograms if not already existing
     if (NULL == fhNoTpat)
     {
@@ -1431,7 +1429,7 @@ void R3BTofDCal2Hit::CreateHistogramsCal()
             char strName2[255];
             sprintf(strName1, "Q_vs_Bar_Plane_%d_Raw", iPlane);
             sprintf(strName2, "Q vs Bar Plane %d Raw", iPlane);
-            fhChargevsBarRaw[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., 20.);
+            fhChargevsBarRaw[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., max_charge);
             fhChargevsBarRaw[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
             fhChargevsBarRaw[iPlane - 1]->GetYaxis()->SetTitle("Charge-Z");
         }
@@ -1441,7 +1439,7 @@ void R3BTofDCal2Hit::CreateHistogramsCal()
             char strName2[255];
             sprintf(strName1, "Q_vs_Bar_Plane_%d_Pol3", iPlane);
             sprintf(strName2, "Q vs Bar Plane %d Pol3", iPlane);
-            fhChargevsBarPol3[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., 20.);
+            fhChargevsBarPol3[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., max_charge);
             fhChargevsBarPol3[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
             fhChargevsBarPol3[iPlane - 1]->GetYaxis()->SetTitle("Charge-Z");
         }
@@ -1451,7 +1449,7 @@ void R3BTofDCal2Hit::CreateHistogramsCal()
             char strName2[255];
             sprintf(strName1, "Q_vs_Bar_Plane_%d_Final", iPlane);
             sprintf(strName2, "Q vs Bar Plane %d Final", iPlane);
-            fhChargevsBarFinal[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., 20.);
+            fhChargevsBarFinal[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 1000, 0., max_charge);
             fhChargevsBarFinal[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
             fhChargevsBarFinal[iPlane - 1]->GetYaxis()->SetTitle("Charge-Z");
         }
