@@ -89,6 +89,14 @@
     },
     {
       "@type": "Person",
+      "givenName": "Laurent",
+      "familyName": "Audouin",
+      "email": "laurent.audouin@ijclab.in2p3.fr",
+      "affiliation": "IPN Orsay, 91406 Orsay, France",
+      "identifier": "https://orcid.org/0000-0001-9899-6923"
+    },
+    {
+      "@type": "Person",
       "givenName": "Antoine",
       "familyName": "Barriere",
       "affiliation": "GANIL, 14000 Caen, France"
@@ -102,7 +110,8 @@
     {
       "@type": "Person",
       "givenName": "Audrey",
-      "familyName": "Chatillon"
+      "familyName": "Chatillon",
+      "affiliation": "CEA, DAM, DIF, 91297 Arpajon, France"
     },
     {
       "@type": "Person",
@@ -121,6 +130,14 @@
       "givenName": "Igor",
       "familyName": "Gasparic",
       "affiliation": "RBI Zagreb, HR10000 Zagreb, Croatia"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Pablo",
+      "familyName": "Gonz\u00e1lez-Rusell",
+      "email": "pablo.grusell@udc.es",
+      "affiliation": "CITENI, Industrial Campus of Ferrol, University of Coru\u00f1a, 15403 Ferrol, Spain",
+      "identifier": "https://orcid.org/0009-0007-2579-9479"
     },
     {
       "@type": "Person",
@@ -175,7 +192,8 @@
     {
       "@type": "Person",
       "givenName": "Eleonora",
-      "familyName": "Kudaibergenova"
+      "familyName": "Kudaibergenova",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -204,7 +222,8 @@
     {
       "@type": "Person",
       "givenName": "Bastian",
-      "familyName": "Loeher"
+      "familyName": "Loeher",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -214,13 +233,32 @@
     {
       "@type": "Person",
       "givenName": "Nikhil",
-      "familyName": "Mozumdar"
+      "familyName": "Mozumdar",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
     },
     {
       "@type": "Person",
       "givenName": "Valerii",
       "familyName": "Panin",
       "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Lukas",
+      "familyName": "Ponnath",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Fabio",
+      "familyName": "Risitano",
+      "affiliation": "INFN Laboratori Nazionali del Sud, 95123 Catania, Italy"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Luke",
+      "familyName": "Rose",
+      "affiliation": "School of Physics, Engineering and Technology, University of York, YO10 5DD York, United Kingdom"
     },
     {
       "@type": "Person",
@@ -237,7 +275,8 @@
     {
       "@type": "Person",
       "givenName": "Vadim",
-      "familyName": "Wagner"
+      "familyName": "Wagner",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -248,21 +287,14 @@
     {
       "@type": "Person",
       "givenName": "Matthew",
-      "familyName": "Whitehead"
+      "familyName": "Whitehead",
+      "affiliation": "School of Physics, Engineering and Technology, University of York, YO10 5DD York, United Kingdom"
     },
     {
       "@type": "Person",
       "givenName": "Manuel",
       "familyName": "Xarepe",
       "affiliation": "Faculty of Science of the University of Lisbon, 1749-016 Lisboa, Portugal"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Laurent",
-      "familyName": "Audouin",
-      "email": "laurent.audouin@ijclab.in2p3.fr",
-      "affiliation": "IPN Orsay, 91406 Orsay, France",
-      "identifier": "https://orcid.org/0000-0001-9899-6923"
     }
   ],
   "contributor": [
@@ -274,19 +306,15 @@
     },
     {
       "@type": "Person",
-      "givenName": "Laurent",
-      "familyName": "Audouin",
-      "affiliation": "IPN Orsay, 91406 Orsay, France"
-    },
-    {
-      "@type": "Person",
       "givenName": "Martin",
-      "familyName": "Bajzek"
+      "familyName": "Bajzek",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
       "givenName": "Konstanze",
-      "familyName": "Boretzky"
+      "familyName": "Boretzky",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -375,11 +403,6 @@
     },
     {
       "@type": "Person",
-      "givenName": "Lukas",
-      "familyName": "Ponnath"
-    },
-    {
-      "@type": "Person",
       "givenName": "Christine",
       "familyName": "Qi"
     },
@@ -387,11 +410,6 @@
       "@type": "Person",
       "givenName": "Alexey",
       "familyName": "Rybalchenko"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Luke",
-      "familyName": "Rose"
     },
     {
       "@type": "Person",
