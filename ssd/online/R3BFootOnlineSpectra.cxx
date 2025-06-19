@@ -158,7 +158,7 @@ InitStatus R3BFootOnlineSpectra::Init()
     mainfol->Add(mapfol);
 
     auto cMap = new TCanvas("FOOT_mapped", "mapped info", 10, 10, 500, 500);
-    cMap->Divide(4, 2);
+    cMap->Divide(4, fNbDet / 4);
     mapfol->Add(cMap);
 
     //================  Mapped data =====================
@@ -176,26 +176,24 @@ InitStatus R3BFootOnlineSpectra::Init()
         fh2_EnergyVsStrip[i]->GetYaxis()->SetTitleOffset(1.4);
         fh2_EnergyVsStrip[i]->GetXaxis()->CenterTitle(true);
         int foot_num = i + 1;
-        if (foot_num < 9)
+
+        cMap->cd(i_pad);
+        fh2_EnergyVsStrip[i]->Draw("col");
+        for (int i_asic = 1; i_asic < 10; i_asic++)
         {
-            cMap->cd(i_pad);
-            fh2_EnergyVsStrip[i]->Draw("col");
-            for (int i_asic = 1; i_asic < 10; i_asic++)
-            {
-                TLine* l = new TLine(64.5 * i_asic, fMinE, 64.5 * i_asic, fMaxE);
-                l->Draw("same");
-                l->SetLineStyle(7);
-                l->SetLineWidth(1);
-                l->SetLineColor(13);
-            }
-            i_pad++;
+            TLine* l = new TLine(64.5 * i_asic, fMinE, 64.5 * i_asic, fMaxE);
+            l->Draw("same");
+            l->SetLineStyle(7);
+            l->SetLineWidth(1);
+            l->SetLineColor(13);
         }
+        i_pad++;
     }
 
     //============ CAL data ==================
 
     auto cCal = new TCanvas("FOOT_cal", "cal info", 10, 10, 500, 500);
-    cCal->Divide(4, 2);
+    cCal->Divide(4, fNbDet / 4);
     calfol->Add(cCal);
 
     if (fCalItems)
@@ -213,27 +211,27 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh2_EnergyVsStrip_cal[i]->GetXaxis()->CenterTitle(true);
             fh2_EnergyVsStrip_cal[i]->GetYaxis()->CenterTitle(true);
             int foot_num = i + 1;
-            if (foot_num < 9)
+            // if (foot_num < 9)
+            //{
+            cCal->cd(i_pad);
+            fh2_EnergyVsStrip_cal[i]->Draw("col");
+            for (int i_asic = 1; i_asic < 10; i_asic++)
             {
-                cCal->cd(i_pad);
-                fh2_EnergyVsStrip_cal[i]->Draw("col");
-                for (int i_asic = 1; i_asic < 10; i_asic++)
-                {
-                    TLine* l = new TLine(64.5 * i_asic, fMinE, 64.5 * i_asic, fMaxE / 3.);
-                    l->Draw("same");
-                    l->SetLineStyle(7);
-                    l->SetLineWidth(1);
-                    l->SetLineColor(13);
-                }
-                i_pad++;
+                TLine* l = new TLine(64.5 * i_asic, fMinE, 64.5 * i_asic, fMaxE / 3.);
+                l->Draw("same");
+                l->SetLineStyle(7);
+                l->SetLineWidth(1);
+                l->SetLineColor(13);
             }
+            i_pad++;
+            //}
         }
     }
 
     //------------- SIGMA -------------------
 
     auto cSigma = new TCanvas("FOOT_sigma", "Sigma info", 10, 10, 500, 500);
-    cSigma->Divide(4, 2);
+    cSigma->Divide(4, fNbDet / 4);
     calfol->Add(cSigma);
 
     fh2_SigmaVsStrip.resize(fNbDet);
@@ -251,25 +249,25 @@ InitStatus R3BFootOnlineSpectra::Init()
         fh2_SigmaVsStrip[i]->GetYaxis()->CenterTitle(true);
 
         int foot_num = i + 1;
-        if (foot_num < 9)
+        // if (foot_num < 9)
+        //{
+        cSigma->cd(i_pad);
+        fh2_SigmaVsStrip[i]->Draw("col");
+        for (int i_asic = 1; i_asic < 10; i_asic++)
         {
-            cSigma->cd(i_pad);
-            fh2_SigmaVsStrip[i]->Draw("col");
-            for (int i_asic = 1; i_asic < 10; i_asic++)
-            {
-                TLine* l = new TLine(64.5 * i_asic, 0, 64.5 * i_asic, 15);
-                l->Draw("same");
-                l->SetLineStyle(7);
-                l->SetLineWidth(1);
-                l->SetLineColor(13);
-            }
-            i_pad++;
+            TLine* l = new TLine(64.5 * i_asic, 0, 64.5 * i_asic, 15);
+            l->Draw("same");
+            l->SetLineStyle(7);
+            l->SetLineWidth(1);
+            l->SetLineColor(13);
         }
+        i_pad++;
+        //}
     }
 
     //================ HIT data ==========================
 
-    int n = fNbDet / 2;
+    int n = fXNdx.size();
     int r = 2;
 
     R3BLOG_IF(fatal, n > 100, Form("Number of FOOT is too high. Are you sure you have %d FOOTs?", 2 * n));
@@ -278,52 +276,61 @@ InitStatus R3BFootOnlineSpectra::Init()
 
     // General canvas info (cluster position and energy)
     auto cHit = new TCanvas("FOOT_hit", "hit general info", 10, 10, 500, 500);
-    cHit->Divide(4, 4);
+    cHit->Divide(2 * fNbDet / 4, 4);
 
     // General canvas info (cluster position and energy)
     auto cHitMax = new TCanvas("FOOT_hitMax", "hit general info (max energy)", 10, 10, 500, 500);
-    cHitMax->Divide(4, 4);
+    cHitMax->Divide(2 * fNbDet / 4, 4);
 
     // Correlation position between detectors
     auto cHit_PosCorr = new TCanvas("FOOT_posCorr", "hit position correlation info", 10, 10, 500, 500);
-    cHit_PosCorr->Divide(2, 2);
+    cHit_PosCorr->Divide(fNbDet / 4, 2);
 
     // Eta
     auto cHit_Eta = new TCanvas("FOOT_eta", "hit eta plot info", 10, 10, 500, 500);
-    cHit_Eta->Divide(4, 2);
+    cHit_Eta->Divide(fNbDet / 2, 2);
 
     // Eta
     auto cHit_EtaMax = new TCanvas("FOOT_etaMax", "hit eta plot info (max energy)", 10, 10, 500, 500);
-    cHit_EtaMax->Divide(4, 2);
+    cHit_EtaMax->Divide(fNbDet / 2, 2);
 
     // Multiplicity and cluster size
     auto cHit_MultSize = new TCanvas("FOOT_mulSize", "hit multiplicity and size info", 10, 10, 500, 500);
-    cHit_MultSize->Divide(4, 4);
+    cHit_MultSize->Divide(2 * fNbDet / 4, 4);
 
     // Energy correlation
     auto cHit_EnergyCorr = new TCanvas("FOOT_energyCorr", "Energy correlation", 10, 10, 500, 500);
-    cHit_EnergyCorr->Divide(2, 2);
+    cHit_EnergyCorr->Divide(fNbDet / 4, 2);
 
     // Max energy correlation
     auto cHit_MaxEnergyCorr = new TCanvas("FOOT_maxEnergyCorr", "Max energy correlation", 10, 10, 500, 500);
-    cHit_MaxEnergyCorr->Divide(2, 2);
+    cHit_MaxEnergyCorr->Divide(fNbDet / 4, 2);
 
     // Eta
     auto cHit_Charge = new TCanvas("FOOT_charge", "charge info", 10, 10, 500, 500);
-    cHit_Charge->Divide(4, 2);
+    cHit_Charge->Divide(fNbDet / 4, 4);
 
     // position vs energy
     auto cHit_position_charge = new TCanvas("FOOT_position_charge", "charge info", 10, 10, 500, 500);
-    cHit_position_charge->Divide(4, 2);
+    cHit_position_charge->Divide(fNbDet / 4, 4);
 
     // Max pos correlation
     auto cHit_XYCorrMax = new TCanvas("FOOT_XYCorrMax", "Position correlation XY (max energy)", 10, 10, 500, 500);
-    cHit_XYCorrMax->Divide(2, 2);
+    cHit_XYCorrMax->Divide(fNbDet / 4, 2);
 
     // Max pos correlation
     auto cHit_SameCorrMax =
         new TCanvas("FOOT_SameCorrMax", "Position correlation XX and YY (max energy)", 10, 10, 500, 500);
-    cHit_SameCorrMax->Divide(4, 3);
+
+    // Different combinations depending on the setup
+    if (dim % 8 == 0)
+        cHit_SameCorrMax->Divide(dim / 4, 8);
+    else if (dim % 4 == 0)
+        cHit_SameCorrMax->Divide(dim / 2, 4);
+    else if (dim % 5 == 0)
+        cHit_SameCorrMax->Divide(dim / 5 * 2, 5);
+    else
+        cHit_SameCorrMax->Divide(dim, 2);
 
     hitfol->Add(cHit);
     hitfol->Add(cHitMax);
@@ -378,8 +385,6 @@ InitStatus R3BFootOnlineSpectra::Init()
             }
         }
 
-        // dim = fCorrNdxX.size() / 2;
-
         for (int i = 0; i < dim; i++)
         {
 
@@ -410,7 +415,7 @@ InitStatus R3BFootOnlineSpectra::Init()
             cHit_SameCorrMax->cd(i + 1);
             fh2_XX_max_corr[i]->Draw();
 
-            cHit_SameCorrMax->cd(i + 7);
+            cHit_SameCorrMax->cd(i + 1 + dim);
             fh2_YY_max_corr[i]->Draw();
         }
 
@@ -506,7 +511,7 @@ InitStatus R3BFootOnlineSpectra::Init()
             fh2_pos_charge[i]->GetXaxis()->CenterTitle(true);
             fh2_pos_charge[i]->GetYaxis()->CenterTitle(true);
 
-            if ((i % 2) == 0)
+            if ((i % 2) == 0 && (i / 2 + 1 <= fXNdx.size()))
             {
                 sprintf(Name1, "fh2_pos_corr_dets_%d_%d", fXNdx[i / 2] + 1, fYNdx[i / 2] + 1);
                 sprintf(Name2, "Cluster position correlation for FOOTs: %d and %d", fXNdx[i / 2] + 1, fYNdx[i / 2] + 1);
@@ -559,61 +564,56 @@ InitStatus R3BFootOnlineSpectra::Init()
             }
 
             int foot_num = i + 1;
-            if (foot_num < 9)
+
+            cHit->cd(i_pad_double);
+            fh1_ene[i]->Draw();
+            cHit->cd(i_pad_double + 1);
+            fh1_pos[i]->Draw();
+
+            cHitMax->cd(i_pad_double);
+            fh1_eneMax[i]->Draw();
+            cHitMax->cd(i_pad_double + 1);
+            fh1_posMax[i]->Draw();
+
+            if ((foot_num % 2) == 1 && (i / 2 + 1 <= fXNdx.size()))
             {
 
-                cHit->cd(i_pad_double);
-                fh1_ene[i]->Draw();
-                cHit->cd(i_pad_double + 1);
-                fh1_pos[i]->Draw();
+                cHit_PosCorr->cd(i_pad_corr);
+                fh2_foot_corr[i / 2]->Draw();
 
-                cHitMax->cd(i_pad_double);
-                fh1_eneMax[i]->Draw();
-                cHitMax->cd(i_pad_double + 1);
-                fh1_posMax[i]->Draw();
+                cHit_EnergyCorr->cd(i_pad_corr);
+                fh2_energy_corr[i / 2]->Draw();
 
-                if ((foot_num % 2) == 1)
-                {
-                    if (foot_num < 12) // do not change!
-                    {
-                        cHit_PosCorr->cd(i_pad_corr);
-                        fh2_foot_corr[i / 2]->Draw();
+                cHit_MaxEnergyCorr->cd(i_pad_corr);
+                fh2_energy_corr_max[i / 2]->Draw();
 
-                        cHit_EnergyCorr->cd(i_pad_corr);
-                        fh2_energy_corr[i / 2]->Draw();
+                cHit_XYCorrMax->cd(i_pad_corr);
+                fh2_XY_max_corr[i / 2]->Draw();
 
-                        cHit_MaxEnergyCorr->cd(i_pad_corr);
-                        fh2_energy_corr_max[i / 2]->Draw();
-
-                        cHit_XYCorrMax->cd(i_pad_corr);
-                        fh2_XY_max_corr[i / 2]->Draw();
-
-                        i_pad_corr++;
-                    }
-                }
-
-                cHit_Eta->cd(i_pad);
-                fh2_eta[i]->Draw();
-
-                cHit_EtaMax->cd(i_pad);
-                fh2_etaMax[i]->Draw();
-
-                cHit_Charge->cd(i_pad);
-                fh1_charge[i]->Draw();
-
-                cHit_MultSize->cd(i_pad_double);
-                fh1_size[i]->Draw();
-                cHit_MultSize->cd(i_pad_double + 1);
-                fh1_mult[i]->Draw();
-
-                cHit_position_charge->cd(i_pad);
-                fh2_pos_charge[i]->Draw();
-
-                i_pad_double++;
-                i_pad_double++;
-
-                i_pad++;
+                i_pad_corr++;
             }
+
+            cHit_Eta->cd(i_pad);
+            fh2_eta[i]->Draw();
+
+            cHit_EtaMax->cd(i_pad);
+            fh2_etaMax[i]->Draw();
+
+            cHit_Charge->cd(i_pad);
+            fh1_charge[i]->Draw();
+
+            cHit_MultSize->cd(i_pad_double);
+            fh1_size[i]->Draw();
+            cHit_MultSize->cd(i_pad_double + 1);
+            fh1_mult[i]->Draw();
+
+            cHit_position_charge->cd(i_pad);
+            fh2_pos_charge[i]->Draw();
+
+            i_pad_double++;
+            i_pad_double++;
+
+            i_pad++;
         }
     }
 
@@ -658,6 +658,7 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
     }
 
     // Hit data
+
     if (fHitItems)
     {
         for (Int_t i = 0; i < fNbDet; i++)
@@ -673,7 +674,7 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
             fh1_charge[i]->Reset();
             fh2_pos_charge[i]->Reset();
 
-            if ((i % 2) == 0)
+            if ((i % 2) == 0 && (i / 2 + 1 <= fXNdx.size()))
             {
                 fh2_foot_corr[i / 2]->Reset();
                 fh2_energy_corr[i / 2]->Reset();
@@ -688,6 +689,7 @@ void R3BFootOnlineSpectra::Reset_FOOT_Histo()
             fh2_YY_max_corr[i]->Reset();
         }
     }
+
     return;
 }
 
@@ -824,8 +826,9 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         }
     }
 
-    for (int i = 0; i < fNbDet / 2; i++)
+    for (int i = 0; i < fXNdx.size(); i++)
     {
+
         // Max energy
         if ((maxEnergy[fXNdx[i]] > 0) && (maxEnergy[fYNdx[i]] > 0))
         {
@@ -896,6 +899,7 @@ void R3BFootOnlineSpectra::FinishEvent()
     {
         fCalItems->Clear();
     }
+
     if (fHitItems)
     {
         fHitItems->Clear();
@@ -936,7 +940,7 @@ void R3BFootOnlineSpectra::FinishTask()
             fh2_etaMax[i]->Write();
             fh1_charge[i]->Write();
 
-            if ((i % 2) == 0)
+            if ((i % 2) == 0 && (i / 2 + 1 <= fXNdx.size()))
             {
                 fh2_foot_corr[i / 2]->Write();
                 fh2_energy_corr[i / 2]->Write();
@@ -951,6 +955,7 @@ void R3BFootOnlineSpectra::FinishTask()
             fh2_YY_max_corr[i]->Write();
         }
     }
+
     return;
 }
 
