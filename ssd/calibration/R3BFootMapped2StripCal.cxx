@@ -132,12 +132,13 @@ void R3BFootMapped2StripCal::SetParameter()
     }
     else
     {
-        R3BLOG(warn, "FineSigmas array not found, initializing with default value .0");
+        R3BLOG(warn,
+               "FineSigmas array not found, initializing with default value 20. Please, disregard the 10.000 entries!");
         for (Int_t d = 0; d < fNDets; d++)
         {
             for (Int_t i = 0; i < fNStrip; i++)
             {
-                fine_sigmas[d][i] = 0.;
+                fine_sigmas[d][i] = 20.;
                 fCal_Par->SetFineSigma(0., d * fNStrip + i);
             }
         }

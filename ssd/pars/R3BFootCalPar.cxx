@@ -109,11 +109,13 @@ Bool_t R3BFootCalPar::getParams(FairParamList* list)
         LOG(fatal) << "R3BFootCalPar::Could not initialize footStripCalPar";
         return kFALSE;
     }
+
     fFineSigmas->Set(fNumDets * fNumStrips);
 
     if (!(list->fill("footFineSigmas", fFineSigmas)))
     {
-        LOG(fatal) << "R3BFootCalPar::Could not initialize footFineSigmas";
+        LOG(warn)
+            << "R3BFootCalPar::Could not initialize footFineSigmas. This is ok if your experiment is older than g249.";
         return kFALSE;
     }
 

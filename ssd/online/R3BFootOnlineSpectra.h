@@ -155,7 +155,7 @@ class R3BFootOnlineSpectra : public FairTask
     // Number of posible combinations of correlations
     int dim = 6;
 
-    // Variables measured by each foot
+    // Variables measured by each foot (example of G-249 experiment)
     std::vector<int> fXNdx = { 0, 2, 5, 7 };
     std::vector<int> fYNdx = { 1, 3, 4, 6 };
 
