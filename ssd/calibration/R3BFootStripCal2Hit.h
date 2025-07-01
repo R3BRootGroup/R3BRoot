@@ -14,6 +14,7 @@
 // ---------------------------------------------------------------------
 // -----            R3BFootStripCal2Hit source file                -----
 // -----       Created 05/11/21 by J.L. Rodriguez-Sanchez          -----
+// -----       Modified 05/2025 by Pablo Gonzalez Rusell           -----
 // ---------------------------------------------------------------------
 
 #pragma once
@@ -88,18 +89,24 @@ class R3BFootStripCal2Hit : public FairTask
     std::vector<double> fAnglePhi;
     std::vector<double> fOffsetX;
     std::vector<double> fOffsetY;
-    std::vector<double> fCharCalPar;
     std::vector<TH1F*> hssd;
     TArrayF* HitCalParams = nullptr;
 
-    std::vector<int> ClusterMult;                 // Cluster multiplicity
-    std::vector<std::vector<double>> ClusterPos;  // Position of Cluster from Weighted Average
-    std::vector<std::vector<double>> Eta;         // Decimal part of the average position of the cluster
-    std::vector<std::vector<double>> ClusterESum; // Sum of Energies in the Cluster
-    // std::vector<std::vector<double>> Nu;       // Nu for Energy/Position correction
+    std::vector<int> ClusterMult;                           // Cluster multiplicity
+    std::vector<std::vector<double>> ClusterPos;            // Position of Cluster from Weighted Average
+    std::vector<std::vector<double>> Eta;                   // Decimal part of the average position of the cluster
+    std::vector<std::vector<double>> ClusterESum;           // Sum of Energies in the Cluster
     std::vector<std::vector<int>> ClusterNStrip;            // Number of Strips in Cluster
     std::vector<std::vector<std::vector<double>>> ClusterI; // Id Strip in Cluster
     std::vector<std::vector<std::vector<double>>> ClusterE; // Energy of Strip in Cluster
+
+    // Parameters for the eta correction and calibration
+    int fNumParsCal = 2;
+    int fNumParsEtaCorr = 5;
+    std::vector<int> fMultCharPar;
+    std::vector<std::vector<double>> fEtaCorrPar;
+    std::vector<std::vector<double>> fCharCalPar;
+    std::vector<std::vector<double>> fCharCalParSM;
 
     R3BFootMappingPar* fMap_Par = nullptr; // Parameter container with mapping
     R3BFootHitPar* fHit_Par = nullptr;     // Parameter container with hit params
