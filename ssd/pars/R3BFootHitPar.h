@@ -13,7 +13,7 @@
 
 // ------------------------------------------------------------------
 // -----                R3BFootHitPar source file               -----
-// -----         Created 17/05/25 by J.L. Rodriguez-Sanchez     -----
+// -----         Created 17/05/25 by Pablo González Rusell      -----
 // ------------------------------------------------------------------
 
 #pragma once
@@ -49,20 +49,35 @@ class R3BFootHitPar : public FairParGenericSet
     // Method to print values of parameters to the standard output
     void print() override;
 
-    // Accessor functions
+    // Getters
     [[nodiscard]] inline const int GetNumDets() const { return fNumDets; }
-    [[nodiscard]] inline const int GetNumParsFit() const { return fNumParsFit; }
-    inline void SetNumDets(int ndet) { fNumDets = ndet; }
-    TArrayF* GetCharCalParams() { return fCharCalPar; }
+    [[nodiscard]] inline const int GetNumParsFit() const { return fNumParsCal; }
+    [[nodiscard]] inline const int GetNumParsEtaCorr() const { return fNumParsEtaCorr; }
 
-    // Method for setting the calibration parameters
+    [[nodiscard]] inline const TArrayF* GetMultCharParams() { return fMultCharPar; }
+    [[nodiscard]] inline const TArrayF* GetCharCalParams() { return fCharCalPar; }
+    [[nodiscard]] inline const TArrayF* GetCharCalParamsSM() { return fCharCalParSM; }
+    [[nodiscard]] inline const TArrayF* GetEtaCorrParams() { return fEtaCorrPar; }
+
+    // Setters
+    inline void SetNumDets(int ndet) { fNumDets = ndet; }
+    inline void SetNumParsCal(int npar) { fNumParsCal = npar; }
+    inline void SetNumParsEtaCorr(int npar) { fNumParsEtaCorr = npar; }
+
     inline void SetCharCalPars(float value, int index) { fCharCalPar->AddAt(value, index); }
-    inline void SetNumParsFit(int npar) { fNumParsFit = npar; }
+    inline void SetCharCalParsSM(float value, int index) { fCharCalParSM->AddAt(value, index); }
+    inline void SetEtaCorrParams(float value, int index) { fEtaCorrPar->AddAt(value, index); }
+    inline void SetMultCharParams(float value, int index) { fMultCharPar->AddAt(value, index); }
 
   private:
-    int fNumDets = 8;     // Number of detectors
-    int fNumParsFit = 2;  // Number of parameters of for the calibration
-    TArrayF* fCharCalPar; // Parameters for the calibration charge vs energy
+    int fNumDets = 8;        // Number of detectors
+    int fNumParsCal = -1;    // Number of parameters of for the calibration
+    int fNumParsEtaCorr = 5; // Number of parameters for the eta correction
+
+    TArrayF* fMultCharPar;  // Number of charge states at every asic
+    TArrayF* fCharCalPar;   // Parameters for the calibration charge vs energy
+    TArrayF* fCharCalParSM; // Parameters for the calibration charge vs energy (single strip case)
+    TArrayF* fEtaCorrPar;   // Parameters for the eta correction
 
     const R3BFootHitPar& operator=(const R3BFootHitPar&);
     R3BFootHitPar(const R3BFootHitPar&);

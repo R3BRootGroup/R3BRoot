@@ -13,7 +13,7 @@
 
 // ------------------------------------------------------------------
 // -----                R3BFootHitPar source file               -----
-// -----         Created 17/05/25 by J.L. Rodriguez-Sanchez     -----
+// -----         Created 17/05/25 by Pablo González Rusell      -----
 // ------------------------------------------------------------------
 
 #include "R3BFootHitPar.h"
@@ -30,7 +30,10 @@ R3BFootHitPar::R3BFootHitPar(const char* name, const char* title, const char* co
     : FairParGenericSet(name, title, context)
 {
     detName = "FootHit";
-    fCharCalPar = new TArrayF(fNumDets * fNumParsFit);
+    fMultCharPar = new TArrayF(fNumDets * 10);
+    fCharCalPar = new TArrayF();
+    fCharCalParSM = new TArrayF();
+    fEtaCorrPar = new TArrayF();
 }
 
 // ----  Destructor ------------------------------------------------------------
@@ -38,6 +41,13 @@ R3BFootHitPar::~R3BFootHitPar()
 {
     this->clear(); // NOLINT
     delete fCharCalPar;
+    fCharCalPar = nullptr;
+    delete fCharCalParSM;
+    fCharCalParSM = nullptr;
+    delete fMultCharPar;
+    fMultCharPar = nullptr;
+    delete fEtaCorrPar;
+    fEtaCorrPar = nullptr;
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -57,14 +67,28 @@ void R3BFootHitPar::putParams(FairParamList* list)
         return;
     }
 
-    Int_t array_size = fNumDets;
-    LOG(info) << "Array Size: " << array_size;
+    // Get the size of the parameters
+    Int_t array_size = 0;
 
-    fCharCalPar->Set(array_size * fNumParsFit);
+    for (int i = 0; i < fMultCharPar->GetSize(); ++i)
+        array_size += static_cast<int>(fMultCharPar->At(i));
 
+    R3BLOG(info, Form("Number of active asics: %i", array_size));
+
+    // Create the charge and eta arrays
+    fCharCalPar->Set(array_size * fNumParsCal);
+    fCharCalParSM->Set(array_size * fNumParsCal);
+    fEtaCorrPar->Set(array_size * fNumParsEtaCorr);
+
+    // Save the values
     list->add("footDetNbPar", fNumDets);
+    list->add("footNumberCalPars", fNumParsCal);
+    list->add("footNumberEtaCorrPars", fNumParsEtaCorr);
+
     list->add("footCharCalPar", *fCharCalPar);
-    list->add("footNumberParsFit", fNumParsFit);
+    list->add("footCharCalParSM", *fCharCalParSM);
+    list->add("footEtaCorrPar", *fEtaCorrPar);
+    list->add("footMultCharPar", *fMultCharPar);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -83,18 +107,49 @@ Bool_t R3BFootHitPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
-    if (!list->fill("footNumberParsFit", &fNumParsFit))
+    if (!list->fill("footNumberCalPars", &fNumParsCal))
     {
-        LOG(fatal) << "R3BFootCalPar::Could not initialize footNumberParsFit";
+        R3BLOG(fatal, "R3BFootHitPar::Could not initialize footNumberCalPars");
         return kFALSE;
     }
 
-    Int_t array_size = fNumDets;
-    fCharCalPar->Set(array_size * fNumParsFit);
+    if (!list->fill("footNumberEtaCorrPars", &fNumParsEtaCorr))
+    {
+        R3BLOG(fatal, "R3BFootHitPar::Could not initialize footNumberEtaCorrPars");
+        return kFALSE;
+    }
+
+    if (!list->fill("footMultCharPar", fMultCharPar))
+    {
+        R3BLOG(fatal, "R3BFootHitPar::Could not initialize footMultCharPar");
+        return kFALSE;
+    }
+
+    Int_t array_size = 0;
+
+    for (int i = 0; i < fMultCharPar->GetSize(); ++i)
+        array_size += static_cast<int>(fMultCharPar->At(i));
+
+    fCharCalPar->Set(array_size * fNumParsCal);
+    fCharCalParSM->Set(array_size * fNumParsCal);
+    fEtaCorrPar->Set(array_size * fNumParsEtaCorr);
 
     if (!(list->fill("footCharCalPar", fCharCalPar)))
     {
-        LOG(fatal) << "R3BFootCalPar::Could not initialize footCharCalPar";
+        R3BLOG(fatal, "R3BFootHitPar::Could not initialize footCharCalPar");
+        return kFALSE;
+    }
+
+    // We assume that the calibration parameters are the same for all multiplicities
+    R3BLOG_IF(warn,
+              !(list->fill("footCharCalParSM", fCharCalParSM)),
+              "R3BFootHitPar::Could not initialize footCharCalParSM. Single multiplicity calibration will not be used");
+
+    list->fill("footCharCalPar", fCharCalParSM);
+
+    if (!(list->fill("footEtaCorrPar", fEtaCorrPar)))
+    {
+        R3BLOG(fatal, "R3BFootHitPar::Could not initialize footEtaCorrPar");
         return kFALSE;
     }
 
@@ -105,16 +160,8 @@ Bool_t R3BFootHitPar::getParams(FairParamList* list)
 void R3BFootHitPar::print()
 {
     R3BLOG(info, "Foot Hit Parameters");
-
-    for (Int_t d = 0; d < fNumDets; d++)
-    {
-        R3BLOG(info, "Foot detector number: " << d + 1);
-
-        for (Int_t j = 0; j < fNumParsFit; j++)
-        {
-            LOG(info) << "FitParam(" << j + 1 << ") = " << fCharCalPar->GetAt(d * fNumParsFit + j);
-        }
-    }
+    R3BLOG(info, Form("Number of calibration parameters: %i", fNumParsCal));
+    R3BLOG(info, Form("Number of eta correction parameters: %i", fNumParsEtaCorr));
 }
 
 ClassImp(R3BFootHitPar)
