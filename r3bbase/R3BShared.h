@@ -215,4 +215,17 @@ namespace R3B
         std::sort(filelist.begin(), filelist.end());
         return filelist;
     }
+
+    // batch clear and resize for STL containers
+    template <typename... Containers>
+    inline void ClearAll(Containers&... containers)
+    {
+        (containers.clear(), ...);
+    }
+
+    template <typename... Containers>
+    inline void ResizeAll(std::size_t n, Containers&... containers)
+    {
+        (containers.resize(n), ...);
+    }
 } // namespace R3B
