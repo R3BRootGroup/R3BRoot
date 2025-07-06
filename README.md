@@ -56,10 +56,12 @@ First, you will need to install FairSoft and FairRoot. For more details:
 export SIMPATH=%PATH_TO_FAIRSOFT%
 export FAIRROOTPATH=%PATH_TO_FAIRROOT%
 # from %R3BRoot_DIRECTORY%
-mkdir build
-cmake -S . -B ./build
-cmake --build ./build -- -j${number_of_threads}
-source build/config.sh
+./build_thisr3broot.sh
+# or a second option is the following
+mkdir ../build
+cmake -S . -B ../build
+cmake --build ../build -j${number_of_threads}
+source ../build/config.sh
 ~~~
 
 For the building with Conan package manager, see [this instruction](doc/conan_usage.md).
@@ -86,6 +88,20 @@ The R3BRoot project uses clang-format-15 to ensure a common code formatting. The
 ~~~bash
 source util/clang-format-all.sh
 ~~~
+
+## Tested systems
+
+The following systems are tested regularly.
+
+| **OS Name** | **Arch** | **OS Version** | **Compiler** | **CMake** |
+| --- | --- | --- | --- | --- |
+| Almalinux  | x86_64 | 9.3   | GCC 11.4.1                 | 3.27.9 |
+| Almalinux  | x86_64 | 9.4   | GCC 14.2.0                 | 3.30.6 |
+|   RHEL     | x86_64 | 9.6   | GCC 14.2.0                 | 3.30.6 |
+| Debian     | x86_64 | 10    | GCC 8.3.0                  | 3.27.4 |
+| Debian     | x86_64 | 11    | GCC 10.2.1                 | 3.27.4 |
+| Debian     | x86_64 | 12    | GCC 12.2.0                 | 3.27.4 |
+| Ubuntu     | x86_64 | 24.04 | GCC 13.3.0                 | 3.28.3 |
 
 ## Security Policy
 
