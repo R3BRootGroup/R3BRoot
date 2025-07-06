@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2023 Members of R3B Collaboration                          #
+#   Copyright (C) 2023-2025 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -18,7 +18,8 @@ source ${SIMPATH}/bin/geant4.sh
 source ${SIMPATH}/bin/thisroot.sh
 
 mkdir -p -v ../build
-cd ../build
-cmake ../R3BRoot -DUSE_DIFFERENT_COMPILER=TRUE
-source config.sh
-make -j8
+cmake -S ./ -B ../build -DBUILD_GEOMETRY=OFF
+source ../build/config.sh
+cmake -S ./ -B ../build -DBUILD_GEOMETRY=ON
+cmake --build ../build -j9
+
