@@ -5,18 +5,40 @@
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
 #include "R3BNeulandApp.h"
-#include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandDigitizer.h"
 #include "R3BNeulandJsonHeader.h"
 #include "R3BNeulandSimApp.h"
 #include <R3BROOTTypeJson.h> //NOLINT
 #include <fmt/core.h>
+#include <fmt/ranges.h>
 #include <magic_enum/magic_enum.hpp>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
+#include <string_view>
 
 using json = nlohmann::ordered_json;
+
+namespace
+{
+    template <typename EnumType>
+    void set_enum_from_string(EnumType& enum_obj, const json& json_obj, std::string_view name)
+    {
+        auto enum_str = std::string{};
+        json_obj.at(name.data()).get_to(enum_str);
+        auto enum_val = magic_enum::enum_cast<EnumType>(enum_str, magic_enum::case_insensitive);
+        if (enum_val.has_value())
+        {
+            enum_obj = enum_val.value();
+            return;
+        }
+        constexpr auto enum_all_names = magic_enum::enum_names<EnumType>();
+        throw R3B::logic_error(fmt::format("{:?} cannot be parsed to its enum class! Available options: {}",
+                                           enum_str,
+                                           fmt::join(enum_all_names, ", ")));
+    }
+
+} // namespace
 
 namespace R3B::Digitizing::Neuland::Tamex
 {
@@ -106,8 +128,10 @@ namespace R3B::Neuland
     void to_json(nlohmann::ordered_json& json_obj, const CLIApplication::Options::Input& option)
     {
         json_obj = nlohmann::ordered_json{
-            { "working-dir", option.working_dir }, { "data", option.data },        { "tree-data", option.tree_data },
-            { "first-par", option.par },           { "second-par", option.par_2 },
+            { "working-dir", option.working_dir },
+            { "data", option.data },
+            { "tree-data", option.tree_data },
+            { "first-par", option.par },
         };
     }
 
@@ -118,7 +142,6 @@ namespace R3B::Neuland
         json_obj.at("data").get_to(option.data);
         json_obj.at("tree-data").get_to(option.tree_data);
         json_obj.at("first-par").get_to(option.par);
-        json_obj.at("second-par").get_to(option.par_2);
     }
 
     template <>
@@ -128,6 +151,7 @@ namespace R3B::Neuland
             { "working-dir", option.working_dir },
             { "data", option.data },
             { "par", option.par },
+            { "mode", option.mode },
         };
     }
 
@@ -137,59 +161,11 @@ namespace R3B::Neuland
         json_obj.at("working-dir").get_to(option.working_dir);
         json_obj.at("data").get_to(option.data);
         json_obj.at("par").get_to(option.par);
+        json_obj.at("mode").get_to(option.mode);
     }
 
     // =============================================================================================
-    // Anaysis options:
-    template <>
-    void to_json(json& json_obj, const AnalysisApplication::Options& option)
-    {
-        json_obj = json{ { "general", option.general }, { "tasks", option.tasks } };
-    }
-
-    template <>
-    void from_json(const json& json_obj, AnalysisApplication::Options& option)
-    {
-        json_obj.at("general").get_to(option.general);
-        json_obj.at("tasks").get_to(option.tasks);
-    }
-
-    template <>
-    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks& option)
-    {
-        json_obj = json{
-            { option.digi.name, option.digi },
-            { option.sim_cal_to_cal.name, option.sim_cal_to_cal },
-            { option.hit_monitor.name, option.hit_monitor },
-            { option.prim_inter_finder.name, option.prim_inter_finder },
-            { option.cluster_finder.name, option.cluster_finder },
-            { option.prim_cluster_finder.name, option.prim_cluster_finder },
-            { option.multi_calorimeter_train.name, option.multi_calorimeter_train },
-            { option.multi_bayes_train.name, option.multi_bayes_train },
-            { option.multi_bayes.name, option.multi_bayes },
-            { option.neutron_r_value.name, option.neutron_r_value },
-            { option.cal_to_hit_par_task.name, option.cal_to_hit_par_task },
-        };
-    }
-
-    template <>
-    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks& option)
-    {
-        json_obj.at(option.digi.name).get_to(option.digi);
-        json_obj.at(option.hit_monitor.name).get_to(option.hit_monitor);
-        json_obj.at(option.prim_inter_finder.name).get_to(option.prim_inter_finder);
-        json_obj.at(option.cluster_finder.name).get_to(option.cluster_finder);
-        json_obj.at(option.prim_cluster_finder.name).get_to(option.prim_cluster_finder);
-        json_obj.at(option.multi_calorimeter_train.name).get_to(option.multi_calorimeter_train);
-        json_obj.at(option.multi_bayes_train.name).get_to(option.multi_bayes_train);
-        json_obj.at(option.multi_bayes.name).get_to(option.multi_bayes);
-        json_obj.at(option.neutron_r_value.name).get_to(option.neutron_r_value);
-        json_obj.at(option.sim_cal_to_cal.name).get_to(option.sim_cal_to_cal);
-        json_obj.at(option.cal_to_hit_par_task.name).get_to(option.cal_to_hit_par_task);
-    }
-
-    // =============================================================================================
-    // tasks specialization:
+    // Analysis tasks specialization:
     template <>
     void to_json(json& json_obj, const R3B::Neuland::DigiTaskOptions& option)
     {
@@ -221,22 +197,7 @@ namespace R3B::Neuland
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
         json_obj.at("point-filter").get_to(option.point_filter);
-
-        // parse enum string
-        auto enum_name = std::string{};
-        json_obj.at("pileup-strategy").get_to(enum_name);
-        auto enum_val = magic_enum::enum_cast<Digitizing::Neuland::Tamex::PeakPileUpStrategy>(
-            enum_name, magic_enum::case_insensitive);
-        if (enum_val.has_value())
-        {
-            option.pileup_strategy = enum_val.value();
-        }
-        else
-        {
-            throw R3B::logic_error(fmt::format("Cannot parse the enum string {:?} to PeakPileUpStrategy enum class. "
-                                               "Please check if the enum string is correct!",
-                                               enum_name));
-        }
+        set_enum_from_string(option.pileup_strategy, json_obj, "pileup-strategy");
     }
 
     template <>
@@ -295,6 +256,7 @@ namespace R3B::Neuland
         json_obj = json{
             { "enable", option.enable },
             { "min-stat", option.min_stat },
+            { "mode", magic_enum::enum_name(option.mode) },
             { "method", magic_enum::enum_name(option.method) },
             { "read", option.read },
             { "write", option.write },
@@ -308,21 +270,127 @@ namespace R3B::Neuland
         json_obj.at("min-stat").get_to(option.min_stat);
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
-
-        auto method_str = std::string{};
-        json_obj.at("method").get_to(method_str);
-
-        auto enum_val = magic_enum::enum_cast<Cal2HitParMethod>(method_str, magic_enum::case_insensitive);
-        if (enum_val.has_value())
-        {
-            option.method = enum_val.value();
-        }
-        else
-        {
-            throw R3B::logic_error(fmt::format("{} cannot be parsed to the enum class Cal2HitParMethod!", method_str));
-        }
+        set_enum_from_string(option.method, json_obj, "method");
+        set_enum_from_string(option.mode, json_obj, "mode");
     }
 
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Map2CalParTask& option)
+    {
+        json_obj = json{
+            { "enable", option.enable },
+            { "has-trig-enabled", option.has_trig_enabled },
+            { "error-method", magic_enum::enum_name(option.error_method) },
+            { "read", option.read },
+            { "write", option.write },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::Map2CalParTask& option)
+    {
+        json_obj.at("enable").get_to(option.enable);
+        json_obj.at("has-trig-enabled").get_to(option.has_trig_enabled);
+        set_enum_from_string(option.error_method, json_obj, "error-method");
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+    }
+
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::MapDataConverterTask& option)
+    {
+        json_obj = json{
+            { "enable", option.enable },
+            { "read", option.read },
+            { "write", option.write },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::MapDataConverterTask& option)
+    {
+        json_obj.at("enable").get_to(option.enable);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+    }
+
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Map2CalTask& option)
+    {
+        json_obj = json{
+            { "enable", option.enable },
+            { "enable-pulse-mode", option.enable_pulse_mode },
+            { "enable-walk-effect", option.enable_walk_effect },
+            { "min-stat", option.min_stat },
+            { "read", option.read },
+            { "write", option.write },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::Map2CalTask& option)
+    {
+        json_obj.at("enable").get_to(option.enable);
+        json_obj.at("enable-pulse-mode").get_to(option.enable_pulse_mode);
+        json_obj.at("enable-walk-effect").get_to(option.enable_walk_effect);
+        json_obj.at("min-stat").get_to(option.min_stat);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+    }
+    // =============================================================================================
+    // Anaysis general options:
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks& option)
+    {
+        json_obj = json{
+            { option.digi.name, option.digi },
+            { option.sim_cal_to_cal.name, option.sim_cal_to_cal },
+            { option.hit_monitor.name, option.hit_monitor },
+            { option.prim_inter_finder.name, option.prim_inter_finder },
+            { option.cluster_finder.name, option.cluster_finder },
+            { option.prim_cluster_finder.name, option.prim_cluster_finder },
+            { option.multi_calorimeter_train.name, option.multi_calorimeter_train },
+            { option.multi_bayes_train.name, option.multi_bayes_train },
+            { option.multi_bayes.name, option.multi_bayes },
+            { option.neutron_r_value.name, option.neutron_r_value },
+            { option.map_to_cal_par_task.name, option.map_to_cal_par_task },
+            { option.map_data_converter_task.name, option.map_data_converter_task },
+            { option.map_to_cal_task.name, option.map_to_cal_task },
+            { option.cal_to_hit_par_task.name, option.cal_to_hit_par_task },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks& option)
+    {
+        json_obj.at(option.digi.name).get_to(option.digi);
+        json_obj.at(option.hit_monitor.name).get_to(option.hit_monitor);
+        json_obj.at(option.prim_inter_finder.name).get_to(option.prim_inter_finder);
+        json_obj.at(option.cluster_finder.name).get_to(option.cluster_finder);
+        json_obj.at(option.prim_cluster_finder.name).get_to(option.prim_cluster_finder);
+        json_obj.at(option.multi_calorimeter_train.name).get_to(option.multi_calorimeter_train);
+        json_obj.at(option.multi_bayes_train.name).get_to(option.multi_bayes_train);
+        json_obj.at(option.multi_bayes.name).get_to(option.multi_bayes);
+        json_obj.at(option.neutron_r_value.name).get_to(option.neutron_r_value);
+        json_obj.at(option.sim_cal_to_cal.name).get_to(option.sim_cal_to_cal);
+        json_obj.at(option.map_to_cal_par_task.name).get_to(option.map_to_cal_par_task);
+        json_obj.at(option.map_data_converter_task.name).get_to(option.map_data_converter_task);
+        json_obj.at(option.map_to_cal_task.name).get_to(option.map_to_cal_task);
+        json_obj.at(option.cal_to_hit_par_task.name).get_to(option.cal_to_hit_par_task);
+    }
+
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options& option)
+    {
+        json_obj = json{ { "general", option.general }, { "tasks", option.tasks } };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options& option)
+    {
+        json_obj.at("general").get_to(option.general);
+        json_obj.at("tasks").get_to(option.tasks);
+    }
     // =============================================================================================
     // Simuation options:
     template <>

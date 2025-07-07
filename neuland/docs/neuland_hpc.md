@@ -29,7 +29,7 @@ Here are the steps to run the NeuLAND cli application in HPC clusters:
    Then pull the image to your current folder:
 
    ```shell
-   apptainer pull -F neuland library://yanzhaow/r3bdev/neuland:latest
+   apptainer pull -F neuland library://yanzhao/r3bdev/neuland:latest
    ```
 
    This could take few minutes if you have a slow internet. See [this section below](#NeulandApptainer) for more details about Apptainer images.
@@ -85,16 +85,16 @@ The build processes of the NeuLAND Apptainer image can be summarized in the foll
 
 1. Build the docker image `yanzhaowang/r3bdev:fedora41`, containing the compiler and `FairSoft`, using the [Fedora 41 base image](https://hub.docker.com/_/fedora/tags). The build script (i.e. `Dockerfile`) can be found [here](https://github.com/YanzhaoW/Dockerfiles/blob/master/r3bdev/fedora41/Dockerfile).
 2. Build the docker image `yanzhaowang/r3bdev:r3broot`, which contains the `dev` version of `FairRoot` and the `edwin_dev` version of `R3BRoot`, using the previous `r3bdev:fedora41` as the base image. Its build script can be found in this [webpage](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/util/container/Dockerfile).
-3. Build the Apptainer image `yanzhaow/r3bdev/neuland:latest`, which specifies the execution script of the image, using the previous docker image `r3bdev:r3broot` as the base image. The Apptainer build script can be found from the file, [neuland.def](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/util/container/neuland.def).
+3. Build the Apptainer image `yanzhao/r3bdev/neuland:latest`, which specifies the execution script of the image, using the previous docker image `r3bdev:r3broot` as the base image. The Apptainer build script can be found from the file, [neuland.def](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/util/container/neuland.def).
 
-The step 2 and 3 are _automatically done_ by the [this CI/CD workflow](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/.github/workflows/container_deploy.yml) whenever a new commit is pushed to `edwin_dev` branch. Both the docker images, `r3bdev:fedora` and `r3bdev:r3broot`, can be found in [this dockerhub repo](https://hub.docker.com/r/yanzhaowang/r3bdev/tags) and the Apptainer image can be found in [this sylabs repo](https://cloud.sylabs.io/library/yanzhaow/r3bdev/neuland).
+The step 2 and 3 are _automatically done_ by the [this CI/CD workflow](https://github.com/YanzhaoW/R3BRoot/blob/edwin_dev/.github/workflows/container_deploy.yml) whenever a new commit is pushed to `edwin_dev` branch. Both the docker images, `r3bdev:fedora` and `r3bdev:r3broot`, can be found in [this dockerhub repo](https://hub.docker.com/r/yanzhaowang/r3bdev/tags) and the Apptainer image can be found in [this sylabs repo](https://cloud.sylabs.io/library/yanzhao/r3bdev/neuland).
 
 ### Testing the validity of the image
 
 To test whether the image still works, first download the image if not yet done:
 
 ```shell
-apptainer pull -F neuland library://yanzhaow/r3bdev/neuland:latest
+apptainer pull -F neuland library://yanzhao/r3bdev/neuland:latest
 ```
 
 then run a simple simulation like:

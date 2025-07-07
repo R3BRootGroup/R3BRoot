@@ -34,11 +34,11 @@ namespace R3B::Neuland
     {
       public:
         BarCalData() = default;
-        explicit BarCalData(unsigned int mod_num)
+        explicit BarCalData(int mod_num)
             : module_num{ mod_num }
         {
         }
-        unsigned int module_num = 0; // 1 based bar num
+        int module_num = 0; // 1 based bar num
         std::vector<CalDataSignal> left;
         std::vector<CalDataSignal> right;
         ClassDefNV(BarCalData, 1)

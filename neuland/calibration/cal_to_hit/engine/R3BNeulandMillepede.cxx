@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 #include "R3BNeulandMillepede.h"
+#include "Mille.h"
 #include "ParResultReader.h"
 #include "R3BDataMonitor.h"
-#include "R3BLogger.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandMilleCalDataProcessor.h"
@@ -28,6 +28,8 @@
 #include <algorithm>
 #include <array>
 #include <cstdlib>
+#include <fairlogger/Logger.h>
+#include <filesystem>
 #include <fmt/core.h>
 #include <iterator>
 #include <memory>
@@ -42,6 +44,7 @@
 #include <range/v3/view/transform.hpp>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -81,26 +84,42 @@ namespace R3B::Neuland::Calibration
 {
     void MillepedeEngine::Init()
     {
+        set_working_dir();
+        fs::create_directories(fs::path(working_dir_));
         cal_to_hit_par_ = GetTask()->GetCal2HitPar();
 
-        par_result_.set_filename(DEFAULT_RES_FILENAME);
+        par_result_.set_filename((fs::path(working_dir_) / DEFAULT_RES_FILENAME).string());
         pede_launcher_.set_steer_filename(pede_steer_filename_);
         pede_launcher_.set_parameter_filename(parameter_filename_);
         if (const auto* r3b_dir = std::getenv("R3BROOTPATH"); r3b_dir != nullptr)
         {
             pede_launcher_.set_binary_dir(fmt::format("{}/bin", r3b_dir));
+            // TODO: make subdir configurable
+            pede_launcher_.set_working_dir(fs::absolute(fs::path{ working_dir_ }).string());
         }
         else
         {
             throw R3B::runtime_error(
                 "Environment variable R3BROOTPATH is not defined! Did you forget to source the \"config.sh\" file?");
         }
-        binary_data_writer_.set_buffer_size(MILLE_BUFFER_SIZE);
+        binary_data_writer_ = std::make_unique<Mille>((fs::path{ working_dir_ } / input_data_filename_).string());
+        binary_data_writer_->set_buffer_size(MILLE_BUFFER_SIZE);
         data_preprocessor_ = std::make_unique<MilleDataProcessor>(GetModuleSize());
         data_preprocessor_->set_p_value_cut(p_value_cut_);
 
         init_steer_writer();
         init_parameter();
+    }
+
+    void MillepedeEngine::set_working_dir()
+    {
+        auto filename = FairRun::Instance()->GetSink()->GetFileName();
+        auto output_dir_str = filename.View();
+        auto output_path = fs::path{ output_dir_str };
+        auto output_dir = output_path.parent_path();
+        auto output_filename = output_path.filename();
+        working_dir_ = (output_dir / DEFAULT_SUB_DIR / output_filename);
+        LOGP(debug, "Working dir has set to be: {}", working_dir_);
     }
 
     // output: module_num & global label
@@ -213,7 +232,7 @@ namespace R3B::Neuland::Calibration
                                                      });
             auto sum = rng::accumulate(t_sum_view, 0.F);
             average_t_sum_ = sum / static_cast<float>(rng::distance(t_sum_view.begin(), t_sum_view.end()));
-            R3BLOG(info, fmt::format("Average t_sum is calculated to be {}", average_t_sum_.value()));
+            LOGP(info, "Average t_sum is calculated to be {}", average_t_sum_.value());
         }
         return true;
     }
@@ -342,10 +361,10 @@ namespace R3B::Neuland::Calibration
         //         "c_value_2.append({})\na_value_2.append({})\nb_value_2.append({})", c_val, pos_z / SCALE_FACTOR, 1.);
         // }
         write_to_buffer();
-        R3BLOG(
-            debug,
-            fmt::format(
-                "Writting Mille data to binary file with meas = {} and z = {}", input_data_buffer_.measurement, pos_z));
+        LOGP(debug,
+             "Writting Mille data to binary file with meas = {} and z = {}",
+             input_data_buffer_.measurement,
+             pos_z);
     }
 
     auto MillepedeEngine::select_t_diff_signal(const std::vector<MilleCalData>& plane_data)
@@ -412,8 +431,8 @@ namespace R3B::Neuland::Calibration
 
     void MillepedeEngine::Calibrate(Cal2HitPar& hit_par)
     {
-        binary_data_writer_.close();
-        R3BLOG(info, "Launching pede algorithm..");
+        binary_data_writer_->close();
+        LOGP(info, "Launching pede algorithm..");
         pede_launcher_.launch();
         pede_launcher_.end();
 
@@ -439,7 +458,7 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::EndOfEvent(unsigned int /*event_num*/)
     {
         // TODO: could be an empty event
-        binary_data_writer_.end();
+        binary_data_writer_->end();
         data_preprocessor_->reset();
     }
 
@@ -471,7 +490,7 @@ namespace R3B::Neuland::Calibration
         input_data_buffer_.sigma = 0.F;
     }
 
-    void MillepedeEngine::write_to_buffer() { binary_data_writer_.mille(input_data_buffer_); }
+    void MillepedeEngine::write_to_buffer() { binary_data_writer_->mille(input_data_buffer_); }
 
     void MillepedeEngine::EndOfTask()
     {
@@ -490,6 +509,7 @@ namespace R3B::Neuland::Calibration
     void MillepedeEngine::init_steer_writer()
     {
         auto steer_writer = SteerWriter{};
+        steer_writer.set_working_dir(working_dir_);
         steer_writer.set_filepath(pede_steer_filename_);
         steer_writer.set_parameter_file(parameter_filename_);
         steer_writer.set_data_filepath(input_data_filename_);

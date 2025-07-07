@@ -84,6 +84,7 @@ class HitParReader:
 
     def _construct_empty_dict(self, hit_par):
         num_of_modules = hit_par.GetNumOfModules()
+        print(f"Number of modules: {num_of_modules}")
         self._par_dict["bar_id"] = np.zeros(num_of_modules)
         for par_name in self._par_name_list:
             dicts = dir(getattr(ROOT.R3B.Neuland.HitModulePar(), par_name))
@@ -113,12 +114,16 @@ class HitParReader:
                 dicts = dir(getattr(ROOT.R3B.Neuland.HitModulePar(), par_name))
                 if "left" in dicts:
                     for side in ["left", "right"]:
-                        self._par_dict[f"{par_name}.{side}.value"][bar_id] = getattr(
-                            getattr(module_par, par_name), side
-                        )().value
-                        self._par_dict[f"{par_name}.{side}.error"][bar_id] = getattr(
-                            getattr(module_par, par_name), side
-                        )().error
+                        self._par_dict[f"{par_name}.{side}.value"][bar_id] = (
+                            getattr(
+                                getattr(module_par, par_name), side
+                            )().value
+                        )
+                        self._par_dict[f"{par_name}.{side}.error"][bar_id] = (
+                            getattr(
+                                getattr(module_par, par_name), side
+                            )().error
+                        )
                 else:
                     self._par_dict[f"{par_name}.value"][bar_id] = getattr(
                         module_par, par_name

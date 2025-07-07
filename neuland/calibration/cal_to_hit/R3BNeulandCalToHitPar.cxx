@@ -39,7 +39,7 @@ namespace
 
 namespace R3B::Neuland
 {
-    Cal2HitPar::Cal2HitPar(std::string_view name, std::string_view title, std::string_view context, Bool_t own)
+    Cal2HitPar::Cal2HitPar(std::string_view name, std::string_view title, std::string_view context, bool own)
         : ParSet(name, title, context, own)
     {
     }

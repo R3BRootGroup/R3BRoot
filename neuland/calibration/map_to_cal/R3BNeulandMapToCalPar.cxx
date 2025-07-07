@@ -14,9 +14,9 @@ namespace R3B
     {
     }
 
-    void Map2CalPar::AddModuleParam(unsigned int module_num, TCalVFTXModulePar modulePar)
+    void Map2CalPar::AddModuleParam(int module_num, TCalVFTXModulePar modulePar)
     {
-        moduleParams_.emplace(module_num, std::move(modulePar));
+        module_params_.emplace(module_num, std::move(modulePar));
     }
 
     auto TCalVFTXModulePar::GetFineTime(FTType ftType, uint channel_num) const -> ValueError<double>

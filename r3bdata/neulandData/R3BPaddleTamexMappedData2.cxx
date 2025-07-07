@@ -23,21 +23,16 @@ namespace R3B
         push_back(side, signal);
     }
 
-    PaddleTamexMappedData::PaddleTamexMappedData(int pID)
-        : plane_num{ pID }
+    void PaddleTamexMappedData::push_back(R3B::Side side, int bar_num, const R3B::DoubleEdgeSignal& signal)
     {
-    }
-
-    void PaddleTamexMappedData::push_back(R3B::Side side, int barID, const R3B::DoubleEdgeSignal& signal)
-    {
-        if (auto barIter = bars.find(barID); barIter != bars.end())
+        if (auto barIter = bars.find(bar_num); barIter != bars.end())
         {
             auto& [_, bar] = *barIter;
             bar.push_back(side, signal);
         }
         else
         {
-            bars.insert(std::make_pair(barID, R3B::MapBarSignal{ side, signal }));
+            bars.insert(std::make_pair(bar_num, R3B::MapBarSignal{ side, signal }));
         }
     }
 } // namespace R3B

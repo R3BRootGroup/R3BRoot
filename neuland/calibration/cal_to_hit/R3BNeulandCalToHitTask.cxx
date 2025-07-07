@@ -22,11 +22,11 @@
 #include "R3BValueError.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
-#include <R3BLogger.h>
 #include <R3BNeulandSignalMatcher.h>
 #include <R3BShared.h>
 #include <TVector3.h>
 #include <cmath>
+#include <fairlogger/Logger.h>
 #include <fmt/core.h>
 #include <string_view>
 #include <vector>
@@ -47,18 +47,16 @@ namespace
     {
         const auto plane_id = ::R3B::Neuland::ModuleID2PlaneID(static_cast<int>(par.module_num - 1));
         const auto bar_num = par.module_num % ::R3B::Neuland::BarsPerPlane;
-        R3BLOG(debug2,
-               fmt::format("Calculating position with left tdc: {}, right tdc {}, effective speed: {}, tdc_diff: {}",
-                           tdc_left,
-                           tdc_right,
-                           par.effective_speed,
-                           tdc_right - tdc_left));
+        LOGP(debug2,
+             "Calculating position with left tdc: {}, right tdc {}, effective speed: {}, tdc_diff: {}",
+             tdc_left,
+             tdc_right,
+             par.effective_speed,
+             tdc_right - tdc_left);
         const auto pos_along_bar = par.effective_speed.value * (tdc_right - tdc_left);
         const auto pos_perp_bar = (bar_num - 0.5 - ::R3B::Neuland::BarsPerPlane * 0.5) * ::R3B::Neuland::BarSize_XY;
         const auto pos_z = (plane_id + 0.5) * ::R3B::Neuland::BarSize_Z;
-        R3BLOG(debug2,
-               fmt::format(
-                   "pos along the bar: {} cm, pos perp to bar {} cm, z: {} cm", pos_along_bar, pos_perp_bar, pos_z));
+        LOGP(debug2, "pos along the bar: {} cm, pos perp to bar {} cm, z: {} cm", pos_along_bar, pos_perp_bar, pos_z);
 
         auto is_horizontal = ::R3B::Neuland::IsPlaneIDHorizontal(plane_id);
         return is_horizontal ? TVector3{ pos_along_bar, pos_perp_bar, pos_z }
@@ -80,8 +78,13 @@ namespace
 namespace R3B::Neuland
 {
 
-    Cal2HitTask::Cal2HitTask(std::string_view name, int iVerbose)
-        : CalibrationTask(name, iVerbose)
+    Cal2HitTask::Cal2HitTask(std::string_view input_cal_data_name,
+                             std::string_view output_hit_data_name,
+                             std::string_view input_cal_2_hit_par_name)
+        : CalibrationTask("R3BNeulandCal2Hit", 1)
+        , cal_data_{ input_cal_data_name }
+        , hit_data_{ output_hit_data_name }
+        , cal_to_hit_par_{ input_cal_2_hit_par_name }
     {
     }
 
@@ -89,6 +92,7 @@ namespace R3B::Neuland
 
     void Cal2HitTask::ExtraInit(FairRootManager* /*rootMan*/)
     {
+        cal_to_hit_par_.init(this);
         cal_data_.init();
         hit_data_.init(not IsHistDisabled());
     }
@@ -104,7 +108,7 @@ namespace R3B::Neuland
             temp_left_signals_.clear();
             temp_right_signals_.clear();
 
-            R3BLOG(debug1, fmt::format("Input calBar: {}", calBar));
+            LOGP(debug1, "Input calBar: {}", calBar);
             if (calBar.module_num == 0)
             {
                 throw R3B::runtime_error("cal-level bar signal has invalid moudule number 0!");
@@ -137,10 +141,10 @@ namespace R3B::Neuland
     {
         auto hit = R3BNeulandHit{};
 
-        R3BLOG(debug2,
-               fmt::format("Input left calibrated signal: {} and right calibrated signal: {}",
-                           signalPair.left(),
-                           signalPair.right()));
+        LOGP(debug2,
+             "Input left calibrated signal: {} and right calibrated signal: {}",
+             signalPair.left(),
+             signalPair.right());
         // hit module id is 0-based
         hit.module_id = static_cast<int>(par.module_num - 1);
         hit.tdc_left = signalPair.left().time.value;
@@ -151,7 +155,7 @@ namespace R3B::Neuland
         hit.energy = get_hit_energy(hit.qdc_left, hit.qdc_right, par);
         hit.position = get_hit_position(hit.tdc_left, hit.tdc_right, par);
         hit.pixel = get_hit_pixel(hit.position);
-        R3BLOG(debug, fmt::format("Adding a new NeulandHit: {}\n", hit));
+        LOGP(debug, "Adding a new NeulandHit: {}\n", hit);
         return hit;
     }
 

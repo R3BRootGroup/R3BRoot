@@ -157,7 +157,7 @@ auto main(int argc, char** argv) -> int
     calPar->SetTrigEnabled(not no_trig_neuland.value());
     calPar->SetErrorMethod(R3B::Neuland::Map2CalParTask::ErrorMethod::approx);
     // calPar->SetTrigIDMapPrintFormat(R3B::Neuland::TrigIDMappingPrintFormat::screen);
-    calPar->SetTrigIDMapAutoFind(false);
+    // calPar->SetTrigIDMapAutoFind(false);
     calPar->SetTrigIDMapDir(outputDir.string());
     // calPar->SetTrigIDMapFileName(jsonName());
     run->AddTask(calPar.release());

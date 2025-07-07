@@ -18,24 +18,33 @@
 #include <R3BNeulandParSet.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
+#include <cstddef>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace R3B::Neuland
 {
     struct HitModulePar
     {
-        unsigned int module_num = 0;                 // 1-based
-        ValueError<double> t_diff;                   // ns
-        ValueError<double> t_sync;                   // ns
-        ValueError<double> effective_speed;          // cm/ns
-        ValueError<double> light_attenuation_length; // cm, 1/alpha
-        ValueError<double> light_attenuation_factor; // exp(alpha*L/2)
-        LRPair<ValueError<double>> pedestal;         //
-        LRPair<ValueError<double>> energy_gain;      //
-        LRPair<ValueError<double>> pmt_saturation;   //
-        LRPair<ValueError<double>> pmt_threshold;    //
+        int module_num = 0;                          //!< 1-based
+        ValueError<double> t_diff;                   //!< ns
+        ValueError<double> t_sync;                   //!< ns
+        ValueError<double> effective_speed;          //!< cm/ns
+        ValueError<double> light_attenuation_length; //!< cm, 1/alpha
+        ValueError<double> light_attenuation_factor; //!< exp(alpha*L/2)
+        LRPair<ValueError<double>> pedestal;         //!<
+        LRPair<ValueError<double>> energy_gain;      //!<
+        LRPair<ValueError<double>> pmt_saturation;   //!<
+        LRPair<ValueError<double>> pmt_threshold;    //!<
+
+        HitModulePar() = default;
+        explicit HitModulePar(int module_number)
+            : module_num{ module_number }
+        {
+        }
+
         ClassDefNV(HitModulePar, 2);
     };
 
@@ -45,7 +54,7 @@ namespace R3B::Neuland
         explicit Cal2HitPar(std::string_view name = "NeulandHitPar",
                             std::string_view title = "Neuland Cal2Hit calibration",
                             std::string_view context = "TestDefaultContext",
-                            Bool_t own = kTRUE);
+                            bool own = true);
 
         Cal2HitPar(const Cal2HitPar&) = default;
         Cal2HitPar(Cal2HitPar&&) = default;
@@ -60,25 +69,33 @@ namespace R3B::Neuland
         void SetDistanceToTarget(double distance) { distance_to_target_ = distance; }
         void SetEnergyCutoff(double cutoff) { energy_cut_ = cutoff; }
         void SetGlobalTimeOffset(double offset) { global_time_offset_ = offset; }
-        void SetNumOfModules(int num) { num_of_modules = num; }
+        [[deprecated]] void SetNumOfModules(int num) {}
         void AddModulePar(const HitModulePar& module_par)
         {
             const auto mNum = module_par.module_num;
             module_pars_.insert_or_assign(mNum, module_par);
+        }
+        auto AddNewModulePar(int module_num) -> HitModulePar&
+        {
+            auto& module_par = module_pars_.try_emplace(module_num).first->second;
+            module_par.module_num = module_num;
+            return module_par;
+        }
+        void SetModulePars(std::unordered_map<int, ::R3B::Neuland::HitModulePar> module_pars)
+        {
+            module_pars_ = std::move(module_pars);
         }
 
         // getter:
         auto GetDistanceToTarget() const { return distance_to_target_; }
         auto GetEnergyCutoff() const { return energy_cut_; }
         auto GetGlobalTimeOffset() const { return global_time_offset_; }
-        [[deprecated("Use GetDistancesToFirstPlane instead")]] auto GetDistanceToFirstPlane(
-            unsigned int plane_num) const
+        [[deprecated("Use GetDistancesToFirstPlane instead")]] auto GetDistanceToFirstPlane(int plane_num) const
         {
             return distances_to_first_plane_.at(plane_num);
         }
         auto GetDistancesToFirstPlane() const -> const auto& { return distances_to_first_plane_; }
-        auto GetNumModulePar() const { return module_pars_.size(); }
-        auto GetModuleParAt(unsigned int module_num) const -> const ::R3B::Neuland::HitModulePar&
+        auto GetModuleParAt(int module_num) const -> const ::R3B::Neuland::HitModulePar&
         {
             return module_pars_.at(module_num);
         }
@@ -86,17 +103,17 @@ namespace R3B::Neuland
         {
             return module_pars_.find(module_num) != module_pars_.end();
         }
-        auto GetModulePars() const -> const std::unordered_map<unsigned int, ::R3B::Neuland::HitModulePar>&
+        auto GetModulePars() const -> const std::unordered_map<int, ::R3B::Neuland::HitModulePar>&
         {
             return module_pars_;
         }
         // no auto because pybind from pyROOT
-        auto GetListOfModulePar() const -> const std::unordered_map<unsigned int, ::R3B::Neuland::HitModulePar>&
+        auto GetListOfModulePar() const -> const std::unordered_map<int, ::R3B::Neuland::HitModulePar>&
         {
             return module_pars_;
         }
         auto GetListOfModuleParRef() -> auto& { return module_pars_; }
-        auto GetNumOfModules() const -> int { return num_of_modules; }
+        auto GetNumOfModules() const -> std::size_t { return module_pars_.size(); }
 
       private:
         int num_of_modules = 0;
@@ -104,7 +121,7 @@ namespace R3B::Neuland
         double distance_to_target_ = 0.; // in cm
         double energy_cut_ = 0.;         // in MeV
         std::vector<double> distances_to_first_plane_;
-        std::unordered_map<unsigned int, ::R3B::Neuland::HitModulePar> module_pars_;
+        std::unordered_map<int, ::R3B::Neuland::HitModulePar> module_pars_;
         void clear() override
         {
             global_time_offset_ = 0.;

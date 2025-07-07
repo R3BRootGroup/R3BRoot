@@ -50,5 +50,7 @@ CheckOptions:
     value: 40
   - key: readability-function-cognitive-complexity.IgnoreMacros
     value: 'true'
+  - key: misc-include-cleaner.IngoreHeaders
+    value: "range/v3/.*"
 
 FormatStyle: 'file'

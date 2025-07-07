@@ -16,6 +16,7 @@ namespace R3B::Neuland
         json_obj = nlohmann::ordered_json{
             { "type", magic_enum::enum_name(options.generator_type) },
             { "particle", options.particle_type },
+            { "multiplicity", options.multiplicity },
             { "energy", options.energy },
             { "theta", options.theta },
             { "phi", options.phi },
@@ -29,6 +30,7 @@ namespace R3B::Neuland
         auto type_str = std::string{};
         json_obj.at("type").get_to(type_str);
         json_obj.at("particle").get_to(options.particle_type);
+        json_obj.at("multiplicity").get_to(options.multiplicity);
         json_obj.at("energy").get_to(options.energy);
         json_obj.at("theta").get_to(options.theta);
         json_obj.at("phi").get_to(options.phi);

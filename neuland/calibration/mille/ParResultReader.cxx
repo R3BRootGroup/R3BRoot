@@ -83,6 +83,10 @@ namespace R3B::Millepede
                 }
             }
         }
+        else
+        {
+            fmt::println("ERROR: parameter file {:?} cannot be read", filename_);
+        }
     }
     void ResultReader::print() { fmt::print("{}\n", fmt::join(par_results_ | rng::views::values, "\n")); }
 

@@ -55,9 +55,8 @@ namespace R3B::Neuland
             }
         };
 
-        for (const auto& plane_data : mapped_data_)
+        for (const auto& [plane_num, plane_data] : mapped_data_)
         {
-            const auto plane_num = plane_data.plane_num;
             for (const auto& [bar_num, bar_data] : plane_data.bars)
             {
                 const auto module_num = Neuland_PlaneBar2ModuleNum(plane_num, bar_num);

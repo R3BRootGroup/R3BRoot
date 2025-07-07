@@ -23,11 +23,11 @@
 #include <FairRootManager.h>
 #include <R3BEventHeader.h>
 #include <R3BException.h>
-#include <R3BLogger.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <algorithm>
 #include <cmath>
+#include <fairlogger/Logger.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <iterator>
@@ -53,15 +53,25 @@ namespace
 
 namespace R3B::Neuland
 {
-
-    Map2CalTask::Map2CalTask()
-        : Map2CalTask{ "NeulandMapped2Cal", 1 }
+    // NOLINTNEXTLINE
+    Map2CalTask::Map2CalTask(std::string_view map_data_name,
+                             std::string_view trig_map_data_name,
+                             std::string_view par_name,
+                             std::string_view trig_par_name,
+                             std::string_view cal_data_name)
+        : CalibrationTask("NeulandMap2CalTask", 1)
+        , map_data_{ map_data_name }
+        , trig_map_data_{ trig_map_data_name }
+        , cal_data_{ cal_data_name }
+        , calibration_par_{ par_name }
+        , calibration_trig_par_{ trig_par_name }
     {
     }
 
-    Map2CalTask::Map2CalTask(std::string_view name, int iVerbose)
-        : CalibrationTask(name.data(), iVerbose)
+    void Map2CalTask::SetExtraPar(FairRuntimeDb* /*rtdb*/)
     {
+        calibration_par_.init(this);
+        calibration_trig_par_.init(this);
     }
 
     void Map2CalTask::HistogramInit(DataMonitor& histograms)
@@ -110,23 +120,23 @@ namespace R3B::Neuland
 
     void Map2CalTask::ExtraInit(FairRootManager* /*rootMan*/)
     {
-        mappedData_.init();
-        trigMappedData_.init();
-        calData_.init(not IsHistDisabled());
+        map_data_.init();
+        trig_map_data_.init();
+        cal_data_.init(not IsHistDisabled());
         set_pmt_num();
         set_ct_freq();
     }
 
     void Map2CalTask::set_pmt_num()
     {
-        if (plane_num_ = base_par_->get_num_of_planes(); plane_num_ == 0)
+        if (plane_num_ = GetBasePar()->get_num_of_planes(); plane_num_ == 0)
         {
-            R3BLOG(warn, "plane number obtained from the calibration parameters is 0!");
+            LOGP(warn, "plane number obtained from the calibration parameters is 0!");
         }
         else
         {
             total_pmt_nums_ = 2 * plane_num_ * BarsPerPlane;
-            R3BLOG(info, fmt::format("total number of PMTs set to be {}", total_pmt_nums_).c_str());
+            LOGP(info, "total number of PMTs set to be {}", total_pmt_nums_);
         }
 
         if (total_pmt_nums_ == 0)
@@ -137,33 +147,33 @@ namespace R3B::Neuland
 
     void Map2CalTask::set_ct_freq()
     {
-        if (auto ct_freq = calibrationPar_->GetSlowClockFrequency(); ct_freq == 0)
+        if (auto ct_freq = calibration_par_->GetSlowClockFrequency(); ct_freq == 0)
         {
-            R3BLOG(warn, "Coarse time frequency obtained from parameteers is 0! Use default value.");
+            LOGP(warn, "Coarse time frequency obtained from parameteers is 0! Use default value.");
             coarse_time_frequency_ = COARSE_TIME_CLOCK_FREQUENCY_MHZ;
         }
         else
         {
             coarse_time_frequency_ = ct_freq;
             max_coarse_time_ = 1000. * coarse_time_max_num_ / coarse_time_frequency_;
-            R3BLOG(info, fmt::format("Coarse time frequency set to be {} MHz", ct_freq).c_str());
+            LOGP(info, "Coarse time frequency set to be {} MHz", ct_freq);
         }
     }
 
     auto Map2CalTask::CheckConditions() const -> bool
     {
 
-        auto signal_size = mappedData_.size();
-        R3BLOG(debug2,
-               fmt::format("Minimal signal size: {}. Current signal size: {}. Number of PMTs: {}",
-                           signal_min_size_,
-                           signal_size,
-                           total_pmt_nums_));
+        auto signal_size = map_data_.size();
+        LOGP(debug2,
+             "Minimal signal size: {}. Current signal size: {}. Number of PMTs: {}",
+             signal_min_size_,
+             signal_size,
+             total_pmt_nums_);
         if (signal_size < signal_min_size_)
         {
-            R3BLOG(debug2,
-                   fmt::format("condition of the minimal size is not met with current paddle signal size. Skip the "
-                               "current event."));
+            LOGP(debug2,
+                 "condition of the minimal size is not met with current paddle signal size. Skip the "
+                 "current event.");
             return false;
         }
         return is_pulse_mode_ ? signal_size > total_pmt_nums_ : signal_size < total_pmt_nums_ / 2;
@@ -174,7 +184,7 @@ namespace R3B::Neuland
     auto Map2CalTask::convert_to_real_time(R3BTCalPar2* calPar,
                                            SingleEdgeSignal signal,
                                            FTType ftType,
-                                           unsigned int module_num) const -> ValueError<double>
+                                           int module_num) const -> ValueError<double>
     {
         const auto& modulePar = calPar->GetParamAt(module_num);
         const auto fineTime = modulePar.GetFineTime(ftType, signal.fine);
@@ -184,46 +194,46 @@ namespace R3B::Neuland
         return { coarseTime - fineTime.value, fineTime.error };
     }
 
-    auto Map2CalTask::get_trigger_time(unsigned int module_num, Side side) const -> ValueError<double>
+    auto Map2CalTask::get_trigger_time(int module_num, Side side) const -> ValueError<double>
     {
 
-        const auto& triggerMap = base_par_->get_trig_id_map();
+        const auto& triggerMap = GetBasePar()->get_trig_id_map();
         auto triggerIDPair = triggerMap.find(module_num);
         if (triggerIDPair == triggerMap.end())
         {
             const auto eventNum = GetEventHeader()->GetEventno();
-            R3BLOG(error,
-                   fmt::format("Can't find the trigger ID for the module ID {} in the event {}", module_num, eventNum));
+            LOGP(error, "Can't find the trigger ID for the module ID {} in the event {}", module_num, eventNum);
             return { -1., 0 };
         }
         const auto triggerID = (side == Side::left) ? triggerIDPair->second.first : triggerIDPair->second.second;
-        const auto trigData = std::find_if(trigMappedData_.begin(),
-                                           trigMappedData_.end(),
+        const auto trigData = std::find_if(trig_map_data_.begin(),
+                                           trig_map_data_.end(),
                                            [&triggerID](const auto& ele) { return ele.first == triggerID; });
-        if (trigData == trigMappedData_.end())
+        if (trigData == trig_map_data_.end())
         {
             const auto eventNum = GetEventHeader()->GetEventno();
-            R3BLOG(error,
-                   fmt::format("No such trigger ID {} in mappedTrigData for moduleNum {} in the event {}!",
-                               triggerID,
-                               module_num,
-                               eventNum));
-            R3BLOG(error, fmt::format("Available trigIDs: {}", fmt::join(trigMappedData_ | ranges::views::keys, ", ")));
+            LOGP(error,
+                 "No such trigger ID {} in mappedTrigData for moduleNum {} in the event {}!",
+                 triggerID,
+                 module_num,
+                 eventNum);
+            LOGP(error, "Available trigIDs: {}", fmt::join(trig_map_data_ | ranges::views::keys, ", "));
             return { -1., 0 };
         }
-        return convert_to_real_time(calibrationTrigPar_, trigData->second.signal, FTType::trigger, trigData->first);
+        return convert_to_real_time(
+            calibration_trig_par_.get(), trigData->second.signal, FTType::trigger, trigData->first);
     }
 
     auto Map2CalTask::get_tot(const DoubleEdgeSignal& pmtSignal,
-                              unsigned int module_num,
+                              int module_num,
                               R3B::Side module_side) const -> ValueError<double>
     {
         const auto leadFType = (module_side == Side::left) ? FTType::leftleading : FTType::rightleading;
         const auto trailFType = (module_side == Side::left) ? FTType::lefttrailing : FTType::righttrailing;
-        const auto leadingT = convert_to_real_time(calibrationPar_, pmtSignal.leading, leadFType, module_num);
-        const auto trailingT = convert_to_real_time(calibrationPar_, pmtSignal.trailing, trailFType, module_num);
+        const auto leadingT = convert_to_real_time(calibration_par_.get(), pmtSignal.leading, leadFType, module_num);
+        const auto trailingT = convert_to_real_time(calibration_par_.get(), pmtSignal.trailing, trailFType, module_num);
         const auto time_over_thres = trailingT - leadingT;
-        R3BLOG(debug3, fmt::format("leading :{} trailing: {}", leadingT.value, trailingT.value));
+        LOGP(debug3, "leading :{} trailing: {}", leadingT.value, trailingT.value);
         return (time_over_thres.value > 0) ? time_over_thres : time_over_thres + max_coarse_time_;
     }
 
@@ -238,7 +248,7 @@ namespace R3B::Neuland
 
     auto Map2CalTask::doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& double_edge_signal,
                                                     R3B::Side side,
-                                                    unsigned int module_num) const -> CalDataSignal
+                                                    int module_num) const -> CalDataSignal
     {
         auto calDataSignal = CalDataSignal{};
         const auto ftType = (side == R3B::Side::left) ? FTType::leftleading : FTType::rightleading;
@@ -246,15 +256,16 @@ namespace R3B::Neuland
         const auto walk_correction =
             (is_walk_enabled_) ? GetWalkCorrection(calDataSignal.time_over_threshold.value) : 0.;
         calDataSignal.leading_time =
-            convert_to_real_time(calibrationPar_, double_edge_signal.leading, ftType, module_num) + walk_correction;
+            convert_to_real_time(calibration_par_.get(), double_edge_signal.leading, ftType, module_num) +
+            walk_correction;
         calDataSignal.trigger_time = get_trigger_time(module_num, side);
         overflow_correct(calDataSignal);
-        R3BLOG(debug, fmt::format("Adding a new cal signal: {}", calDataSignal));
+        LOGP(debug, "Adding a new cal signal: {}", calDataSignal);
         return calDataSignal;
     }
 
     auto Map2CalTask::mapBarSignal_to_calSignals(const MapBarSignal& map_bar_signals,
-                                                 unsigned int module_num,
+                                                 int module_num,
                                                  R3B::Side side) const -> std::vector<CalDataSignal>
     {
         const auto& signals = (side == Side::left) ? map_bar_signals.left : map_bar_signals.right;
@@ -282,19 +293,23 @@ namespace R3B::Neuland
 
     void Map2CalTask::calibrate()
     {
-        R3BLOG(debug2, fmt::format("mapped Data size: {}", mappedData_.size()));
-        for (const auto& planeSignals : mappedData_)
+        LOGP(debug2, "mapped Data size: {}", map_data_.size());
+
+        if (trig_map_data_.size() == 0)
         {
-            const auto planeNum = planeSignals.plane_num;
-            for (const auto& [barNum, barSignals] : planeSignals.bars)
+            return;
+        }
+        for (const auto& [plane_num, plane_signals] : map_data_)
+        {
+            for (const auto& [bar_num, bar_signals] : plane_signals.bars)
             {
                 if (not IsHistDisabled())
                 {
-                    GetHistMonitor().get("module_num")->Fill(barNum);
+                    GetHistMonitor().get("module_num")->Fill(bar_num);
                 }
-                const auto module_num = Neuland_PlaneBar2ModuleNum(planeNum, barNum);
-                auto& cal = calData_.get().emplace_back(module_num);
-                fill_cal_data(cal, barSignals);
+                const auto module_num = Neuland_PlaneBar2ModuleNum(plane_num, bar_num);
+                auto& cal = cal_data_.get().emplace_back(module_num);
+                fill_cal_data(cal, bar_signals);
             }
         }
     }

@@ -12,7 +12,7 @@
  ******************************************************************************/
 #pragma once
 
-#include <R3BNeulandJsonHeader.h> // NOLINT
+// #include <R3BNeulandJsonHeader.h> // NOLINT
 #include <R3BNeulandParSet.h>
 #include <Rtypes.h>
 #include <string>
@@ -25,7 +25,8 @@ namespace R3B::Neuland
     class CalibrationBasePar : public Neuland::ParSet
     {
       public:
-        using TrigIDMap = std::unordered_map<unsigned int, std::pair<unsigned int, unsigned int>>;
+        using TrigIDMap = std::unordered_map<int, std::pair<int, int>>; //<! key: bar_number. Value: module number on
+                                                                        // the left (first) and right (second) side.
         explicit CalibrationBasePar(std::string_view name = "NeulandCalibrationBasePar",
                                     std::string_view title = "Neuland calibration base par",
                                     std::string_view context = "TestDefaultContext",

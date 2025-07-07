@@ -15,6 +15,7 @@ if(GTest_FOUND)
     include(GoogleTest)
     add_executable(
         NeulandUnitTests
+        calibration/testNeulandTSyncEngine.cxx
         digitizing/testNeulandDigitizingPaddle.cxx
         digitizing/testNeulandDigitizingTamex.cxx
         digitizing/testNeulandPointFilter.cxx

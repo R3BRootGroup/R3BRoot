@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #pragma once
+#include "R3BParRootFileIo.h"
 #include <FairParRootFileIo.h>
 #include <FairRuntimeDb.h>
 #include <R3BException.h>
@@ -26,19 +27,19 @@ namespace R3B::Neuland
     {
       public:
         explicit ParDirCreator(
-            FairParRootFileIo* parFileIO = dynamic_cast<FairParRootFileIo*>(FairRuntimeDb::instance()->getOutput()))
+            ParRootFileIo* parFileIO = dynamic_cast<ParRootFileIo*>(FairRuntimeDb::instance()->getOutput()))
             : file_io_{ parFileIO }
             , old_dir_{ gDirectory }
         {
             if (file_io_ == nullptr)
             {
-                throw R3B::runtime_error("unable to obtain the FairParRootFileIo object!");
+                throw R3B::runtime_error("unable to obtain the R3B::ParRootFileIo object!");
             }
-            par_root_file_ = parFileIO->getParRootFile();
+            par_root_file_ = parFileIO->get_first_root_file();
 
             if (!par_root_file_->IsOpen() || !par_root_file_->IsWritable())
             {
-                throw R3B::runtime_error("parRootFile is either closed or unable to be written!");
+                throw R3B::runtime_error("R3B::ParRootFile is either closed or unable to be written!");
             }
         }
 
@@ -91,8 +92,8 @@ namespace R3B::Neuland
         }
 
       private:
-        FairParRootFileIo* file_io_ = nullptr;
-        FairParRootFile* par_root_file_ = nullptr;
+        ParRootFileIo* file_io_ = nullptr;
+        TFile* par_root_file_ = nullptr;
         TDirectory* old_dir_ = nullptr;
     };
 } // namespace R3B::Neuland

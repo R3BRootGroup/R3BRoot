@@ -45,8 +45,8 @@ namespace R3B::Neuland
         ClassDefNV(MuonTrackInfo, 1);
     };
 
-    constexpr auto default_detector_size{ 200.0 };
-    constexpr auto default_PID{ 13 };
+    constexpr auto DEFAULT_DETECTOR_RADIUS{ 400.0 }; // cm
+    constexpr auto DEFAULT_MUON_PID{ 13 };
 
     class TrackGeneratorAbstract
     {
@@ -84,8 +84,8 @@ namespace R3B::Neuland
         using MomentumPosition = std::pair<ROOT::Math::PxPyPzE4D<double>, ROOT::Math::Cartesian3D<double>>;
         using Momentum = ROOT::Math::PxPyPzE4D<double>;
         using AngleRadius = ROOT::Math::Polar3D<double>;
-        double detector_size_{ default_detector_size };
-        int PID_{ default_PID };
+        double detector_size_{ DEFAULT_DETECTOR_RADIUS };
+        int PID_{ DEFAULT_MUON_PID };
 
         R3B::OutputVectorConnector<MuonTrackInfo> muon_track_output_{ "muon_track_info" };
         AngleDist angle_dist_{};
@@ -97,7 +97,7 @@ namespace R3B::Neuland
         auto rd_num_gen_angles(const AngleDist& angle_dist) -> AngleRadius;
         auto calculate_momentum_energy(const double& kinetic_energy, const AngleInfo& angle_info) -> Momentum;
 
-        auto calculate_external_position_momentum(const AngleDist& angle_dist,
+        auto calculate_external_momentum_position(const AngleDist& angle_dist,
                                                   const EnergyDist& energy_dist,
                                                   const PositionDist& position_dist) -> MomentumPosition;
         auto ReadEvent(FairPrimaryGenerator* prim_gen) -> bool override
@@ -105,7 +105,7 @@ namespace R3B::Neuland
             muon_track_output_.clear();
             auto& muon_track = muon_track_output_.get().emplace_back();
             auto momentum_position =
-                MomentumPosition{ calculate_external_position_momentum(angle_dist_, energy_dist_, position_dist_) };
+                MomentumPosition{ calculate_external_momentum_position(angle_dist_, energy_dist_, position_dist_) };
             muon_track.momentum = momentum_position.first;
             muon_track.position = momentum_position.second;
             prim_gen->AddTrack(PID_,
@@ -145,7 +145,7 @@ namespace R3B::Neuland
     }
 
     template <typename AngleDist, typename EnergyDist, typename PositionDist>
-    auto TrackGeneratorImp<AngleDist, EnergyDist, PositionDist>::calculate_external_position_momentum(
+    auto TrackGeneratorImp<AngleDist, EnergyDist, PositionDist>::calculate_external_momentum_position(
         const AngleDist& angle_dist,
         const EnergyDist& energy_dist,
         const PositionDist& position_dist) -> MomentumPosition

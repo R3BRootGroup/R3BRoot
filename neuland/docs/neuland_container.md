@@ -27,7 +27,7 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
    ```bash
    cd containers
 
-   apptainer pull -F neuland library://yanzhaow/r3bdev/neuland:latest
+   apptainer pull -F neuland library://yanzhao/r3bdev/neuland:latest
    ```
 
    Depending on the downloading speed, it may take several minutes. You may use other name instead of `neuland` after the `-F` flag.
@@ -103,6 +103,10 @@ You could [install the Apptainer software](https://apptainer.org/docs/admin/main
    ```bash
    root -l -q your_macro.C
    ```
+
+> [!important]
+> If you are mounting a folder from MacOS, please make sure the folder is **case-sensitive**. Be default, files and folders used in MacOS are **case-insensitive**. To create a case-sensitive folder in MacOS, please check [this blog](https://brianboyko.medium.com/a-case-sensitive-src-folder-for-mac-programmers-176cc82a3830).
+
 
 ## Developing R3BRoot in the container
 

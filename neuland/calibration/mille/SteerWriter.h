@@ -48,6 +48,7 @@ namespace R3B
         void set_filepath(std::string_view filepath) { filepath_ = filepath; }
         void set_data_filepath(std::string_view filepath) { data_filepath_ = filepath; }
         void set_parameter_file(std::string_view filename) { parameter_file_ = filename; }
+        void set_working_dir(std::string_view dir) { working_dir_ = dir; }
 
         void add_parameter_default(int par_num, const std::pair<float, float>& values);
         void add_method(Method method, const std::pair<float, float>& values);
@@ -62,6 +63,7 @@ namespace R3B
         std::string data_filepath_ = DEFAULT_DATA_FILENAME;
         std::unordered_map<int, std::pair<float, float>> parameter_defaults_;
         std::vector<std::vector<std::string>> other_options_;
+        std::string working_dir_ = ".";
 
         void write_parameter_defaults();
         void write_data_file(std::ofstream& ofile);

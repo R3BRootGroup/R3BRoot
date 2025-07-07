@@ -24,10 +24,10 @@
 
 namespace R3B::Neuland::Calibration
 {
-    class LSQREngineAdaptor : public CosmicEngineInterface
+    class MuonReconstruction : public CosmicEngineInterface
     {
       public:
-        LSQREngineAdaptor() = default;
+        MuonReconstruction() = default;
 
       private:
         int minimum_signal_size_ = 6;

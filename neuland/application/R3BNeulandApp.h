@@ -45,13 +45,13 @@ namespace R3B::Neuland
                 std::vector<std::string> data;
                 std::vector<std::string> tree_data;
                 std::string par;
-                std::string par_2;
             } input;
             struct Output
             {
                 std::string working_dir;
                 std::string data = "output.root";
                 std::string par = "output.par.root";
+                std::string mode = "update";
             } output;
         };
 
@@ -81,10 +81,6 @@ namespace R3B::Neuland
         void set_run_id(int run_id) { option_.get().run_id = run_id; }
         void set_output_filename(std::string_view output_filename) { option_.get().output.data = output_filename; }
         void set_inputpar_filename(std::string_view inputpar_filename) { option_.get().input.par = inputpar_filename; }
-        void set_second_inputpar_filename(std::string_view inputpar_filename)
-        {
-            option_.get().input.par_2 = inputpar_filename;
-        }
         void set_outputpar_filename(std::string_view outputpar_filename)
         {
             option_.get().output.par = outputpar_filename;

@@ -1,6 +1,9 @@
 #include "R3BNeulandApp.h"
 #include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandCommonFunc.h"
+#include "R3BNeulandMapDataConverterTask.h"
+#include "R3BNeulandMapToCalParTask.h"
+#include "R3BNeulandMapToCalTask.h"
 #include "R3BNeulandSimCalToCal.h"
 #include <CLI/CLI.hpp>
 #include <FairRun.h>
@@ -17,6 +20,7 @@
 #include <R3BNeulandNeutronsRValue.h>
 #include <R3BNeulandPrimaryClusterFinder.h>
 #include <R3BNeulandPrimaryInteractionFinder.h>
+#include <fairlogger/Logger.h>
 #include <fmt/core.h>
 #include <functional>
 #include <memory>
@@ -59,10 +63,10 @@ namespace R3B::Neuland
         auto EvntHeader = std::make_unique<R3BEventHeader>();
         auto read_branch_names = std::vector<std::string>{};
         auto write_branch_names = std::vector<std::string>{};
+        LOGP(info, "Setting the event header to be R3BEventHeader!");
         run->SetEventHeader(EvntHeader.release());
 
         auto task_option = options_.tasks;
-        run->SetEventHeader(std::make_unique<R3BEventHeader>().release());
 
         if (const auto& option = task_option.digi; option.enable)
         {
@@ -166,12 +170,45 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
+        if (const auto& option = task_option.map_data_converter_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 2);
+            auto task = std::make_unique<Calibration::MapDataConverterTask>(
+                read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0), write_branch_names.at(1));
+            task->SetName(option.name.c_str());
+            run->AddTask(task.release());
+        }
+
+        if (const auto& option = task_option.map_to_cal_par_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 2);
+            auto task = std::make_unique<R3B::Neuland::Map2CalParTask>(
+                read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0), write_branch_names.at(1));
+            task->SetTrigEnabled(option.has_trig_enabled);
+            task->SetErrorMethod(option.error_method);
+            run->AddTask(task.release());
+        }
+        if (const auto& option = task_option.map_to_cal_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 4, write_branch_names, 1);
+            auto task = std::make_unique<R3B::Neuland::Map2CalTask>(read_branch_names.at(0),
+                                                                    read_branch_names.at(1),
+                                                                    read_branch_names.at(2),
+                                                                    read_branch_names.at(3),
+                                                                    write_branch_names.at(0));
+            task->SetPulserMode(option.enable_pulse_mode);
+            task->SetNhitmin(option.min_stat);
+            task->EnableWalk(option.enable_walk_effect);
+            run->AddTask(task.release());
+        }
+
         if (const auto& option = task_option.cal_to_hit_par_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
             auto task = std::make_unique<R3B::Neuland::Cal2HitParTask>(
                 option.method, read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
             task->SetMinStat(option.min_stat);
+            task->SetTrigger(option.mode);
             run->AddTask(task.release());
         }
     }

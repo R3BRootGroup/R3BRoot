@@ -15,7 +15,6 @@
 
 #include <FairRuntimeDb.h>
 #include <TRandom3.h>
-#include <cmath>
 
 #include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddle.h"
@@ -152,7 +151,7 @@ namespace R3B::Digitizing::Neuland::Tamex
             return false;
         }
 
-        auto PaddleId_max = neuland_hit_par_->GetNumModulePar();
+        auto PaddleId_max = neuland_hit_par_->GetNumOfModules();
         if (GetPaddle()->GetPaddleID() > PaddleId_max)
         {
             LOG(warn) << "Paddle id " << GetPaddle()->GetPaddleID() << " exceeds the id " << PaddleId_max

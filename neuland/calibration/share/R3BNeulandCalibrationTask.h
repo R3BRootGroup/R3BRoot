@@ -23,6 +23,7 @@
 #include <RtypesCore.h>
 #include <TH1.h>
 #include <cstdint>
+#include <fairlogger/Logger.h>
 #include <string_view>
 #include <vector>
 
@@ -48,18 +49,18 @@ namespace R3B::Neuland
             is_write_hist_disabled_ = is_write_hist_disabled;
         }
 
-        auto GetBasePar() -> auto* { return base_par_; }
+        [[nodiscard]] auto GetBasePar() const -> auto* { return base_par_; }
         // void SetOnline()
 
-      protected:
         template <typename ParType>
-        auto InputPar(std::string_view par_name, FairRuntimeDb* rtdb = FairRuntimeDb::instance()) -> ParType*
+        auto AddInputPar(std::string_view par_name, FairRuntimeDb* rtdb = FairRuntimeDb::instance()) -> ParType*
         {
+            LOGP(debug, "Adding parameter {} into the inputs.", par_name);
             return add_par<ParType>(par_name, input_pars_, rtdb);
         }
 
         template <typename ParType>
-        auto OutputPar(std::string_view par_name, FairRuntimeDb* rtdb = FairRuntimeDb::instance()) -> ParType*
+        auto AddOutputPar(std::string_view par_name, FairRuntimeDb* rtdb = FairRuntimeDb::instance()) -> ParType*
         {
             return add_par<ParType>(par_name, output_pars_, rtdb);
         }
@@ -74,7 +75,7 @@ namespace R3B::Neuland
         std::vector<FairParSet*> input_pars_;
         std::vector<FairParSet*> output_pars_;
 
-        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
+        CalibrationBasePar* base_par_ = AddInputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
         TH1I* hist_trig_check_ = nullptr;
         TH1I* hist_condition_check_ = nullptr;
 

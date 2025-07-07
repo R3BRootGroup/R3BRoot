@@ -33,14 +33,14 @@ namespace R3B::Neuland::calibration
         }
     }
 
-    ModuleCal::ModuleCal(std::string_view hist_name, unsigned int mID)
+    ModuleCal::ModuleCal(std::string_view hist_name, int mID)
         : FTBaseCal{ hist_name, mID, { FTType::trigger } }
     {
         auto initHist = R3B::make_hist<TH1I>(hist_name.data(), hist_name.data(), MaxFTValue, 0.5, MaxFTValue + 0.5);
         InitAllDistributions(initHist.get());
     }
 
-    PlaneCal::PlaneCal(std::string_view hist_name, unsigned int mID)
+    PlaneCal::PlaneCal(std::string_view hist_name, int mID)
         : FTBaseCal{ hist_name,
                      mID,
                      { FTType::leftleading, FTType::lefttrailing, FTType::rightleading, FTType::righttrailing } }
@@ -59,7 +59,7 @@ namespace R3B::Neuland::calibration
     namespace
     {
         using ValueErrors = FTCalStrategy::ValueErrors;
-        constexpr unsigned int uniform_err_divider = 12;
+        constexpr int uniform_err_divider = 12;
         constexpr auto uniform_err_divider_sqrt = SQRT_12;
         const auto sqrt_3 = std::sqrt(3);
 
@@ -125,7 +125,7 @@ namespace R3B::Neuland::calibration
             }
         }
 
-        auto extract_bin_data(TH1* hist, unsigned int max_bin) -> ValueErrors
+        auto extract_bin_data(TH1* hist, int max_bin) -> ValueErrors
         {
             auto output = ValueErrors{};
             output.reserve(max_bin);
@@ -148,9 +148,9 @@ namespace R3B::Neuland::calibration
         }
 
         auto calculate_value_errors(TH1* hist,
-                                    unsigned int max_bin,
+                                    int max_bin,
                                     double total_entry,
-                                    FTCalErrorMethod methodtype) -> std::pair<ValueErrors, unsigned int>
+                                    FTCalErrorMethod methodtype) -> std::pair<ValueErrors, int>
         {
             auto output = extract_bin_data(hist, max_bin);
 

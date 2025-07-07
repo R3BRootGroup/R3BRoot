@@ -29,6 +29,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 // #include <RankChecker.h>
@@ -62,13 +63,15 @@ namespace R3B::Neuland::Calibration
         float init_effective_c_ = DEFAULT_EFFECTIVE_C;
         double t_diff_residual_cut_ = DEFAULT_T_DIFF_RESIDUAL_CUT;
         double p_value_cut_ = DEFAULT_CALIBRATION_P_VALUE_CUT;
+        constexpr static std::string_view DEFAULT_SUB_DIR = "millepede";
 
         MilleDataPoint input_data_buffer_;
         std::string input_data_filename_ = "neuland_cosmic_mille.bin";
         std::string pede_steer_filename_ = "neuland_steer.txt";
         std::string parameter_filename_ = "neuland_pars.txt";
+        std::string working_dir_;
 
-        Mille binary_data_writer_{ input_data_filename_ };
+        std::unique_ptr<Mille> binary_data_writer_;
         Millepede::ResultReader par_result_;
         Millepede::Launcher pede_launcher_;
 
@@ -111,6 +114,7 @@ namespace R3B::Neuland::Calibration
 
         void init_parameter();
         void init_steer_writer();
+        void set_working_dir();
 
         auto select_t_diff_signal(const std::vector<MilleCalData>& plane_data);
     };

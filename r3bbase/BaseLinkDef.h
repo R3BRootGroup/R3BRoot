@@ -31,6 +31,8 @@
 #pragma link C++ class R3BTcutPar+;
 #pragma link C++ class R3BTsplinePar+;
 #pragma link C++ class R3BCoarseTimeStitch+;
+#pragma link C++ class R3B::ParRootFileIo+;
+#pragma link C++ class R3B::DetParRootFileIo+;
 #pragma link C++ class R3B::ValueError<double>+;
 #pragma link C++ class pair<R3B::ValueError<double>, R3B::ValueError<double>>+;
 #pragma link C++ class R3B::LRPair<R3B::ValueError<double>>+;

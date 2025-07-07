@@ -22,7 +22,7 @@
 
 #include <iostream>
 
-static R3BFieldCreator gR3BFieldCreator;
+// static R3BFieldCreator gR3BFieldCreator;
 
 R3BFieldCreator::R3BFieldCreator()
     : FairFieldFactory()

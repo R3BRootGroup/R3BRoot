@@ -1,5 +1,10 @@
-add_library(R3BNeulandApp SHARED R3BNeulandAnalysisApp.cxx R3BNeulandApp.cxx
-                                 R3BNeulandAppOptionJson.cxx R3BNeulandSimApp.cxx)
+add_library(
+    R3BNeulandApp SHARED
+    R3BNeulandAnalysisApp.cxx
+    R3BNeulandApp.cxx
+    R3BNeulandAppOptionJson.cxx
+    R3BNeulandBaseParCreator.cxx
+    R3BNeulandSimApp.cxx)
 
 target_include_directories(R3BNeulandApp PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_definitions(
@@ -18,4 +23,5 @@ target_link_libraries(
            ${Geant4_LIBRARIES}
            ${Geant4VMC_LIBRARIES}
            R3BGen
-           CLI11::CLI11)
+           CLI11::CLI11
+           re2::re2)

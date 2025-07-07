@@ -30,15 +30,15 @@ namespace R3B::Neuland
 {
     enum class Cal2HitParMethod : uint8_t
     {
-        LSQT,
-        predecessor,
+        recons,
+        histogram,
         millepede
     };
 
     class Cal2HitParTask : public CalibrationTask
     {
       public:
-        explicit Cal2HitParTask(Cal2HitParMethod method = Cal2HitParMethod::LSQT,
+        explicit Cal2HitParTask(Cal2HitParMethod method = Cal2HitParMethod::recons,
                                 std::string_view cal_data_name = "NeulandCalData",
                                 std::string_view base_par_name = "NeulandCalibrationBasePar",
                                 std::string_view hit_par_name = "NeulandHitPar",

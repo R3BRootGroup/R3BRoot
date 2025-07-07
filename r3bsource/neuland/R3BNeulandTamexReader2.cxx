@@ -56,7 +56,6 @@ using Errors = R3BNeulandTamexReader2::Errors;
 
 namespace
 {
-    constexpr size_t INITIAL_SIGNAL_SIZE = 20;
     constexpr size_t PRINT_ERROR_MAX = 100000;
     constexpr auto BarsPerPlane = 50;
     const auto errorStrings = std::map<Errors, std::string>{
@@ -118,7 +117,6 @@ R3BNeulandTamexReader2::R3BNeulandTamexReader2(EXT_STR_h101_raw_nnp_tamex_onion*
     , mappedDataPtr_{ &mappedData_ }
     , mappedTrigDataPtr_{ &mappedTrigData_ }
 {
-    mappedData_.reserve(INITIAL_SIGNAL_SIZE);
     error_log_.insert_or_assign(Errors::module_size, 0);
     error_log_.insert_or_assign(Errors::data_size, 0);
     error_log_.insert_or_assign(Errors::indices, 0);
@@ -195,7 +193,7 @@ namespace
 template <typename ViewType>
 auto R3BNeulandTamexReader2::extract_plane_signals(const ViewType& signalsPlane, int planeNum)
 {
-    auto planeSignals = R3BPaddleTamexMappedData2{ planeNum };
+    auto planeSignals = R3B::PaddleTamexMappedData{};
     const auto signals_sides_view =
         ranges::zip_view(signalsPlane.tcl_T, signalsPlane.tfl_T, signalsPlane.tct_T, signalsPlane.tft_T, SIDES);
     for (const auto& [coarse_leading, fine_leading, coarse_trailing, fine_trailing, side] : signals_sides_view)
@@ -219,7 +217,6 @@ auto R3BNeulandTamexReader2::extract_plane_signals(const ViewType& signalsPlane,
         const auto module_size = coarse_leading.BM;
         const auto signal_size = coarse_leading.B;
         R3BLOG(debug, fmt::format("Signals at the current event from plane {}: {}", planeNum, signal_size));
-        mappedData_.reserve(signal_size);
         const auto barNum_divider_view = ranges::zip_view(span(coarse_leading.BMI), span(coarse_leading.BME));
 
         const auto signals_view = Zip_from([](const auto& item) { return span(item.Bv); },
@@ -276,16 +273,16 @@ auto R3BNeulandTamexReader2::ReadSignals(EXT_STR_h101_raw_nnp_tamex_onion* input
     const auto signalsAllPlanes = span(inputData->NN_P);
 
     mappedData_.clear();
-    for (const auto& [signalsPlane, planeID] : ranges::zip_view(signalsAllPlanes, ranges::iota_view(1)))
+    for (const auto& [signalsPlane, plane_num] : ranges::zip_view(signalsAllPlanes, ranges::iota_view(1)))
     {
-        auto planeSignals = extract_plane_signals(signalsPlane, planeID);
+        auto planeSignals = extract_plane_signals(signalsPlane, plane_num);
         if (!planeSignals.empty())
         {
             if (not is_online_)
             {
                 histogram_action(planeSignals);
             }
-            mappedData_.emplace_back(std::move(planeSignals));
+            mappedData_.try_emplace(plane_num, std::move(planeSignals));
         }
     }
 
@@ -348,7 +345,6 @@ auto R3BNeulandTamexReader2::ReadTriggerSignals(EXT_STR_h101_raw_nnp_tamex_onion
              {
                  const auto& [coarse_time, fine_time] = signal_pack;
                  auto trigDatum = mappedTrigData_.emplace(module_num, R3BPaddleTamexTrigMappedData{}).first;
-                 trigDatum->second.module_num = module_num;
                  trigDatum->second.signal.fine = fine_time;
                  trigDatum->second.signal.coarse = coarse_time;
                  R3BLOG(debug3,

@@ -35,6 +35,6 @@ namespace R3B::Neuland
         void CanvasFill(DataMonitor& histograms) override;
         void CanvasFinish() override;
 
-        InputVectorConnector<PaddleTamexMappedData> mapped_data_{ "NeulandMappedData" };
+        InputMapConnector<int, PaddleTamexMappedData> mapped_data_{ "NeulandMappedData" };
     };
 } // namespace R3B::Neuland

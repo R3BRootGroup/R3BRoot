@@ -55,12 +55,10 @@ namespace R3B
 
     struct PaddleTamexMappedData
     {
-        int plane_num = 0;                               ///< number of plane 1..n
-        std::unordered_map<int, R3B::MapBarSignal> bars; ///< number of bar   1..n
+        std::unordered_map<int, R3B::MapBarSignal> bars; //!< bar number in a plane   1..50
 
         PaddleTamexMappedData() = default;
-        explicit PaddleTamexMappedData(int pID);
-        void push_back(R3B::Side side, int barID, const R3B::DoubleEdgeSignal& signal);
+        void push_back(R3B::Side side, int bar_num, const R3B::DoubleEdgeSignal& signal);
         auto empty() const -> bool { return bars.empty(); };
 
         ClassDefNV(PaddleTamexMappedData, 1);
@@ -68,9 +66,8 @@ namespace R3B
 
     struct PaddleTamexTrigMappedData
     {
-        int module_num = 0; //... number of trigID 1..n
         R3B::SingleEdgeSignal signal;
-        ClassDefNV(PaddleTamexTrigMappedData, 2);
+        ClassDefNV(PaddleTamexTrigMappedData, 1);
     };
 } // namespace R3B
 
@@ -111,8 +108,8 @@ class fmt::formatter<R3B::MapBarSignal>
     }
 };
 
-using R3BPaddleTamexMappedDataContainer = std::vector<R3B::PaddleTamexMappedData>;
-using R3BPaddleTamexTrigDataContainer = std::map<int, R3B::PaddleTamexTrigMappedData>;
+using R3BPaddleTamexMappedDataContainer = std::map<int, R3B::PaddleTamexMappedData>;   //!< 1-based key number
+using R3BPaddleTamexTrigDataContainer = std::map<int, R3B::PaddleTamexTrigMappedData>; //!< 1-based key number
 
 using R3BPaddleTamexMappedData2 = R3B::PaddleTamexMappedData;
 using R3BPaddleTamexTrigMappedData = R3B::PaddleTamexTrigMappedData;

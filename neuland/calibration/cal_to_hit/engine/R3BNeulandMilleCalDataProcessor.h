@@ -20,7 +20,7 @@ namespace R3B::Neuland::Calibration
             , right{ bar_cal_data.right.front() }
         {
         }
-        unsigned int module_num = 0; // 1 based bar num
+        int module_num = 0; // 1 based bar num
         CalDataSignal left;
         CalDataSignal right;
     };

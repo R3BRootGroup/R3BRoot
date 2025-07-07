@@ -16,6 +16,7 @@
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandMapToCalPar.h"
 #include "R3BPaddleTamexMappedData2.h"
+#include "R3BParView.h"
 #include "R3BShared.h"
 #include "R3BValueError.h"
 #include <FairRootManager.h>
@@ -27,16 +28,20 @@
 #include <vector>
 
 class R3BEventHeader;
+class FairRuntimeDb;
 namespace R3B::Neuland
 {
     class Map2CalTask : public CalibrationTask
     {
       public:
-        Map2CalTask();
-        Map2CalTask(std::string_view name, int iVerbose);
+        explicit Map2CalTask(std::string_view map_data_name = "NeulandMapData",
+                             std::string_view trig_map_data_name = "NeulandTrigMapData",
+                             std::string_view par_name = "LandTCalPar",
+                             std::string_view trig_par_name = "LandTrigTCalPar",
+                             std::string_view cal_data_name = "NeulandCalData");
         void SetPulserMode(bool pulser_mode = true) { is_pulse_mode_ = pulser_mode; }
         void SetNhitmin(unsigned int size) { signal_min_size_ = size; }
-        void EnableWak(bool is_walk_enabled = true) { is_walk_enabled_ = is_walk_enabled; }
+        void EnableWalk(bool is_walk_enabled = true) { is_walk_enabled_ = is_walk_enabled; }
 
       private:
         bool is_pulse_mode_ = false;
@@ -49,19 +54,19 @@ namespace R3B::Neuland
         unsigned int plane_num_ = 0;
 
         // IO data and paramters:
-        InputVectorConnector<PaddleTamexMappedData> mappedData_{ "NeulandMappedData" };
-        InputMapConnector<unsigned int, PaddleTamexTrigMappedData> trigMappedData_{ "NeulandTrigMappedData" };
-        OutputVectorConnector<BarCalData> calData_{ "NeulandCalData" };
+        InputMapConnector<int, PaddleTamexMappedData> map_data_;
+        InputMapConnector<int, PaddleTamexTrigMappedData> trig_map_data_;
+        OutputVectorConnector<BarCalData> cal_data_;
 
-        CalibrationBasePar* base_par_ = InputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
-        Map2CalPar* calibrationPar_ = InputPar<Map2CalPar>("LandTCalPar");
-        Map2CalPar* calibrationTrigPar_ = InputPar<Map2CalPar>("LandTrigTCalPar");
+        InputParView<Map2CalPar> calibration_par_;
+        InputParView<Map2CalPar> calibration_trig_par_;
 
         void ExtraInit(FairRootManager* rootMan) override;
         void HistogramInit(DataMonitor& histograms) override;
-        void BeginOfEvent() override { calData_.clear(); };
+        void BeginOfEvent() override { cal_data_.clear(); };
         void TriggeredExec() override;
         void FinishEvent() override;
+        void SetExtraPar(FairRuntimeDb* rtdb) override;
         [[nodiscard]] auto CheckConditions() const -> bool override;
 
         void set_pmt_num();
@@ -72,18 +77,18 @@ namespace R3B::Neuland
         void fill_cal_data(BarCalData& cal, const MapBarSignal& signals);
         [[nodiscard]] auto doubleEdgeSignal_to_calSignal(const DoubleEdgeSignal& double_edge_signal,
                                                          R3B::Side side,
-                                                         unsigned int module_num) const -> CalDataSignal;
+                                                         int module_num) const -> CalDataSignal;
         [[nodiscard]] auto mapBarSignal_to_calSignals(const MapBarSignal& map_bar_signals,
-                                                      unsigned int module_num,
+                                                      int module_num,
                                                       R3B::Side side) const -> std::vector<CalDataSignal>;
         [[nodiscard]] auto convert_to_real_time(R3BTCalPar2* calPar,
                                                 SingleEdgeSignal signal,
                                                 FTType ftType,
-                                                unsigned int module_num) const -> ValueError<double>;
+                                                int module_num) const -> ValueError<double>;
         [[nodiscard]] auto get_tot(const DoubleEdgeSignal& pmtSignal,
-                                   unsigned int module_num,
+                                   int module_num,
                                    R3B::Side module_side) const -> ValueError<double>;
-        [[nodiscard]] auto get_trigger_time(unsigned int module_num, Side side) const -> ValueError<double>;
+        [[nodiscard]] auto get_trigger_time(int module_num, Side side) const -> ValueError<double>;
         void overflow_correct(R3B::Neuland::CalDataSignal& calSignal) const;
     };
 } // namespace R3B::Neuland

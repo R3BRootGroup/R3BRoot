@@ -9,6 +9,7 @@
 #include <R3BLogger.h>
 #include <RtypesCore.h>
 #include <TH1.h>
+#include <fairlogger/Logger.h>
 #include <fmt/core.h>
 #include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/algorithm/for_each.hpp>
@@ -59,10 +60,10 @@ namespace R3B::Neuland
                 init_histogram();
             }
 
-            R3BLOG(info,
-                   fmt::format("Neuland calibration task \"{}\" has event trigger type: {}",
-                               GetName(),
-                               CalTrigger2Str(trig_type_)));
+            LOGP(info,
+                 "Neuland calibration task \"{}\" has event trigger type: {}",
+                 GetName(),
+                 CalTrigger2Str(trig_type_));
             return kSUCCESS;
         }
         return kFATAL;
@@ -71,8 +72,7 @@ namespace R3B::Neuland
     void CalibrationTask::Exec(Option_t* /*option*/)
     {
         BeginOfEvent();
-        R3BLOG(debug,
-               fmt::format("Event number: {}, tpat: {:016b}", eventHeader_->GetEventno(), eventHeader_->GetTpat()));
+        LOGP(debug, "Event number: {}, tpat: {:016b}", eventHeader_->GetEventno(), eventHeader_->GetTpat());
         (is_hist_disabled_) ? execute_no_hist() : execute_with_hist();
     }
 
@@ -106,22 +106,22 @@ namespace R3B::Neuland
     void CalibrationTask::FinishTask()
     {
         EndOfTask();
-        R3BLOG(info,
-               fmt::format(R"(Passed events with the trigger type "{}" in task "{}": {})",
-                           CalTrigger2Str(trig_type_),
-                           GetName(),
-                           passed_num_of_events));
+        LOGP(info,
+             R"(Passed events with the trigger type "{}" in task "{}": {})",
+             CalTrigger2Str(trig_type_),
+             GetName(),
+             passed_num_of_events);
         if (not is_hist_disabled_ and not is_write_hist_disabled_)
         {
             histograms_.save_to_sink(GetName());
         }
         else
         {
-            R3BLOG(info,
-                   fmt::format(
-                       "Figures not saved due to current configuration: hist_disabled = {}, write_hist_disabled = {}",
-                       is_hist_disabled_,
-                       is_write_hist_disabled_));
+            LOGP(info,
+
+                 "Figures not saved due to current configuration: hist_disabled = {}, write_hist_disabled = {}",
+                 is_hist_disabled_,
+                 is_write_hist_disabled_);
         }
         ranges::for_each(output_pars_, [](FairParSet* par) { par->setChanged(); });
         reset();
@@ -129,11 +129,11 @@ namespace R3B::Neuland
 
     auto CalibrationTask::check_trigger() const -> bool
     {
-        R3BLOG(debug2,
-               fmt::format(R"(From task "{}": tpat {}. Trig type {})",
-                           GetName(),
-                           eventHeader_->GetTpat(),
-                           CalTrigger2Tpat(trig_type_, offspill_tpat_bit_).to_string()));
+        LOGP(debug2,
+             R"(From task "{}": tpat {}. Trig type {})",
+             GetName(),
+             eventHeader_->GetTpat(),
+             CalTrigger2Tpat(trig_type_, offspill_tpat_bit_).to_string());
         return CheckTriggerWithTpat(trig_type_, eventHeader_->GetTpat(), offspill_tpat_bit_);
     }
 
@@ -149,8 +149,9 @@ namespace R3B::Neuland
         auto par_not_changed = ranges::find_if(input_pars_, [](auto* par) { return !par->hasChanged(); });
         if (par_not_changed != input_pars_.end())
         {
-            throw R3B::runtime_error(fmt::format(R"(Calibration parameter "{}" is not initiated from the root file!)",
-                                                 (*par_not_changed)->GetName()));
+            auto par_name = std::string_view{ (*par_not_changed)->GetName() };
+            throw R3B::runtime_error(
+                fmt::format(R"(Calibration parameter "{}" is not initiated from the root file!)", par_name));
         }
     }
     void CalibrationTask::reset()

@@ -15,6 +15,7 @@
 
 #include "R3BDataMonitor.h"
 #include "R3BNeulandCalToHitPar.h"
+#include "R3BParView.h"
 #include "R3BValueError.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
@@ -38,16 +39,26 @@ namespace R3B::Neuland
     class Cal2HitTask : public CalibrationTask
     {
       public:
-        explicit Cal2HitTask(std::string_view name = "R3BNeulandCal2Hit", int iVerbose = 1);
+        explicit Cal2HitTask(std::string_view input_cal_data_name = "NeulandCalData",
+                             std::string_view output_hit_data_name = "NeulandHits",
+                             std::string_view input_cal_2_hit_par_name = "NeulandHitPar");
+
+        /**
+         * @brief Set the global time offset relating to the reference bar
+         *
+         * The time offset value should be determined by fitting the gamma ray peak from the reference bar with the
+         * module number equal to #Calibration::DEFAULT_TSYNC_REFERENCE_BAR_NUM.
+         * @param offset Time offset from the LOS
+         */
         void SetGlobalTimeOffset(double offset) { global_time_offset_ = offset; }
         void SetDistanceToTarget(double distance) { distance_to_target_ = distance; }
 
       private:
         double global_time_offset_ = 0.;
         double distance_to_target_ = 0.;
-        InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
-        OutputVectorConnector<R3BNeulandHit> hit_data_{ "NeulandHits" };
-        Cal2HitPar* cal_to_hit_par_ = InputPar<Cal2HitPar>("NeulandHitPar");
+        InputVectorConnector<BarCalData> cal_data_;
+        OutputVectorConnector<R3BNeulandHit> hit_data_;
+        InputParView<Cal2HitPar> cal_to_hit_par_;
 
         // temporary variables to reduce dynamic allocations
         std::vector<CalibratedSignal> temp_left_signals_;

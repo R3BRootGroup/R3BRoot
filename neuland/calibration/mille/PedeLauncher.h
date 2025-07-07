@@ -28,6 +28,7 @@ namespace R3B::Millepede
         void set_steer_filename(std::string_view filename) { steer_filename_ = filename; }
         void set_parameter_filename(std::string_view filename) { parameter_file_ = filename; }
         void set_binary_dir(std::string_view dir) { binary_directory_ = dir; }
+        void set_working_dir(std::string_view dir) { working_directory_ = dir; }
         void launch();
         void end();
 
@@ -36,6 +37,7 @@ namespace R3B::Millepede
         std::string steer_filename_ = DEFAULT_STEER_FILENAME;
         std::string parameter_file_;
         std::string binary_directory_ = ".";
+        std::string working_directory_ = ".";
         std::string executable_ = "pede";
     };
 } // namespace R3B::Millepede

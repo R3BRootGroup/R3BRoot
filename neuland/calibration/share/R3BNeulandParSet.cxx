@@ -1,9 +1,10 @@
 #include "R3BNeulandParSet.h"
+#include "R3BDetParRootFileIo.h"
 #include <FairDetParIo.h>
 #include <FairParIo.h>
 #include <R3BException.h>
-#include <R3BLogger.h>
 #include <Rtypes.h>
+#include <fairlogger/Logger.h>
 #include <fmt/core.h>
 #include <gsl/span>
 #include <range/v3/algorithm/fill.hpp>
@@ -22,19 +23,19 @@ namespace R3B::Neuland
 
     auto ParSet::init(FairParIo* inputFile) -> bool
     {
-        R3BLOG(debug, fmt::format("Try to init parameter {}", GetName()));
-        if (auto* detParIo = inputFile->getDetParIo("FairGenericParIo"); detParIo != nullptr)
+        LOGP(debug, "Try to init parameter {}", GetName());
+        if (auto* detParIo = inputFile->getDetParIo(DetParRootFileIo::DEFAULT_NAME.data()); detParIo != nullptr)
         {
-            R3BLOG(debug, fmt::format("Found DetParIo {}. Try to init with this.", detParIo->GetName()));
+            LOGP(debug, "Found DetParIo {}. Try to init with this.", detParIo->GetName());
             auto res = detParIo->init(this);
             if (not res)
             {
-                R3BLOG(error, fmt::format("Parameter {} init failed.", detParIo->GetName()));
+                LOGP(error, "Parameter {} init failed.", detParIo->GetName());
             }
             return res;
         }
 
-        R3BLOG(error, fmt::format("Failed to init parameter {} because no FairDetParIo object is found!", GetName()));
+        LOGP(error, "Failed to init parameter {} because no FairDetParIo object is found!", GetName());
         return false;
     }
 
@@ -43,7 +44,7 @@ namespace R3B::Neuland
         // writes the container to an output
         if (auto* detParIo = outputFile->getDetParIo("FairGenericParIo"); detParIo != nullptr)
         {
-            R3BLOG(info, fmt::format("writing parameter {} to root file.", GetName()));
+            LOGP(info, "writing parameter {} to root file.", GetName());
             return detParIo->write(this);
         }
         throw R3B::runtime_error(

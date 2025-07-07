@@ -86,6 +86,7 @@ namespace R3B::Neuland
     constexpr auto FirstHorizontalPlane = 0;
     constexpr auto BarsPerPlane = 50;
     constexpr auto MaxNumberOfPlanes = 26;
+    constexpr auto DefaultNumberOfPlanes = 26;
     constexpr auto MaxNumberOfBars = MaxNumberOfPlanes * BarsPerPlane;
 
     // naming convention:
@@ -101,8 +102,12 @@ namespace R3B::Neuland
     constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
     constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
     constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
+    constexpr auto IsModuleNumHorizontal(int module_num) -> bool
+    {
+        return IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));
+    }
     // planeNum, barNum and ModuleNum is 1-based
-    constexpr auto Neuland_PlaneBar2ModuleNum(unsigned int planeNum, unsigned int barNum) -> unsigned int
+    constexpr auto Neuland_PlaneBar2ModuleNum(int planeNum, int barNum) -> int
     {
         assert(planeNum > 0);
         return ((planeNum - 1) * BarsPerPlane) + barNum;
@@ -130,6 +135,12 @@ namespace R3B::Neuland
 
     // NeuLAND TPAT:
     constexpr auto NeulandOnSpillTpatPos = 0U; // 0 based
+    namespace Calibration
+    {
+        constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_NUM = 25;
+        constexpr auto DEFAULT_TSYNC_MAX_TIME_DIFF = 300; // ns
+
+    } // namespace Calibration
 
     // Default values:
     constexpr auto DEFAULT_BOX_GENERATOR_THETA = MinMaxValueD{ 0., 3. }; // degree

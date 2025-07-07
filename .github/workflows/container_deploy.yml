@@ -77,9 +77,9 @@ jobs:
           # apptainer remote add --no-login SylabsCloud cloud.sycloud.io
           echo "${{ secrets.SYLABS_TOKEN }}" | singularity remote login
           apptainer remote status
-          apptainer delete -F library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag} || true
           apptainer build --notest -F neuland.sif ./util/container/neuland.def
-          apptainer sign --keyidx 0 neuland.sif
+          # apptainer sign --keyidx 0 neuland.sif
+          apptainer delete -F library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag} || true
           apptainer push -D "neuland cli" -U neuland.sif library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag}
         shell: bash
         env:

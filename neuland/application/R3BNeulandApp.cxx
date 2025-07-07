@@ -1,6 +1,8 @@
 #include "R3BNeulandApp.h"
+#include "R3BDetParRootFileIo.h"
 #include "R3BException.h"
 #include "R3BFileSource2.h"
+#include "R3BParRootFileIo.h"
 #include "R3BShared.h"
 #include <CLI/CLI.hpp>
 #include <FairParRootFileIo.h>
@@ -116,7 +118,14 @@ namespace R3B::Neuland
         {
             LOGP(info, "Writting all parameters to files");
             run_->GetRuntimeDb()->writeContainers();
-            run_->GetSink()->Close();
+            if (auto* runtime_db = run_->GetRuntimeDb(); runtime_db != nullptr)
+            {
+                runtime_db->writeContainers();
+            }
+            if (auto* sink = run_->GetSink(); sink != nullptr)
+            {
+                sink->Close();
+            }
 
             if (has_failed())
             {
@@ -217,10 +226,6 @@ namespace R3B::Neuland
         program_options.add_option("--par-in", options.input.par, "Set the filename of the input parameter root file")
             ->capture_default_str()
             ->group("Input options");
-        program_options
-            .add_option(
-                "--par-in-second", options.input.par_2, "Set the filename of the second input parameter root file")
-            ->group("Input options");
 
         program_options.add_option("-o, --output-file", options.output.data, "Set the output filename")
             ->capture_default_str()
@@ -275,20 +280,10 @@ namespace R3B::Neuland
         {
             file_path =
                 input_wd.empty() ? fs::path{ input_option.par } : fs::path{ input_wd } / fs::path{ input_option.par };
-            auto fileio = std::make_unique<FairParRootFileIo>();
+            auto fileio = ParRootFileIo::Input();
             LOGP(info, "Input first parameter file is {:?}", file_path.string());
             fileio->open(file_path.c_str(), "READ");
             run_->GetRuntimeDb()->setFirstInput(fileio.release());
-        }
-
-        if (not input_option.par_2.empty())
-        {
-            file_path = input_wd.empty() ? fs::path{ input_option.par_2 }
-                                         : fs::path{ input_wd } / fs::path{ input_option.par_2 };
-            auto fileio = std::make_unique<FairParRootFileIo>();
-            LOGP(info, "Input second parameter file is {:?}", file_path.string());
-            fileio->open(file_path.c_str(), "READ");
-            run_->GetRuntimeDb()->setSecondInput(fileio.release());
         }
 
         if (not output_option.par.empty())
@@ -298,8 +293,10 @@ namespace R3B::Neuland
                 option.enable_mpi ? fmt::format("{}.{}", output_option.par, rank_num_) : output_option.par;
             file_path = output_wd.empty() ? fs::path{ output_name } : fs::path{ output_wd } / fs::path{ output_name };
             LOGP(info, "Ouptut parameter file is {:?}", file_path.string());
-            auto fileio = std::make_unique<FairParRootFileIo>(true);
-            fileio->open(file_path.c_str(), "RECREATE");
+            auto fileio = ParRootFileIo::Output();
+            fileio->open(file_path.c_str(), option.output.mode);
+            // auto fileio = std::make_unique<FairParRootFileIo>(true);
+            // fileio->open(file_path.c_str(), option.output.mode.c_str());
             auto* rtdb = run_->GetRuntimeDb();
             rtdb->setOutput(fileio.release());
         }

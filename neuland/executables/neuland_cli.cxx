@@ -1,6 +1,7 @@
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
 #include "R3BNeulandAppOptionJson.h" // NOLINT
+#include "R3BNeulandBaseParCreator.h"
 #include "R3BNeulandCLIAbstract.h"
 #include "R3BNeulandSimApp.h"
 #include <CLI/CLI.hpp>
@@ -45,11 +46,19 @@ auto main(int argc, char** argv) -> int
                 app->setup_options(*program_options.get_subcommand("ana"));
                 return;
             }
+            if (program_options.got_subcommand("basepar"))
+            {
+                app = std::make_unique<R3B::Neuland::BaseParCreator>();
+                app->setup_options(*program_options.get_subcommand("basepar"));
+                return;
+            }
         };
 
         program_options.require_subcommand(1, 1);
         program_options.add_subcommand("sim", "Run simulation application.")->preparse_callback(instantiate_app);
         program_options.add_subcommand("ana", "Run analysis application.")->preparse_callback(instantiate_app);
+        program_options.add_subcommand("basepar", "Create a base parameter for an experiment.")
+            ->preparse_callback(instantiate_app);
 
         CLI11_PARSE(program_options, argc, argv);
 

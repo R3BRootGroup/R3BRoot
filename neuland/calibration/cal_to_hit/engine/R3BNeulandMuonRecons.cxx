@@ -11,7 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BNeulandLSQREngineAdaptor.h"
+#include "R3BNeulandMuonRecons.h"
 
 #include <R3BException.h>
 #include <R3BLogger.h>
@@ -65,7 +65,7 @@ namespace
 
 namespace R3B::Neuland::Calibration
 {
-    void LSQREngineAdaptor::Init()
+    void MuonReconstruction::Init()
     {
         const auto module_size = GetModuleSize();
         if (module_size == 0)
@@ -79,7 +79,7 @@ namespace R3B::Neuland::Calibration
         hit_cal_engine_.Init(&hit_par_temp);
     }
 
-    void LSQREngineAdaptor::AddSignals(const std::vector<BarCalData>& signals)
+    void MuonReconstruction::AddSignals(const std::vector<BarCalData>& signals)
     {
         for (const auto& signal : signals)
         {
@@ -88,7 +88,7 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    void LSQREngineAdaptor::add_bar_signal(const BarCalData& barSignal, Side side)
+    void MuonReconstruction::add_bar_signal(const BarCalData& barSignal, Side side)
     {
         // change to 0 based indexing
         const auto module_id = static_cast<int>(barSignal.module_num - 1);
@@ -109,7 +109,7 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    void LSQREngineAdaptor::EndOfEvent(unsigned int event_num)
+    void MuonReconstruction::EndOfEvent(unsigned int event_num)
     {
         const auto added_points_num = cosmic_tracker_.GetBarIDs().size();
         const auto& track = cosmic_tracker_.GetTrack();
@@ -123,7 +123,7 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    void LSQREngineAdaptor::Calibrate(Cal2HitPar& hit_par)
+    void MuonReconstruction::Calibrate(Cal2HitPar& hit_par)
     {
         hit_par.Reset();
         // auto* new_dir = ParDirCreator{}.mkdir(DEFAULT_HIST_MONITOR_DIR);

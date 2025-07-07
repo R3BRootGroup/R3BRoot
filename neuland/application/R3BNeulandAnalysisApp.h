@@ -1,8 +1,10 @@
 #pragma once
 
 #include "R3BDigitizingTamex.h"
+#include "R3BFTCalEngine.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandDigitizer.h"
+#include "R3BNeulandTriggerTypes.h"
 #include <R3BNeulandCalToHitParTask.h>
 #include <string>
 #include <string_view>
@@ -109,11 +111,38 @@ namespace R3B::Neuland
                     std::string read = "NeulandMultiplicity;NeulandClusters";
                     std::string write = "NeulandNeutrons";
                 } neutron_r_value;
+                struct MapDataConverterTask
+                {
+                    bool enable = false;
+                    std::string name = "MapDataConverterTask";
+                    std::string read = "NeulandMappedData;NeulandTrigMappedData";
+                    std::string write = "NeulandMapData;NeulandTrigMapData";
+                } map_data_converter_task;
+                struct Map2CalParTask
+                {
+                    bool enable = false;
+                    bool has_trig_enabled = true;
+                    calibration::FTCalErrorMethod error_method = calibration::FTCalErrorMethod::approx;
+                    std::string name = "NeulandMap2CalParTask";
+                    std::string read = "NeulandMapData;NeulandTrigMapData";
+                    std::string write = "LandTCalPar;LandTrigTCalPar";
+                } map_to_cal_par_task;
+                struct Map2CalTask
+                {
+                    bool enable = false;
+                    bool enable_pulse_mode = false;
+                    bool enable_walk_effect = true;
+                    int min_stat = 1;
+                    std::string name = "NeulandMap2CalTask";
+                    std::string read = "NeulandMapData;NeulandTrigMapData;LandTCalPar;LandTrigTCalPar";
+                    std::string write = "NeulandCalData";
+                } map_to_cal_task;
                 struct Cal2HitParTask
                 {
                     bool enable = false;
                     int min_stat = DEFAULT_MIN_STAT;
-                    Cal2HitParMethod method = Cal2HitParMethod::LSQT;
+                    CalTrigger mode = CalTrigger::offspill;
+                    Cal2HitParMethod method = Cal2HitParMethod::recons;
                     std::string name = "NeulandCal2HitParTask";
                     std::string read = "NeulandCalData;NeulandCalibrationBasePar";
                     std::string write = "NeulandHitPar";

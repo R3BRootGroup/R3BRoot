@@ -19,9 +19,10 @@ neuland mode [options]
 
 The available `mode` values from the cli executable are
 
-- `sim`: interface to simulation.
-- `ana`: interface to offline analysis.
-- `online`: interface to online analysis. (not yet implemented)
+- `sim`: performs simulation.
+- `ana`: performs offline analysis.
+- `basepar`: creates the base parameter for calibrations and data conversions.
+- `online`: performs online analysis. (not yet implemented)
 
 For example,
 
@@ -179,7 +180,7 @@ neuland ana [-h] [options]
   - `NeulandNeutronsRValue`. See `R3BNeulandNeutronsRValue`.
   - `NeulandCal2HitParTask`: See `R3B::Neuland::Cal2HitParTask`.
     - `min-stat`: Minimal number of hits from the events that are used for the calibration.
-    - `method`: Method of the calibration. Available options: `LSQT`, `predecessor` and `millepede`. See `R3B::Neuland::Cal2HitParMethod`.
+    - `method`: Method of the calibration. Available options: `recons`, `histogram` and `millepede`. See `R3B::Neuland::Cal2HitParMethod`.
 
 All tasks listed above have three common options: "enable", "read" and "write". The "enable" option specifies whether the task is added or not. If some tasks should be added, simply change its value to `true`.
 
@@ -187,6 +188,23 @@ Options "read" and "write" specify the names of input branch or parameter that t
 
 > [!important]
 > Names in the "read" and "write" options must be separated by a semicolon `;` and their order matters. They should be kept the same if not under very special circumstances.
+
+## Base parameter creation
+
+NeuLAND base parameter is required to do any data calibrations and conversions from the real experimental data. It has the type `Neuland::CalibrationBasePar`, which contains multiple important numbers relating to NeuLAND detector in an experiment, such as experiment ID, off-spill bit position, number of scintillation planes and the mapping of trigger signal IDs.
+
+### Synopsis
+
+```bash
+neuland basepar [-h] [-s severity] -i path_to_header_file.hh -o path_to_output_file.root --offspill-pos POSITION --exp-id "sXXX"
+```
+
+The program options such `-i`, `-o`, `--offspill-pos`, `--exp-id` must be given by users:
+
+- `-i` or `--input`: The NeuLAND trigger ID mapping header file. This file is usually named as `mapping_neuland_trig.hh` and can be found at the `upexps/exp_id` folder. Please download it from the official [upexps repository](https://git.gsi.de/r3b/upexps).
+- `-o` or `--output`: This specifies the location of the output root file.
+- `--exp-id`: This specifies the experiment ID, e.g. `s512` or `s118`.
+- `--offspill-pos`: This specifies the bit position of the NeuLAND off-spill data. Please find this value from the ELOG of the corresponding experiment.
 
 ## Online analysis application
 

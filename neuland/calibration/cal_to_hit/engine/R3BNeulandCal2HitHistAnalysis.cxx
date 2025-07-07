@@ -1,9 +1,9 @@
-#include "R3BNeulandPredecessor.h"
+#include "R3BNeulandCal2HitHistAnalysis.h"
 #include "R3BDataMonitor.h"
-#include "R3BLogger.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandCommon.h"
+#include "R3BNeulandCommonFunc.h"
 #include "R3BValueError.h"
 #include <R3BNeulandCalToHitParTask.h>
 #include <TF1.h>
@@ -12,7 +12,13 @@
 #include <TH1.h>
 #include <TH2.h>
 #include <array>
+#include <fairlogger/Logger.h>
 #include <fmt/core.h>
+#include <range/v3/range/conversion.hpp>
+#include <range/v3/view/iota.hpp>
+#include <range/v3/view/transform.hpp>
+#include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace R3B::Neuland::Calibration
@@ -30,20 +36,14 @@ namespace R3B::Neuland::Calibration
 
         auto calculate_toffset_speed(TH1D* histogram, int bar_id) -> ParResult
         {
-            histogram->Scale(1 / histogram->GetEntries());
-            auto* cumulative = histogram->GetCumulative();
-            constexpr auto QUANTILES_NUM = 2;
-            const auto quantiles =
-                std::array<double, QUANTILES_NUM>{ 0.5 - (FITTING_RANGE_RATIO / 2.), 0.5 + (FITTING_RANGE_RATIO / 2.) };
-            auto x_pos = std::array<double, QUANTILES_NUM>{};
-            histogram->GetQuantiles(QUANTILES_NUM, x_pos.data(), quantiles.data());
+
+            auto [cumulative, x_pos] = calculate_CDF_with_quantiles(histogram, FITTING_RANGE_RATIO);
 
             // First fit to determine the values of the slope and offset
-            auto first_fit_res = cumulative->Fit("pol1", "SQ", "", x_pos[0], x_pos[1]);
+            auto first_fit_res = cumulative->Fit("pol1", "SQC", "", x_pos[0], x_pos[1]);
             if (first_fit_res.Get() == nullptr)
             {
-                R3BLOG(warn,
-                       fmt::format("First linear fitting on time_diff CFD failed for the bar with id {}", bar_id));
+                LOGP(warn, "First linear fitting on time_diff CFD failed for the bar with id {}", bar_id);
                 return {};
             }
             const auto slope = first_fit_res->Parameter(1);
@@ -56,10 +56,10 @@ namespace R3B::Neuland::Calibration
             auto fit_fun = TF1{ "fit_fun", "[1]*x + 0.5 - [0] * [1]", x_pos[0], x_pos[1] };
             fit_fun.SetParameter(0, (0.5 - offset) / slope);
             fit_fun.SetParameter(1, slope);
-            auto second_fit_res = cumulative->Fit(&fit_fun, "SQ", "", x_pos[0], x_pos[1]);
+            auto second_fit_res = cumulative->Fit(&fit_fun, "SQC", "", x_pos[0], x_pos[1]);
             if (second_fit_res.Get() == nullptr)
             {
-                R3BLOG(warn, fmt::format("Second fitting on time_diff CFD failed for the bar with id {}", bar_id));
+                LOGP(warn, "Second fitting on time_diff CFD failed for the bar with id {}", bar_id);
                 return {};
             }
 
@@ -72,14 +72,12 @@ namespace R3B::Neuland::Calibration
         }
     } // namespace
 
-    void Predecessor::HistInit(DataMonitor& histograms)
+    void HistAnalysis::HistInit(DataMonitor& histograms)
     {
         const auto module_size = GetModuleSize();
 
-        static constexpr auto TIME_DIFF_MAX = 100.; // ns
-        static constexpr auto TIME_DIFF_BIN_NUM = 500;
-        // static constexpr auto TIME_SUM_MAX = 800; // ns
-        // static constexpr auto TIME_SUM_BIN_NUM = 400;
+        static constexpr auto TIME_DIFF_MAX = 300.; // ns
+        static constexpr auto TIME_DIFF_BIN_NUM = 600;
 
         hist_time_diff_ = histograms.add_hist<TH2D>("hist_time_diff",
                                                     "Time differences between two adjacent PMTs",
@@ -90,19 +88,18 @@ namespace R3B::Neuland::Calibration
                                                     -TIME_DIFF_MAX,
                                                     TIME_DIFF_MAX);
 
-        // hist_time_sum_ = histograms.add_hist<TH2D>("hist_time_sum",
-        //                                            "Time summation between two adjacent PMTs",
-        //                                            module_size,
-        //                                            0.5,
-        //                                            0.5 + module_size,
-        //                                            TIME_SUM_BIN_NUM,
-        //                                            0.,
-        //                                            TIME_SUM_MAX + 0.);
+        tsync_engine_.init_hist(histograms);
     }
 
-    void Predecessor::Init() { cal_to_hit_par_ = GetTask()->GetCal2HitPar(); }
+    void HistAnalysis::Init()
+    {
+        cal_to_hit_par_ = GetTask()->GetCal2HitPar();
+        tsync_engine_.set_number_of_modules(GetModuleSize());
+        tsync_engine_.set_max_time_difference(DEFAULT_TSYNC_MAX_TIME_DIFF);
+        tsync_engine_.init();
+    }
 
-    void Predecessor::AddSignals(const std::vector<BarCalData>& signals)
+    void HistAnalysis::AddSignals(const std::vector<BarCalData>& signals)
     {
         // all bar signal must have one signal on both sides
         for (const auto& signal : signals)
@@ -115,40 +112,57 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    void Predecessor::fill_hist(const BarCalData& signal)
+    void HistAnalysis::fill_hist(const BarCalData& signal)
     {
         const auto& left_signal = signal.left.front();
         const auto& right_signal = signal.right.front();
 
         const auto module_num = signal.module_num;
         const auto t_diff = right_signal.leading_time - left_signal.leading_time;
-        // const auto t_sum = right_signal.leading_time + left_signal.leading_time;
+        const auto t_sum = right_signal.leading_time + left_signal.leading_time;
 
         hist_time_diff_->Fill(static_cast<int>(module_num), t_diff.value);
+        tsync_engine_.add_point(t_sum.value, module_num);
         // hist_time_sum_->Fill(static_cast<int>(module_num), t_sum.value);
     }
 
-    auto Predecessor::SignalFilter(const std::vector<BarCalData>& signals) -> bool
+    auto HistAnalysis::SignalFilter(const std::vector<BarCalData>& signals) -> bool
     {
         // select out rays with few hits
         return signals.size() >= minimum_hit_;
     }
 
-    void Predecessor::Calibrate(Cal2HitPar& hit_par)
+    namespace
     {
-        const auto module_size = GetModuleSize();
-
-        for (int bar_id{}; bar_id < module_size; ++bar_id)
+        void calibrate_t_diff(TH2D* hist_time_diff, HitModulePar& module_par)
         {
-            auto* hist_t_diff_py = hist_time_diff_->ProjectionY("_py", bar_id + 1, bar_id + 1);
-            const auto par_res = calculate_toffset_speed(hist_t_diff_py, bar_id);
+            const auto module_num = module_par.module_num;
 
-            auto module_par = HitModulePar{};
-            module_par.module_num = bar_id + 1;
+            auto* hist_t_diff_py = hist_time_diff->ProjectionY("_py", module_num, module_num);
+            const auto par_res = calculate_toffset_speed(hist_t_diff_py, module_num);
             module_par.t_diff = par_res.t_offset;
             module_par.effective_speed = par_res.effective_speed;
-
-            hit_par.AddModulePar(module_par);
         }
+
+        void add_default_module_pars(Cal2HitPar& hit_par, int module_size)
+        {
+            auto module_pars =
+                ranges::views::iota(1, module_size + 1) |
+                ranges::views::transform([](int module_num)
+                                         { return std::make_pair(module_num, HitModulePar{ module_num }); }) |
+                ranges::to<std::unordered_map<int, HitModulePar>>();
+            hit_par.SetModulePars(std::move(module_pars));
+        }
+    } // namespace
+
+    void HistAnalysis::Calibrate(Cal2HitPar& hit_par)
+    {
+        add_default_module_pars(hit_par, GetModuleSize());
+        for (auto& [module_num, module_par] : hit_par.GetListOfModuleParRef())
+        {
+            calibrate_t_diff(hist_time_diff_, module_par);
+        }
+        tsync_engine_.calibrate(hit_par);
     }
+
 } // namespace R3B::Neuland::Calibration

@@ -14,6 +14,7 @@
 #include "PedeLauncher.h"
 #include <boost/process/search_path.hpp>
 #include <boost/process/v2/process.hpp>
+#include <boost/process/v2/start_dir.hpp>
 #include <boost/process/v2/stdio.hpp>
 #include <exception>
 #include <filesystem>
@@ -37,8 +38,10 @@ namespace R3B::Millepede
         throw std::runtime_error(
             "Program is not compiled with with millepde2. Please enable \"WITH_MILLEPEDE=ON\" with CMake.");
 #endif
+        fs::create_directories(fs::path{ working_directory_ });
         const auto exe_string = fmt::format("{}/{}", binary_directory_, executable_);
-        auto launch_args = std::vector<std::string>{ "-i", steer_filename_ };
+        const auto steer_filepath = fs::absolute(fs::path{ working_directory_ } / fs::path{ steer_filename_ });
+        auto launch_args = std::vector<std::string>{ "-i", steer_filepath.string() };
         auto exe_path = std::filesystem::path(exe_string);
         if (not std::filesystem::exists(exe_path))
         {
@@ -47,9 +50,11 @@ namespace R3B::Millepede
 
         try
         {
-            auto pede_program = bpv2::process{
-                ios_, exe_path, launch_args, bpv2::process_stdio{ .in = nullptr, .out = stdout, .err = stderr }
-            };
+            auto pede_program = bpv2::process{ ios_,
+                                               exe_path,
+                                               launch_args,
+                                               bpv2::process_start_dir{ working_directory_ },
+                                               bpv2::process_stdio{ .in = nullptr, .out = stdout, .err = stderr } };
             pede_program.async_wait(
                 [](const std::error_code& err, int ret)
                 {
@@ -73,8 +78,8 @@ namespace R3B::Millepede
 
     void Launcher::end()
     {
-        auto old_result_path = fs::current_path() / fs::path{ DEFAULT_RES_FILENAME };
-        auto new_result_path = fs::current_path() / fs::path{ parameter_file_ };
+        auto old_result_path = fs::path{ working_directory_ } / fs::path{ DEFAULT_RES_FILENAME };
+        auto new_result_path = fs::path{ working_directory_ } / fs::path{ parameter_file_ };
 
         if (fs::exists(old_result_path))
         {

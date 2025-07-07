@@ -8,7 +8,7 @@ else
     channels:
       - conda-forge
     dependencies:
-      - python==$(${SIMPATH}/lib/root-config --python-version)
+      - python==$(${SIMPATH}/bin/root-config --python-version)
       - numpy
       - matplotlib
       - seaborn
@@ -17,6 +17,7 @@ else
       - scipy
       - jupyterlab
       - jupyterlab_code_formatter
+      - black
       - jupyterlab_vim
       - jupyterlab-lsp
       - conan

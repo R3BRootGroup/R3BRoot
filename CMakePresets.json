@@ -32,6 +32,7 @@
         "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "util/cmake-conan/conan_provider.cmake",
         "WITH_MILLEPEDE": "ON",
         "CONAN_ENABLED": "ON",
+        "BUILD_LAND_DIR": "OFF",
         "CONAN_INSTALL_ARGS": "--build=missing;--settings:build=compiler.cppstd=gnu17"
       }
     },
@@ -43,6 +44,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "WITH_DOX": "ON",
+        "BUILD_LAND_DIR": "OFF",
         "NO_BUILD": "ON"
       }
     }

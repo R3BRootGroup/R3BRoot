@@ -2,11 +2,15 @@
 
 #include <R3BException.h>
 #include <algorithm>
+#include <array>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <fairlogger/Logger.h>
 #include <fmt/format.h>
+#include <root/TH1.h>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace R3B::Neuland
@@ -18,6 +22,7 @@ namespace R3B::Neuland
                                std::vector<std::string>& write,
                                int write_num)
     {
+        LOGP(info, "Task {:?} is enabled", option.name);
         auto resolve_branch_names = [](const std::string& input, std::vector<std::string>& output)
         {
             output.clear();
@@ -49,4 +54,32 @@ namespace R3B::Neuland
                 option.write));
         }
     }
+
+    inline auto calculate_cdf(TH1* histogram) -> TH1*
+    {
+        histogram->Scale(1 / histogram->GetEntries());
+        auto* cumulative = histogram->GetCumulative();
+        histogram->Scale(histogram->GetEntries());
+        return cumulative;
+    }
+
+    inline auto calculate_hist_quantiles(TH1* histogram, double quantile_ratio) -> std::array<double, 2>
+    {
+        static constexpr auto QUANTILES_NUM = 2;
+        const auto quantiles =
+            std::array<double, QUANTILES_NUM>{ 0.5 - (quantile_ratio / 2.), 0.5 + (quantile_ratio / 2.) };
+        auto x_pos = std::array<double, QUANTILES_NUM>{};
+        histogram->GetQuantiles(QUANTILES_NUM, x_pos.data(), quantiles.data());
+        return x_pos;
+    }
+
+    inline auto calculate_CDF_with_quantiles(TH1* histogram, double ratio) -> std::pair<TH1*, std::array<double, 2>>
+    {
+        if (histogram == nullptr)
+        {
+            return {};
+        }
+        return { calculate_cdf(histogram), calculate_hist_quantiles(histogram, ratio) };
+    }
+
 } // namespace R3B::Neuland

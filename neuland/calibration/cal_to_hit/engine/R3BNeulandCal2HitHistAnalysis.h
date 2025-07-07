@@ -5,6 +5,7 @@
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandCosmicEngine.h"
+#include "R3BNeulandTSyncAnalysis.h"
 
 #include <TH2.h>
 #include <fmt/core.h>
@@ -12,25 +13,25 @@
 
 namespace R3B::Neuland::Calibration
 {
-    class Predecessor : public CosmicEngineInterface
+    class HistAnalysis : public CosmicEngineInterface
     {
       public:
-        Predecessor() = default;
+        HistAnalysis() = default;
 
       private:
         Cal2HitPar* cal_to_hit_par_ = nullptr;
         int minimum_hit_ = 1;
+        TSyncEngine tsync_engine_;
 
         // histograms:
         TH2D* hist_time_diff_ = nullptr;
-        // TH2D* hist_time_sum_ = nullptr;
 
         // private virtual functions:
         void Init() override;
         void AddSignals(const std::vector<BarCalData>& signals) override;
         void Calibrate(Cal2HitPar& hit_par) override;
-        void EndOfEvent(unsigned int event_num = 0) override {}
-        void EventReset() override {}
+        void EndOfEvent(unsigned int /*event_num*/ = 0) override { tsync_engine_.end_of_event(); }
+        void EventReset() override { tsync_engine_.reset(); }
         void EndOfTask() override {}
         auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
         void HistInit(DataMonitor& histograms) override;

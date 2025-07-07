@@ -21,9 +21,9 @@
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
 #include <R3BLogger.h>
-#include <R3BNeulandLSQREngineAdaptor.h>
+#include <R3BNeulandCal2HitHistAnalysis.h>
 #include <R3BNeulandMillepede.h>
-#include <R3BNeulandPredecessor.h>
+#include <R3BNeulandMuonRecons.h>
 #include <memory>
 #include <string_view>
 
@@ -38,25 +38,22 @@ namespace R3B::Neuland
                                    int iVerbose)
         : CalibrationTask(name, iVerbose)
         , cal_data_{ cal_data_name }
-        , base_par_{ InputPar<CalibrationBasePar>(base_par_name) }
+        , base_par_{ AddInputPar<CalibrationBasePar>(base_par_name) }
     // NOLINTEND
     {
         switch (method)
         {
-            case Cal2HitParMethod::LSQT:
-                R3BLOG(info, "Cal2HitPar method: LSQT.");
-                engine_ = std::make_unique<Calibration::LSQREngineAdaptor>();
-                hit_par_ = OutputPar<Cal2HitPar>(hit_par_name);
+            case Cal2HitParMethod::recons:
+                engine_ = std::make_unique<Calibration::MuonReconstruction>();
+                hit_par_ = AddOutputPar<Cal2HitPar>(hit_par_name);
                 break;
             case Cal2HitParMethod::millepede:
-                R3BLOG(info, "Cal2HitPar method: Millepede.");
                 engine_ = std::make_unique<Calibration::MillepedeEngine>();
-                hit_par_ = InputPar<Cal2HitPar>(hit_par_name);
+                hit_par_ = AddInputPar<Cal2HitPar>(hit_par_name);
                 break;
-            case Cal2HitParMethod::predecessor:
-                R3BLOG(info, "Cal2HitPar method: predecessor.");
-                engine_ = std::make_unique<Calibration::Predecessor>();
-                hit_par_ = OutputPar<Cal2HitPar>(hit_par_name);
+            case Cal2HitParMethod::histogram:
+                engine_ = std::make_unique<Calibration::HistAnalysis>();
+                hit_par_ = AddOutputPar<Cal2HitPar>(hit_par_name);
                 break;
         }
     }

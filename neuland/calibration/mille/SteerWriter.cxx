@@ -12,6 +12,7 @@
  ******************************************************************************/
 
 #include "SteerWriter.h"
+#include <filesystem>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h> // NOLINT: provides formatter for std::pair<>
@@ -50,7 +51,8 @@ namespace R3B
 
     void SteerWriter::write()
     {
-        auto ofile = std::ofstream{ filepath_, std::ios_base::out | std::ios_base::trunc };
+        auto ofile = std::ofstream{ std::filesystem::path{ working_dir_ } / filepath_,
+                                    std::ios_base::out | std::ios_base::trunc };
 
         if (not ofile.is_open())
         {
@@ -74,7 +76,8 @@ namespace R3B
 
     void SteerWriter::write_parameter_defaults()
     {
-        auto ofile = std::ofstream{ parameter_file_, std::ios_base::out | std::ios_base::trunc };
+        auto ofile = std::ofstream{ std::filesystem::path{ working_dir_ } / parameter_file_,
+                                    std::ios_base::out | std::ios_base::trunc };
 
         if (not ofile.is_open())
         {

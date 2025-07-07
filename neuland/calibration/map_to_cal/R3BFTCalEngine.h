@@ -34,7 +34,7 @@ namespace R3B::Neuland::calibration
         FTCalStrategy() = default;
         using ValueErrors = TCalVFTXModulePar::ValueErrors;
 
-        void Set_max_bin_number(unsigned int num) { max_bin_number_ = num; }
+        void Set_max_bin_number(int num) { max_bin_number_ = num; }
         void Set_cycle_period(double time) { cycle_period_ = time; } // ns
         void Set_error_method(FTCalErrorMethod method) { error_method_ = method; }
 
@@ -42,7 +42,7 @@ namespace R3B::Neuland::calibration
         auto GetChannel2Time(TH1* hist) const -> FTChannel2TimeRelation;
 
       private:
-        unsigned int max_bin_number_ = 0;
+        int max_bin_number_ = 0;
         double cycle_period_ = 0.; // nano seconds
         FTCalErrorMethod error_method_ = FTCalErrorMethod::uniform_only;
     };
@@ -77,9 +77,7 @@ namespace R3B::Neuland::calibration
             }
         }
 
-        void Write2Par(unsigned int moduleID,
-                       Map2CalPar& t_cal_par,
-                       std::map<FTType, FTChannel2TimeRelation> valueErrors)
+        void Write2Par(int moduleID, Map2CalPar& t_cal_par, std::map<FTType, FTChannel2TimeRelation> valueErrors)
         {
             auto modulePar = TCalVFTXModulePar{ moduleID };
 
@@ -107,11 +105,11 @@ namespace R3B::Neuland::calibration
 
       private:
         std::string_view hist_name_;
-        unsigned int moduleNum_ = 0;
+        int moduleNum_ = 0;
         // fine time distributions:
         std::map<FTType, std::unique_ptr<TH1>> fTDistribution_;
 
-        FTBaseCal(std::string_view hist_name, unsigned int moduleNum, const std::vector<FTType>& types)
+        FTBaseCal(std::string_view hist_name, int moduleNum, const std::vector<FTType>& types)
             : hist_name_(hist_name)
             , moduleNum_{ moduleNum }
         {
@@ -135,8 +133,8 @@ namespace R3B::Neuland::calibration
     {
       public:
         using HistType = TH1I;
-        explicit ModuleCal(std::string_view hist_name, unsigned int mID);
-        void Fill(FTType type, unsigned int ftValue) { AddFineTime(type, ftValue); }
+        explicit ModuleCal(std::string_view hist_name, int mID);
+        void Fill(FTType type, int ftValue) { AddFineTime(type, ftValue); }
         template <typename Strategy>
         void Write_to_par(const Strategy& strategy, Map2CalPar& t_cal_par)
         {
@@ -159,9 +157,9 @@ namespace R3B::Neuland::calibration
     {
       public:
         using HistType = TH2I;
-        explicit PlaneCal(std::string_view hist_name, unsigned int mID);
+        explicit PlaneCal(std::string_view hist_name, int mID);
 
-        void Fill(FTType type, unsigned int ftValue, unsigned int barID) { AddFineTime(type, barID, ftValue); }
+        void Fill(FTType type, int ftValue, int barID) { AddFineTime(type, barID, ftValue); }
 
         // template <typename Strategy>
         void Write_to_par(const FTCalStrategy& strategy, Map2CalPar& t_cal_par)
@@ -194,7 +192,7 @@ namespace R3B::Neuland::calibration
         }
 
         template <typename... AdditionalPar>
-        void Fill(FTType type, unsigned int ftValue, unsigned int moduleNum, AdditionalPar&&... pars)
+        void Fill(FTType type, int ftValue, int moduleNum, AdditionalPar&&... pars)
         {
             auto iter = cals_.find(moduleNum);
             if (iter == cals_.end())
@@ -222,7 +220,7 @@ namespace R3B::Neuland::calibration
         }
 
       private:
-        std::map<unsigned int, CalType> cals_;
+        std::map<int, CalType> cals_;
         std::string hist_name_;
     };
 
