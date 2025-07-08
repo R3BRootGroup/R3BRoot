@@ -297,24 +297,6 @@ namespace R3B::Neuland
     }
 
     template <>
-    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::MapDataConverterTask& option)
-    {
-        json_obj = json{
-            { "enable", option.enable },
-            { "read", option.read },
-            { "write", option.write },
-        };
-    }
-
-    template <>
-    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::MapDataConverterTask& option)
-    {
-        json_obj.at("enable").get_to(option.enable);
-        json_obj.at("read").get_to(option.read);
-        json_obj.at("write").get_to(option.write);
-    }
-
-    template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Map2CalTask& option)
     {
         json_obj = json{
@@ -337,6 +319,28 @@ namespace R3B::Neuland
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
     }
+
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Cal2HitTask& option)
+    {
+        json_obj = json{
+            { "enable", option.enable },
+            { "mode", magic_enum::enum_name(option.mode) },
+            { "global-time-offset", option.global_time_offset },
+            { "read", option.read },
+            { "write", option.write },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::Cal2HitTask& option)
+    {
+        json_obj.at("enable").get_to(option.enable);
+        json_obj.at("global-time-offset").get_to(option.global_time_offset);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+        set_enum_from_string(option.mode, json_obj, "mode");
+    }
     // =============================================================================================
     // Anaysis general options:
     template <>
@@ -357,6 +361,10 @@ namespace R3B::Neuland
             { option.map_data_converter_task.name, option.map_data_converter_task },
             { option.map_to_cal_task.name, option.map_to_cal_task },
             { option.cal_to_hit_par_task.name, option.cal_to_hit_par_task },
+            { option.los_map_to_cal_task.name, option.los_map_to_cal_task },
+            { option.los_map_to_cal_par_task.name, option.los_map_to_cal_par_task },
+            { option.los_provide_t_start.name, option.los_provide_t_start },
+            { option.cal_to_hit_task.name, option.cal_to_hit_task },
         };
     }
 
@@ -377,6 +385,10 @@ namespace R3B::Neuland
         json_obj.at(option.map_data_converter_task.name).get_to(option.map_data_converter_task);
         json_obj.at(option.map_to_cal_task.name).get_to(option.map_to_cal_task);
         json_obj.at(option.cal_to_hit_par_task.name).get_to(option.cal_to_hit_par_task);
+        json_obj.at(option.los_map_to_cal_task.name).get_to(option.los_map_to_cal_task);
+        json_obj.at(option.los_map_to_cal_par_task.name).get_to(option.los_map_to_cal_par_task);
+        json_obj.at(option.los_provide_t_start.name).get_to(option.los_provide_t_start);
+        json_obj.at(option.cal_to_hit_task.name).get_to(option.cal_to_hit_task);
     }
 
     template <>

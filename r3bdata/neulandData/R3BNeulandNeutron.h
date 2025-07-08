@@ -17,38 +17,41 @@
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
 #include "TObject.h"
-#include "TVector3.h"
+#include <Math/Vector3D.h>
+#include <Math/Vector3Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <iostream>
 
 class R3BNeulandNeutron : public TObject
 {
   public:
     R3BNeulandNeutron() = default;
-    R3BNeulandNeutron(Int_t paddle, Double_t time, const TVector3& pos, const TVector3& pix);
+    R3BNeulandNeutron(int paddle, double time, const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& pix);
     explicit R3BNeulandNeutron(const R3BNeulandHit&);
     explicit R3BNeulandNeutron(const R3BNeulandCluster&);
 
-    Int_t GetPaddle() const { return fPaddle; }
-    Double_t GetT() const { return fT; }
-    TVector3 GetPosition() const { return fPosition; }
-    TVector3 GetPixel() const { return fPixel; }
+    [[nodiscard]] auto GetPaddle() const -> int { return fPaddle; }
+    [[nodiscard]] auto GetT() const -> double { return fT; }
+    [[nodiscard]] auto GetPosition() const -> ROOT::Math::XYZVector { return fPosition; }
+    [[nodiscard]] auto GetPixel() const -> ROOT::Math::XYZVector { return fPixel; }
 
-    Double_t GetEtot() const;
-    Double_t GetEkin() const;
-    Double_t GetGamma() const;
-    TVector3 GetP() const;
+    [[nodiscard]] auto GetEtot() const -> double;
+    [[nodiscard]] auto GetEkin() const -> double;
+    [[nodiscard]] auto GetGamma() const -> double;
+    [[nodiscard]] auto GetP() const -> ROOT::Math::XYZVector;
 
-    void Print(const Option_t*) const override;
+    void Print(const Option_t* /*option*/) const override;
 
   private:
-    Int_t fPaddle;
-    Double_t fT;
-    TVector3 fPosition;
-    TVector3 fPixel;
+    int fPaddle{};
+    double fT{};
+    ROOT::Math::XYZVector fPosition;
+    ROOT::Math::XYZVector fPixel;
 
     ClassDefOverride(R3BNeulandNeutron, 1)
 };
 
-std::ostream& operator<<(std::ostream&, const R3BNeulandNeutron&); // Support easy printing
+auto operator<<(std::ostream&, const R3BNeulandNeutron&) -> std::ostream&; // Support easy printing
 
 #endif // R3BNEULANDNEUTRON_H

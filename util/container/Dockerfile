@@ -10,8 +10,10 @@ RUN yes | dnf upgrade --refresh &&\
         mkdir -p /opt && cd /opt &&\
         git clone --depth 1 --branch ${R3B_BRNAME} https://github.com/YanzhaoW/R3BRoot.git &&\
         cd R3BRoot && git submodule update --init && cmake --preset default -GNinja -DWITH_DOX=NO &&\
-        cmake --build --preset default -- -j${THREAD_NUM} &&\
-        source build/config.sh && root -l -q neuland/geobase/create_neuland_geo.C
+        export ROOT_CXX_STANDARD=$(${SIMPATH}/bin/root-config --cxxstandard)
+        cmake --preset default . -DCMAKE_CXX_STANDARD=${ROOT_CXX_STANDARD}
+        cmake --build --preset default -- -j${THREAD_NUM}
 
 ENV CONFIG_FILE="/opt/R3BRoot/build/config.sh"
-ENTRYPOINT ["/bin/bash", "--rcfile", "/opt/R3BRoot/build/config.sh"]
+COPY --chmod=755 entrypoint.sh /opt/entrypoint.sh
+ENTRYPOINT ["/opt/entrypoint.sh"]

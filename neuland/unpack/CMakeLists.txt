@@ -12,7 +12,7 @@
 ##############################################################################
 
 set(SRCS R3BNeulandTcalFill.cxx R3BNeulandTcal.cxx R3BNeulandPmt.cxx)
-set(SRCS R3BNeulandTcalFill.h R3BNeulandTcal.h R3BNeulandPmt.h)
+set(HEADERS R3BNeulandTcalFill.h R3BNeulandTcal.h R3BNeulandPmt.h)
 
 add_library(R3BNeulandUnpack SHARED ${SRCS})
 target_include_directories(R3BNeulandUnpack PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

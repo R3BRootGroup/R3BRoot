@@ -41,12 +41,12 @@ class fmt::formatter<R3B::Millepede::ParResultEntry>
     template <typename FmtContent>
     constexpr auto format(const R3B::Millepede::ParResultEntry& entry, FmtContent& ctn) const
     {
-        return format_to(ctn.out(),
-                         "par id: {}, value: {}, sigma: {}, value_diff: {}, error: {}",
-                         entry.par_num,
-                         entry.value,
-                         entry.sigma,
-                         entry.value_diff,
-                         entry.error);
+        return fmt::format_to(ctn.out(),
+                              "par id: {}, value: {}, sigma: {}, value_diff: {}, error: {}",
+                              entry.par_num,
+                              entry.value,
+                              entry.sigma,
+                              entry.value_diff,
+                              entry.error);
     }
 };

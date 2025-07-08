@@ -12,7 +12,6 @@
  ******************************************************************************/
 
 #pragma once
-#include <FairLogger.h>
 #include <R3BValueError.h>
 #include <Rtypes.h>
 #include <TFile.h>

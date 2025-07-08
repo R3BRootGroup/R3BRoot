@@ -13,10 +13,15 @@
 
 #pragma once
 
+#include <Rtypes.h>
 #include <TNamed.h>
 
 // if needed
+#include <TObject.h>
+#include <cstdint>
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <string_view>
 
 namespace R3B
 {
@@ -24,7 +29,7 @@ namespace R3B
     {
       public:
         explicit DetectorData(std::string_view name = "DefaultName")
-            : TNamed(name.data(), ""){};
+            : TNamed(name.data(), "") {};
 
         int module_num = 0; // starts from 1
         int module_id = 0;  // starts from 0
@@ -72,7 +77,7 @@ class fmt::formatter<R3B::DetectorData>
     template <typename FmtContent>
     constexpr auto format(const R3B::DetectorData& data, FmtContent& ctn) const
     {
-        return format_to(
+        return fmt::format_to(
             ctn.out(), "{{module_id: {}, energy: {}, tpat: {:x}}}", data.module_id, data.energy, data.tpat);
     }
 };

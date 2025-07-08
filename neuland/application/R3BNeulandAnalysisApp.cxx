@@ -1,5 +1,9 @@
+#include "R3BLosMapped2Cal.h"
+#include "R3BLosMapped2CalPar.h"
+#include "R3BLosProvideTStart.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandCalToHitParTask.h"
+#include "R3BNeulandCalToHitTask.h"
 #include "R3BNeulandCommonFunc.h"
 #include "R3BNeulandMapDataConverterTask.h"
 #include "R3BNeulandMapToCalParTask.h"
@@ -40,7 +44,7 @@ namespace R3B::Neuland
         : CLIApplication{ "neuland_ana", std::make_unique<FairRunAna>(), std::ref(options_.general) }
     {
         options_.general.input.data.emplace_back("sim.output.root");
-        options_.general.input.par = "sim.par.root";
+        options_.general.input.par.emplace_back("sim.par.root");
 
         options_.general.output.data = "digi.output.root";
         options_.general.output.par = "digi.par.root";
@@ -202,6 +206,22 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
+        if (const auto& option = task_option.los_map_to_cal_par_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
+            auto task = std::make_unique<R3BLosMapped2CalPar>();
+            run->AddTask(task.release());
+        }
+
+        if (const auto& option = task_option.los_map_to_cal_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 3, write_branch_names, 1);
+            auto task = std::make_unique<R3BLosMapped2Cal>();
+            static constexpr auto LOS_MODULE_NUM = 8;
+            task->SetNofModules(1, LOS_MODULE_NUM);
+            task->SetTrigger(1);
+            run->AddTask(task.release());
+        }
         if (const auto& option = task_option.cal_to_hit_par_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
@@ -209,6 +229,22 @@ namespace R3B::Neuland
                 option.method, read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
             task->SetMinStat(option.min_stat);
             task->SetTrigger(option.mode);
+            run->AddTask(task.release());
+        }
+        if (const auto& option = task_option.los_provide_t_start; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 0);
+            auto task = std::make_unique<R3BLosProvideTStart>();
+            run->AddTask(task.release());
+        }
+
+        if (const auto& option = task_option.cal_to_hit_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
+            auto task = std::make_unique<R3B::Neuland::Cal2HitTask>(
+                read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
+            task->SetTrigger(option.mode);
+            task->SetGlobalTimeOffset(option.global_time_offset);
             run->AddTask(task.release());
         }
     }

@@ -30,6 +30,7 @@
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandHit.h"
 #include <FairTask.h>
+#include <Math/Vector3Dfwd.h>
 #include <R3BNeulandCommonFunc.h>
 #include <R3BShared.h>
 #include <RtypesCore.h>
@@ -53,6 +54,10 @@ constexpr auto MAX_SIZE_BIN = 20;
 
 namespace R3B::Neuland
 {
+    template <typename Type>
+    using UseChannel = Digitizing::UseChannel<Type>;
+    template <typename Type>
+    using UsePaddle = Digitizing::UsePaddle<Type>;
     namespace
     {
         inline auto CreateDigiEngine(const DigiTaskOptions& option, std::string_view hit_par_name, FairRun* run)
@@ -117,6 +122,8 @@ namespace R3B::Neuland
         : Digitizer(Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(), UseChannel<TacquilaChannel>()))
     {
     }
+
+    Digitizer::~Digitizer() = default;
 
     Digitizer::Digitizer(std::unique_ptr<Digitizing::EngineInterface> engine,
                          std::string_view points_name,
@@ -355,10 +362,10 @@ namespace R3B::Neuland
 
         for (const auto& signal : signals)
         {
-            const TVector3 hitPositionLocal = TVector3(signal.position, 0., 0.);
-            const TVector3 hitPositionGlobal =
+            const auto hitPositionLocal = ROOT::Math::XYZVector(signal.position, 0., 0.);
+            const auto hitPositionGlobal =
                 neuland_geo_par_->ConvertToGlobalCoordinates(hitPositionLocal, paddle.GetPaddleID());
-            const TVector3 hitPixel = neuland_geo_par_->ConvertGlobalToPixel(hitPositionGlobal);
+            const auto hitPixel = neuland_geo_par_->ConvertGlobalToPixel(hitPositionGlobal);
 
             auto hit = R3BNeulandHit{ paddle.GetPaddleID(),
                                       signal.left_channel_hit->tdc,

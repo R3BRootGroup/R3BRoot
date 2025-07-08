@@ -56,6 +56,8 @@ namespace R3B
 
         void write();
 
+        static constexpr auto convert_method_to_str(Method) -> std::string_view;
+
       private:
         std::map<Method, std::pair<float, float>> methods_;
         std::string filepath_ = DEFAULT_STEER_FILENAME;
@@ -81,32 +83,6 @@ class fmt::formatter<R3B::SteerWriter::Method>
     template <typename FmtContent>
     constexpr auto format(const R3B::SteerWriter::Method& method, FmtContent& ctn) const
     {
-        switch (method)
-        {
-            case R3B::SteerWriter::Method::inversion:
-                return format_to(ctn.out(), "{}", "inversion");
-                break;
-            case R3B::SteerWriter::Method::diagonalization:
-                return format_to(ctn.out(), "{}", "diagonalization");
-                break;
-            case R3B::SteerWriter::Method::fullGMRES:
-                return format_to(ctn.out(), "{}", "fullGMRES");
-                break;
-            case R3B::SteerWriter::Method::sparseGMRES:
-                return format_to(ctn.out(), "{}", "sparseGMRES");
-                break;
-            case R3B::SteerWriter::Method::cholesky:
-                return format_to(ctn.out(), "{}", "cholesky");
-                break;
-            case R3B::SteerWriter::Method::bandcholesky:
-                return format_to(ctn.out(), "{}", "bandcholesky");
-                break;
-            case R3B::SteerWriter::Method::HIP:
-                return format_to(ctn.out(), "{}", "HIP");
-                break;
-            default:
-                return format_to(ctn.out(), "{}", "unrecognized");
-                break;
-        }
+        return fmt::format_to(ctn.out(), "{}", R3B::SteerWriter::convert_method_to_str(method));
     }
 };

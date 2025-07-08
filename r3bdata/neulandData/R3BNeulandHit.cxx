@@ -12,12 +12,14 @@
  ******************************************************************************/
 
 #include "R3BNeulandHit.h"
+#include <Math/Vector3Dfwd.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <TVector3.h>
 #include <cmath>
 #include <iostream>
 #include <ostream>
+#include <utility>
 
 constexpr double light_speed = 29.97924580000000105; //!< cm/ns
 // constexpr double light_speed_square = 898.75517873681758374; // cm²/ns²
@@ -29,8 +31,8 @@ R3BNeulandHit::R3BNeulandHit(int paddle,
                              double QdcL,
                              double QdcR,
                              double energy_val,
-                             const TVector3& pos,
-                             const TVector3& pix)
+                             ROOT::Math::XYZVector pos,
+                             ROOT::Math::XYZVector pix)
     : module_id(paddle)
     , tdc_left(TdcL)
     , tdc_right(TdcR)
@@ -38,12 +40,12 @@ R3BNeulandHit::R3BNeulandHit(int paddle,
     , qdc_left(QdcL)
     , qdc_right(QdcR)
     , energy(energy_val)
-    , position(pos)
-    , pixel(pix)
+    , position(std::move(pos))
+    , pixel(std::move(pix))
 {
 }
 
-auto R3BNeulandHit::GetBeta() const -> double { return position.Mag() / (time * light_speed); }
+auto R3BNeulandHit::GetBeta() const -> double { return position.r() / (time * light_speed); }
 
 auto R3BNeulandHit::GetEToF(const double mass) const -> double
 {

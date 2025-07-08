@@ -48,13 +48,13 @@ class R3BNeulandCluster : public TObject
     R3BNeulandHit GetLastHit() const;
     R3BNeulandHit GetMaxEnergyHit() const;
     R3BNeulandHit GetForemostHit() const;
-    TVector3 GetPosition() const;
+    ROOT::Math::XYZVector GetPosition() const;
     Double_t GetT() const;
     Double_t GetE() const;
     Double_t GetBeta() const { return GetFirstHit().GetBeta(); }
     Double_t GetEToF() const { return GetFirstHit().GetEToF(); }
     Size_t GetSize() const { return fHits.size(); }
-    TVector3 GetEnergyCentroid() const;
+    ROOT::Math::XYZVector GetEnergyCentroid() const;
     Double_t GetEnergyMoment() const;
     Double_t GetRCluster(Double_t beta) const;
     Double_t GetRECluster(Double_t ekin) const;

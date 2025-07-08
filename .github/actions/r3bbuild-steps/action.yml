@@ -27,7 +27,9 @@ runs:
         git submodule update --init --recursive
         git clone https://github.com/R3BRootGroup/macros.git
         conan remote update conancenter --url="https://center2.conan.io"
-        cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
+        export ROOT_CXX_STANDARD=$(${SIMPATH}/bin/root-config --cxxstandard)
+        export ROOT_CXX_STANDARD="${ROOT_CXX_STANDARD:-17}"
+        cmake --preset ${{ matrix.preset }} . -DCMAKE_CXX_STANDARD=${ROOT_CXX_STANDARD} -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
       shell: bash
 
     - name: build ${{ matrix.repos }}

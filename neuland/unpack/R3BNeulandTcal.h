@@ -132,7 +132,7 @@ class R3BNeulandTcal : public FairTask
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
 
   public:
-    ClassDef(R3BNeulandTcal, 1)
+    ClassDefOverride(R3BNeulandTcal, 1)
 };
 
 #endif

@@ -18,4 +18,6 @@ namespace R3B::Neuland
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
     }
+
+    // template
 } // namespace R3B::Neuland

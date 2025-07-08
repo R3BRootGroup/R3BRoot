@@ -176,7 +176,7 @@ void R3BNeulandHitMon::Exec(Option_t* /*option*/)
     {
         hist_pos_vs_energy_->Fill(hit.GetPosition().Z(), hit.GetE());
         hist_time_->Fill(hit.GetT());
-        hist_time_adj_->Fill(distance_to_target_ / hit.GetPosition().Mag() * hit.GetT());
+        hist_time_adj_->Fill(distance_to_target_ / hit.GetPosition().r() * hit.GetT());
         hist_beta_->Fill(hit.GetBeta());
         hist_energy_->Fill(hit.GetE());
         hist_x_->Fill(hit.GetPosition().X());

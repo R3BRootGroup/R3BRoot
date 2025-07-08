@@ -16,6 +16,7 @@
 
 #include "FairParGenericSet.h"
 #include "TGeoNode.h"
+#include <Math/Vector3Dfwd.h>
 #include <map>
 class FairParamList;
 class TVector3;
@@ -49,9 +50,9 @@ class R3BNeulandGeoPar : public FairParGenericSet
     void SetNeulandGeoNode(const TGeoNode* const p);
 
     Double_t GetPaddleHalfLength() const;
-    TVector3 ConvertToLocalCoordinates(const TVector3& position, const Int_t paddleID) const;
-    TVector3 ConvertToGlobalCoordinates(const TVector3& position, const Int_t paddleID) const;
-    TVector3 ConvertGlobalToPixel(const TVector3& position) const;
+    ROOT::Math::XYZVector ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position, const Int_t paddleID) const;
+    ROOT::Math::XYZVector ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position, const Int_t paddleID) const;
+    ROOT::Math::XYZVector ConvertGlobalToPixel(const ROOT::Math::XYZVector& position) const;
 
   private:
     std::map<Int_t, TGeoNode*> fPaddleGeoNodes;

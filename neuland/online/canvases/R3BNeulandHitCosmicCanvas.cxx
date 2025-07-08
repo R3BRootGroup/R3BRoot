@@ -115,7 +115,7 @@ namespace R3B::Neuland
                     const auto time_diff = time_mean - time_mean_ref;
 
                     const auto distance = hit.position - hit_ref.position;
-                    const auto time_c = std::copysign(distance.Mag() / CLight, distance.Y());
+                    const auto time_c = std::copysign(distance.r() / CLight, distance.Y());
 
                     hist->Fill(module_id, time_diff);
                     hist_c->Fill(module_id, time_diff + time_c);

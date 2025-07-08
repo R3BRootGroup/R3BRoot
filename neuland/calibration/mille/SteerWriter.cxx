@@ -18,13 +18,20 @@
 #include <fmt/ranges.h> // NOLINT: provides formatter for std::pair<>
 #include <fstream>
 #include <ios>
+#include <magic_enum/magic_enum.hpp>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
 namespace R3B
 {
+    constexpr auto SteerWriter::convert_method_to_str(Method method) -> std::string_view
+    {
+        return magic_enum::enum_name(method);
+    }
+
     void SteerWriter::add_parameter_default(int par_num, const std::pair<float, float>& values)
     {
         if (auto iter = parameter_defaults_.find(par_num); iter != parameter_defaults_.end())

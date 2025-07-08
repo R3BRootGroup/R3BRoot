@@ -147,6 +147,36 @@ namespace R3B::Neuland
                     std::string read = "NeulandCalData;NeulandCalibrationBasePar";
                     std::string write = "NeulandHitPar";
                 } cal_to_hit_par_task;
+                struct Cal2HitTask
+                {
+                    bool enable = false;
+                    CalTrigger mode = CalTrigger::offspill;
+                    double global_time_offset = 0.;
+                    std::string name = "NeulandCal2HitTask";
+                    std::string read = "NeulandCalData;NeulandHitPar";
+                    std::string write = "NeulandHit";
+                } cal_to_hit_task;
+                struct LosMap2CalParTask
+                {
+                    bool enable = false;
+                    std::string name = "LosMap2CalParTask";
+                    std::string read = "LosMapped;LosTriggerMapped";
+                    std::string write = "LosTCalPar";
+                } los_map_to_cal_par_task;
+                struct LosMap2CalTask
+                {
+                    bool enable = false;
+                    std::string name = "LosMap2CalTask";
+                    std::string read = "LosMapped;LosTriggerMapped;LosTCalPar";
+                    std::string write = "LosCal;LosTriggerCal";
+                } los_map_to_cal_task;
+                struct LosProvideTStart
+                {
+                    bool enable = false;
+                    std::string name = "LosProvideTStart";
+                    std::string read = "LosCal;LosTriggerCal";
+                    std::string write;
+                } los_provide_t_start;
             } tasks;
         };
 

@@ -3,11 +3,9 @@
 # variables:
 # - DOCKER_REPO: repository to be pushed to.
 # - DOCKER_USERNAME: the user name of the repository owner.
-# - SYLABS_USERNAME: the user name of sylab repo owner
 #
 # secrets:
 # - DOCKER_TOKEN: access token to dockerhub
-# - SYLABS_TOKEN: access token to sylab server
 
 name: deploy-container
 
@@ -27,10 +25,10 @@ jobs:
           - 'r3bdev:r3broot-arm'
         include:
           - repo: 'r3bdev:r3broot'
-            build-repo: 'r3bdev:fedora-latest'
+            build-repo: 'r3bdev:fedora-stable'
             build-env: 'ubuntu-latest'
           - repo: 'r3bdev:r3broot-arm'
-            build-repo: 'r3bdev:fedora-latest-arm'
+            build-repo: 'r3bdev:fedora-stable-arm'
             build-env: 'ubuntu-24.04-arm'
 
     runs-on: ${{ matrix.build-env }}
@@ -57,39 +55,3 @@ jobs:
             BUILD_REPO=${{ matrix.build-repo }}
             THREAD_NUM=4 
             R3B_BRNAME=${{ github.head_ref || github.ref_name }}
-
-
-  apptainer-build:
-    runs-on: self-hosted
-    continue-on-error: true
-    needs: docker-build
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          submodules: 'true'
-
-      - name: build apptainer and push
-        run: |
-          set -e
-          apptainer remote logout SylabsCloud
-          mkdir -p ${{ github.workspace }}/tmp
-          # apptainer remote add --no-login SylabsCloud cloud.sycloud.io
-          echo "${{ secrets.SYLABS_TOKEN }}" | singularity remote login
-          apptainer remote status
-          apptainer build --notest -F neuland.sif ./util/container/neuland.def
-          # apptainer sign --keyidx 0 neuland.sif
-          apptainer delete -F library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag} || true
-          apptainer push -D "neuland cli" -U neuland.sif library://${{ vars.SYLABS_USERNAME }}/r3bdev/${image_tag}
-        shell: bash
-        env:
-          image_tag: 'neuland:latest'
-          APPTAINER_TMPDIR: ${{ github.workspace }}/tmp
-
-      - name: clean up
-        if: success() || failure()
-        run: |
-          apptainer remote logout SylabsCloud
-          apptainer cache clean -f
-          rm -rf ${{ github.workspace }}/tmp
-          df -h

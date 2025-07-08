@@ -92,7 +92,7 @@ class fmt::formatter<R3B::Neuland::Calibration::MilleCalData>
     template <typename FmtContent>
     constexpr auto format(const R3B::Neuland::Calibration::MilleCalData& signal, FmtContent& ctn) const
     {
-        return format_to(
+        return fmt::format_to(
             ctn.out(), "ModuleNum: {}, left bar: {}, right bar: {}", signal.module_num, signal.left, signal.right);
     }
 };

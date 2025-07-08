@@ -56,7 +56,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     // TVector3 pos1;
     // TVector3 pos2;
 
-    const TVector3 pos1 = c1->GetFirstHit().GetPosition();
+    const auto pos1 = c1->GetFirstHit().GetPosition();
 
     //    incoming particle
     // vector from previous interaction to present interaction
@@ -90,7 +90,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
     Double_t K1max = En1max - amu;
 
     // particle 4 is proton
-    const TVector3 pos2 = c1->GetLastHit().GetPosition();
+    const auto pos2 = c1->GetLastHit().GetPosition();
     Double_t v4x = (pos2 - pos1).X();
     Double_t v4y = (pos2 - pos1).Y();
     Double_t v4z = (pos2 - pos1).Z();
@@ -157,7 +157,7 @@ bool Neuland::IsElastic(const R3BNeulandCluster* cl1, const R3BNeulandCluster* c
         theta4Measuredmax = 1.55;
 
     // calculate velocity of neutron after scattering
-    const TVector3 pos3 = c2->GetFirstHit().GetPosition();
+    const auto pos3 = c2->GetFirstHit().GetPosition();
     Double_t v3x = (pos3 - pos1).X();
     Double_t v3y = (pos3 - pos1).Y();
     Double_t v3z = (pos3 - pos1).Z();

@@ -16,6 +16,8 @@
 
 #include "FairMCPoint.h"
 #include "TVector3.h"
+#include <Math/Vector3D.h>
+#include <Math/Vector3Dfwd.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <iostream>
@@ -60,8 +62,14 @@ class R3BNeulandPoint : public FairMCPoint
     {
     }
 
-    [[nodiscard]] auto GetMomentum() const -> TVector3;
-    [[nodiscard]] auto GetPosition() const -> TVector3;
+    [[nodiscard]] auto GetMomentum() const -> ROOT::Math::XYZVector
+    {
+        return ROOT::Math::XYZVector{ GetPx(), GetPy(), GetPz() };
+    }
+    [[nodiscard]] auto GetPosition() const -> ROOT::Math::XYZVector
+    {
+        return ROOT::Math::XYZVector{ GetX(), GetY(), GetZ() };
+    }
     [[nodiscard]] auto GetPaddle() const -> int { return GetDetectorID(); }
     [[nodiscard]] auto GetLightYield() const -> double { return fLightYield; }
     [[nodiscard]] auto GetPID() const -> int { return fParticleId; }

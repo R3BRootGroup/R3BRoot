@@ -13,8 +13,19 @@
 
 #include "R3BNeulandNeutronReconstructionMon.h"
 
+#include <FairTask.h>
+#include <Math/Vector3Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TLorentzVector.h>
+#include <TString.h>
+#include <TVector3.h>
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
+#include <fairlogger/Logger.h>
 #include <functional>
 #include <iostream>
 #include <numeric>
@@ -22,15 +33,11 @@
 
 #include "TClonesArray.h"
 #include "TDirectory.h"
-#include "TH1D.h"
-#include "TH2D.h"
 #include <TFile.h>
+#include <vector>
 
-#include "FairLogger.h"
 #include "FairMCPoint.h"
 #include "FairRootManager.h"
-#include "FairRtdbRun.h"
-#include "FairRuntimeDb.h"
 
 #include "R3BMCTrack.h"
 #include "R3BNeulandNeutron.h"
@@ -39,10 +46,9 @@
 static const Double_t c2 = 898.75517873681758374; // cm²/ns²
 static const Double_t massNeutron = 939.565379;   // MeV/c²
 
-Double_t Distance(const R3BNeulandNeutron& nn, const FairMCPoint& mc)
+auto Distance(const R3BNeulandNeutron& nn, const FairMCPoint& mc) -> Double_t
 {
-    TVector3 v;
-    mc.Position(v);
+    auto v = ROOT::Math::XYZVector{ mc.GetX(), mc.GetY(), mc.GetZ() };
     v -= nn.GetPosition();
     return std::sqrt(v.Dot(v));
 }
@@ -246,7 +252,8 @@ void R3BNeulandNeutronReconstructionMon::Exec(Option_t*)
 
         for (const auto& neutron : neutrons)
         {
-            p4_reco += TLorentzVector(neutron.GetP(), neutron.GetEtot());
+            auto pos = neutron.GetP();
+            p4_reco += TLorentzVector(TVector3{ pos.X(), pos.Y(), pos.Z() }, neutron.GetEtot());
             m0_reco += massNeutron;
         }
 

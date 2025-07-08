@@ -351,7 +351,7 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             hHitEvsBar->Fill(bar, hit->GetE());
             hTdiffvsBar->Fill(bar, hit->GetTdcL() - hit->GetTdcR());
 
-            const Double_t tcorr = hit->GetT() - (hit->GetPosition().Mag() - fDistanceToTarget) / clight;
+            const Double_t tcorr = hit->GetT() - (hit->GetPosition().r() - fDistanceToTarget) / clight;
             const Double_t tadj = hit->GetT();
 
             if (hit->GetE() > 0.)
@@ -394,7 +394,7 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
                                       (hit->GetTdcL() + hit->GetTdcR()) / 2. -
                                           (hitref->GetTdcL() + hitref->GetTdcR()) / 2. +
                                           copysign(1., (hit->GetPosition() - hitref->GetPosition()).Y()) *
-                                              (hit->GetPosition() - hitref->GetPosition()).Mag() / clight);
+                                              (hit->GetPosition() - hitref->GetPosition()).r() / clight);
                     }
                     if ((hitref->GetPaddle() == 625) && (bar != 625))
                     {
@@ -404,7 +404,7 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
                                       (hit->GetTdcL() + hit->GetTdcR()) / 2. -
                                           (hitref->GetTdcL() + hitref->GetTdcR()) / 2. +
                                           copysign(1., (hit->GetPosition() - hitref->GetPosition()).Y()) *
-                                              (hit->GetPosition() - hitref->GetPosition()).Mag() / clight);
+                                              (hit->GetPosition() - hitref->GetPosition()).r() / clight);
                     }
                 }
             }

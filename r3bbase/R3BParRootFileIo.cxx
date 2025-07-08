@@ -45,6 +45,10 @@ namespace R3B
 
     void ParRootFileIo::open(std::unique_ptr<TFile> root_file)
     {
+        if (root_file == nullptr)
+        {
+            throw R3B::runtime_error("Root file is nullptr!");
+        }
         if (not root_file->IsOpen())
         {
             throw R3B::logic_error(fmt::format("Cannot open the root file {:?}", root_file->GetName()));
@@ -70,6 +74,7 @@ namespace R3B
     void ParRootFileIo::open(std::string_view file_name, std::string_view file_option)
     {
         open(std::make_unique<TFile>(file_name.data(), file_option.data()));
+        LOGP(debug, "Open root file {:?}", file_name);
     }
 
     void ParRootFileIo::open(const std::vector<std::string>& filenames, std::string_view file_option)

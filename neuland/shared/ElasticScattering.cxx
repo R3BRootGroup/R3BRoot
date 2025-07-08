@@ -13,7 +13,6 @@
 
 #include "ElasticScattering.h"
 #include "R3BNeulandCluster.h"
-#include "TVector3.h"
 #include <cmath>
 
 using std::pow;
@@ -33,8 +32,8 @@ namespace Neuland
 
     auto RecoilScatteringAngle(const R3BNeulandCluster& cluster) -> double
     {
-        const TVector3 pNUnit = cluster.GetFirstHit().GetPosition().Unit();
-        const TVector3 pp_Unit = (cluster.GetEnergyCentroid() - cluster.GetFirstHit().GetPosition()).Unit();
+        const auto pNUnit = cluster.GetFirstHit().GetPosition().Unit();
+        const auto pp_Unit = (cluster.GetEnergyCentroid() - cluster.GetFirstHit().GetPosition()).Unit();
         const double cosTheta = pNUnit.Dot(pp_Unit);
         return cosTheta;
     }
@@ -44,7 +43,7 @@ namespace Neuland
         static constexpr auto neutron_mass = 938.;                    // Rest Mass Neutron [MeV]
         static constexpr auto light_speed_sq = 898.75517873681758374; // cm²/ns²
 
-        const TVector3 first_hit_distance = second.GetFirstHit().GetPosition() - first.GetFirstHit().GetPosition();
+        const auto first_hit_distance = second.GetFirstHit().GetPosition() - first.GetFirstHit().GetPosition();
         const double time_diff = second.GetT() - first.GetT();
 
         const double velocity_sq = first_hit_distance.Mag2() / std::pow(time_diff, 2); // cm²/ns²
@@ -61,8 +60,8 @@ namespace Neuland
 
     auto ScatteredNeutronAngle(const R3BNeulandCluster& first, const R3BNeulandCluster& second) -> double
     {
-        const TVector3 pNUnit = first.GetFirstHit().GetPosition().Unit();
-        const TVector3 pN_Unit = (second.GetFirstHit().GetPosition() - first.GetFirstHit().GetPosition()).Unit();
+        const auto pNUnit = first.GetFirstHit().GetPosition().Unit();
+        const auto pN_Unit = (second.GetFirstHit().GetPosition() - first.GetFirstHit().GetPosition()).Unit();
         const double cosTheta = pNUnit.Dot(pN_Unit); // \cos(\theta_{NN'})
         return cosTheta;
     }

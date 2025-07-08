@@ -18,6 +18,7 @@
 #include <Rtypes.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <vector>
 
 namespace R3B::Neuland
@@ -55,11 +56,11 @@ class fmt::formatter<R3B::Neuland::CalDataSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::Neuland::CalDataSignal& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(),
-                         "{{leadT: {}, tot: {}, trigT: {} }}",
-                         signal.leading_time,
-                         signal.time_over_threshold,
-                         signal.trigger_time);
+        return fmt::format_to(ctn.out(),
+                              "{{leadT: {}, tot: {}, trigT: {} }}",
+                              signal.leading_time,
+                              signal.time_over_threshold,
+                              signal.trigger_time);
     }
 };
 
@@ -71,10 +72,10 @@ class fmt::formatter<R3B::Neuland::BarCalData>
     template <typename FmtContent>
     constexpr auto format(const R3B::Neuland::BarCalData& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(),
-                         "ModuleNum: {}, left bar: [{}], right bar: [{}]",
-                         signal.module_num,
-                         fmt::join(signal.left, ", "),
-                         fmt::join(signal.right, ", "));
+        return fmt::format_to(ctn.out(),
+                              "ModuleNum: {}, left bar: [{}], right bar: [{}]",
+                              signal.module_num,
+                              fmt::join(signal.left, ", "),
+                              fmt::join(signal.right, ", "));
     }
 };

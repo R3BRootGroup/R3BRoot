@@ -137,7 +137,7 @@ class R3BNeulandTcalFill : public FairTask
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
   public:
-    ClassDef(R3BNeulandTcalFill, 1)
+    ClassDefOverride(R3BNeulandTcalFill, 1)
 };
 
 #endif // Test 1

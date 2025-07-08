@@ -36,11 +36,11 @@ class fmt::formatter<R3B::MilleDataPoint>
     template <typename FmtContent>
     constexpr auto format(const R3B::MilleDataPoint& point, FmtContent& ctn) const
     {
-        return format_to(ctn.out(),
-                         "measurement: {}, sigma: {}, locals: {}, globals: {}",
-                         point.measurement,
-                         point.sigma,
-                         point.locals,
-                         point.globals);
+        return fmt::format_to(ctn.out(),
+                              "measurement: {}, sigma: {}, locals: {}, globals: {}",
+                              point.measurement,
+                              point.sigma,
+                              point.locals,
+                              point.globals);
     }
 };

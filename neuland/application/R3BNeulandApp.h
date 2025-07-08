@@ -44,7 +44,7 @@ namespace R3B::Neuland
                 std::string working_dir;
                 std::vector<std::string> data;
                 std::vector<std::string> tree_data;
-                std::string par;
+                std::vector<std::string> par;
             } input;
             struct Output
             {
@@ -80,7 +80,10 @@ namespace R3B::Neuland
         void set_log_level(std::string_view log_level) { option_.get().log_level = log_level; }
         void set_run_id(int run_id) { option_.get().run_id = run_id; }
         void set_output_filename(std::string_view output_filename) { option_.get().output.data = output_filename; }
-        void set_inputpar_filename(std::string_view inputpar_filename) { option_.get().input.par = inputpar_filename; }
+        void add_inputpar_filename(std::string_view inputpar_filename)
+        {
+            option_.get().input.par.emplace_back(inputpar_filename);
+        }
         void set_outputpar_filename(std::string_view outputpar_filename)
         {
             option_.get().output.par = outputpar_filename;

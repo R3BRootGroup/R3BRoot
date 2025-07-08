@@ -69,13 +69,13 @@ void R3BTCalPar::clear()
 
 void R3BTCalPar::printParams()
 {
-    R3BLOG(info, GetName() << " Time Calib. Parameters");
+    R3BLOG(debug, GetName() << " Time Calib. Parameters");
 
-    R3BLOG(info, "Number of TCal Parameters " << fTCalParams->GetEntries());
+    R3BLOG(debug, "Number of TCal Parameters " << fTCalParams->GetEntries());
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
-        auto t_par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
-        LOG(info) << "----------------------------------------------------------------------";
+        R3BTCalModulePar* t_par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
+        LOG(debug) << "----------------------------------------------------------------------";
         if (t_par)
         {
             t_par->printParams();

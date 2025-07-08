@@ -152,12 +152,12 @@ class fmt::formatter<R3B::Digitizing::ChannelHit>
     template <typename FmtContent>
     constexpr auto format(const R3B::Digitizing::ChannelHit& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(),
-                         "{{qdc: {}, tdc: {}, adcUnSat: {}, side: {}}}",
-                         signal.qdc,
-                         signal.tdc,
-                         signal.qdcUnSat,
-                         signal.side);
+        return fmt::format_to(ctn.out(),
+                              "{{qdc: {}, tdc: {}, adcUnSat: {}, side: {}}}",
+                              signal.qdc,
+                              signal.tdc,
+                              signal.qdcUnSat,
+                              signal.side);
     }
 };
 
@@ -169,7 +169,8 @@ class fmt::formatter<R3B::Digitizing::ChannelCalSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::Digitizing::ChannelCalSignal& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{{ToT: {}, Leading edge: {}, side: {}}}", signal.tot, signal.tle, signal.side);
+        return fmt::format_to(
+            ctn.out(), "{{ToT: {}, Leading edge: {}, side: {}}}", signal.tot, signal.tle, signal.side);
     }
 };
 
@@ -181,6 +182,6 @@ class fmt::formatter<R3B::Digitizing::ChannelSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::Digitizing::ChannelSignal& hit, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{{time: {} ns, light dep: {} MeV}}", hit.time, hit.intensity);
+        return fmt::format_to(ctn.out(), "{{time: {} ns, light dep: {} MeV}}", hit.time, hit.intensity);
     }
 };

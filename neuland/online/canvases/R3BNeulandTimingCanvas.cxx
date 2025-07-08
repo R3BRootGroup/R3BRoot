@@ -79,7 +79,7 @@ namespace R3B::Neuland
             const auto bar_width_error = rand_gen->Uniform(-BarSize_XY / 2., BarSize_XY / 2.);
 
             const auto time = hit.time;
-            const auto correc_time = time - ((hit.position.Mag() - distance_to_target) / CLight);
+            const auto correc_time = time - ((hit.position.r() - distance_to_target) / CLight);
             const auto pos_x = IsPlaneIDHorizontal(plane_id) ? hit.position.X() : hit.position.X() + bar_width_error;
 
             hTofvsZ_->Fill(plane_id, time);

@@ -18,6 +18,7 @@ set(SRCS
     NeulandParticleFilter.cxx
     R3BDigitizingChannel.cxx
     R3BDigitizingChannelMock.h
+    R3BDigitizingEngine.cxx
     R3BDigitizingPaddle.cxx
     R3BDigitizingPaddleMock.h
     R3BDigitizingPaddleNeuland.cxx
@@ -32,7 +33,6 @@ set(HEADERS
     NeulandParticleFilter.h
     R3BDigitizingChannel.h
     R3BDigitizingChannelMock.h
-    R3BDigitizingEngine.h
     R3BDigitizingPaddle.h
     R3BDigitizingPaddleMock.h
     R3BDigitizingPaddleNeuland.h

@@ -36,9 +36,10 @@
 #include <cstdint>
 #include <cstdio>
 #include <fairlogger/Logger.h>
-#include <fmt/chrono.h> // NOLINT
+#include <fmt/chrono.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <memory>
 #include <optional>
 #include <string>

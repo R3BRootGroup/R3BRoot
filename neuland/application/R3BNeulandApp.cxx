@@ -92,7 +92,6 @@ namespace
         }
         return value_string;
     }
-
 } // namespace
 
 namespace R3B::Neuland
@@ -270,7 +269,6 @@ namespace R3B::Neuland
 
     void CLIApplication::add_inout_pars()
     {
-        auto file_path = fs::path{};
         const auto& input_option = option_.get().input;
         const auto& output_option = option_.get().output;
         const auto& input_wd = input_option.working_dir;
@@ -278,12 +276,26 @@ namespace R3B::Neuland
 
         if (not input_option.par.empty())
         {
-            file_path =
-                input_wd.empty() ? fs::path{ input_option.par } : fs::path{ input_wd } / fs::path{ input_option.par };
-            auto fileio = ParRootFileIo::Input();
-            LOGP(info, "Input first parameter file is {:?}", file_path.string());
-            fileio->open(file_path.c_str(), "READ");
-            run_->GetRuntimeDb()->setFirstInput(fileio.release());
+            auto input_par_fileio = ParRootFileIo::Input();
+            for (const auto& par_filename : input_option.par)
+            {
+                if (not par_filename.empty())
+                {
+                    auto file_path = [&]()
+                    {
+                        auto par_file = fs::path{ par_filename };
+
+                        if (par_file.is_absolute())
+                        {
+                            return par_file;
+                        }
+                        return input_wd.empty() ? par_file : fs::path{ input_wd } / par_file;
+                    }();
+                    LOGP(info, "Input first parameter file is {:?}", file_path.c_str());
+                    input_par_fileio->open(file_path.c_str(), "READ");
+                }
+            }
+            run_->GetRuntimeDb()->setFirstInput(input_par_fileio.release());
         }
 
         if (not output_option.par.empty())
@@ -291,14 +303,15 @@ namespace R3B::Neuland
             const auto& option = option_.get();
             const auto output_name =
                 option.enable_mpi ? fmt::format("{}.{}", output_option.par, rank_num_) : output_option.par;
-            file_path = output_wd.empty() ? fs::path{ output_name } : fs::path{ output_wd } / fs::path{ output_name };
+            auto file_path =
+                output_wd.empty() ? fs::path{ output_name } : fs::path{ output_wd } / fs::path{ output_name };
             LOGP(info, "Ouptut parameter file is {:?}", file_path.string());
-            auto fileio = ParRootFileIo::Output();
-            fileio->open(file_path.c_str(), option.output.mode);
+            auto output_par_fileio = ParRootFileIo::Output();
+            output_par_fileio->open(file_path.c_str(), option.output.mode);
             // auto fileio = std::make_unique<FairParRootFileIo>(true);
             // fileio->open(file_path.c_str(), option.output.mode.c_str());
             auto* rtdb = run_->GetRuntimeDb();
-            rtdb->setOutput(fileio.release());
+            rtdb->setOutput(output_par_fileio.release());
         }
     }
 

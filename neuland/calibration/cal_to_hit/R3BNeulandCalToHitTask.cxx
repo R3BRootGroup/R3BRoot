@@ -19,12 +19,14 @@
 #include "R3BNeulandCalibrationTask.h"
 #include "R3BNeulandCommon.h"
 #include "R3BNeulandHit.h"
+#include "R3BNeulandTriggerTypes.h"
 #include "R3BValueError.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
+#include <Math/Vector3D.h>
+#include <Math/Vector3Dfwd.h>
 #include <R3BNeulandSignalMatcher.h>
 #include <R3BShared.h>
-#include <TVector3.h>
 #include <cmath>
 #include <fairlogger/Logger.h>
 #include <fmt/core.h>
@@ -36,6 +38,7 @@ namespace
     using R3B::ValueErrorD;
     using R3B::Neuland::CalibratedSignal;
     using R3B::Neuland::HitModulePar;
+    using ROOT::Math::XYZVector;
 
     inline auto get_hit_energy(double first_e, double second_e, const HitModulePar& par)
     {
@@ -53,17 +56,17 @@ namespace
              tdc_right,
              par.effective_speed,
              tdc_right - tdc_left);
-        const auto pos_along_bar = par.effective_speed.value * (tdc_right - tdc_left);
+        const auto pos_along_bar = par.effective_speed.value * (tdc_right - tdc_left) / 2.;
         const auto pos_perp_bar = (bar_num - 0.5 - ::R3B::Neuland::BarsPerPlane * 0.5) * ::R3B::Neuland::BarSize_XY;
         const auto pos_z = (plane_id + 0.5) * ::R3B::Neuland::BarSize_Z;
         LOGP(debug2, "pos along the bar: {} cm, pos perp to bar {} cm, z: {} cm", pos_along_bar, pos_perp_bar, pos_z);
 
         auto is_horizontal = ::R3B::Neuland::IsPlaneIDHorizontal(plane_id);
-        return is_horizontal ? TVector3{ pos_along_bar, pos_perp_bar, pos_z }
-                             : TVector3{ pos_perp_bar, pos_along_bar, pos_z };
+        return is_horizontal ? XYZVector{ pos_along_bar, pos_perp_bar, pos_z }
+                             : XYZVector{ pos_perp_bar, pos_along_bar, pos_z };
     }
 
-    inline auto get_hit_pixel(const TVector3& position)
+    inline auto get_hit_pixel(const XYZVector& position)
     {
         const auto pixel_x =
             std::floor(position.X() / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
@@ -71,7 +74,7 @@ namespace
             std::floor(position.Y() / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
         const auto pixel_z = std::floor(position.Z() / ::R3B::Neuland::BarSize_Z);
 
-        return TVector3{ pixel_x, pixel_y, pixel_z };
+        return XYZVector{ pixel_x, pixel_y, pixel_z };
     }
 } // namespace
 
@@ -79,8 +82,8 @@ namespace R3B::Neuland
 {
 
     Cal2HitTask::Cal2HitTask(std::string_view input_cal_data_name,
-                             std::string_view output_hit_data_name,
-                             std::string_view input_cal_2_hit_par_name)
+                             std::string_view input_cal_2_hit_par_name,
+                             std::string_view output_hit_data_name)
         : CalibrationTask("R3BNeulandCal2Hit", 1)
         , cal_data_{ input_cal_data_name }
         , hit_data_{ output_hit_data_name }
@@ -92,12 +95,15 @@ namespace R3B::Neuland
 
     void Cal2HitTask::ExtraInit(FairRootManager* /*rootMan*/)
     {
-        cal_to_hit_par_.init(this);
         cal_data_.init();
         hit_data_.init(not IsHistDisabled());
+        if (cal_to_hit_par_->GetModulePars().empty())
+        {
+            throw R3B::logic_error("Cal2HitPar has no modules!");
+        }
     }
 
-    void Cal2HitTask::SetExtraPar(FairRuntimeDb* rtdb) {}
+    void Cal2HitTask::SetExtraPar(FairRuntimeDb* /*rtdb*/) { cal_to_hit_par_.init(this); }
 
     void Cal2HitTask::TriggeredExec() { calibrate(); }
 
@@ -192,12 +198,16 @@ namespace R3B::Neuland
 
     void Cal2HitTask::EndOfTask() {}
 
-    // auto Cal2Hit::CheckConditions() const -> bool
-    // {
-    //     const auto t_start = GetEventHeader()->GetTStart();
-    //     const auto is_beam_on = not std::isnan(t_start);
-    //     return is_beam_on;
-    // }
+    auto Cal2HitTask::CheckConditions() const -> bool
+    {
+        if (GetTrigger() == CalTrigger::onspill)
+        {
+            const auto t_start = GetEventHeader()->GetTStart();
+            const auto is_beam_on = not std::isnan(t_start);
+            return is_beam_on;
+        }
+        return true;
+    }
 
     auto Cal2HitTask::get_hit_time(double first_t, double second_t) const -> double
     {
@@ -222,10 +232,15 @@ namespace R3B::Neuland
     {
         const auto tot_no_offset = calSignal.time_over_threshold - par.pedestal.get(side);
 
+        const auto denominator = par.energy_gain.get(side) - par.pmt_saturation.get(side) * tot_no_offset;
+
+        if (denominator.value == 0.)
+        {
+            return ValueErrorD{};
+        }
+
         // apply minimum 1 ns:
-        return (tot_no_offset.value < 1)
-                   ? ValueErrorD{}
-                   : tot_no_offset / (par.energy_gain.get(side) - par.pmt_saturation.get(side) * tot_no_offset);
+        return (tot_no_offset.value < 1) ? ValueErrorD{} : tot_no_offset / denominator;
     }
 
     auto Cal2HitTask::get_calibrated_time(const CalDataSignal& calSignal,

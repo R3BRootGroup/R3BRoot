@@ -17,7 +17,6 @@
 #include "NeulandParticleFilter.h"
 #include "NeulandSimCalData.h"
 #include "R3BDataMonitor.h"
-#include "R3BDigitizingEngine.h"
 #include "R3BDigitizingPaddle.h"
 #include "R3BDigitizingPaddleNeuland.h"
 #include "R3BDigitizingTacQuila.h"
@@ -46,6 +45,10 @@ class TH2F;
  *
  */
 
+namespace R3B::Digitizing
+{
+    class EngineInterface;
+}
 namespace R3B::Neuland
 {
     /**
@@ -112,15 +115,17 @@ namespace R3B::Neuland
         using NeulandPaddle = Digitizing::Neuland::Paddle;
         using TacquilaChannel = Digitizing::Neuland::TacQuila::Channel;
         using TamexChannel = Digitizing::Neuland::Tamex::Channel;
-        template <typename Type>
-        using UseChannel = Digitizing::UseChannel<Type>;
-        template <typename Type>
-        using UsePaddle = Digitizing::UsePaddle<Type>;
 
         /**
          * @brief Constructor with no input parameters.
          */
         Digitizer();
+
+        Digitizer(const Digitizer&) = delete;
+        Digitizer(Digitizer&&) = delete;
+        auto operator=(const Digitizer&) -> Digitizer& = delete;
+        auto operator=(Digitizer&&) -> Digitizer& = delete;
+        ~Digitizer() override;
 
         /**
          * @brief Constructor with the given engine and input/output data branch names.

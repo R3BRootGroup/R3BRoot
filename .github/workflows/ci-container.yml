@@ -1,0 +1,76 @@
+name: ci test for containers
+on:
+  pull_request:
+    branches: [ edwin_dev ]
+
+  workflow_dispatch:
+
+permissions: write-all
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        repos: [fedora-latest, fedora-stable]
+        include:
+          - url: https://github.com/R3BRootGroup/R3BFileSource.git
+          - preset: default
+    container:
+      image: yanzhaowang/r3bdev:${{ matrix.repos }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # This allows all commits of all branches to be fetched.
+          fetch-depth: 0
+
+      - name: setup environments
+        run: |
+          echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+          echo "CONAN_HOME=${GITHUB_WORKSPACE}/.conan2" >> $GITHUB_ENV
+          echo "NUM_THREADS=4" >> $GITHUB_ENV
+          sudo -H pip3 install -U conan
+
+      - name: load cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: | 
+            ${{ github.workspace }}/.ccache
+            ${{ github.workspace }}/.conan2
+          key: r3b-cache-${{ matrix.repos }}
+
+      - name: configure-build
+        uses: './.github/actions/r3bbuild-steps'
+
+      - name: ctest-cdash
+        if: always()
+        uses: './.github/actions/ctest-cdash'
+        with:
+          repo: ${{ matrix.repos }}
+
+      - name: ccache stats
+        if: always()
+        run: ccache --show-stats
+
+      - name: cache-delete
+        run: |
+          sudo dnf -y install gh
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          gh cache delete ${{ steps.cache-restore.outputs.cache-primary-key }} || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: save cache
+        uses: actions/cache/save@v4
+        with:
+          path: | 
+            ${{ github.workspace }}/.ccache
+            ${{ github.workspace }}/.conan2
+          key: r3b-cache-${{ matrix.repos }}
+

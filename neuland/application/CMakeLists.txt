@@ -18,6 +18,7 @@ target_link_libraries(
     PUBLIC R3BNeulandDigitizing
            nlohmann_json::nlohmann_json
            R3BNeulandReconstruction
+           R3BLos
            R3BNeulandSimulation
            R3BNeulandClustering
            ${Geant4_LIBRARIES}

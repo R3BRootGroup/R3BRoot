@@ -29,9 +29,7 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/os.h>
-// NOLINTBEGIN
-#include <fmt/ranges.h> //IWYU pragma: keep
-// NOLINTEND
+#include <fmt/ranges.h>
 #include <memory>
 #include <regex>
 

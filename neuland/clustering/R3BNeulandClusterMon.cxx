@@ -41,7 +41,7 @@ namespace
     inline auto GetTheta(const R3BNeulandCluster& cluster) -> double
     {
         const auto direction = cluster.GetLastHit().GetPosition() - cluster.GetFirstHit().GetPosition();
-        const auto degree = std::acos(direction.Y() / direction.Mag()) * rad2deg;
+        const auto degree = std::acos(direction.Y() / direction.r()) * rad2deg;
         // Not sure, but Kondos Theta is -90:90
         static constexpr auto retate_angle = 90.;
         return degree - retate_angle;
@@ -306,28 +306,27 @@ void R3BNeulandClusterMon::Exec(Option_t*)
         if (cluster.GetSize() > 2)
         {
             fhClusterForemostMinusCentroidVSEnergy->Fill(
-                (cluster.GetForemostHit().GetPosition() - cluster.GetEnergyCentroid()).Mag(), cluster.GetE());
+                (cluster.GetForemostHit().GetPosition() - cluster.GetEnergyCentroid()).r(), cluster.GetE());
 
             fhClusterForemostMinusMaxEnergyDigiPosVSEnergy->Fill(
-                (cluster.GetForemostHit().GetPosition() - cluster.GetMaxEnergyHit().GetPosition()).Mag(),
-                cluster.GetE());
+                (cluster.GetForemostHit().GetPosition() - cluster.GetMaxEnergyHit().GetPosition()).r(), cluster.GetE());
 
             fhClusterCentroidMinusFirstDigiPosVSEnergy->Fill(
-                (cluster.GetEnergyCentroid() - cluster.GetFirstHit().GetPosition()).Mag(), cluster.GetE());
+                (cluster.GetEnergyCentroid() - cluster.GetFirstHit().GetPosition()).r(), cluster.GetE());
 
             fhClusterMaxEnergyDigiMinusFirstDigiPosVSEnergy->Fill(
-                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetFirstHit().GetPosition()).Mag(), cluster.GetE());
+                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetFirstHit().GetPosition()).r(), cluster.GetE());
             fhClusterMaxEnergyDigiMinusCentroidVSEnergy->Fill(
-                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetEnergyCentroid()).Mag(), cluster.GetE());
+                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetEnergyCentroid()).r(), cluster.GetE());
             fhClusterEnergyMomentVSEnergy->Fill(cluster.GetEnergyMoment(), cluster.GetE());
             fhClusterEnergyMomentVSClusterSize->Fill(cluster.GetEnergyMoment(), cluster.GetSize());
 
             fhClusterLastMinusFirstDigiMagVSEnergy->Fill(
-                (cluster.GetLastHit().GetPosition() - cluster.GetFirstHit().GetPosition()).Mag(), cluster.GetE());
+                (cluster.GetLastHit().GetPosition() - cluster.GetFirstHit().GetPosition()).r(), cluster.GetE());
 
             fhClusterEnergyMoment->Fill(cluster.GetEnergyMoment());
             fhClusterMaxEnergyDigiMinusFirstDigiMag->Fill(
-                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetFirstHit().GetPosition()).Mag());
+                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetFirstHit().GetPosition()).r());
         }
 
         fhZ->Fill(cluster.GetFirstHit().GetPosition().Z());

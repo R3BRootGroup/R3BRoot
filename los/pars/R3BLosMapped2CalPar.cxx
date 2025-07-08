@@ -42,19 +42,6 @@ R3BLosMapped2CalPar::R3BLosMapped2CalPar(const char* name, Int_t iVerbose)
 {
 }
 
-R3BLosMapped2CalPar::~R3BLosMapped2CalPar()
-{
-    R3BLOG(debug1, "Destructor");
-    if (fCal_Par)
-    {
-        delete fCal_Par;
-    }
-    if (fEngine)
-    {
-        delete fEngine;
-    }
-}
-
 InitStatus R3BLosMapped2CalPar::Init()
 {
     R3BLOG(info, "");
@@ -161,19 +148,14 @@ void R3BLosMapped2CalPar::FinishTask()
     fEngine->CalculateParamVFTX();
     fCal_Par->setChanged();
 
-    R3BLOG(info, "Calibration of LOS detector");
-    for (size_t d = 0; d < fNofDetectors; d++)
+    R3BLOG(debug, "Calibration of LOS detector");
+    for (Int_t i = 0; i < 16; i++)
     {
         for (size_t i = 0; i < fNofChannels; i++)
         {
             for (size_t k = 0; k < fNofTypes; k++)
             {
-                if (Icount[d][i][k] > fMinStats)
-                {
-                    R3BLOG(info,
-                           "Detector: " << d + 1 << ", Channel: " << i + 1 << ", Type: " << k
-                                        << ", Count: " << Icount[d][i][k]);
-                }
+                R3BLOG(debug, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
             }
         }
     }
@@ -185,10 +167,7 @@ void R3BLosMapped2CalPar::FinishTask()
         {
             if (Icounttrig[i][k] > fMinStats)
             {
-                if (k == 0)
-                    R3BLOG(info, "VFTX channel: " << i + 1 << ", Counts: " << Icounttrig[i][k]);
-                else
-                    R3BLOG(info, "Tamex Channel: " << i + 1 << ", Type: " << k << ", Counts: " << Icounttrig[i][k]);
+                R3BLOG(debug, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icounttrig[i][k]);
             }
         }
     }

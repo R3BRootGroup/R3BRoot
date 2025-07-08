@@ -13,7 +13,8 @@
 #pragma once
 
 #include "TObject.h"
-#include "TVector3.h"
+#include <Math/Vector3D.h>
+#include <Math/Vector3Dfwd.h>
 #include <R3BFormatters.h> // NOLINT: for formatting
 #include <Rtypes.h>
 #include <RtypesCore.h>
@@ -31,8 +32,8 @@ struct R3BNeulandHit : public TObject
     double qdc_left = 0.;
     double qdc_right = 0.;
     double energy = 0.;
-    TVector3 position;
-    TVector3 pixel;
+    ROOT::Math::XYZVectorD position;
+    ROOT::Math::XYZVectorD pixel;
 
     R3BNeulandHit() = default;
     R3BNeulandHit(int paddle,
@@ -42,8 +43,8 @@ struct R3BNeulandHit : public TObject
                   double QdcL,
                   double QdcR,
                   double energy,
-                  const TVector3& pos,
-                  const TVector3& pix);
+                  ROOT::Math::XYZVector pos,
+                  ROOT::Math::XYZVector pix);
 
     void Print(const Option_t* /*option*/) const override;
     auto operator==(const R3BNeulandHit& other) const -> bool
@@ -60,13 +61,13 @@ struct R3BNeulandHit : public TObject
     [[nodiscard]] auto GetQdcR() const -> double { return qdc_right; }
     [[nodiscard]] auto GetQdcL() const -> double { return qdc_left; }
     [[nodiscard]] auto GetE() const -> double { return energy; }
-    [[nodiscard]] auto GetPosition() const -> TVector3 { return position; }
-    [[nodiscard]] auto GetPixel() const -> TVector3 { return pixel; }
+    [[nodiscard]] auto GetPosition() const -> const ROOT::Math::XYZVector& { return position; }
+    [[nodiscard]] auto GetPixel() const -> const ROOT::Math::XYZVector& { return pixel; }
 
     [[nodiscard]] auto GetBeta() const -> double;
     [[nodiscard]] auto GetEToF(double mass = NEUTRON_MASS_MEV) const -> double;
 
-    ClassDefOverride(R3BNeulandHit, 2);
+    ClassDefOverride(R3BNeulandHit, 3);
 };
 
 auto operator<<(std::ostream&, const R3BNeulandHit&) -> std::ostream&; // Support easy printing
@@ -79,7 +80,7 @@ class fmt::formatter<R3BNeulandHit>
     template <typename FmtContent>
     constexpr auto format(const R3BNeulandHit& hit, FmtContent& ctn) const
     {
-        return format_to(
+        return fmt::format_to(
             ctn.out(),
             "{{module_id: {}, left_tdc: {}, right_tdc: {}, time: {} ns, left_qdc: {}, right_qdc: {}, energy: "
             "{} MeV, position: {} cm, pixel: {}}}",

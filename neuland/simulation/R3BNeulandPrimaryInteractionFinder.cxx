@@ -186,7 +186,7 @@ void R3BNeulandPrimaryInteractionFinder::Exec(Option_t* /*option*/)
     if (FairLogger::GetLogger()->IsLogNeeded(fair::Severity::debug))
     {
         LOG(debug) << "R3BNeulandPrimaryInteractionFinder: Points without Hit in: ";
-        for (const auto [map_point, map_hit] : point_to_hit_map)
+        for (const auto& [map_point, map_hit] : point_to_hit_map)
         {
             if (map_hit == nullptr)
             {
@@ -219,7 +219,7 @@ void R3BNeulandPrimaryInteractionFinder::Exec(Option_t* /*option*/)
 
             if ((firstHit != nullptr) && (firstPoint != nullptr))
             {
-                fhDistance->Fill((firstPoint->GetPosition() - firstHit->GetPosition()).Mag());
+                fhDistance->Fill((firstPoint->GetPosition() - firstHit->GetPosition()).r());
             }
 
             fhPointVsHitPaddle->Fill((firstPoint != nullptr) ? firstPoint->GetPaddle() : -1,

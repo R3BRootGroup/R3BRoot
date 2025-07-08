@@ -41,6 +41,7 @@ namespace R3B::Neuland
         [[nodiscard]] auto GetEventHeader() const -> auto* { return eventHeader_; }
         [[nodiscard]] auto GetHistMonitor() -> DataMonitor& { return histograms_; }
         [[nodiscard]] auto IsHistDisabled() const -> bool { return is_hist_disabled_; }
+        [[nodiscard]] auto GetTrigger() const -> CalTrigger { return trig_type_; }
 
         void SetTrigger(CalTrigger trigger) { trig_type_ = trigger; }
         void SetDisableHist(bool is_hist_disabled = true) { is_hist_disabled_ = is_hist_disabled; }
@@ -68,7 +69,7 @@ namespace R3B::Neuland
       private:
         bool is_hist_disabled_ = false;
         bool is_write_hist_disabled_ = false;
-        int offspill_tpat_bit_ = 0;
+        int32_t offspill_tpat_bit_ = 0;
         int64_t passed_num_of_events = 0;
         CalTrigger trig_type_ = CalTrigger::all;
         R3BEventHeader* eventHeader_ = nullptr;

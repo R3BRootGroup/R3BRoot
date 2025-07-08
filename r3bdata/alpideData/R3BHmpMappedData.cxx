@@ -43,18 +43,18 @@ R3BHmpMappedData::R3BHmpMappedData(uint32_t TSYS_LO,
 
 std::string R3BHmpMappedData::toString() const
 {
-    return fmt::format("TSLO: {}, TSHI: {}, Volt1: {}, Curr1: {}, Volt2: {}, Curr2: {}, Volt3: {}, Curr3: "
-                       "{}, Volt4: {}, Curr4: {}",
-                       GetTSLO(),
-                       GetTSHI(),
-                       GetVolt1(),
-                       GetCurr1(),
-                       GetVolt2(),
-                       GetCurr2(),
-                       GetVolt3(),
-                       GetCurr3(),
-                       GetVolt4(),
-                       GetCurr4());
+    return fmt::format(
+        "TSLO: {}, TSHI: {}, Volt1: {}, Curr1: {}, Volt2: {}, Curr2: {}, Volt3: {}, Curr3: {}, Volt4: {}, Curr4: {}",
+        GetTSLO(),
+        GetTSHI(),
+        GetVolt1(),
+        GetCurr1(),
+        GetVolt2(),
+        GetCurr2(),
+        GetVolt3(),
+        GetCurr3(),
+        GetVolt4(),
+        GetCurr4());
 }
 
 void R3BHmpMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }

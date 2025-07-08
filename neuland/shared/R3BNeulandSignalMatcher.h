@@ -21,7 +21,7 @@ namespace R3B::Neuland
         {
             double time{};
             double energy{};
-            Input() = default;
+            // Input() = default;
         };
 
         struct Par

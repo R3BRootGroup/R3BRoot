@@ -50,9 +50,9 @@ name: CI-CD-C++17
 on:
   # Triggers the workflow in case of a push or pull request events
   push:
-    branches: [dev, edwin_dev]
+    branches: [dev]
   pull_request:
-    branches: [dev, edwin_dev]
+    branches: [dev]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -133,20 +133,34 @@ jobs:
           - cache: r3broot
           # disable conan build by default
           - preset: simple
+          - base-repo: cvmfs_clang
+          - has-cvmfs: 'true'
 
           # This job is only for testing R3BRoot without downloading any
           # dependencies.
-          - repos: r3broot
+          # - repos: r3broot
 
           # build with conan package manager
           - repos: r3broot-conan
             preset: default
 
+          - repos: container-stable
+            os: fedora-stable
+            preset: default
+            base-repo: r3bdev
+            has-cvmfs: 'false'
+
+          - repos: container-latest
+            os: fedora-latest
+            preset: default
+            base-repo: r3bdev
+            has-cvmfs: 'false'
+
     # Jobs are run inside a Docker container, which provides different compiled
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
     container:
-      image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
+      image: yanzhaowang/${{ matrix.base-repo }}:${{ matrix.os }}
       volumes:
         - /tmp:/cvmfs
       env:
@@ -172,6 +186,7 @@ jobs:
       # A self-defined composite action. It sets multiple necessary environment
       # variables and mounts the cmvfs folder of fairroot and fairsoft.
       - name: pre-build
+        if: matrix.has-cvmfs == 'true'
         uses: './.github/actions/pre-build'
 
       # A self-defined composite action, which restores the caches of
@@ -185,6 +200,7 @@ jobs:
       # cache restoring step is only used for the run triggered with
       # "pull_request" and disabled for the merge event.
       - name: install dependencies
+        if: matrix.has-cvmfs == 'true'
         id: restore-cache
         uses: './.github/actions/install-deps'
         with:

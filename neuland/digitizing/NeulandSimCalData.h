@@ -31,10 +31,10 @@ class fmt::formatter<R3B::Neuland::SimCalData>
     template <typename FmtContent>
     constexpr auto format(const R3B::Neuland::SimCalData& cal_data, FmtContent& ctn) const
     {
-        return format_to(ctn.out(),
-                         "{{module_id: {}, leading_time: {}, time_over_thresh: {}}}",
-                         cal_data.module_id,
-                         cal_data.leading_time,
-                         cal_data.time_over_thresh);
+        return fmt::format_to(ctn.out(),
+                              "{{module_id: {}, leading_time: {}, time_over_thresh: {}}}",
+                              cal_data.module_id,
+                              cal_data.leading_time,
+                              cal_data.time_over_thresh);
     }
 };

@@ -2,6 +2,7 @@
 
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace R3B
 {
@@ -46,6 +47,6 @@ class fmt::formatter<R3B::MinMaxValue<DataType>>
     template <typename FmtContent>
     constexpr auto format(const R3B::MinMaxValue<DataType>& value, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{{min: {}, max: {}}}", value.min, value.max);
+        return fmt::format_to(ctn.out(), "{{min: {}, max: {}}}", value.min, value.max);
     }
 };

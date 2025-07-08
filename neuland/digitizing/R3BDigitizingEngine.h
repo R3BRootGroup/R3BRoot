@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEULAND_DIGITIZING_ENGINE_H
-#define NEULAND_DIGITIZING_ENGINE_H
+#pragma once
 
 #include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddle.h"
@@ -71,15 +70,7 @@ namespace R3B::Digitizing
          *
          * Get the trigger time value from the paddle objects. The value is the minimal trigger time of each paddle.
          */
-        [[nodiscard]] auto GetTriggerTime() const -> double
-        {
-            auto paddles_view = ranges::views::take(paddles_, size_);
-            auto min_element = std::min_element(paddles_view.begin(),
-                                                paddles_view.end(),
-                                                [](const auto& left, const auto& right)
-                                                { return left->GetTrigTime() < right->GetTrigTime(); });
-            return (min_element == paddles_view.end()) ? NAN : min_element->get()->GetTrigTime();
-        }
+        [[nodiscard]] auto GetTriggerTime() const -> double;
 
         /**
          * \brief Initialization of the engine class.
@@ -88,11 +79,7 @@ namespace R3B::Digitizing
          * memories for paddle class are allocated with extra initialization from the derived class.
          * @param initial_capacity Number of paddle objects to be allocated.
          */
-        void Init(int initial_capacity = 1)
-        {
-            ExtraInit(initial_capacity);
-            reserve_additional_paddles(initial_capacity);
-        }
+        void Init(int initial_capacity = 1);
 
         /**
          * \brief Reset the engine for a new event.
@@ -112,13 +99,7 @@ namespace R3B::Digitizing
          * all the points are read by the engine.
          * @see R3B::Digitizing::Paddle::Construct()
          */
-        void Construct()
-        {
-            for (auto& paddle : ranges::views::take(paddles_, size_))
-            {
-                paddle->Construct();
-            }
-        }
+        void Construct();
 
         /**
          * \brief The number of preallocated bar objects in the engine.
@@ -200,38 +181,8 @@ namespace R3B::Digitizing
          *
          * @param num Number of additional paddles to be reserved
          */
-        void reserve_additional_paddles(int num)
-        {
-            {
-                paddles_.reserve(num + get_capacity());
-                for (int idx{}; idx < num; ++idx)
-                {
-                    paddles_.emplace_back(make_new_paddle());
-                }
-            }
-        }
-
-        auto add_paddle(int paddle_id) -> AbstractPaddle&
-        {
-            // find if a paddle with the paddle_id is already added
-            auto valid_view = ranges::views::take(paddles_, size_);
-            auto iter =
-                ranges::find_if(valid_view, [paddle_id](auto& paddle) { return paddle->GetPaddleID() == paddle_id; });
-            if (iter != valid_view.end())
-            {
-                return *(*iter);
-            }
-            // check if size is still smaller than capacity
-            if (size_ >= get_capacity())
-            {
-                // underlying data storage need to grow
-                reserve_additional_paddles(size_ / 2);
-            }
-            auto* new_paddle = paddles_.at(size_++).get();
-            new_paddle->Reset();
-            new_paddle->SetPaddleID(paddle_id);
-            return *new_paddle;
-        }
+        void reserve_additional_paddles(int num);
+        auto add_paddle(int paddle_id) -> AbstractPaddle&;
     };
 
     // factory classes for paddle and channel:
@@ -305,5 +256,3 @@ namespace R3B::Digitizing
     }
 
 } // namespace R3B::Digitizing
-
-#endif // NEULAND_DIGITIZING_ENGINE_H

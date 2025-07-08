@@ -21,6 +21,7 @@
 #include "R3BNeulandHitPar.h"
 #include "TMath.h"
 #include <FairTask.h>
+#include <Math/Vector3Dfwd.h>
 #include <R3BLogger.h>
 
 #include <Rtypes.h>
@@ -259,7 +260,15 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
         pos[2] = fDistanceToTarget + fDistancesToFirstPlane[plane];
         pixel[2] = plane;
 
-        auto hit = R3BNeulandHit{ barID + 1, tdc[0], tdc[1], time, unsatEnergy[0], unsatEnergy[1], energy, pos, pixel };
+        auto hit = R3BNeulandHit{ barID + 1,
+                                  tdc[0],
+                                  tdc[1],
+                                  time,
+                                  unsatEnergy[0],
+                                  unsatEnergy[1],
+                                  energy,
+                                  ROOT::Math::XYZVector{ pos },
+                                  ROOT::Math::XYZVector{ pixel } };
         R3BLOG(debug1, fmt::format("Neuland hit: {}", hit));
         fHits.Insert(hit);
     }

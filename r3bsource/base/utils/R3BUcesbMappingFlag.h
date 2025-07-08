@@ -18,6 +18,8 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <iostream>
+#include <string>
+#include <type_traits>
 
 constexpr auto UCESB_MAP_BITSIZE = 32;
 

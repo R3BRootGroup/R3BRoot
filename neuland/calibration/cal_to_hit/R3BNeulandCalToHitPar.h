@@ -13,12 +13,14 @@
 
 #pragma once
 
+#include "R3BException.h"
 #include "R3BShared.h"
 #include "R3BValueError.h"
 #include <R3BNeulandParSet.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <cstddef>
+#include <fmt/core.h>
 #include <string_view>
 #include <unordered_map>
 #include <utility>
@@ -97,6 +99,10 @@ namespace R3B::Neuland
         auto GetDistancesToFirstPlane() const -> const auto& { return distances_to_first_plane_; }
         auto GetModuleParAt(int module_num) const -> const ::R3B::Neuland::HitModulePar&
         {
+            if (module_pars_.find(module_num) == module_pars_.end())
+            {
+                throw R3B::logic_error(fmt::format("module pars has no module num {}", module_num));
+            }
             return module_pars_.at(module_num);
         }
         auto HasModuleParAt(int module_num) const -> bool

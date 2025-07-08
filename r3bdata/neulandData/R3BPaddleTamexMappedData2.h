@@ -79,7 +79,7 @@ class fmt::formatter<R3B::SingleEdgeSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::SingleEdgeSignal& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{{fine: {}, coarse: {} }}", signal.fine, signal.coarse);
+        return fmt::format_to(ctn.out(), "{{fine: {}, coarse: {} }}", signal.fine, signal.coarse);
     }
 };
 
@@ -91,7 +91,7 @@ class fmt::formatter<R3B::DoubleEdgeSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::DoubleEdgeSignal& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{{leading: {}, trailing: {} }}", signal.leading, signal.trailing);
+        return fmt::format_to(ctn.out(), "{{leading: {}, trailing: {} }}", signal.leading, signal.trailing);
     }
 };
 
@@ -103,7 +103,7 @@ class fmt::formatter<R3B::MapBarSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::MapBarSignal& signal, FmtContent& ctn) const
     {
-        return format_to(
+        return fmt::format_to(
             ctn.out(), "{{left: [{}], right: [{}] }}", fmt::join(signal.left, ", "), fmt::join(signal.left, ", "));
     }
 };

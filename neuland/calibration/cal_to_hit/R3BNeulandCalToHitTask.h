@@ -40,8 +40,10 @@ namespace R3B::Neuland
     {
       public:
         explicit Cal2HitTask(std::string_view input_cal_data_name = "NeulandCalData",
-                             std::string_view output_hit_data_name = "NeulandHits",
-                             std::string_view input_cal_2_hit_par_name = "NeulandHitPar");
+                             std::string_view input_cal_2_hit_par_name = "NeulandHitPar",
+                             std::string_view output_hit_data_name = "NeulandHits"
+
+        );
 
         /**
          * @brief Set the global time offset relating to the reference bar
@@ -71,7 +73,7 @@ namespace R3B::Neuland
         void BeginOfEvent() override { hit_data_.clear(); };
         void TriggeredExec() override;
         void EndOfTask() override;
-        // [[nodiscard]] auto CheckConditions() const -> bool override {};
+        [[nodiscard]] auto CheckConditions() const -> bool override;
 
         // non-virtual private functions:
         void calibrate();
@@ -108,6 +110,6 @@ class fmt::formatter<R3B::Neuland::CalibratedSignal>
     template <typename FmtContent>
     constexpr auto format(const R3B::Neuland::CalibratedSignal& signal, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{{time: {}, energy: {}}}", signal.time, signal.energy);
+        return fmt::format_to(ctn.out(), "{{time: {}, energy: {}}}", signal.time, signal.energy);
     }
 };
