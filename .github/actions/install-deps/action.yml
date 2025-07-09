@@ -35,7 +35,7 @@ runs:
           r3b-build-
 
     - name: build ucesb
-      if: steps.cache-ucesb.outputs.cache-hit != 'true'
+      if: steps.cache-ucesb.outputs.cache-hit == ''
       run: |
         echo "ucesb directory is set as ${UCESB_DIR}"
         export LD_LIBRARY_PATH="${SIMPATH}/lib/:${LD_LIBRARY_PATH}"
