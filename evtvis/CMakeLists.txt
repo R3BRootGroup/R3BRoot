@@ -39,6 +39,8 @@ add_library_with_dictionary(
     INCLUDEDIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
     DEPENDENCIES
+    ROOT::Eve
+    FairRoot::EventDisplay
     R3BCalifa)
 
 # set(DEPENDENCIES
