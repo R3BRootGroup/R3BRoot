@@ -49,7 +49,7 @@ set(HEADERS
     R3BTsplinePar.h
     R3BWhiterabbitPropagator.h)
 
-set(DEPENDENCIES FairRoot::Generators FairRoot::Online)
+set(DEPENDENCIES FairRoot::Generators FairRoot::Online ROOT::RHTTP)
 
 add_library_with_dictionary(
     LIBNAME

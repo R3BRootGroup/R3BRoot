@@ -90,6 +90,7 @@ add_library_with_dictionary(
     pars
     sim
     DEPENDENCIES
+    ROOT::Spectrum
     R3BTracking R3BTCal R3BNeulandShared)
 
 add_subdirectory(test)

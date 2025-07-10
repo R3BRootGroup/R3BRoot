@@ -66,4 +66,5 @@ add_library_with_dictionary(
     sim
     DEPENDENCIES
     R3BTCal
+    ROOT::Spectrum
     R3BTracking)
