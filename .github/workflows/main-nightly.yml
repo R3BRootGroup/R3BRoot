@@ -122,7 +122,7 @@ jobs:
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
     container: 
-      image: r3bdockers/:${{ matrix.os }}
+      image: r3bdockers/${{ matrix.os }}
       volumes:
         - /tmp:/cvmfs
       env:
