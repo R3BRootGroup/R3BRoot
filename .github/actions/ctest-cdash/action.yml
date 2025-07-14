@@ -29,6 +29,7 @@ runs:
         source $GITHUB_WORKSPACE/util/generate_geo_test.sh
         ctest -S cmake/CI_CD/CDash.cmake -DBUILD_J=${NUM_THREADS}\
               -DTEST_MODEL=${TEST_MODEL}\
+              -DEXTRA_FLAGS="--preset=${{ matrix.preset }}"\
               -DTEST_NAME=${{ env.TEST_NAME }}\
               -DSITE_NAME="Github hosted (${{ github.repository }})"\
               --force-new-ctest-process \
