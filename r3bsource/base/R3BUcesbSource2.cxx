@@ -26,6 +26,7 @@
 #include <exception>
 #include <ext_data_client.h>
 #include <fairlogger/Logger.h>
+#include <fmt/base.h>
 #include <fmt/chrono.h> // NOLINT
 #include <fmt/core.h>
 #include <fmt/format.h>

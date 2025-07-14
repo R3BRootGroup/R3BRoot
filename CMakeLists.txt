@@ -33,6 +33,7 @@ set(CMAKE_CXX_STANDARD
     23
     CACHE STRING "the C++ standard to use for this project")
 set(CMAKE_CXX_EXTENSIONS ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # use default gnu install convention:
 include(GNUInstallDirs)

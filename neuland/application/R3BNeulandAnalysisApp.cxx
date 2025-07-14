@@ -25,13 +25,14 @@
 #include <R3BNeulandPrimaryClusterFinder.h>
 #include <R3BNeulandPrimaryInteractionFinder.h>
 #include <fairlogger/Logger.h>
-#include <fmt/core.h>
+#include <fmt/base.h>
 #include <functional>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 using nlohmann::ordered_json;
@@ -68,7 +69,7 @@ namespace R3B::Neuland
         auto read_branch_names = std::vector<std::string>{};
         auto write_branch_names = std::vector<std::string>{};
         LOGP(info, "Setting the event header to be R3BEventHeader!");
-        run->SetEventHeader(EvntHeader.release());
+        run->SetEventHeader(std::move(EvntHeader));
 
         auto task_option = options_.tasks;
 

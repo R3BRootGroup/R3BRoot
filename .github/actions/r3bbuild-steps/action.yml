@@ -40,5 +40,7 @@ runs:
 
     - name: ccache stats
       if: github.event_name == 'pull_request' && always()
-      run: ccache --show-stats
+      run: |
+        ccache --show-stats
+        ccache --print-stats
       shell: bash

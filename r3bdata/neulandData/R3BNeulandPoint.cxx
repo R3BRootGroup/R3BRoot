@@ -12,12 +12,14 @@
  ******************************************************************************/
 
 #include "R3BNeulandPoint.h"
-#include <Math/Vector3D.h>
 #include <Math/Vector3Dfwd.h>
-#include <Rtypes.h>
 #include <RtypesCore.h>
 #include <iostream>
 #include <ostream>
+
+// NOLINTBEGIN(misc-include-cleaner)
+#include <Math/Vector3D.h>
+// NOLINTEND(misc-include-cleaner)
 
 auto operator<<(std::ostream& ostream, const R3BNeulandPoint& point) -> std::ostream&
 {

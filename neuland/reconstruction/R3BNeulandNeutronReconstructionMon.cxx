@@ -14,7 +14,6 @@
 #include "R3BNeulandNeutronReconstructionMon.h"
 
 #include <FairTask.h>
-#include <Math/Vector3Dfwd.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <TH1.h>
@@ -23,22 +22,19 @@
 #include <TString.h>
 #include <TVector3.h>
 #include <algorithm>
-#include <cmath>
+// #include <cmath>
 #include <cstddef>
 #include <fairlogger/Logger.h>
 #include <functional>
-#include <iostream>
-#include <numeric>
-#include <utility>
-
+// #include <iostream>
+// #include <numeric>
 #include "TClonesArray.h"
 #include "TDirectory.h"
 #include <TFile.h>
+#include <utility>
 #include <vector>
-
-#include "FairMCPoint.h"
+// #include "FairMCPoint.h"
 #include "FairRootManager.h"
-
 #include "R3BMCTrack.h"
 #include "R3BNeulandNeutron.h"
 #include "R3BNeulandPoint.h"
@@ -46,52 +42,57 @@
 static const Double_t c2 = 898.75517873681758374; // cm²/ns²
 static const Double_t massNeutron = 939.565379;   // MeV/c²
 
-auto Distance(const R3BNeulandNeutron& nn, const FairMCPoint& mc) -> Double_t
+namespace
 {
-    auto v = ROOT::Math::XYZVector{ mc.GetX(), mc.GetY(), mc.GetZ() };
-    v -= nn.GetPosition();
-    return std::sqrt(v.Dot(v));
-}
+    // auto Distance(const R3BNeulandNeutron& neutron, const FairMCPoint& mc_point) -> Double_t
+    // {
+    //     auto pos_vec = ROOT::Math::XYZVector{ mc_point.GetX(), mc_point.GetY(), mc_point.GetZ() };
+    //     pos_vec -= neutron.GetPosition();
+    //     return std::sqrt(pos_vec.Dot(pos_vec));
+    // }
 
-Double_t Score(const std::vector<std::pair<R3BNeulandNeutron, FairMCPoint>>& combination)
-{
-    return std::accumulate(combination.begin(),
-                           combination.end(),
-                           0.,
-                           [](const Double_t sum, const std::pair<R3BNeulandNeutron, FairMCPoint>& pair)
-                           { return sum + Distance(pair.first, pair.second); });
-}
-
-template <typename T, typename U>
-std::vector<std::vector<std::pair<T, U>>> GetAllCombinations(std::vector<T> ts /* Copy! */,
-                                                             std::vector<U> us /* Copy! */,
-                                                             std::function<bool(const U&, const U&)> comparator)
-{
-    std::vector<std::vector<std::pair<T, U>>> out;
-
-    // Bring both inputs up to the same length
-    if (ts.size() < us.size())
+    // auto Score(const std::vector<std::pair<R3BNeulandNeutron, FairMCPoint>>& combination) -> Double_t
+    // {
+    //     return std::accumulate(combination.begin(),
+    //                            combination.end(),
+    //                            0.,
+    //                            [](const Double_t sum, const std::pair<R3BNeulandNeutron, FairMCPoint>& pair)
+    //                            { return sum + Distance(pair.first, pair.second); });
+    // }
+    template <typename T, typename U>
+    auto GetAllCombinations(std::vector<T> one_series /* Copy! */,
+                            std::vector<U> other_series /* Copy! */,
+                            std::function<bool(const U&, const U&)> comparator)
+        -> std::vector<std::vector<std::pair<T, U>>>
     {
-        ts.resize(us.size());
-    }
-    if (us.size() < ts.size())
-    {
-        us.resize(ts.size());
-    }
+        std::vector<std::vector<std::pair<T, U>>> out;
 
-    std::sort(us.begin(), us.end(), comparator);
-    do
-    {
-        std::vector<std::pair<T, U>> tmp;
-        for (size_t i = 0; i < ts.size(); i++)
+        // Bring both inputs up to the same length
+        if (one_series.size() < other_series.size())
         {
-            tmp.push_back({ ts.at(i), us.at(i) });
+            one_series.resize(other_series.size());
         }
-        out.push_back(std::move(tmp));
-    } while (std::next_permutation(us.begin(), us.end(), comparator));
+        if (other_series.size() < one_series.size())
+        {
+            other_series.resize(one_series.size());
+        }
 
-    return out;
-}
+        std::sort(other_series.begin(), other_series.end(), comparator);
+        // NOLINTBEGIN(cppcoreguidelines-avoid-do-while)
+        do
+        {
+            std::vector<std::pair<T, U>> tmp;
+            for (size_t i = 0; i < one_series.size(); i++)
+            {
+                tmp.push_back({ one_series.at(i), other_series.at(i) });
+            }
+            out.push_back(std::move(tmp));
+        } while (std::next_permutation(other_series.begin(), other_series.end(), comparator));
+        // NOLINTEND(cppcoreguidelines-avoid-do-while)
+
+        return out;
+    }
+} // namespace
 
 R3BNeulandNeutronReconstructionMon::R3BNeulandNeutronReconstructionMon(const TString input, const TString output)
     : FairTask("R3B Neuland Neutron Reconstruction Evaluation")

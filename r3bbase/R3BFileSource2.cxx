@@ -36,7 +36,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <fairlogger/Logger.h>
-#include <fmt/chrono.h>
+#include <fmt/base.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
@@ -180,8 +180,13 @@ namespace
         auto view1 = std::vector<std::string_view>(branchList.begin(), branchList.end());
         auto view2 = std::vector<std::string_view>(newBranchList.begin(), newBranchList.end());
 
+#ifdef HAS_CXX_17
         std::sort(view1.begin(), view1.end());
         std::sort(view2.begin(), view2.end());
+#else
+        std::ranges::sort(view1);
+        std::ranges::sort(view2);
+#endif
         return view1 == view2;
     }
 
@@ -530,10 +535,16 @@ void R3BFileSource2::AddFriend(std::string file_name, bool is_tree_file)
 {
     //
     auto rootfile = R3B::make_rootfile(file_name.c_str());
+#ifdef HAS_CXX_17
     auto friendGroup = std::find_if(inputFriendFiles_.begin(),
                                     inputFriendFiles_.end(),
                                     [&rootfile](const auto& friends)
                                     { return HasBranchList(rootfile.get(), friends.GetBranchListRef()); });
+#else
+    auto friendGroup = std::ranges::find_if(inputFriendFiles_,
+                                            [&rootfile](const auto& friends)
+                                            { return HasBranchList(rootfile.get(), friends.GetBranchListRef()); });
+#endif
     if (friendGroup == inputFriendFiles_.end())
     {
         auto newFriendGroup = R3BInputRootFiles{};

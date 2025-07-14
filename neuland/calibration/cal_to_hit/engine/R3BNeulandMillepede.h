@@ -60,7 +60,6 @@ namespace R3B::Neuland::Calibration
         // float minimum_pos_z_ = 0;
         // float smallest_time_sum_ = 0.;
         std::optional<float> average_t_sum_;
-        float init_effective_c_ = DEFAULT_EFFECTIVE_C;
         double t_diff_residual_cut_ = DEFAULT_T_DIFF_RESIDUAL_CUT;
         double p_value_cut_ = DEFAULT_CALIBRATION_P_VALUE_CUT;
         constexpr static std::string_view DEFAULT_SUB_DIR = "millepede";

@@ -12,8 +12,15 @@
  ******************************************************************************/
 
 #include "R3BNeulandCluster.h"
+#include "R3BNeulandHit.h"
+#include <Math/Vector3Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
 #include <numeric>
+#include <ostream>
 #include <stdexcept>
 
 R3BNeulandHit R3BNeulandCluster::GetForemostHit() const
@@ -73,27 +80,27 @@ Double_t R3BNeulandCluster::GetE() const
 
 Double_t R3BNeulandCluster::GetT() const { return GetFirstHit().GetT(); }
 
-ROOT::Math::XYZVector R3BNeulandCluster::GetPosition() const { return GetFirstHit().GetPosition(); };
+auto R3BNeulandCluster::GetPosition() const -> ROOT::Math::XYZVector { return GetFirstHit().GetPosition(); };
 
-ROOT::Math::XYZVector R3BNeulandCluster::GetEnergyCentroid() const
+auto R3BNeulandCluster::GetEnergyCentroid() const -> ROOT::Math::XYZVector
 {
     // analog to Geometrical Centroid \vec{c} = \frac{\sum_i (\vec{r}_{i} \cdot V_i)}{\sum_i V_i}
-    ROOT::Math::XYZVector centroid = std::accumulate(fHits.cbegin(),
-                                                     fHits.cend(),
-                                                     ROOT::Math::XYZVector(),
-                                                     [](const ROOT::Math::XYZVector& c, const R3BNeulandHit& hit)
-                                                     { return c + (hit.GetPosition() * hit.GetE()); });
+    const auto centroid = std::accumulate(fHits.cbegin(),
+                                          fHits.cend(),
+                                          ROOT::Math::XYZVector(),
+                                          [](const ROOT::Math::XYZVector& cluster, const R3BNeulandHit& hit)
+                                          { return cluster + (hit.GetPosition() * hit.GetE()); });
     return centroid * (1. / GetE());
 }
 
-Double_t R3BNeulandCluster::GetEnergyMoment() const
+auto R3BNeulandCluster::GetEnergyMoment() const -> Double_t
 {
     const ROOT::Math::XYZVector centroid = GetEnergyCentroid();
     Double_t mom = std::accumulate(fHits.cbegin(),
                                    fHits.cend(),
                                    0.,
-                                   [&](const Double_t c, const R3BNeulandHit& hit)
-                                   { return c + (hit.GetPosition() - centroid).r() * hit.GetE(); });
+                                   [&](const Double_t cluster, const R3BNeulandHit& hit)
+                                   { return cluster + ((hit.GetPosition() - centroid).r() * hit.GetE()); });
     return mom / GetE();
 }
 

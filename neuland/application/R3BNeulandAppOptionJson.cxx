@@ -1,6 +1,6 @@
 #include "R3BNeulandAppOptionJson.h"
-#include "JsonParse/GeneratorFactoryJson.h" // NOLINT
-#include "JsonParse/ParticleFilterJson.h"   //NOLINT
+#include "JsonParse/GeneratorFactoryJson.h" // IWYU pragma: keep
+#include "JsonParse/ParticleFilterJson.h"   // IWYU pragma: keep
 #include "R3BDigitizingTamex.h"
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
@@ -8,7 +8,7 @@
 #include "R3BNeulandDigitizer.h"
 #include "R3BNeulandJsonHeader.h"
 #include "R3BNeulandSimApp.h"
-#include <R3BROOTTypeJson.h> //NOLINT
+#include <R3BROOTTypeJson.h> // IWYU pragma: keep
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 #include <magic_enum/magic_enum.hpp>

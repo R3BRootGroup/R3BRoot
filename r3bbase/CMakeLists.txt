@@ -76,6 +76,10 @@ add_library_with_dictionary(
     PRIVATE_DEPENDENCIES
     Geant4::G4materials)
 
+if(CMAKE_CXX_STANDARD LESS_EQUAL 17)
+    target_compile_definitions(R3BBase PUBLIC HAS_CXX_17)
+endif()
+
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)
     message(STATUS "Linking -lstdc++fs due to the old version of gcc")
     target_link_libraries(R3BBase PUBLIC -lstdc++fs)

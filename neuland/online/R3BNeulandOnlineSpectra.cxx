@@ -351,7 +351,7 @@ void R3BNeulandOnlineSpectra::Exec(Option_t*)
             hHitEvsBar->Fill(bar, hit->GetE());
             hTdiffvsBar->Fill(bar, hit->GetTdcL() - hit->GetTdcR());
 
-            const Double_t tcorr = hit->GetT() - (hit->GetPosition().r() - fDistanceToTarget) / clight;
+            const Double_t tcorr = hit->GetT() - ((hit->GetPosition().r() - fDistanceToTarget) / clight);
             const Double_t tadj = hit->GetT();
 
             if (hit->GetE() > 0.)

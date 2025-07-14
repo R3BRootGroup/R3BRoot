@@ -17,6 +17,8 @@
 #include "FairParGenericSet.h"
 #include "TGeoNode.h"
 #include <Math/Vector3Dfwd.h>
+#include <Rtypes.h>
+#include <cstdint>
 #include <map>
 class FairParamList;
 class TVector3;
@@ -32,34 +34,35 @@ class TVector3;
 class R3BNeulandGeoPar : public FairParGenericSet
 {
   public:
-    // needs to be public?
-    TGeoNode* fNeulandGeoNode;
-
-    R3BNeulandGeoPar(const char* name = "R3BNeulandGeoPar",
-                     const char* title = "Neuland Geometry Parameters",
-                     const char* context = "TestDefaultContext");
+    explicit R3BNeulandGeoPar(const char* name = "R3BNeulandGeoPar",
+                              const char* title = "Neuland Geometry Parameters",
+                              const char* context = "TestDefaultContext");
+    R3BNeulandGeoPar(R3BNeulandGeoPar&&) = delete;
+    auto operator=(R3BNeulandGeoPar&&) -> R3BNeulandGeoPar& = delete;
+    R3BNeulandGeoPar(const R3BNeulandGeoPar&);
+    auto operator=(const R3BNeulandGeoPar&) -> R3BNeulandGeoPar&;
     ~R3BNeulandGeoPar() override;
 
     void clear() override;
-    void putParams(FairParamList*) override;
-    Bool_t getParams(FairParamList*) override;
+    void putParams(FairParamList* /*unused*/) override;
+    auto getParams(FairParamList* /*unused*/) -> bool override;
     void printParams() override;
 
     [[nodiscard]] auto GetNumberOfModules() const -> int { return fNeulandGeoNode->GetNdaughters(); }
-    TGeoNode* GetNeulandGeoNode() { return fNeulandGeoNode; } // FIXME: const?
-    void SetNeulandGeoNode(const TGeoNode* const p);
+    [[nodiscard]] auto GetNeulandGeoNode() const -> TGeoNode* { return fNeulandGeoNode; }
+    void SetNeulandGeoNode(const TGeoNode* node);
 
-    Double_t GetPaddleHalfLength() const;
-    ROOT::Math::XYZVector ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position, const Int_t paddleID) const;
-    ROOT::Math::XYZVector ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position, const Int_t paddleID) const;
-    ROOT::Math::XYZVector ConvertGlobalToPixel(const ROOT::Math::XYZVector& position) const;
+    [[nodiscard]] auto GetPaddleHalfLength() const -> double;
+    [[nodiscard]] auto ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position,
+                                                 int paddleID) const -> ROOT::Math::XYZVector;
+    [[nodiscard]] auto ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position,
+                                                  int paddleID) const -> ROOT::Math::XYZVector;
+    [[nodiscard]] auto ConvertGlobalToPixel(const ROOT::Math::XYZVector& position) const -> ROOT::Math::XYZVector;
 
   private:
-    std::map<Int_t, TGeoNode*> fPaddleGeoNodes;
+    std::map<int32_t, TGeoNode*> fPaddleGeoNodes;
+    TGeoNode* fNeulandGeoNode;
     void BuildPaddleLookup();
-
-    R3BNeulandGeoPar(const R3BNeulandGeoPar&);
-    R3BNeulandGeoPar& operator=(const R3BNeulandGeoPar&);
 
     ClassDefOverride(R3BNeulandGeoPar, 1)
 };

@@ -16,11 +16,14 @@
 
 #include "FairMCPoint.h"
 #include "TVector3.h"
-#include <Math/Vector3D.h>
 #include <Math/Vector3Dfwd.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <iostream>
+
+// NOLINTBEGIN(misc-include-cleaner)
+#include <Math/Vector3D.h>
+// NOLINTEND(misc-include-cleaner)
 
 class R3BNeulandPoint : public FairMCPoint
 {

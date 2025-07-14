@@ -23,7 +23,6 @@
 #include "R3BValueError.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
-#include <Math/Vector3D.h>
 #include <Math/Vector3Dfwd.h>
 #include <R3BNeulandSignalMatcher.h>
 #include <R3BShared.h>
@@ -184,11 +183,13 @@ namespace R3B::Neuland
                                             const CalibratedSignal& second_signal,
                                             const HitModulePar& par) -> bool
     {
-        const auto first_input = SignalMatcher::Input{ first_signal.time.value, first_signal.energy.value };
-        const auto second_input = SignalMatcher::Input{ second_signal.time.value, second_signal.energy.value };
+        const auto first_input =
+            SignalMatcher::Input{ .time = first_signal.time.value, .energy = first_signal.energy.value };
+        const auto second_input =
+            SignalMatcher::Input{ .time = second_signal.time.value, .energy = second_signal.energy.value };
 
-        const auto match_par =
-            SignalMatcher::Par{ BarLength / par.light_attenuation_length.value, par.effective_speed.value };
+        const auto match_par = SignalMatcher::Par{ .attenuation = BarLength / par.light_attenuation_length.value,
+                                                   .c_medium = par.effective_speed.value };
         const auto match_goodness = SignalMatcher::GetGoodnessOfMatch(first_input, second_input, match_par);
         const auto match_result = std::log10(match_goodness);
         // FIXME: BAD comparison values. They should be 0. Why? Need fixing
@@ -259,6 +260,6 @@ namespace R3B::Neuland
     {
         const auto energy = get_calibrated_energy(calSignal, par, side);
         const auto time = get_calibrated_time(calSignal, par, side);
-        return CalibratedSignal{ energy, time };
+        return CalibratedSignal{ .energy = energy, .time = time };
     }
 } // namespace R3B::Neuland

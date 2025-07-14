@@ -20,6 +20,8 @@
 #define R3BNEULANDPMT
 
 #include "TObject.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
 
 class R3BNeulandPmt : public TObject
 {

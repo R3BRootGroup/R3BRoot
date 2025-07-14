@@ -25,17 +25,19 @@
 
 #include <TGraphErrors.h>
 #include <TH1.h>
-#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <fairlogger/Logger.h>
 #include <filesystem>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <iterator>
 #include <memory>
 #include <numeric>
 #include <optional>
 #include <range/v3/algorithm/all_of.hpp>
+#include <range/v3/algorithm/copy.hpp>
+#include <range/v3/algorithm/min_element.hpp>
 #include <range/v3/iterator/operations.hpp>
 #include <range/v3/numeric/accumulate.hpp>
 #include <range/v3/view/all.hpp>
@@ -281,7 +283,11 @@ namespace R3B::Neuland::Calibration
         input_data_buffer_.sigma = static_cast<float>(t_sum.error / SCALE_FACTOR / 2. * error_scale_factor_);
         // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
         const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
+#ifdef HAS_CXX_17
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
+#else
+        ranges::copy(local_derivs_t, std::back_inserter(input_data_buffer_.locals));
+#endif
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::tsync), 1.F);
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
                                                 -BarLength / SCALE_FACTOR / 2.F / init_effective_c / init_effective_c);
@@ -317,7 +323,11 @@ namespace R3B::Neuland::Calibration
         //                  pos_z / SCALE_FACTOR,
         //                  1.);
         // }
+#ifdef HAS_CXX_17
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
+#else
+        ranges::copy(local_derivs, std::back_inserter(input_data_buffer_.locals));
+#endif
         write_to_buffer();
     }
 
@@ -346,7 +356,11 @@ namespace R3B::Neuland::Calibration
                                                 : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 1.F };
         // const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F }
         //                                         : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
+#ifdef HAS_CXX_17
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
+#else
+        ranges::copy(local_derivs, std::back_inserter(input_data_buffer_.locals));
+#endif
         // fmt::println("Adding global: {}", get_global_label_id(module_num, GlobalLabel::offset_effective_c));
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::offset_effective_c),
                                                 -0.5F);
@@ -383,10 +397,9 @@ namespace R3B::Neuland::Calibration
                 data_preprocessor_->calculate_residual(position.value, static_cast<int>(signal.module_num));
             return res;
         };
-        auto iter = std::min_element(plane_data.begin(),
-                                     plane_data.end(),
-                                     [calculate_residual](const auto& first, const auto& second)
-                                     { return calculate_residual(first) < calculate_residual(second); });
+        auto iter = ranges::min_element(plane_data,
+                                        [calculate_residual](const auto& first, const auto& second)
+                                        { return calculate_residual(first) < calculate_residual(second); });
         if (iter != plane_data.end())
         {
             auto residual = calculate_residual(*iter);

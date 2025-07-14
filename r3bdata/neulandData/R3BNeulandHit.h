@@ -13,13 +13,16 @@
 #pragma once
 
 #include "TObject.h"
-#include <Math/Vector3D.h>
 #include <Math/Vector3Dfwd.h>
-#include <R3BFormatters.h> // NOLINT: for formatting
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <fmt/core.h>
 #include <iostream>
+
+// NOLINTBEGIN(misc-include-cleaner)
+#include <Math/Vector3D.h>
+#include <R3BFormatters.h>
+// NOLINTEND(misc-include-cleaner)
 
 constexpr auto NEUTRON_MASS_MEV = 939.565;
 

@@ -17,17 +17,20 @@
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandHit.h"
 #include "TObject.h"
-#include <Math/Vector3D.h>
 #include <Math/Vector3Dfwd.h>
 #include <Rtypes.h>
 #include <RtypesCore.h>
 #include <iostream>
 
+// NOLINTBEGIN(misc-include-cleaner)
+#include <Math/Vector3D.h>
+// NOLINTEND(misc-include-cleaner)
+
 class R3BNeulandNeutron : public TObject
 {
   public:
     R3BNeulandNeutron() = default;
-    R3BNeulandNeutron(int paddle, double time, const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& pix);
+    R3BNeulandNeutron(int paddle, double time, ROOT::Math::XYZVector pos, ROOT::Math::XYZVector pix);
     explicit R3BNeulandNeutron(const R3BNeulandHit&);
     explicit R3BNeulandNeutron(const R3BNeulandCluster&);
 

@@ -22,33 +22,36 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
    cd /lustre/r3b/username
    ```
 
-3. Download the Apptainer container in one of the folders, e.g. `containers`
+3. Download and build the Apptainer container in one of the folders, e.g. `containers`
 
    ```bash
    cd containers
 
-   apptainer pull -F neuland library://yanzhao/r3bdev/neuland:latest
+   apptainer build -F r3broot docker://yanzhaowang/r3bdev:r3broot
    ```
 
-   Depending on the downloading speed, it may take several minutes. You may use other name instead of `neuland` after the `-F` flag.
+   Depending on the downloading speed, it may take several minutes. You may use other name instead of `r3broot` after the `-F` flag.
 
-4. Once downloaded, you could treat the download file `neuland` as an executable, identical to `neuland` %CLI (see @ref neuland_exe):
+4. Once downloaded, you could treat the download file `r3broot` as an executable, similar to `neuland` %CLI (see @ref neuland_exe):
 
    ```bash
-   ./neuland sim
+   ./r3broot neuland sim
    ```
 
-   or if you want to run a %ROOT macro file, you could enter the shell environment of the container:
+   or if you want to run a %ROOT macro file, you could use `macro` option:
+
+   ```bash
+   ./r3broot macro your_macro.C
+   ```
+   or enter the shell environment of the container:
 
    ```bash
    apptainer shell ./neuland
-
+   source /opt/R3BRoot/build/config.sh
    root -l -q your_macro.C
    ```
 
-   Here you don't need to source the `config.sh` file as it's automatically done when entering the container.
-
-   Or as a high level data analyst, you most likely need to run jupyterlab in a conda environment (make sure you have conda environment already setup):
+   As a high level data analyst, you most likely need to run jupyterlab in a conda environment (make sure you have conda environment already setup):
 
    ```bash
    apptainer shell ./neuland
@@ -59,7 +62,7 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
 
 **Further remarks:**
 
-- Please regularly check the update from [this image repository website](https://cloud.sylabs.io/library/yanzhaow/r3bdev/neuland). If there is a new version (look at the date of the creation), please repeat the first step.
+- Please regularly check the update from the tag `r3broot` of [this image repository website](https://hub.docker.com/r/yanzhaowang/r3bdev). If there is a new version (look at the "last pushed"), please repeat the first step.
 
 - The R3BRoot version pre-built in the container may not be the latest `dev` branch. If you need latest features, please open [a new issue](https://github.com/YanzhaoW/R3BRoot/issues) in the Github website.
 
@@ -131,7 +134,13 @@ Then enter the shell environment with:
 apptainer shell --bind /lustre,/u fedora.sif
 ```
 
-if you don't want to do run this command every time, you could put it in your `.bashrc` file. If you would like to run the container as a `sudo`, please refer to this [gist](https://gist.github.com/YanzhaoW/7b8fc17bf4da854bd47f1f0757e8ff56).
+if you don't want to do run this command every time, you could put it in your `.bashrc` file. If you would like to run the container as a `sudo`, use the `--fakeroot` option a-case-sensitive-src-folder-for-mac-programmers-176cc82a3830
+
+```bash
+apptainer shell --fakeroot --bind /lustre,/u --overlay some_dir.overlay fedora.sif
+```
+
+The `fakeroot` option allows a user to install any package from the system package manager, like `apt` or `dnf`. But be aware the `fakeroot` option makes the container slow. For more details, please refer to this [gist](https://gist.github.com/YanzhaoW/7b8fc17bf4da854bd47f1f0757e8ff56).
 
 ### In your laptop or PC
 
@@ -210,13 +219,22 @@ But before running this command, several things should be done first:
 
 ### Conda environment
 
-It's helpful to develop the program in a conda environment, where the python version is matched well with the %ROOT version. To create such environment, in the container, clone this repository and source the bash file as:
+It's helpful to develop the program in a conda environment, where the python version is matched well with the %ROOT version. The `r3broot` image already contains some convenient command for this situation.
+
+To initialize the conda environment and download all the packages, do
 
 ```bash
-git clone --depth 1 https://github.com/YanzhaoW/R3BRoot.git
-source R3BRoot/util/init_r3b_env.sh
-conda activate r3bdev
+./r3broot init-conda
 ```
+
+This command will install mini-conda folder `~/miniconda3` in your home folder and create an conda environment named `r3bdev`. This step need to be done only once.
+
+Next, to open a jupyter lab server, simply do:
+
+```
+./r3broot jupyterlab --port ${ANY_PORT_NUMBER}
+```
+
 
 ## Creation of containers (for developers)
 

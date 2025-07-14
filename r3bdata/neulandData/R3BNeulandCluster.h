@@ -16,6 +16,10 @@
 
 #include "R3BNeulandHit.h"
 #include "TObject.h"
+#include <Math/Vector3Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cstddef>
 #include <iostream>
 #include <utility>
 #include <vector>
@@ -37,31 +41,31 @@ class R3BNeulandCluster : public TObject
     {
     }
 
-    void Clear(Option_t*) override
+    void Clear(Option_t* /*unused*/) override
     {
         fHits.clear();
         fHits.shrink_to_fit();
     }
 
-    const std::vector<R3BNeulandHit>& GetHits() const { return fHits; }
-    R3BNeulandHit GetFirstHit() const;
-    R3BNeulandHit GetLastHit() const;
-    R3BNeulandHit GetMaxEnergyHit() const;
-    R3BNeulandHit GetForemostHit() const;
-    ROOT::Math::XYZVector GetPosition() const;
-    Double_t GetT() const;
-    Double_t GetE() const;
-    Double_t GetBeta() const { return GetFirstHit().GetBeta(); }
-    Double_t GetEToF() const { return GetFirstHit().GetEToF(); }
-    Size_t GetSize() const { return fHits.size(); }
-    ROOT::Math::XYZVector GetEnergyCentroid() const;
-    Double_t GetEnergyMoment() const;
-    Double_t GetRCluster(Double_t beta) const;
-    Double_t GetRECluster(Double_t ekin) const;
+    [[nodiscard]] auto GetHits() const -> const std::vector<R3BNeulandHit>& { return fHits; }
+    [[nodiscard]] auto GetFirstHit() const -> R3BNeulandHit;
+    [[nodiscard]] auto GetLastHit() const -> R3BNeulandHit;
+    [[nodiscard]] auto GetMaxEnergyHit() const -> R3BNeulandHit;
+    [[nodiscard]] auto GetForemostHit() const -> R3BNeulandHit;
+    [[nodiscard]] auto GetPosition() const -> ROOT::Math::XYZVector;
+    [[nodiscard]] auto GetT() const -> double;
+    [[nodiscard]] auto GetE() const -> double;
+    [[nodiscard]] auto GetBeta() const -> double { return GetFirstHit().GetBeta(); }
+    [[nodiscard]] auto GetEToF() const -> double { return GetFirstHit().GetEToF(); }
+    [[nodiscard]] auto GetSize() const -> std::size_t { return fHits.size(); }
+    [[nodiscard]] auto GetEnergyCentroid() const -> ROOT::Math::XYZVector;
+    [[nodiscard]] auto GetEnergyMoment() const -> double;
+    [[nodiscard]] auto GetRCluster(double beta) const -> double;
+    [[nodiscard]] auto GetRECluster(double ekin) const -> double;
 
-    void Print(const Option_t*) const override;
+    void Print(const Option_t* /*option*/) const override;
 
-    bool operator==(const R3BNeulandCluster& b) const { return this->GetHits() == b.GetHits(); }
+    auto operator==(const R3BNeulandCluster& cluster) const -> bool { return this->GetHits() == cluster.GetHits(); }
 
   private:
     std::vector<R3BNeulandHit> fHits;
@@ -69,6 +73,6 @@ class R3BNeulandCluster : public TObject
     ClassDefOverride(R3BNeulandCluster, 1)
 };
 
-std::ostream& operator<<(std::ostream&, const R3BNeulandCluster&); // Support easy printing
+auto operator<<(std::ostream&, const R3BNeulandCluster&) -> std::ostream&; // Support easy printing
 
 #endif // R3BNEULANDCLUSTER_H

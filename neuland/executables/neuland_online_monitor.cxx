@@ -59,6 +59,7 @@
 #include <regex>
 #include <string>
 #include <string_view>
+#include <utility>
 
 namespace fs = std::filesystem;
 
@@ -172,7 +173,7 @@ auto main(int argc, char** argv) -> int
     run.SetRunId(inputRunID());
     run.ActivateHttpServer(DEFAULT_REFRESH_RATE, port_number());
     auto EvntHeader = std::make_unique<R3BEventHeader>();
-    run.SetEventHeader(EvntHeader.release());
+    run.SetEventHeader(std::move(EvntHeader));
     run.SetRunId(runID);
 
     //=====================================================================================
