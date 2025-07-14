@@ -44,14 +44,15 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
     gGeoMan = gGeoManager;
 
     TString installedCrystalsFile = "califa_AllCrystalsInstalled.txt";
-    if ((strncmp(expNumber, "s091", 4) == 0) || (strncmp(expNumber, "s118", 4) == 0) || (strncmp(expNumber, "g249", 4) == 0) )
+    if ((strncmp(expNumber, "s091", 4) == 0) || (strncmp(expNumber, "s118", 4) == 0) ||
+        (strncmp(expNumber, "g249", 4) == 0))
     {
         installedCrystalsFile = "califa_InstalledCrystals_Jan2024.txt";
         geoTag = "v2024.1";
     }
     else if ((strncmp(expNumber, "s522", 4) == 0) || (strncmp(expNumber, "s515", 4) == 0) ||
              (strncmp(expNumber, "s509", 4) == 0) || (strncmp(expNumber, "s494", 4) == 0) ||
-             (strncmp(expNumber, "s455", 4) == 0) || (strncmp(expNumber, "s444", 4) == 0 ))
+             (strncmp(expNumber, "s455", 4) == 0) || (strncmp(expNumber, "s444", 4) == 0))
     {
         installedCrystalsFile = "califa_InstalledCrystals_March2021.txt";
         geoTag = "v2021.3";
@@ -94,9 +95,10 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
               << "\033[33m" << fFilePath << " \033[0m" << std::endl
               << std::endl;
 
-    if (strncmp(expNumber, "g249", 4) == 0 || strncmp(expNumber, "s091", 4) == 0 || strncmp(expNumber, "s118", 4) == 0 ||
-        strncmp(expNumber, "s522", 4) == 0 || strncmp(expNumber, "s509", 4) == 0 ||
-        strncmp(expNumber, "s494", 4) == 0 || strncmp(expNumber, "s444", 4) == 0 || strncmp(expNumber, "s467", 4) == 0)
+    if (strncmp(expNumber, "g249", 4) == 0 || strncmp(expNumber, "s091", 4) == 0 ||
+        strncmp(expNumber, "s118", 4) == 0 || strncmp(expNumber, "s522", 4) == 0 ||
+        strncmp(expNumber, "s509", 4) == 0 || strncmp(expNumber, "s494", 4) == 0 ||
+        strncmp(expNumber, "s444", 4) == 0 || strncmp(expNumber, "s467", 4) == 0)
     {
         std::cout << "\033[31m No alignment data for this experiment yet \033[0m " << std::endl << std::endl;
     }
