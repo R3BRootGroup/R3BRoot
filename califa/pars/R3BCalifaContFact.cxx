@@ -11,19 +11,20 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+#include <FairLogger.h>
+#include <FairParAsciiFileIo.h>
+#include <FairParRootFileIo.h>
+#include <FairRuntimeDb.h>
+
 #include "R3BCalifaContFact.h"
-
-#include "FairLogger.h"
-#include "FairParAsciiFileIo.h"
-#include "FairParRootFileIo.h"
-#include "FairRuntimeDb.h"
-
 #include "R3BCalifaCrystalCalPar.h"
 #include "R3BCalifaCrystalPars4Sim.h"
 #include "R3BCalifaMappingPar.h"
 #include "R3BCalifaTotCalPar.h"
+#include "R3BLogger.h"
 #include "R3BTGeoPar.h"
-#include "TClass.h"
+
+#include <TClass.h>
 
 static R3BCalifaContFact gR3BCalifaContFact;
 
@@ -41,25 +42,23 @@ void R3BCalifaContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them
     // to the list of containers for the CALIFA library.
 
-    FairContainer* p1 =
-        new FairContainer("califaCrystalCalPar", "Califa Calibration Parameters", "CalifaCalParContext");
+    auto p1 = new FairContainer("califaCrystalCalPar", "Califa Calibration Parameters", "CalifaCalParContext");
     p1->addContext("CalifaCalParContext");
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("califaMappingPar", "Califa Mapping Parameters", "CalifaMappingContext");
+    auto p2 = new FairContainer("califaMappingPar", "Califa Mapping Parameters", "CalifaMappingContext");
     p2->addContext("CalifaMappingContext");
     containers->Add(p2);
 
-    FairContainer* p3 =
-        new FairContainer("califaCrystalPars4Sim", "Califa Crystal Parameters for Sim", "CalifaSimParContext");
+    auto p3 = new FairContainer("califaCrystalPars4Sim", "Califa Crystal Parameters for Sim", "CalifaSimParContext");
     p3->addContext("CalifaSimParContext");
     containers->Add(p3);
 
-    FairContainer* p4 = new FairContainer("CalifaTotCalPar", "Califa Tot Cal parameters", "CalifaTotCalParContext");
+    auto p4 = new FairContainer("CalifaTotCalPar", "Califa Tot Cal parameters", "CalifaTotCalParContext");
     p4->addContext("CalifaTotCalParContext");
     containers->Add(p4);
 
-    FairContainer* p5 = new FairContainer("CalifaGeoPar", "Califa geometry parameters", "GeometryParameterContext");
+    auto p5 = new FairContainer("CalifaGeoPar", "Califa geometry parameters", "GeometryParameterContext");
     p5->addContext("GeometryParameterContext");
     containers->Add(p5);
 }
@@ -70,31 +69,31 @@ FairParSet* R3BCalifaContFact::createContainer(FairContainer* c)
      * For an actual context, which is not an empty string and not the default context
      * of this container, the name is concatinated with the context.
      */
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
 
-    const char* name = c->GetName();
-    LOG(info) << "R3BCalifaContFact: Create container name: " << name;
-    FairParSet* p = 0;
-    if (strcmp(name, "califaCrystalCalPar") == 0)
+    FairParSet* p = nullptr;
+    if (name == "califaCrystalCalPar")
     {
         p = new R3BCalifaCrystalCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "califaMappingPar") == 0)
+    else if (name == "califaMappingPar")
     {
         p = new R3BCalifaMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "califaCrystalPars4Sim") == 0)
+    else if (name == "califaCrystalPars4Sim")
     {
         p = new R3BCalifaCrystalPars4Sim(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "CalifaTotCalPar") == 0)
+    else if (name == "CalifaTotCalPar")
     {
         p = new R3BCalifaTotCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "CalifaGeoPar") == 0)
+    else if (name == "CalifaGeoPar")
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
 
-ClassImp(R3BCalifaContFact);
+ClassImp(R3BCalifaContFact)

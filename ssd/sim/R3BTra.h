@@ -11,11 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTRA_H
-#define R3BTRA_H
+#pragma once
 
 #include "R3BDetector.h"
-#include "TLorentzVector.h"
+#include <TLorentzVector.h>
 
 class TClonesArray;
 class R3BTraPoint;
@@ -43,65 +42,48 @@ class R3BTra : public R3BDetector
     /** Destructor **/
     ~R3BTra();
 
-    /** Virtual method ProcessHits
+    /** Method ProcessHits
      **
      ** Defines the action to be taken when a step is inside the
      ** active volume. Creates a R3BTraPoint and adds it to the
      ** collection.
      *@param vol  Pointer to the active volume
      **/
-    virtual Bool_t ProcessHits(FairVolume* vol = 0);
+    Bool_t ProcessHits(FairVolume*) override;
 
-    virtual Bool_t CheckIfSensitive(std::string name);
+    Bool_t CheckIfSensitive(std::string name) override;
 
-    /** Virtual method BeginEvent
+    /** Method EndOfEvent
      **
      ** If verbosity level is set, print hit collection at the
      ** end of the event and resets it afterwards.
      **/
 
-    virtual void BeginEvent();
+    void EndOfEvent() override;
 
-    /** Virtual method EndOfEvent
-     **
-     ** If verbosity level is set, print hit collection at the
-     ** end of the event and resets it afterwards.
-     **/
-
-    virtual void EndOfEvent();
-
-    /** Virtual method Register
+    /** Method Register
      **
      ** Registers the hit collection in the ROOT manager.
      **/
-    virtual void Register();
+    void Register() override;
 
     /** Accessor to the hit collection **/
-    virtual TClonesArray* GetCollection(Int_t iColl) const;
+    TClonesArray* GetCollection(Int_t iColl) const override;
 
-    /** Virtual method Print
+    /** Method Print
      **
      ** Screen output of hit collection.
      **/
-    virtual void Print(Option_t* option = "") const;
+    void Print(Option_t* option = "") const override;
 
-    /** Virtual method Reset
+    /** Method Reset
      **
      ** Clears the hit collection
      **/
-    virtual void Reset();
+    void Reset() override;
 
-    /** Virtual method CopyClones
-     **
-     ** Copies the hit collection with a given track index offset
-     *@param cl1     Origin
-     *@param cl2     Target
-     *@param offset  Index offset
-     **/
-    virtual void CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset);
-
-    virtual void Initialize();
-    virtual void SetSpecialPhysicsCuts();
+    void Initialize() override;
+    void SetSpecialPhysicsCuts() override;
 
     //  void SaveGeoParams();
 
@@ -110,7 +92,7 @@ class R3BTra : public R3BDetector
     active volume. **/
     Int_t fTrackID;                 //!  track index
     Int_t fVolumeID;                //!  volume id
-    Int_t fDetCopyID;               //!  Det volume id  // added by Marc
+    Int_t fDetCopyID;               //!  Det volume id
     Int_t fsector;                  //!  volume id
     TLorentzVector fPosIn, fPosOut; //!  position
     TLorentzVector fMomIn, fMomOut; //!  momentum
@@ -121,12 +103,11 @@ class R3BTra : public R3BDetector
     Double32_t fLength_out;         //!  length when exiting active volume
     Double32_t fLength;             //!  length
     Double32_t fELoss;              //!  energy loss
-    Int_t fPosIndex;                //!
     TClonesArray* fTraCollection;   //!  The hit collection
     Bool_t kGeoSaved;               //!
     TList* flGeoPar;                //!
-    Int_t fNbDet;
-    Int_t fdetid[20];
+    const int fNbDet = 10;
+    std::vector<Int_t> fdetid;
     Int_t GetDetId(Int_t);
 
     /** Private method AddHit
@@ -135,7 +116,7 @@ class R3BTra : public R3BDetector
      **/
     R3BTraPoint* AddHit(Int_t trackID,
                         Int_t detID,
-                        Int_t detCopyID, // Int_t detCopyID added by Marc
+                        Int_t detCopyID,
                         TVector3 posIn,
                         TVector3 pos_out,
                         TVector3 momIn,
@@ -151,19 +132,17 @@ class R3BTra : public R3BDetector
      **/
     void ResetParameters();
 
-    ClassDef(R3BTra, 4);
+  public:
+    ClassDefOverride(R3BTra, 5);
 };
 
 inline void R3BTra::ResetParameters()
 {
     fTrackID = fVolumeID = 0;
-    fDetCopyID = 0; // fDetCopyID added by Marc
+    fDetCopyID = 0;
     fPosIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fPosOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fMomIn.SetXYZM(0.0, 0.0, 0.0, 0.0);
     fMomOut.SetXYZM(0.0, 0.0, 0.0, 0.0);
-    fTime = fLength = fELoss = 0;
-    fPosIndex = 0;
+    fTime = fLength = fELoss = 0.0;
 };
-
-#endif
