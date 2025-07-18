@@ -13,10 +13,13 @@
 
 #pragma once
 
+#include <fmt/base.h>
 #include <fmt/core.h>
-#include <fmt/format.h>
+#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 #include <utility>
 #include <vector>
+
 namespace R3B
 {
     struct MilleDataPoint
@@ -26,8 +29,19 @@ namespace R3B
         float measurement = 0.;                     // measurement corresponding to the error value
         float sigma = 1.;                           // error value
     };
+
+    inline void to_json(nlohmann::json& json_obj, const MilleDataPoint& point)
+    {
+        json_obj = nlohmann::ordered_json{
+            { "measurement", point.measurement },
+            { "sigma", point.sigma },
+            { "locals", point.locals },
+            { "globals", point.globals },
+        };
+    }
 } // namespace R3B
 
+#ifndef __CLING__
 template <>
 class fmt::formatter<R3B::MilleDataPoint>
 {
@@ -37,10 +51,11 @@ class fmt::formatter<R3B::MilleDataPoint>
     constexpr auto format(const R3B::MilleDataPoint& point, FmtContent& ctn) const
     {
         return fmt::format_to(ctn.out(),
-                              "measurement: {}, sigma: {}, locals: {}, globals: {}",
+                              "measurement: {}, sigma: {}\nlocals: {}\nglobals: {}",
                               point.measurement,
                               point.sigma,
                               point.locals,
                               point.globals);
     }
 };
+#endif

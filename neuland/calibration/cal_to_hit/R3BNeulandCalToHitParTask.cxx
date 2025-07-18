@@ -24,6 +24,7 @@
 #include <R3BNeulandCal2HitHistAnalysis.h>
 #include <R3BNeulandMillepede.h>
 #include <R3BNeulandMuonRecons.h>
+#include <fairlogger/Logger.h>
 #include <memory>
 #include <string_view>
 
@@ -39,21 +40,43 @@ namespace R3B::Neuland
         : CalibrationTask(name, iVerbose)
         , cal_data_{ cal_data_name }
         , base_par_{ AddInputPar<CalibrationBasePar>(base_par_name) }
+        , hit_par_(AddOutputPar<Cal2HitPar>(hit_par_name))
     // NOLINTEND
+    {
+    }
+
+    void Cal2HitParTask::SetMinStat(int min)
+    {
+        if (engine_ == nullptr)
+        {
+            LOGP(warn, "Engine is nullptr!");
+            return;
+        }
+        engine_->SetMinStat(min);
+    }
+
+    void Cal2HitParTask::SetErrorScale(float scale)
+    {
+        if (engine_ == nullptr)
+        {
+            LOGP(warn, "Engine is nullptr!");
+            return;
+        }
+        engine_->SetErrorScale(scale);
+    }
+
+    void Cal2HitParTask::SetMethod(Cal2HitParMethod method)
     {
         switch (method)
         {
             case Cal2HitParMethod::recons:
                 engine_ = std::make_unique<Calibration::MuonReconstruction>();
-                hit_par_ = AddOutputPar<Cal2HitPar>(hit_par_name);
                 break;
             case Cal2HitParMethod::millepede:
                 engine_ = std::make_unique<Calibration::MillepedeEngine>();
-                hit_par_ = AddInputPar<Cal2HitPar>(hit_par_name);
                 break;
             case Cal2HitParMethod::histogram:
                 engine_ = std::make_unique<Calibration::HistAnalysis>();
-                hit_par_ = AddOutputPar<Cal2HitPar>(hit_par_name);
                 break;
         }
     }
@@ -68,6 +91,10 @@ namespace R3B::Neuland
         if (plane_num == 0)
         {
             throw R3B::runtime_error("Plane number extracted from Map2CalPar is 0!");
+        }
+        if (engine_ == nullptr)
+        {
+            throw R3B::logic_error("Calibration engine is not set!");
         }
         engine_->SetTask(this);
         engine_->SetModuleSize(plane_num * BarsPerPlane);
@@ -106,6 +133,7 @@ namespace R3B::Neuland
         engine_->Calibrate(*hit_par_);
         engine_->EndOfTask();
     }
+    void Cal2HitParTask::BeginOfEvent() { engine_->BeginOfEvent(); }
 
     auto Cal2HitParTask::CheckConditions() const -> bool
     {

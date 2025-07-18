@@ -33,13 +33,7 @@ namespace R3B::Neuland
         return val * val;
     }
 
-    // Millepede calibration defaults:
-    constexpr auto DEFAULT_EFFECTIVE_C = 8.;                // cm/ns
-    constexpr auto DEFAULT_CALIBRATION_P_VALUE_CUT = 1e-10; // any smaller values will be discarded
-    constexpr auto DEFAULT_T_DIFF_RESIDUAL_CUT = 400;       // any larger values will be discarded
-
     // Initialize variables from Birk' s Law
-
     constexpr double BirkdP = 1.032;
     constexpr double BirkC1 = 0.013 / BirkdP;
     constexpr double BirkC2 = 9.6e-6 / (BirkdP * BirkdP);
@@ -139,6 +133,10 @@ namespace R3B::Neuland
     {
         constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_NUM = 25;
         constexpr auto DEFAULT_TSYNC_MAX_TIME_DIFF = 300; // ns
+        // Millepede calibration defaults:
+        constexpr auto DEFAULT_EFFECTIVE_C = 8.;                // cm/ns
+        constexpr auto DEFAULT_CALIBRATION_P_VALUE_CUT = 1e-10; // any smaller values will be discarded
+        constexpr auto DEFAULT_T_DIFF_RESIDUAL_CUT = 400;       // any larger values will be discarded
 
     } // namespace Calibration
 

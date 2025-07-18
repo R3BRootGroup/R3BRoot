@@ -2,7 +2,7 @@
 
 [TOC]
 
-The Digitizing module of NeuLAND (`R3B::Neuland::Digitizer`) acts as an layer between the Geant4 generated `R3BNeulandPoint` and the real physical data `R3BNeulandHit`. The point data generated from the simulation engine contains the energy deposition of different particles. However, the physical hit data calculated through the \ref neuland_cal "calibration" process don't distinguish the energy depositions among different particles. And the resulting energy deposition of the hit data normally represents total energy deposition of the event. There are other effects from both the scintillators and digitizing channels that could influence times, positions and energies of the final hit. the following sections include detailed information how the digitizing module helps to imitate the real physical processes and reduce the difference between the simulated data and the real data.
+The Digitizing module of NeuLAND (`R3B::Neuland::Digitizer`) acts as a layer between the Geant4 generated `R3BNeulandPoint` and the real physical data `R3BNeulandHit`. The point data generated from the simulation engine contains the energy deposition of different particles. However, the physical hit data calculated through the \ref neuland_cal "calibration" process don't distinguish the energy depositions among different particles. And the resulting energy deposition of the hit data normally represents total energy deposition of the event. There are other effects from both the scintillators and digitizing channels that could influence times, positions and energies of the final hit. The following sections include detailed information how the digitizing module helps to imitate the real physical processes and reduce the difference between the simulated data and the real data.
 
 The technical programming details of this module are explained in the following document:
 
@@ -10,7 +10,7 @@ The technical programming details of this module are explained in the following 
 
 ## General
 
-The real data digitization of NeuLAND detector involves PMTS and multiple electronic modules, such as FQT, TAMEX-3, slow control units and the "back plates" which holds multiple FQT-TAMEX pairs and manage their communications to the data acquisition system. In this page, these processes are simplified into two different components: paddle and channel. The name "paddle" comes from the old prototype of NeuLAND, in which the scintillators looks like paddles with different values of height and width. the "channel" component incorporates everything between the scintillator output and the storage of the binary data. On the other hand, the Digitizing module needs to provide the data of `R3BNeulandHit`, which is similar to the step from the calibration process (`R3B::Neuland::Cal2HitTask`). _In the future, the digitizing module may use the same task from the calibration to generate hit level data._ For now, it is using its own process to construct the resulting hit level data (see the picture below).
+The real data digitization of NeuLAND detector involves PMTS and multiple electronic modules, such as FQT, TAMEX-3, slow control units and the "back-plates" which holds multiple FQT-TAMEX pairs and manage their communications to the data acquisition system. In this page, these processes are simplified into two different components: paddle and channel. The name "paddle" comes from the old prototype of NeuLAND, in which the scintillators look like paddles with different values of height and width. The "channel" component incorporates everything between the scintillator output and the storage of the binary data. On the other hand, the Digitizing module needs to provide the data of `R3BNeulandHit`, which is similar to the step from the calibration process (`R3B::Neuland::Cal2HitTask`). _In the future, the digitizing module may use the same task from the calibration to generate hit level data._ For now, it is using its own process to construct the resulting hit level data (see the picture below).
 
 @anchor digi_dataflow
 @image html DigitizingDataFlow.svg "Figure 1: NeuLAND Digitizing Dataflow" width=100%
@@ -44,7 +44,6 @@ They are used in three different physical processes:
    $$
 
    with:
-
    - @f$x@f$: The distance of the energy deposition to the center of the bar (right direction is the positive direction).
    - @f$I_0@f$: The initial energy deposition value.
    - @f$L@f$: The length of the scintillation bar
@@ -62,7 +61,6 @@ They are used in three different physical processes:
    $$
 
    with:
-
    - @f$x@f$: The distance of the energy deposition to the center of the bar.
    - @f$t@f$: The initial time of the energy deposition.
    - @f$c_e@f$: Effective speed of light.
@@ -121,7 +119,7 @@ x = \frac{c_e}{2} (t_l - t_r + t_\text{offset})
 \end{equation}
 $$
 
-where as the time can be obtained from the summation of the two equations:
+whereas the time can be obtained from the summation of the two equations:
 
 $$
 \begin{equation}
@@ -171,12 +169,12 @@ Parameters can be found in the class `R3B::Digitizing::Neuland::Tamex::Params` a
 
 | Parameter                | Default value |  Unit  |             Explanation              |
 | :----------------------- | :-----------: | :----: | :----------------------------------: |
-| `energy_gain`            |     15.0      | ns/MeV |         Energy gain paramter         |
+| `energy_gain`            |     15.0      | ns/MeV |        Energy gain parameter         |
 | `pedestal`               |     14.0      |   ns   | Pedestal (energy baseline) parameter |
 | `energy_res_rel`         |     0.05      |  MeV   |      Relative energy resolution      |
 | `time_res`               |     0.15      |   ns   |           Time resolution            |
 | `pmt_thresh`             |      1.       |  MeV   |            PMT threshold             |
-| `saturation_coefficient` |     0.012     |        |   Saturation coefficent of the PMT   |
+| `saturation_coefficient` |     0.012     |        |  Saturation coefficient of the PMT   |
 | `max_time`               |     1000.     |   ns   |             Maximal time             |
 | `min_time`               |      1.       |   ns   |             Minimal time             |
 | `min_energy`             |     0.067     |  MeV   |            Minimal energy            |
@@ -228,7 +226,6 @@ The procedures to convert channel signals (`R3B::Digitizing::ChannelSignal`) to 
 2. If the condition is met, the signal will be converted to a PMT signal in the type `Neuland::Tamex::PMTPeak`. The time of the PMT signal is the same as the time value from the channel signal. The calculation of the `height` of the PMT signal is calculated from the saturation effect (equation @f$\ref{eq:sat_energy}@f$) where the `height` is @f$E@f$ and the parameter `saturation_coefficient` is @f$\lambda@f$. The converted PMT signal is then pushed to a vector for further processing.
 
 3. Once the public method `Digitizing::Engine::Construct()` is called in the digitizer task, the vector of PMT signals start to be converted to a vector of FQT peaks (`Neuland::Tamex::FQTPeak`) in order:
-
    1. The vector of PMT signals is sorted with increasing time values.
    2. Each adjacent PMT signals in the vector are piled up if they follow the pileup criterion (see section @ref pileup below for more details).
    3. Check the `height` of each piled up PMT signal and remove those whose height is below the threshold value specified by the parameter `pmt_thresh`.
@@ -248,7 +245,7 @@ E = \max \\{ t_\text{ToT} - t_0, 1 \\} / G
 \end{equation}
 $$
 
-where @f$t_\text{ToT}@f$, @f$G@f$ and @f$t_0@f$ is the time-over-threshold, PMT gain and pedestal value respectively. Thus the inverse of the relation is **undefined** for time-over-threshold values smaller than 1 ns. To eliminate this undefined behavior, the conversion from @f$t_\text{ToT}@f$ to the energy isn't exactly the same as equation @f$\ref{eq:gain}@f$, but with an additional condition:
+Here @f$t_\text{ToT}@f$, @f$G@f$ and @f$t_0@f$ are the time-over-threshold, PMT gain and pedestal value respectively. Thus, the inverse of the relation is **undefined** for time-over-threshold values smaller than 1ns. To eliminate this undefined behavior, the conversion from @f$t_\text{ToT}@f$ to the energy isn't exactly the same as equation @f$\ref{eq:gain}@f$, but with an additional condition:
 
 $$
 \begin{aligned}
@@ -265,9 +262,9 @@ The pileup between different signals is the main mechanism to reduce the large m
 
 - The pileup of the PMT signals is straightforward and simple as it's just the summation of their amplitudes (heights) if the time difference between the two signals are smaller than 15 ns. This is based on the fact that if two protons deposit their energy at the same time, the corresponding energy value of the pileup signal should be equal to the summation.
 
-- The pileup of the reshaped signals (FQT signals) is uncertain and requires further investigation. Currently there are three strategies specified by the user:
-  - `time_window`: The FQT signals are first sorted with increasing time. All the signals whose time values are withn @f$[t_\text{min}, \ \ t_\text{min} + t_\text{window}]@f$ are added up where @f$t_\text{min}@f$ is the time of the earliest signal and @f$t_\text{window}@f$ is specified by the `pileup_time_window` parameter. The addition of the two signals are done by summing up their energy values and the time-over-threshold of the piled-up signal is recalculated from the summed energy value. The time of the piled-up signal is @f$t_\text{min}@f$.
-  - `distance`: The "distance" pileup strategy also begins with the sorting with increasing time. Then the time difference between the leading edges of each consecutive signals is checked. If the time difference is less than `pileup_distance` parameter, the two signal will be piled up in the same way as in `time_window` method.
+- The pileup of the reshaped signals (FQT signals) is uncertain and requires further investigation. Currently, there are three strategies specified by the user:
+  - `time_window`: The FQT signals are first sorted with increasing time. All the signals whose time values are within @f$[t_\text{min}, \ \ t_\text{min} + t_\text{window}]@f$ are added up where @f$t_\text{min}@f$ is the time of the earliest signal and @f$t_\text{window}@f$ is specified by the `pileup_time_window` parameter. The addition of the two signals are done by summing up their energy values and the time-over-threshold of the piled-up signal is recalculated from the summed energy value. The time of the piled-up signal is @f$t_\text{min}@f$.
+  - `distance`: The "distance" pileup strategy also begins with the sorting with increasing time. Then the time difference between the leading edges of each consecutive signal is checked. If the time difference is less than `pileup_distance` parameter, the two signal will be piled up in the same way as in `time_window` method.
   - `width`: This strategy utilizes the width (time difference between the leading edge and trailing edge) of each FQT signal. Again, signals are first sorted with the increasing time value. Then each two consecutive signals are checked whether they are overlapped with each other by identifying whether the trailing edge time of the former signal is larger than the leading edge time of the latter signal. If they overlap with each other, the two signals will be piled up in such way that the new piled-up signal has the leading edge time equal to the one from the former signal and the trailing edge time equal to the one of the latter signal. The time-over-threshold is then calculated based on the time difference of the leading and trailing edges. The energy value of the new signal is calculated from its time-over-threshold value using equation @f$\ref{eq:energy}@f$.
 
 The Cal signal data, which only contains time-over-threshold value, leading edge time and the channel side cannot be directly used for the calibration algorithm. However, if one tries to verify the calibration algorithms via the simulated cal level data, the Cal signal data can be converted to the cal level data (`Neuland::BarCalData`) through a conversion task (`Neuland::SimCal2Cal`).

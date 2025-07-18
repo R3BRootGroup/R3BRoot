@@ -105,7 +105,7 @@ namespace R3B::Neuland
         void execute_with_hist();
         void reset();
 
-        [[nodiscard]] auto check_trigger() const -> bool;
+        [[nodiscard]] auto check_offspill_trigger() const -> bool;
         template <typename ParType>
         [[nodiscard]] auto add_par(std::string_view par_name,
                                    std::vector<FairParSet*>& pars,

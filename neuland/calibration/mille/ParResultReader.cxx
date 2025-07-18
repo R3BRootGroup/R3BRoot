@@ -1,4 +1,5 @@
 #include "ParResultReader.h"
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -42,7 +43,7 @@ namespace
         {
             result.par_num = std::stoi(std::string{ splits_view.front() });
             result.value = std::stof(std::string{ splits_view[1] });
-            result.sigma = std::stof(std::string{ splits_view[2] });
+            result.pre_sigma = std::stof(std::string{ splits_view[2] });
         }
         else
         {

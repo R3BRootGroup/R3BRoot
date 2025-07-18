@@ -4,6 +4,7 @@
 #include "R3BFTCalEngine.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandDigitizer.h"
+#include "R3BNeulandMillepede.h"
 #include "R3BNeulandTriggerTypes.h"
 #include <R3BNeulandCalToHitParTask.h>
 #include <string>
@@ -14,7 +15,7 @@ namespace R3B::Neuland
 {
     namespace Digitizing = R3B::Digitizing;
     namespace Tamex = Digitizing::Neuland::Tamex;
-    constexpr auto RVAUE_DEFAULT_NEUTRON_ENERGY = 600.;
+    constexpr auto RVALUE_DEFAULT_NEUTRON_ENERGY = 600.;
 
     struct MinimizerLimVar
     {
@@ -24,10 +25,10 @@ namespace R3B::Neuland
         double upper{};
     };
 
-    constexpr auto DEFAULT_EDEP_OPT = MinimizerLimVar{ 200., 25., 50., 1500. };
-    constexpr auto DEFAULT_EDEP_OFF_OPT = MinimizerLimVar{ 5., 1., 0., 250. };
-    constexpr auto DEFAULT_N_CLUSTER_OPT = MinimizerLimVar{ 10., 5., 5., 50. };
-    constexpr auto DEFAULT_N_CLUSTER_OFF_OPT = MinimizerLimVar{ 2., 1., 0., 10. };
+    constexpr auto DEFAULT_EDEP_OPT = MinimizerLimVar{ .init = 200., .step = 25., .lower = 50., .upper = 1500. };
+    constexpr auto DEFAULT_EDEP_OFF_OPT = MinimizerLimVar{ .init = 5., .step = 1., .lower = 0., .upper = 250. };
+    constexpr auto DEFAULT_N_CLUSTER_OPT = MinimizerLimVar{ .init = 10., .step = 5., .lower = 5., .upper = 50. };
+    constexpr auto DEFAULT_N_CLUSTER_OFF_OPT = MinimizerLimVar{ .init = 2., .step = 1., .lower = 0., .upper = 10. };
     constexpr auto DEFAULT_MIN_STAT = 10;
 
     class AnalysisApplication : public CLIApplication
@@ -106,7 +107,7 @@ namespace R3B::Neuland
                 struct NeutronRValue
                 {
                     bool enable = false;
-                    double neutron_energy_mev = RVAUE_DEFAULT_NEUTRON_ENERGY;
+                    double neutron_energy_mev = RVALUE_DEFAULT_NEUTRON_ENERGY;
                     std::string name = "NeulandNeutronsRValue";
                     std::string read = "NeulandMultiplicity;NeulandClusters";
                     std::string write = "NeulandNeutrons";
@@ -143,6 +144,7 @@ namespace R3B::Neuland
                     int min_stat = DEFAULT_MIN_STAT;
                     CalTrigger mode = CalTrigger::offspill;
                     Cal2HitParMethod method = Cal2HitParMethod::recons;
+                    Calibration::MillepedeOptions millepede;
                     std::string name = "NeulandCal2HitParTask";
                     std::string read = "NeulandCalData;NeulandCalibrationBasePar";
                     std::string write = "NeulandHitPar";

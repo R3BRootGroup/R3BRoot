@@ -3,6 +3,8 @@
 #include <R3BNeulandCLIAbstract.h>
 #include <TStopwatch.h>
 #include <algorithm>
+#include <cstdint>
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <fstream>
 #include <functional>
@@ -22,6 +24,18 @@ class R3BFileSource2;
 namespace CLI
 {
     class App;
+}
+
+namespace R3B
+{
+    enum class WriteMode : uint8_t
+    {
+        NEW,
+        RECREATE,
+        UPDATE,
+        READ,
+    };
+
 }
 
 namespace R3B::Neuland
@@ -51,7 +65,7 @@ namespace R3B::Neuland
                 std::string working_dir;
                 std::string data = "output.root";
                 std::string par = "output.par.root";
-                std::string mode = "update";
+                WriteMode mode = WriteMode::UPDATE;
             } output;
         };
 

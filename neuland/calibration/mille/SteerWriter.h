@@ -37,10 +37,10 @@ namespace R3B
         {
             inversion,
             diagonalization,
-            fullGMRES,
+            fullGORES,
             sparseGMRES,
             cholesky,
-            bandcholesky,
+            bandchooseby,
             HIP
         };
 

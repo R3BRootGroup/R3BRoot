@@ -1,6 +1,8 @@
 #pragma once
 
+#include "R3BNeulandCommon.h"
 #include <R3BException.h>
+#include <Rtypes.h>
 #include <algorithm>
 #include <array>
 #include <boost/algorithm/string/classification.hpp>
@@ -15,6 +17,44 @@
 
 namespace R3B::Neuland
 {
+
+    class Common
+    {
+      public:
+        static constexpr auto GetBarVerticalDisplacement(int module_num) -> double
+        {
+            const auto bar_num = module_num % BarsPerPlane;
+            return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
+        }
+        static constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool
+        {
+            return (plane_id % 2 == FirstHorizontalPlane);
+        }
+        static constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
+        static constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
+        static constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
+        static constexpr auto IsModuleNumHorizontal(int module_num) -> bool
+        {
+            return IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));
+        }
+        // planeNum, barNum and ModuleNum is 1-based
+        static constexpr auto Neuland_PlaneBar2ModuleNum(int planeNum, int barNum) -> int
+        {
+            return ((planeNum - 1) * BarsPerPlane) + barNum;
+        }
+        template <typename T = double>
+        static constexpr auto PlaneID2ZPos(int plane_id) -> T
+        {
+            return static_cast<T>((plane_id + 0.5) * BarSize_Z);
+        }
+        template <typename T = double>
+        static constexpr auto ModuleNum2ZPos(int module_num) -> T
+        {
+            return PlaneID2ZPos<T>(ModuleID2PlaneID(module_num - 1));
+        }
+        ClassDefNV(Common, 1);
+    };
+
     template <typename Option>
     void parse_io_branch_names(const Option& option,
                                std::vector<std::string>& read,

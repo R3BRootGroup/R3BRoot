@@ -17,11 +17,14 @@
 #include <cstdint>
 #include <fairlogger/Logger.h>
 #include <filesystem>
+#include <fmt/base.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <fstream>
 #include <functional>
 #include <gsl/span>
+#include <magic_enum/magic_enum.hpp>
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
@@ -115,7 +118,7 @@ namespace R3B::Neuland
 
         if (has_inited())
         {
-            LOGP(info, "Writting all parameters to files");
+            LOGP(info, "Writing all parameters to files");
             run_->GetRuntimeDb()->writeContainers();
             if (auto* runtime_db = run_->GetRuntimeDb(); runtime_db != nullptr)
             {
@@ -162,7 +165,7 @@ namespace R3B::Neuland
 
     void CLIApplication::init()
     {
-        LOGP(info, "Initializaing application ...");
+        LOGP(info, "Initializing application ...");
         set_inited(true);
         add_inout_files();
         add_inout_pars();
@@ -305,9 +308,9 @@ namespace R3B::Neuland
                 option.enable_mpi ? fmt::format("{}.{}", output_option.par, rank_num_) : output_option.par;
             auto file_path =
                 output_wd.empty() ? fs::path{ output_name } : fs::path{ output_wd } / fs::path{ output_name };
-            LOGP(info, "Ouptut parameter file is {:?}", file_path.string());
+            LOGP(info, "Output parameter file is {:?}", file_path.string());
             auto output_par_fileio = ParRootFileIo::Output();
-            output_par_fileio->open(file_path.c_str(), option.output.mode);
+            output_par_fileio->open(file_path.c_str(), magic_enum::enum_name(option.output.mode));
             // auto fileio = std::make_unique<FairParRootFileIo>(true);
             // fileio->open(file_path.c_str(), option.output.mode.c_str());
             auto* rtdb = run_->GetRuntimeDb();

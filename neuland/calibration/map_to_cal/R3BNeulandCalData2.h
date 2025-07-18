@@ -14,12 +14,16 @@
  ******************************************************************************/
 
 #include "R3BValueError.h"
-#include <R3BFormatters.h> // NOLINT
 #include <Rtypes.h>
+#include <vector>
+
+#ifndef __CLING__
+#include "R3BFormatters.h" // IWYU pragma: keep
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
-#include <vector>
+#endif
 
 namespace R3B::Neuland
 {
@@ -48,6 +52,7 @@ namespace R3B::Neuland
   //
 using R3BNeulandCalDataContainer = std::vector<R3B::Neuland::BarCalData>;
 
+#ifndef __CLING__
 template <>
 class fmt::formatter<R3B::Neuland::CalDataSignal>
 {
@@ -79,3 +84,4 @@ class fmt::formatter<R3B::Neuland::BarCalData>
                               fmt::join(signal.right, ", "));
     }
 };
+#endif

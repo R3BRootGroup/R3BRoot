@@ -76,8 +76,13 @@ add_library_with_dictionary(
     PRIVATE_DEPENDENCIES
     Geant4::G4materials)
 
+target_compile_definitions(R3BBase PUBLIC CPP_STANDARD=${CMAKE_CXX_STANDARD})
 if(CMAKE_CXX_STANDARD LESS_EQUAL 17)
-    target_compile_definitions(R3BBase PUBLIC HAS_CXX_17)
+    target_compile_definitions(R3BBase PUBLIC HAS_CPP_STANDARD_17)
+elseif(CMAKE_CXX_STANDARD LESS_EQUAL 20)
+    target_compile_definitions(R3BBase PUBLIC HAS_CPP_STANDARD_20)
+elseif(CMAKE_CXX_STANDARD LESS_EQUAL 23)
+    target_compile_definitions(R3BBase PUBLIC HAS_CPP_STANDARD_23)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9)

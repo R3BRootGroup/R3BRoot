@@ -23,12 +23,17 @@
 #include <TObject.h>
 #include <cstddef>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <map>
 #include <string>
 #include <string_view>
 #include <type_traits>
 #include <unordered_map>
 #include <vector>
+
+#if CPP_STANDARD > 20
+#include <concepts>
+#endif
 
 // TODO: Use C++20 Concept to put more constains on the template parameters
 namespace R3B
@@ -212,7 +217,16 @@ namespace R3B
         }
     };
 
+#if CPP_STANDARD >= 20
+    template <typename T>
+    concept CanOutput = requires(T data) {
+        { data.clear() } -> std::convertible_to<void>;
+    };
+
+    template <CanOutput OutputType>
+#else
     template <typename OutputType>
+#endif
     class OutputConnector
     {
       public:
@@ -229,11 +243,19 @@ namespace R3B
         OutputConnector& operator=(const OutputConnector& other) = delete;
         OutputConnector& operator=(OutputConnector&&) = delete;
 
-        void init(bool persistance = true, const boost::source_location& loc = BOOST_CURRENT_LOCATION)
+        OutputConnector& operator=(const RawDataType& data)
+        {
+            data_ = data;
+            return *this;
+        }
+        auto operator*() -> RawDataType& { return data_; }
+        auto operator->() -> RawDataType* { return &data_; }
+
+        void init(bool persistence = true, const boost::source_location& loc = BOOST_CURRENT_LOCATION)
         {
             if (auto* ioman = FairRootManager::Instance(); ioman != nullptr)
             {
-                ioman->RegisterAny(branch_name_.c_str(), data_ptr_, persistance);
+                ioman->RegisterAny(branch_name_.c_str(), data_ptr_, persistence);
             }
             else
             {

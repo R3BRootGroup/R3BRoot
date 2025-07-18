@@ -18,6 +18,7 @@
 #include <boost/process/v2/stdio.hpp>
 #include <exception>
 #include <filesystem>
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <fmt/ranges.h> // NOLINT
@@ -36,7 +37,7 @@ namespace R3B::Millepede
     {
 #ifndef WITH_MILLEPEDE
         throw std::runtime_error(
-            "Program is not compiled with with millepde2. Please enable \"WITH_MILLEPEDE=ON\" with CMake.");
+            "Program is not compiled with with millepede2. Please enable \"WITH_MILLEPEDE=ON\" with CMake.");
 #endif
         fs::create_directories(fs::path{ working_directory_ });
         const auto exe_string = fmt::format("{}/{}", binary_directory_, executable_);
@@ -60,7 +61,7 @@ namespace R3B::Millepede
                 {
                     if (err)
                     {
-                        fmt::println("Error occured from the pede program. Error message: {}", err.message());
+                        fmt::println("Error occurred from the pede program. Error message: {}", err.message());
                     }
                     fmt::println("The pede program is closed successfully with the return value: {}", ret);
                 });
@@ -69,7 +70,7 @@ namespace R3B::Millepede
         }
         catch (std::exception& ex)
         {
-            throw std::runtime_error(fmt::format("Error occured when launching pede with \"{} {}\": \n {}",
+            throw std::runtime_error(fmt::format("Error occurred when launching pede with \"{} {}\": \n {}",
                                                  bp::search_path(executable_).string(),
                                                  fmt::join(launch_args, " "),
                                                  ex.what()));
@@ -83,13 +84,13 @@ namespace R3B::Millepede
 
         if (fs::exists(old_result_path))
         {
-            fmt::print(
-                "Info: copy the file {:?} to the file {:?}!\n", old_result_path.string(), new_result_path.string());
+            fmt::println(
+                "Info: copy the file {:?} to the file {:?}!", old_result_path.string(), new_result_path.string());
             fs::copy(old_result_path, new_result_path, fs::copy_options::overwrite_existing);
         }
         else
         {
-            fmt::print("Error: millepede.res doesn't exist!\n");
+            fmt::println("Error: millepede.res doesn't exist!");
         }
     }
 

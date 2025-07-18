@@ -128,7 +128,7 @@ namespace R3B::Neuland::Calibration
         {
             return;
         }
-        buffer_points_.emplace_back(Point{ module_num, t_sum / 2 });
+        buffer_points_.emplace_back(Point{ .module_num = module_num, .t_mean = t_sum / 2 });
     }
 
     void TSyncEngine::end_of_event()
@@ -424,6 +424,13 @@ namespace R3B::Neuland::Calibration
             module_par.t_sync = t_sync_val + t_sync_corr;
         }
         offset_to_tsync_ref_bar(hit_par);
+
+        // // TEST: try to set error to zero
+        // for (auto& [module_num, module_par] : hit_par.GetListOfModuleParRef())
+        // {
+        //     module_par.t_sync.error = 0.;
+        // }
+
         LOGP(info, "Time synchronization calibration ends.");
     }
 } // namespace R3B::Neuland::Calibration

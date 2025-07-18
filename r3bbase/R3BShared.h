@@ -177,6 +177,7 @@ namespace R3B
         return exp;
     }
 
+#ifndef __CLING__
     // -------------------------------------------------------------------------
     // File handling
     namespace fs = std::filesystem;

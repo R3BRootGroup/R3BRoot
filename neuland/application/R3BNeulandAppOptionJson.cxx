@@ -1,5 +1,6 @@
 #include "R3BNeulandAppOptionJson.h"
 #include "JsonParse/GeneratorFactoryJson.h" // IWYU pragma: keep
+#include "JsonParse/MillepedeOptionJson.h"  // IWYU pragma: keep
 #include "JsonParse/ParticleFilterJson.h"   // IWYU pragma: keep
 #include "R3BDigitizingTamex.h"
 #include "R3BException.h"
@@ -151,7 +152,7 @@ namespace R3B::Neuland
             { "working-dir", option.working_dir },
             { "data", option.data },
             { "par", option.par },
-            { "mode", option.mode },
+            { "mode", magic_enum::enum_name(option.mode) },
         };
     }
 
@@ -161,7 +162,7 @@ namespace R3B::Neuland
         json_obj.at("working-dir").get_to(option.working_dir);
         json_obj.at("data").get_to(option.data);
         json_obj.at("par").get_to(option.par);
-        json_obj.at("mode").get_to(option.mode);
+        set_enum_from_string(option.mode, json_obj, "mode");
     }
 
     // =============================================================================================
@@ -250,6 +251,28 @@ namespace R3B::Neuland
         json_obj.at("write").get_to(option.write);
     }
 
+    // template <>
+    // inline void to_json(nlohmann::ordered_json& json_obj, const Calibration::MillepedeOptions& options)
+    // {
+    //     json_obj = nlohmann::ordered_json{
+    //         { "scale-factor", options.scale_factor },
+    //         { "t-diff-residual-cut", options.t_diff_residual_cut },
+    //         { "p-value-cut", options.p_value_cut },
+    //         { "mille-par-filename", options.mille_par_filename },
+    //         { "pede-par-filename", options.pede_par_filename },
+    //     };
+    // }
+
+    // template <>
+    // inline void from_json(const nlohmann::ordered_json& json_obj, Calibration::MillepedeOptions& options)
+    // {
+    //     json_obj.at("scale-factor").get_to(options.scale_factor);
+    //     json_obj.at("t-diff-residual-cut").get_to(options.t_diff_residual_cut);
+    //     json_obj.at("p-value-cut").get_to(options.p_value_cut);
+    //     json_obj.at("mille-par-filename").get_to(options.mille_par_filename);
+    //     json_obj.at("pede-par-filename").get_to(options.pede_par_filename);
+    // }
+
     template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::Cal2HitParTask& option)
     {
@@ -258,6 +281,7 @@ namespace R3B::Neuland
             { "min-stat", option.min_stat },
             { "mode", magic_enum::enum_name(option.mode) },
             { "method", magic_enum::enum_name(option.method) },
+            { "millepede", option.millepede },
             { "read", option.read },
             { "write", option.write },
         };
@@ -268,6 +292,7 @@ namespace R3B::Neuland
     {
         json_obj.at("enable").get_to(option.enable);
         json_obj.at("min-stat").get_to(option.min_stat);
+        json_obj.at("millepede").get_to(option.millepede);
         json_obj.at("read").get_to(option.read);
         json_obj.at("write").get_to(option.write);
         set_enum_from_string(option.method, json_obj, "method");
@@ -342,7 +367,7 @@ namespace R3B::Neuland
         set_enum_from_string(option.mode, json_obj, "mode");
     }
     // =============================================================================================
-    // Anaysis general options:
+    // Analysis general options:
     template <>
     void to_json(json& json_obj, const AnalysisApplication::Options::Tasks& option)
     {
@@ -404,7 +429,7 @@ namespace R3B::Neuland
         json_obj.at("tasks").get_to(option.tasks);
     }
     // =============================================================================================
-    // Simuation options:
+    // Simulation options:
     template <>
     void to_json(nlohmann::ordered_json& json_obj, const SimulationApplication::Options& option)
     {

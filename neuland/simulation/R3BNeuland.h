@@ -11,10 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULAND_H
-#define R3BNEULAND_H
+#pragma once
 
-#include "R3BDetector.h"
 #include "R3BNeulandPoint.h"
 #include "TLorentzVector.h"
 #include <FairDetector.h>
@@ -88,7 +86,7 @@ class R3BNeuland : public FairDetector
      *
      * Set the translation and rotation of the NeuLAND detector using parameter with the type `TGeoCombiTrans`. This
      * will override the value specified by the constructors.
-     * @param pos Input tranlation and rotation matrix.
+     * @param pos Input translation and rotation matrix.
      * @see <a href="https://root.cern/doc/master/classTGeoCombiTrans.html">TGeoCombiTrans</a>
      */
     void SetLocationDirection(const TGeoCombiTrans& pos) { rot_trans_ = pos; }
@@ -120,7 +118,7 @@ class R3BNeuland : public FairDetector
     R3BNeulandGeoPar* neuland_geo_par_ = nullptr; //!
     /// Creating NeuLAND geometry if EnableAutoGeoBuild() is enabled.
     R3B::Neuland::Geometry::Creator geo_creator_; //!
-    /// Rotation and tranlation of NeuLAND detector.
+    /// Rotation and translation of NeuLAND detector.
     TGeoCombiTrans rot_trans_;
     /// Geometry file name. The file must be present if EnableAutoGeoBuild() is disabled
     std::string geo_file_;
@@ -164,5 +162,3 @@ class R3BNeuland : public FairDetector
 
     ClassDefOverride(R3BNeuland, 4);
 };
-
-#endif // R3BNEULAND_H

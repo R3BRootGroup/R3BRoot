@@ -4,14 +4,16 @@ Checking the values of cal_to_hit parameters in the root file. The corresponding
 
 import warnings
 
+import os
 import numpy as np
 import pandas as pd
 import ROOT
 
 
 class HitParReader:
-    def __init__(self, filename: str):
+    def __init__(self, filename: str, is_verbose: bool = True):
         self._filename: str = filename
+        self._base_filename: str = os.path.basename(filename)
         self._hit_par_name: str = "NeulandHitPar"
         self._par_name_list: list[str] = [
             "t_diff",
@@ -26,6 +28,8 @@ class HitParReader:
         ]
         self._par_dict: dict[str, np.typing.NDArray] = {}
         self._dataframe = pd.DataFrame()
+        self._dataframes: dict[int, pd.DataFrame] = {}
+        self._verbose = is_verbose
 
     @property
     def par_dict(self):
@@ -72,19 +76,39 @@ class HitParReader:
     def dataframe(self, value):
         self._dataframe = value
 
+    def set_verbose(self, is_verbose: bool = False):
+        self._verbose = is_verbose
+
     def header(self):
         return list(self._dataframe.columns.values)
 
-    def read(self):
+    def read(self, all_cycles: bool = True):
         par_file = ROOT.TFile(self._filename, "read")
-        hit_par = par_file.Get(f"{self._hit_par_name}")
-        self._construct_empty_dict(hit_par)
-        self._fill_data(hit_par)
-        self._dataframe = pd.DataFrame(self._par_dict)
+        cycles = (
+            self._get_all_cycles(par_file, self._hit_par_name)
+            if all_cycles
+            else [9999]
+        )
+        if self._verbose:
+            print(f"In file {self._base_filename} \t> Cycle numbers read: {cycles}")
+        for cycle in cycles:
+            hit_par = par_file.Get(f"{self._hit_par_name};{cycle}")
+            self._construct_empty_dict(hit_par, cycle)
+            self._fill_data(hit_par)
+            self._dataframes[cycle] = pd.DataFrame(self._par_dict)
+        self._dataframe = self._dataframes[max(self._dataframes)]
+        return self._dataframes if all_cycles else self._dataframe
 
-    def _construct_empty_dict(self, hit_par):
+    def _get_all_cycles(self, root_file, par_name: str):
+        keys = root_file.GetListOfKeys()
+        return [key.GetCycle() for key in keys if key.GetName() == par_name]
+
+    def _construct_empty_dict(self, hit_par, cycle):
         num_of_modules = hit_par.GetNumOfModules()
-        print(f"Number of modules: {num_of_modules}")
+        if self._verbose:
+            print(
+                    f"In file {self._base_filename} \t> Number of modules read: {num_of_modules}. Cycle number: {cycle}"
+            )
         self._par_dict["bar_id"] = np.zeros(num_of_modules)
         for par_name in self._par_name_list:
             dicts = dir(getattr(ROOT.R3B.Neuland.HitModulePar(), par_name))

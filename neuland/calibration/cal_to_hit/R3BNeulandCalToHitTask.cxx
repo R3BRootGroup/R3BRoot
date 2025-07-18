@@ -18,7 +18,7 @@
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandCalibrationTask.h"
 #include "R3BNeulandCommon.h"
-#include "R3BNeulandHit.h"
+#include "R3BNeulandHit2.h"
 #include "R3BNeulandTriggerTypes.h"
 #include "R3BValueError.h"
 #include <FairRootManager.h>
@@ -32,53 +32,63 @@
 #include <string_view>
 #include <vector>
 
-namespace
-{
-    using R3B::ValueErrorD;
-    using R3B::Neuland::CalibratedSignal;
-    using R3B::Neuland::HitModulePar;
-    using ROOT::Math::XYZVector;
-
-    inline auto get_hit_energy(double first_e, double second_e, const HitModulePar& par)
-    {
-        // const auto attenuation_value = std::exp(R3B::Neuland::TotalBarLength / par.lightAttenuationLength.value);
-        return par.light_attenuation_factor.value * std::sqrt(first_e * second_e);
-    }
-
-    inline auto get_hit_position(double tdc_left, double tdc_right, const HitModulePar& par)
-    {
-        const auto plane_id = ::R3B::Neuland::ModuleID2PlaneID(static_cast<int>(par.module_num - 1));
-        const auto bar_num = par.module_num % ::R3B::Neuland::BarsPerPlane;
-        LOGP(debug2,
-             "Calculating position with left tdc: {}, right tdc {}, effective speed: {}, tdc_diff: {}",
-             tdc_left,
-             tdc_right,
-             par.effective_speed,
-             tdc_right - tdc_left);
-        const auto pos_along_bar = par.effective_speed.value * (tdc_right - tdc_left) / 2.;
-        const auto pos_perp_bar = (bar_num - 0.5 - ::R3B::Neuland::BarsPerPlane * 0.5) * ::R3B::Neuland::BarSize_XY;
-        const auto pos_z = (plane_id + 0.5) * ::R3B::Neuland::BarSize_Z;
-        LOGP(debug2, "pos along the bar: {} cm, pos perp to bar {} cm, z: {} cm", pos_along_bar, pos_perp_bar, pos_z);
-
-        auto is_horizontal = ::R3B::Neuland::IsPlaneIDHorizontal(plane_id);
-        return is_horizontal ? XYZVector{ pos_along_bar, pos_perp_bar, pos_z }
-                             : XYZVector{ pos_perp_bar, pos_along_bar, pos_z };
-    }
-
-    inline auto get_hit_pixel(const XYZVector& position)
-    {
-        const auto pixel_x =
-            std::floor(position.X() / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
-        const auto pixel_y =
-            std::floor(position.Y() / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
-        const auto pixel_z = std::floor(position.Z() / ::R3B::Neuland::BarSize_Z);
-
-        return XYZVector{ pixel_x, pixel_y, pixel_z };
-    }
-} // namespace
-
 namespace R3B::Neuland
 {
+    namespace
+    {
+        using R3B::ValueErrorD;
+        using R3B::Neuland::CalibratedSignal;
+        using R3B::Neuland::HitModulePar;
+        using ROOT::Math::XYZVector;
+
+        template <typename T>
+        inline auto sqrt_value_error(const ValueError<T>& val_err)
+        {
+            // NOTE: Error evaluation of the sqrt function only uses the first order of Taylor expansion
+            const auto value = std::sqrt(val_err.value);
+            const auto error = 1. / 2 / std::sqrt(val_err.value) * val_err.error;
+            return ValueErrorD{ value, error };
+        }
+
+        inline auto get_hit_energy(const ValueErrorD& first_e, const ValueErrorD& second_e, const HitModulePar& par)
+        {
+            return par.light_attenuation_factor * sqrt_value_error(first_e) * sqrt_value_error(second_e);
+        }
+
+        inline auto get_hit_position(const ValueErrorD& tdc_left, const ValueErrorD& tdc_right, const HitModulePar& par)
+        {
+            const auto plane_id = ModuleID2PlaneID(static_cast<int>(par.module_num - 1));
+            LOGP(debug2,
+                 "Calculating position with left tdc: {}, right tdc {}, effective speed: {}, tdc_diff: {}",
+                 tdc_left,
+                 tdc_right,
+                 par.effective_speed,
+                 tdc_right - tdc_left);
+            const auto pos_along_bar = -par.effective_speed * (tdc_right - tdc_left) / 2.;
+            const auto pos_perp_bar = ValueErrorD{ GetBarVerticalDisplacement(par.module_num), BarSize_XY / SQRT_12 };
+            const auto pos_z = ValueErrorD{ (plane_id + 0.5) * BarSize_Z, BarSize_Z / SQRT_12 };
+            LOGP(debug2,
+                 "pos along the bar: {} cm, pos perp to bar {} cm, z: {} cm",
+                 pos_along_bar,
+                 pos_perp_bar,
+                 pos_z);
+
+            auto is_horizontal = IsPlaneIDHorizontal(plane_id);
+            return is_horizontal ? XYZVectorValueErrorD{ pos_along_bar, pos_perp_bar, pos_z }
+                                 : XYZVectorValueErrorD{ pos_perp_bar, pos_along_bar, pos_z };
+        }
+
+        inline auto get_hit_pixel(const XYZVectorValueErrorD& position)
+        {
+            const auto pixel_x =
+                std::floor(position.X().value / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
+            const auto pixel_y =
+                std::floor(position.Y().value / ::R3B::Neuland::BarSize_XY) + (::R3B::Neuland::BarsPerPlane / 2.);
+            const auto pixel_z = std::floor(position.Z().value / ::R3B::Neuland::BarSize_Z);
+
+            return XYZVector{ pixel_x, pixel_y, pixel_z };
+        }
+    } // namespace
 
     Cal2HitTask::Cal2HitTask(std::string_view input_cal_data_name,
                              std::string_view input_cal_2_hit_par_name,
@@ -116,7 +126,7 @@ namespace R3B::Neuland
             LOGP(debug1, "Input calBar: {}", calBar);
             if (calBar.module_num == 0)
             {
-                throw R3B::runtime_error("cal-level bar signal has invalid moudule number 0!");
+                throw R3B::runtime_error("cal-level bar signal has invalid module number 0!");
             }
 
             calculate_calibrated_signals(calBar, temp_left_signals_, Side::left);
@@ -141,10 +151,9 @@ namespace R3B::Neuland
         }
     }
 
-    auto Cal2HitTask::construct_hit(const LRPair<CalibratedSignal>& signalPair,
-                                    const HitModulePar& par) const -> R3BNeulandHit
+    auto Cal2HitTask::construct_hit(const LRPair<CalibratedSignal>& signalPair, const HitModulePar& par) const -> Hit
     {
-        auto hit = R3BNeulandHit{};
+        auto hit = Hit{};
 
         LOGP(debug2,
              "Input left calibrated signal: {} and right calibrated signal: {}",
@@ -152,11 +161,11 @@ namespace R3B::Neuland
              signalPair.right());
         // hit module id is 0-based
         hit.module_id = static_cast<int>(par.module_num - 1);
-        hit.tdc_left = signalPair.left().time.value;
-        hit.tdc_right = signalPair.right().time.value;
+        hit.tdc_left = signalPair.left().time;
+        hit.tdc_right = signalPair.right().time;
         hit.time = get_hit_time(hit.tdc_left, hit.tdc_right);
-        hit.qdc_left = signalPair.left().energy.value;
-        hit.qdc_right = signalPair.right().energy.value;
+        hit.qdc_left = signalPair.left().energy;
+        hit.qdc_right = signalPair.right().energy;
         hit.energy = get_hit_energy(hit.qdc_left, hit.qdc_right, par);
         hit.position = get_hit_position(hit.tdc_left, hit.tdc_right, par);
         hit.pixel = get_hit_pixel(hit.position);
@@ -167,7 +176,7 @@ namespace R3B::Neuland
     void Cal2HitTask::construct_hits(const std::vector<CalibratedSignal>& left_signals,
                                      const std::vector<CalibratedSignal>& right_signals,
                                      const HitModulePar& par,
-                                     /* inout */ std::vector<R3BNeulandHit>& hits)
+                                     /* inout */ std::vector<Hit>& hits)
     {
         // TODO: Multi-hits needs to be implemented here
         if (left_signals.size() == 1 and right_signals.size() == 1)
@@ -175,7 +184,9 @@ namespace R3B::Neuland
             const auto& left_signal = left_signals.front();
             const auto& right_signal = right_signals.front();
             // signal_match_checking(left_signal, right_signal, par);
-            hits.push_back(construct_hit(R3B::LRPair<CalibratedSignal>{ left_signal, right_signal }, par));
+            const auto new_hit = construct_hit(R3B::LRPair<CalibratedSignal>{ left_signal, right_signal }, par);
+            LOGP(debug, "Adding a new hit with: {}", new_hit);
+            hits.push_back(new_hit);
         }
     }
 
@@ -210,21 +221,22 @@ namespace R3B::Neuland
         return true;
     }
 
-    auto Cal2HitTask::get_hit_time(double first_t, double second_t) const -> double
+    auto Cal2HitTask::get_hit_time(ValueErrorD first_t, ValueErrorD second_t) const -> ValueErrorD
     {
         auto larger_t = (first_t > second_t) ? first_t : second_t;
         auto smaller_t = (first_t < second_t) ? first_t : second_t;
 
         // check if the smaller value is overflowed
         // TODO: overflow should be checked in cal level for better time calibration. But the cal level calibration
-        // doesn't have singal paring. Solution: Do it in cal level only for one hit bar signal and calibration should
+        // doesn't have signal pairing. Solution: Do it in cal level only for one hit bar signal and calibration should
         // only use those with one hit.
         if (larger_t - smaller_t > 0.5 * R3B::Neuland::MaxCalTime)
         {
             larger_t -= R3B::Neuland::MaxCalTime;
         }
-        return std::remainder(((larger_t + smaller_t) / 2.) - global_time_offset_ - GetEventHeader()->GetTStart(),
-                              R3B::Neuland::MaxCalTime);
+        auto time_val = ((larger_t + smaller_t) / 2.) - global_time_offset_ - GetEventHeader()->GetTStart();
+        time_val.value = std::remainder(time_val.value, R3B::Neuland::MaxCalTime);
+        return time_val;
     }
 
     auto Cal2HitTask::get_calibrated_energy(const CalDataSignal& calSignal,

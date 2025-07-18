@@ -14,6 +14,7 @@
 
 #include "MilleEntry.h"
 #include "R3BDataMonitor.h"
+#include "R3BIOConnector.h"
 #include "R3BLogger.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalToHitPar.h"
@@ -26,6 +27,7 @@
 #include <TH1.h>
 #include <cstdint>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <memory>
 #include <optional>
 #include <string>
@@ -45,6 +47,18 @@ namespace R3B::Neuland::Calibration
         effective_c         // effective speed of light
     };
 
+    struct MillepedeOptions
+    {
+        bool outdir_has_timestamp = true;
+        int num_of_threads = 0;
+        float scale_factor = 1000.F;
+        double t_diff_residual_cut = DEFAULT_T_DIFF_RESIDUAL_CUT;
+        double p_value_cut = DEFAULT_CALIBRATION_P_VALUE_CUT;
+        std::string mille_par_filename = "neuland_pars.txt";
+        std::string pede_par_filename = "neuland_pars.txt";
+        std::string mille_log_filename;
+    };
+
     class MillepedeEngine : public CosmicEngineInterface
     {
       public:
@@ -52,10 +66,13 @@ namespace R3B::Neuland::Calibration
         void enable_rank_check(bool rank_check = true) { has_rank_check_ = rank_check; }
         void set_t_diff_residual_cut(double val) { t_diff_residual_cut_ = val; }
         void set_p_value_cut(double val) { p_value_cut_ = val; }
+        void set_options(const MillepedeOptions& options);
 
       private:
+        bool outdir_has_timestamp_ = true;
         bool has_rank_check_ = false;
         int minimum_hit_ = 1;
+        int pede_num_of_threads_ = 0;
         float error_scale_factor_ = 1000.F;
         // float minimum_pos_z_ = 0;
         // float smallest_time_sum_ = 0.;
@@ -65,9 +82,13 @@ namespace R3B::Neuland::Calibration
         constexpr static std::string_view DEFAULT_SUB_DIR = "millepede";
 
         MilleDataPoint input_data_buffer_;
+        R3B::OutputVectorConnector<MilleCalData> output_mille_data_{ "MilleData" };
+        R3B::OutputConnector<MilleTrackInfo> output_mille_track_info_{ "MilleTrackInfo" };
         std::string input_data_filename_ = "neuland_cosmic_mille.bin";
         std::string pede_steer_filename_ = "neuland_steer.txt";
-        std::string parameter_filename_ = "neuland_pars.txt";
+        std::string input_parameter_filename_ = "neuland_pars.txt";
+        std::string output_parameter_filename_ = "neuland_pars.txt";
+        std::string mille_log_filename_;
         std::string working_dir_;
 
         std::unique_ptr<Mille> binary_data_writer_;
@@ -79,6 +100,12 @@ namespace R3B::Neuland::Calibration
         TGraphErrors* graph_time_sync_ = nullptr;
         TGraphErrors* graph_effective_c_ = nullptr;
         TH1D* hist_t_offset_residual_ = nullptr;
+        TH1D* hist_p_value_xz_ = nullptr;
+        TH1D* hist_p_value_yz_ = nullptr;
+        TH1D* hist_a_xz_ = nullptr;
+        TH1D* hist_b_xz_ = nullptr;
+        TH1D* hist_a_yz_ = nullptr;
+        TH1D* hist_b_yz_ = nullptr;
 
         // parameter:
         Cal2HitPar* cal_to_hit_par_ = nullptr;
@@ -91,6 +118,11 @@ namespace R3B::Neuland::Calibration
         void EndOfEvent(unsigned int event_num = 0) override;
         void EventReset() override;
         auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
+        void BeginOfEvent() override
+        {
+            output_mille_data_.clear();
+            output_mille_track_info_.clear();
+        };
         void EndOfTask() override;
         void HistInit(DataMonitor& histograms) override;
         void SetMinStat(int min) override
@@ -102,7 +134,7 @@ namespace R3B::Neuland::Calibration
 
         void buffer_clear();
         void write_to_buffer();
-        void add_signal_t_sum(const MilleCalData& signal);
+        void add_signal_t_sum(const MilleCalData& signal, double a_t);
         void add_signal_t_diff(const MilleCalData& signal);
         void add_spacial_local_constraint(int plane_id, const std::vector<MilleCalData>& plane_signals);
         auto set_minimum_values(const std::vector<R3B::Neuland::BarCalData>& signals) -> bool;
@@ -114,6 +146,7 @@ namespace R3B::Neuland::Calibration
         void init_parameter();
         void init_steer_writer();
         void set_working_dir();
+        void add_fit_result_hist(const MilleDataProcessor::FitResult& fit_result);
 
         auto select_t_diff_signal(const std::vector<MilleCalData>& plane_data);
     };

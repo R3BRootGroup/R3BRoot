@@ -21,14 +21,22 @@ jobs:
       fail-fast: false
       matrix:
         repo: 
-          - 'r3bdev:r3broot'
-          - 'r3bdev:r3broot-arm'
+          - 'r3broot:latest'
+          - 'r3broot:latest-arm'
+          - 'r3broot:stable'
+          - 'r3broot:stable-arm'
         include:
-          - repo: 'r3bdev:r3broot'
+          - repo: 'r3broot:stable'
             build-repo: 'r3bdev:fedora-stable'
             build-env: 'ubuntu-latest'
-          - repo: 'r3bdev:r3broot-arm'
+          - repo: 'r3broot:stable-arm'
             build-repo: 'r3bdev:fedora-stable-arm'
+            build-env: 'ubuntu-24.04-arm'
+          - repo: 'r3broot:latest'
+            build-repo: 'r3bdev:fedora-latest'
+            build-env: 'ubuntu-latest'
+          - repo: 'r3broot:latest-arm'
+            build-repo: 'r3bdev:fedora-latest-arm'
             build-env: 'ubuntu-24.04-arm'
 
     runs-on: ${{ matrix.build-env }}

@@ -4,6 +4,7 @@
 #include "R3BException.h"
 #include "R3BNeulandJsonHeader.h"
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <magic_enum/magic_enum.hpp>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>

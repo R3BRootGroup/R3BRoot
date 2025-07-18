@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <string>
 #include <string_view>
@@ -11,7 +12,7 @@ namespace R3B::Millepede
     {
         int par_num = 0;
         float value = 0.F;
-        float sigma = 0.F;
+        float pre_sigma = 0.F;
         float value_diff = 0.F;
         float error = 0.F;
     };
@@ -45,7 +46,7 @@ class fmt::formatter<R3B::Millepede::ParResultEntry>
                               "par id: {}, value: {}, sigma: {}, value_diff: {}, error: {}",
                               entry.par_num,
                               entry.value,
-                              entry.sigma,
+                              entry.pre_sigma,
                               entry.value_diff,
                               entry.error);
     }

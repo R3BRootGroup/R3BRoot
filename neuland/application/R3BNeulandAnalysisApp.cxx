@@ -8,6 +8,7 @@
 #include "R3BNeulandMapDataConverterTask.h"
 #include "R3BNeulandMapToCalParTask.h"
 #include "R3BNeulandMapToCalTask.h"
+#include "R3BNeulandMillepede.h"
 #include "R3BNeulandSimCalToCal.h"
 #include <CLI/CLI.hpp>
 #include <FairRun.h>
@@ -65,11 +66,11 @@ namespace R3B::Neuland
     void AnalysisApplication::pre_init(FairRun* run)
     {
 
-        auto EvntHeader = std::make_unique<R3BEventHeader>();
+        auto event_header = std::make_unique<R3BEventHeader>();
         auto read_branch_names = std::vector<std::string>{};
         auto write_branch_names = std::vector<std::string>{};
         LOGP(info, "Setting the event header to be R3BEventHeader!");
-        run->SetEventHeader(std::move(EvntHeader));
+        run->SetEventHeader(std::move(event_header));
 
         auto task_option = options_.tasks;
 
@@ -228,6 +229,16 @@ namespace R3B::Neuland
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
             auto task = std::make_unique<R3B::Neuland::Cal2HitParTask>(
                 option.method, read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
+            if (option.method == Cal2HitParMethod::millepede)
+            {
+                auto millepede_engine = std::make_unique<Calibration::MillepedeEngine>();
+                millepede_engine->set_options(option.millepede);
+                task->SetMethod(std::move(millepede_engine));
+            }
+            else
+            {
+                task->SetMethod(option.method);
+            }
             task->SetMinStat(option.min_stat);
             task->SetTrigger(option.mode);
             run->AddTask(task.release());

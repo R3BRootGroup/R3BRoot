@@ -1,6 +1,6 @@
 # NeuLAND Program With Containers {#neuland_container}
 
-Most of low/middle level data analysis relating to NeuLAND detector are done in the program R3BRoot, which requires many third-party libraries and tool-kits, such as FairSoft, FairRoot and UCESB etc. These software, on the other hand, requires newer versions of compilers and even operating systems. Therefore, to compile the R3BRoot oneself is an insurmountable task and may take quite lot of unnecessary times. To solve this problem and relief some burdens of high level data analysts, several containers containing the pre-built R3BRoot program are available. One only has to download the container and run the program with the data in your local machine or servers. Since containers doesn't care about your local operating system, you could use containers to run R3BRoot in Linux, MacOS and even Windows.
+Most of the low/middle level data analysis relating to NeuLAND detector are done in the program R3BRoot, which requires many third-party libraries and tool-kits, such as `FairSoft`, `FairRoot` and `UCESB` etc. These programs, on the other hand, require newer versions of compilers and even operating systems. Therefore, to compile the R3BRoot oneself is an insurmountable task and may take quite a lot of unnecessary times. To solve this problem and relief some burdens of high level data analysts, several containers containing the pre-built R3BRoot program are available. One only has to download the container and run the program with the data in your local machine or servers. Since containers doesn't care about your local operating system, you could use containers to run R3BRoot on Linux, macOS and even Windows.
 
 [TOC]
 
@@ -27,7 +27,7 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
    ```bash
    cd containers
 
-   apptainer build -F r3broot docker://yanzhaowang/r3bdev:r3broot
+   apptainer build -F r3broot docker://yanzhaowang/r3broot:stable
    ```
 
    Depending on the downloading speed, it may take several minutes. You may use other name instead of `r3broot` after the `-F` flag.
@@ -43,6 +43,7 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
    ```bash
    ./r3broot macro your_macro.C
    ```
+
    or enter the shell environment of the container:
 
    ```bash
@@ -64,7 +65,7 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
 
 - Please regularly check the update from the tag `r3broot` of [this image repository website](https://hub.docker.com/r/yanzhaowang/r3bdev). If there is a new version (look at the "last pushed"), please repeat the first step.
 
-- The R3BRoot version pre-built in the container may not be the latest `dev` branch. If you need latest features, please open [a new issue](https://github.com/YanzhaoW/R3BRoot/issues) in the Github website.
+- The R3BRoot version pre-built in the container may not be the latest `dev` branch. If you need latest features, please open [a new issue](https://github.com/YanzhaoW/R3BRoot/issues) in the GitHub website.
 
 - All the new files and changes you have created inside the _Apptainer_ container will also be available outside the container. They will also not be deleted if the whole container is deleted. (Be careful! This is not the case for Docker containers!)
 
@@ -72,27 +73,26 @@ If you have access to GSI Linux server, there are some powerful server nodes, na
 
 You could [install the Apptainer software](https://apptainer.org/docs/admin/main/installation.html) in your PC and do the same things as in GSI servers. But it's highly recommended to use Docker containers as they are more reliable and have more features. The following steps show how to run the R3BRoot program in docker container:
 
-1. Install Docker Engine from your system package manager (e.g. `dnf`, `apt`) according to [this website](https://docs.docker.com/engine/install/). But if you are using Windows or MacOS, the best solution is to install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
+1. Install Docker Engine from your system package manager (e.g. `dnf`, `apt`) according to [this website](https://docs.docker.com/engine/install/). But if you are using Windows or macOS, the best solution is to install [Docker Desktop](https://docs.docker.com/desktop/setup/install/mac-install/).
 
-2. If your operating system supports CLI (such as MacOS and Linux), pull the latest R3BRoot image from the [dockerhub](https://hub.docker.com/r/yanzhaowang/r3bdev/tags). To create the container, one way is to use `docker run`:
+2. If your operating system supports CLI (such as macOS and Linux), pull the latest R3BRoot image from the [Dockerhub](https://hub.docker.com/r/yanzhaowang/r3bdev/tags). To create the container, one way is to use `docker run`:
 
    If your computer is using x86_64 architecture (Most of Windows PCs), you could do:
 
    ```bash
-   docker run -it -v .:/root/test:rw --name r3b yanzhaowang/r3bdev:r3broot
+   docker run -it -v .:/root/test:rw --name r3b yanzhaowang/r3broot:stable
    ```
 
    If your computer is using ARM architecture (MacBook with Apple Silicon), you should use:
 
    ```bash
-   docker run -it -v .:/root/test:rw --name r3b yanzhaowang/r3bdev:r3broot-arm
+   docker run -it -v .:/root/test:rw --name r3b yanzhaowang/r3bdev:stable-arm
    ```
 
    Further remarks about running a container:
-
    - You can use whatever name you want instead of "r3b".
    - If you want to go back to your local system, you could either do `exit` or press `Ctrl-p` and `Ctrl-q`. The former stops the container and the latter still keeps the container running. To go back to the running container, simply do `docker attach r3b`. To start and run the stopped container, do `docker start r3b`.
-   - The option behind the flag `-v` specifies the shared (mounted) folders between your local(host) machine and the container. The first path, e.g. current folder `.`, is in your local machine. The second path is the folder in the container. The third option `rw` represents read and write. You could use `ro` for read-only.
+   - The option behind the flag `-v` specifies the shared (mounted) folders between your local (host) machine and the container. The first path, e.g. current folder `.`, is in your local machine. The second path is the folder in the container. The third option `rw` represents read and write. You could use `ro` for read-only.
    - If you need to share other directories after the container is created, you have to delete the container and recreate it. **Deleting a container will wipe out all the data inside except those in the shared folders.**
 
 3. Run the program:
@@ -108,19 +108,18 @@ You could [install the Apptainer software](https://apptainer.org/docs/admin/main
    ```
 
 > [!important]
-> If you are mounting a folder from MacOS, please make sure the folder is **case-sensitive**. Be default, files and folders used in MacOS are **case-insensitive**. To create a case-sensitive folder in MacOS, please check [this blog](https://brianboyko.medium.com/a-case-sensitive-src-folder-for-mac-programmers-176cc82a3830).
-
+> If you are mounting a folder from macOS, please make sure the folder is **case-sensitive**. Be default, files and folders used on macOS are **case-insensitive**. To create a case-sensitive folder on macOS, please check [this blog](https://brianboyko.medium.com/a-case-sensitive-src-folder-for-mac-programmers-176cc82a3830).
 
 ## Developing R3BRoot in the container
 
 Developing the R3BRoot program can also be done inside the container. Again there are two containers for x86_64 and ARM machines, which include almost all compilers, software and third party libraries needed to compile R3BRoot.
 
 > [!note]
-> upexp is not installed in the container as it's badly designed and completely chaotic. If you need to use experimental data, use those already mapped data in .root files.
+> `upexp` is not installed in the container as it's badly designed and completely chaotic. If you need to use experimental data, use those already mapped data in .root files.
 
 ### In GSI servers
 
-Choose any GSI servers (e.g. `lustre.hpc.gsi.de`) which have `apptainer` available. Then create a Apptainer container with:
+Choose any GSI servers (e.g. `lustre.hpc.gsi.de`) which have `apptainer` available. Then create an Apptainer container with:
 
 ```bash
 apptainer build --fix-perms fedora.sif docker://yanzhaowang/r3bdev:fedora-latest
@@ -134,7 +133,7 @@ Then enter the shell environment with:
 apptainer shell --bind /lustre,/u fedora.sif
 ```
 
-if you don't want to do run this command every time, you could put it in your `.bashrc` file. If you would like to run the container as a `sudo`, use the `--fakeroot` option a-case-sensitive-src-folder-for-mac-programmers-176cc82a3830
+If you don't want to do run this command every time, you could put it in your `.bashrc` file. If you would like to run the container as a `sudo`, use the `--fakeroot` option:
 
 ```bash
 apptainer shell --fakeroot --bind /lustre,/u --overlay some_dir.overlay fedora.sif
@@ -178,8 +177,7 @@ But before running this command, several things should be done first:
    ```
 
    _Further remarks:_
-
-   - Here you specifies the folder mounting under the `volumes` section.
+   - Here you specify the folder mounting under the `volumes` section.
    - The port number `3100` can be changed to other port number larger than 1024. This number will be used for ssh login.
    - The non-root user "admin" also has the password "admin". If you want a difference name for the non-root account, please change it both in the `command` and the `volumes` section.
 
@@ -199,9 +197,9 @@ But before running this command, several things should be done first:
    ssh admin@localhost -p 3100
    ```
 
-   The initial password for the login is set in the `docker-compose.yaml` file. You could change it by using the command `chpasswd` after the login. But the best way is to send your local ssh key to the container such that password is not needed for the login. You could also login with root account with the password "root".
+   The initial password for the login is set in the `docker-compose.yaml` file. You could change it by using the command `chpasswd` after the login. But the best way is to send your local ssh key to the container such that password is not needed for the login. You could also log in with root account with the password "root".
 
-   If you don't want to always remember the port number, add the following config in `~/.ssh/config` file (create it if not existed):
+   If you don't want to always remember the port number, add the following configuration in `~/.ssh/config` file (create it if not existed):
 
    ```text
    Host r3b
@@ -219,15 +217,15 @@ But before running this command, several things should be done first:
 
 ### Conda environment
 
-It's helpful to develop the program in a conda environment, where the python version is matched well with the %ROOT version. The `r3broot` image already contains some convenient command for this situation.
+It's helpful to develop the program in a Conda environment, where the python version is matched well with the %ROOT version. The `r3broot` image already contains some convenient command for this situation.
 
-To initialize the conda environment and download all the packages, do
+To initialize the Conda environment and download all the packages, do
 
 ```bash
 ./r3broot init-conda
 ```
 
-This command will install mini-conda folder `~/miniconda3` in your home folder and create an conda environment named `r3bdev`. This step need to be done only once.
+This command will install mini-conda folder `~/miniconda3` in your home folder and create a conda environment named `r3bdev`. This step need to be done only once.
 
 Next, to open a jupyter lab server, simply do:
 
@@ -235,6 +233,28 @@ Next, to open a jupyter lab server, simply do:
 ./r3broot jupyterlab --port ${ANY_PORT_NUMBER}
 ```
 
+## Available images in Dockerhub
+
+The aforementioned docker images are located in two different Dockerhub repositories:
+
+- [yanzhaowang:r3bdev](https://hub.docker.com/r/yanzhaowang/r3bdev): Containing images for the Development environment containing all third party libraries required to compile R3BRoot.
+- [yanzhaowang:r3broot](https://hub.docker.com/r/yanzhaowang/r3broot): Containing images for running R3BRoot directly and jupyterlab.
+
+Each repository contains 4 images with different configurations:
+
+For [yanzhaowang:r3bdev](https://hub.docker.com/r/yanzhaowang/r3bdev):
+
+- `fedora-latest`
+- `fedora-stable`
+- `fedora-latest-arm`
+- `fedora-stable`
+
+And for [yanzhaowang:r3broot](https://hub.docker.com/r/yanzhaowang/r3broot):
+
+- `fedora-latest`
+- `fedora-stable`
+- `fedora-latest-arm`
+- `fedora-stable`
 
 ## Creation of containers (for developers)
 

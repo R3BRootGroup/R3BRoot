@@ -171,7 +171,7 @@ namespace
                                          }
                                      });
 
-        // TODO: what if it's branch with signle literal value?
+        // TODO: what if it's branch with single literal value?
     }
 
     auto HasBranchList(TFile* rootFile, const std::vector<std::string>& branchList) -> bool
@@ -180,7 +180,7 @@ namespace
         auto view1 = std::vector<std::string_view>(branchList.begin(), branchList.end());
         auto view2 = std::vector<std::string_view>(newBranchList.begin(), newBranchList.end());
 
-#ifdef HAS_CXX_17
+#ifdef HAS_CPP_STANDARD_17
         std::sort(view1.begin(), view1.end());
         std::sort(view2.begin(), view2.end());
 #else
@@ -535,7 +535,7 @@ void R3BFileSource2::AddFriend(std::string file_name, bool is_tree_file)
 {
     //
     auto rootfile = R3B::make_rootfile(file_name.c_str());
-#ifdef HAS_CXX_17
+#ifdef HAS_CPP_STANDARD_17
     auto friendGroup = std::find_if(inputFriendFiles_.begin(),
                                     inputFriendFiles_.end(),
                                     [&rootfile](const auto& friends)

@@ -11,16 +11,16 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BData" which includes the source files given in 
-# the array. The extension is already found. Any number of sources could be 
+# Create a library called "libR3BData" which includes the source files given in
+# the array. The extension is already found. Any number of sources could be
 # listed here.
 
 set(SRCS
     #cmake-format: sortable
-    actafData/R3BActafPoint.cxx
     actafData/R3BActafMappedData.cxx
     actafData/R3BActafCalData.cxx
     actafData/R3BActafHitData.cxx
+    actafData/R3BActafPoint.cxx
     alpideData/R3BAlpideCalData.cxx
     alpideData/R3BAlpideHitData.cxx
     alpideData/R3BAlpideMappedData.cxx
@@ -154,10 +154,10 @@ set(SRCS
 
 set(HEADERS
     #cmake-format: sortable
-    actafData/R3BActafPoint.h
     actafData/R3BActafMappedData.h
     actafData/R3BActafCalData.h
     actafData/R3BActafHitData.h
+    actafData/R3BActafPoint.h
     alpideData/R3BAlpideCalData.h
     alpideData/R3BAlpideHitData.h
     alpideData/R3BAlpideMappedData.h
@@ -216,6 +216,7 @@ set(HEADERS
     neulandData/R3BNeulandCalData.h
     neulandData/R3BNeulandCluster.h
     neulandData/R3BNeulandHit.h
+    neulandData/R3BNeulandHit2.h
     neulandData/R3BNeulandMultiplicity.h
     neulandData/R3BNeulandNeutron.h
     neulandData/R3BNeulandPoint.h

@@ -22,49 +22,68 @@
 #include <R3BNeulandHitPar.h>
 #include <R3BNeulandParDirCreator.h>
 #include <R3BShared.h>
+#include <algorithm>
 #include <cmath>
+#include <fmt/format.h>
 #include <vector>
-
-namespace
-{
-    void fill_module_parameters(const std::vector<R3BNeulandHitModulePar>& old_module_pars,
-                                R3B::Neuland::Cal2HitPar& new_module_pars)
-    {
-        for (const auto& par : old_module_pars)
-        {
-            auto new_par = R3B::Neuland::HitModulePar{};
-            // GetModuleId return 1 based module Num
-            new_par.module_num = par.GetModuleId();
-            new_par.t_diff.value = par.GetTDiff();
-            new_par.t_sync.value = par.GetTSync();
-            new_par.effective_speed.value = par.GetEffectiveSpeed();
-            new_par.light_attenuation_length.value = par.GetLightAttenuationLength();
-            new_par.light_attenuation_factor.value =
-                std::exp(R3B::Neuland::TotalBarLength / new_par.light_attenuation_length.value / 2);
-
-            // Getters accept 1 as the left side and 2 as the right side
-
-            const auto left_index = 1 + toIndex(R3B::Side::left);
-            const auto right_index = 1 + toIndex(R3B::Side::right);
-
-            new_par.pedestal.left().value = par.GetPedestal(left_index);
-            new_par.pedestal.right().value = par.GetPedestal(right_index);
-
-            new_par.energy_gain.left().value = par.GetEnergyGain(left_index);
-            new_par.energy_gain.right().value = par.GetEnergyGain(right_index);
-
-            new_par.pmt_saturation.left().value = par.GetPMTSaturation(left_index);
-            new_par.pmt_saturation.right().value = par.GetPMTSaturation(right_index);
-
-            new_par.pmt_threshold.left().value = par.GetPMTThreshold(left_index);
-            new_par.pmt_threshold.right().value = par.GetPMTThreshold(right_index);
-            new_module_pars.AddModulePar(new_par);
-        }
-    }
-} // namespace
 
 namespace R3B::Neuland::Calibration
 {
+    namespace
+    {
+        void fill_module_parameters(const std::vector<R3BNeulandHitModulePar>& old_module_pars,
+                                    R3B::Neuland::Cal2HitPar& new_module_pars)
+        {
+#ifdef HAS_CPP_STANDARD_23
+            auto t_sync_ref_par_iter = std::ranges::find(
+                old_module_pars, DEFAULT_TSYNC_REFERENCE_BAR_NUM, &R3BNeulandHitModulePar::GetModuleId);
+#else
+            auto t_sync_ref_par_iter = std::find_if(old_module_pars.begin(),
+                                                    old_module_pars.end(),
+                                                    [](const R3BNeulandHitModulePar& par)
+                                                    { return par.GetModuleId() == DEFAULT_TSYNC_REFERENCE_BAR_NUM; });
+#endif
+            if (t_sync_ref_par_iter == old_module_pars.end())
+            {
+                throw R3B::logic_error(
+                    fmt::format("Reference module  for tsync parameter with the module number {} doesn't exist!",
+                                DEFAULT_TSYNC_REFERENCE_BAR_NUM));
+            }
+            const auto t_sync_ref_value = t_sync_ref_par_iter->GetTSync();
+
+            for (const auto& par : old_module_pars)
+            {
+                auto new_par = R3B::Neuland::HitModulePar{};
+                // GetModuleId return 1 based module Num
+                new_par.module_num = par.GetModuleId();
+                new_par.t_diff.value = par.GetTDiff();
+                new_par.t_sync.value = par.GetTSync() - t_sync_ref_value;
+                new_par.effective_speed.value = -2 * par.GetEffectiveSpeed();
+                new_par.light_attenuation_length.value = par.GetLightAttenuationLength();
+                new_par.light_attenuation_factor.value =
+                    std::exp(R3B::Neuland::TotalBarLength / new_par.light_attenuation_length.value / 2);
+
+                // Getters accept 1 as the left side and 2 as the right side
+
+                const auto left_index = 1 + toIndex(R3B::Side::left);
+                const auto right_index = 1 + toIndex(R3B::Side::right);
+
+                new_par.pedestal.left().value = par.GetPedestal(left_index);
+                new_par.pedestal.right().value = par.GetPedestal(right_index);
+
+                new_par.energy_gain.left().value = par.GetEnergyGain(left_index);
+                new_par.energy_gain.right().value = par.GetEnergyGain(right_index);
+
+                new_par.pmt_saturation.left().value = par.GetPMTSaturation(left_index);
+                new_par.pmt_saturation.right().value = par.GetPMTSaturation(right_index);
+
+                new_par.pmt_threshold.left().value = par.GetPMTThreshold(left_index);
+                new_par.pmt_threshold.right().value = par.GetPMTThreshold(right_index);
+                new_module_pars.AddModulePar(new_par);
+            }
+        }
+    } // namespace
+
     void MuonReconstruction::Init()
     {
         const auto module_size = GetModuleSize();

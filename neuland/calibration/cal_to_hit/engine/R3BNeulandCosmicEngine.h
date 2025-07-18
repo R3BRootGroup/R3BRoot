@@ -46,7 +46,7 @@ namespace R3B::Neuland::Calibration
         virtual void AddSignals(const std::vector<BarCalData>& signal) = 0;
         virtual void Calibrate(Cal2HitPar& hit_par) = 0;
         virtual void SetMinStat(int min) {}
-        virtual void BeginOfEvent(unsigned int event_num) {};
+        virtual void BeginOfEvent() {};
         virtual void EndOfEvent(unsigned int event_num) {};
         virtual void EventReset() {};
         virtual void EndOfTask() {};

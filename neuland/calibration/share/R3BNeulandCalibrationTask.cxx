@@ -78,7 +78,7 @@ namespace R3B::Neuland
 
     void CalibrationTask::execute_with_hist()
     {
-        if (!check_trigger())
+        if (!check_offspill_trigger())
         {
             hist_trig_check_->Fill(fmt::format("{:016b}", eventHeader_->GetTpat()).c_str(), 1);
             return;
@@ -96,7 +96,7 @@ namespace R3B::Neuland
 
     void CalibrationTask::execute_no_hist()
     {
-        if (check_trigger() and CheckConditions())
+        if (check_offspill_trigger() and CheckConditions())
         {
             passed_num_of_events++;
             TriggeredExec();
@@ -127,7 +127,7 @@ namespace R3B::Neuland
         reset();
     }
 
-    auto CalibrationTask::check_trigger() const -> bool
+    auto CalibrationTask::check_offspill_trigger() const -> bool
     {
         LOGP(debug2,
              R"(From task "{}": tpat {}. Trig type {})",

@@ -26,6 +26,12 @@
 #include <memory>
 #include <string_view>
 
+#ifdef HAS_CPP_STANDARD_17
+#include <type_traits>
+#else
+#include <concepts>
+#endif
+
 namespace R3B::Neuland
 {
     enum class Cal2HitParMethod : uint8_t
@@ -44,9 +50,21 @@ namespace R3B::Neuland
                                 std::string_view hit_par_name = "NeulandHitPar",
                                 std::string_view name = "NeulandCal2HitParTask",
                                 int iVerbose = 1);
-        void SetMinStat(int min) { engine_->SetMinStat(min); }
-        void SetErrorScale(float scale) { engine_->SetErrorScale(scale); }
+        void SetMinStat(int min);
+        void SetErrorScale(float scale);
         auto GetCal2HitPar() -> auto* { return hit_par_; }
+        void SetMethod(Cal2HitParMethod method);
+
+#ifdef HAS_CPP_STANDARD_17
+        template <typename Engine,
+                  typename = std::enable_if_t<std::is_base_of_v<Calibration::CosmicEngineInterface, Engine>>>
+#else
+        template <std::derived_from<Calibration::CosmicEngineInterface> Engine>
+#endif
+        void SetMethod(std::unique_ptr<Engine> engine)
+        {
+            engine_ = std::move(engine);
+        }
 
       private:
         InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
@@ -59,6 +77,7 @@ namespace R3B::Neuland
         // overriden functions:
         void HistogramInit(DataMonitor& histograms) override;
         void ExtraInit(FairRootManager* rootMan) override;
+        void BeginOfEvent() override;
         void SetExtraPar(FairRuntimeDb* rtdb) override;
         void TriggeredExec() override;
         void EndOfTask() override;
