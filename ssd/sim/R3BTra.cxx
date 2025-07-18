@@ -11,24 +11,21 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BTra.h"
-#include "FairGeoInterface.h"
-#include "FairGeoLoader.h"
-#include "FairGeoNode.h"
-#include "FairGeoRootBuilder.h"
 #include "FairRootManager.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
 #include "FairVolume.h"
+
 #include "R3BLogger.h"
 #include "R3BMCStack.h"
+#include "R3BTra.h"
 #include "R3BTraPoint.h"
-#include "TClonesArray.h"
-#include "TGeoMCGeometry.h"
-#include "TGeoManager.h"
-#include "TObjArray.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
+
+#include <TClonesArray.h>
+#include <TGeoManager.h>
+#include <TVirtualMC.h>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 R3BTra::R3BTra()
     : R3BTra("")
@@ -43,21 +40,13 @@ R3BTra::R3BTra(const TString& geoFile, const TGeoTranslation& trans, const TGeoR
 R3BTra::R3BTra(const TString& geoFile, const TGeoCombiTrans& combi)
     : R3BDetector("R3BTra", kTRA, geoFile, combi)
     , fTraCollection(new TClonesArray("R3BTraPoint"))
-    , fPosIndex(0)
     , kGeoSaved(kFALSE)
-    , flGeoPar(new TList())
-    , fNbDet(20)
 {
-    flGeoPar->SetName(GetName());
     ResetParameters();
 }
 
 R3BTra::~R3BTra()
 {
-    if (flGeoPar)
-    {
-        delete flGeoPar;
-    }
     if (fTraCollection)
     {
         fTraCollection->Delete();
@@ -69,24 +58,34 @@ void R3BTra::Initialize()
 {
     FairDetector::Initialize();
 
-    LOG(info) << "R3BTra: initialisation";
+    R3BLOG(info, "");
     LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("TraLog");
     LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Strip");
-    LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Foot_");
+    LOG(debug) << "R3BTra: Sens. Vol. (McId) " << gMC->VolId("Foot");
 
-    Char_t buffer[126];
-    for (Int_t i = 0; i < fNbDet; i++)
+    fdetid.resize(fNbDet);
+    for (int i = 0; i < fNbDet; ++i)
     {
-        sprintf(buffer, "Det%i", i + 1);
-        LOG(debug) << "Det " << i << " connected to (McId) ---> " << buffer << "  " << gMC->VolId(buffer);
-        fdetid[i] = gMC->VolId(buffer);
+        std::ostringstream nameStream;
+        nameStream << "Foot" << (i + 1);
+        std::string name = nameStream.str();
+        LOG(debug) << "Det " << i << " connected to (McId) ---> " << name.c_str() << " " << gMC->VolId(name.c_str());
+        fdetid[i] = gMC->VolId(name.c_str());
+        if (gMC->VolId(name.c_str()) == 0)
+        {
+            std::ostringstream nameStream2;
+            nameStream2 << "TraLog_" << i;
+            std::string name2 = nameStream2.str();
+            LOG(debug) << "Det " << i << " connected to (McId) ---> " << name2.c_str() << " "
+                       << gMC->VolId(name2.c_str());
+            fdetid[i] = gMC->VolId(name2.c_str());
+        }
     }
 }
 
 void R3BTra::SetSpecialPhysicsCuts()
 {
-    LOG(info) << "R3BTra: Adding customized Physics cut ... ";
-
+    R3BLOG(info, "Adding customized Physics cut ...");
     if (gGeoManager)
     {
         TGeoMedium* pSi = gGeoManager->GetMedium("silicon");
@@ -384,12 +383,12 @@ void R3BTra::SetSpecialPhysicsCuts()
 Int_t R3BTra::GetDetId(Int_t volID)
 {
     Int_t detid = -1;
-
     for (Int_t i = 0; i < fNbDet; i++)
     {
-        if (volID == fdetid[i] + 1 || volID == fdetid[i] + 2)
+        // std::cout<<volID<<" "<<fdetid[i]<<std::endl;
+        if (volID == fdetid[i])
         {
-            detid = i;
+            detid = i + 1;
             return (detid);
         }
     }
@@ -399,7 +398,7 @@ Int_t R3BTra::GetDetId(Int_t volID)
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BTra::ProcessHits(FairVolume* vol)
 {
-    if (gMC->IsTrackEntering())
+    if (TVirtualMC::GetMC()->IsTrackEntering())
     {
         fELoss = 0.;
         fTime = gMC->TrackTime() * 1.0e09;
@@ -412,48 +411,19 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
     fELoss += gMC->Edep();
 
     // Set additional parameters at exit of active volume. Create R3BTraPoint.
-    if (gMC->IsTrackExiting() || gMC->IsTrackStop() || gMC->IsTrackDisappeared())
+    if (TVirtualMC::GetMC()->IsTrackExiting() || TVirtualMC::GetMC()->IsTrackStop() ||
+        TVirtualMC::GetMC()->IsTrackDisappeared())
     {
-        fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
+        fTrackID = TVirtualMC::GetMC()->GetStack()->GetCurrentTrackNumber();
+        R3BLOG(debug, TVirtualMC::GetMC()->CurrentVolPath());
         fVolumeID = vol->getMCid();
         fVolumeID = GetDetId(fVolumeID);
         fDetCopyID = vol->getCopyNo();
-        gMC->TrackPosition(fPosOut);
-        gMC->TrackMomentum(fMomOut);
+        TVirtualMC::GetMC()->TrackPosition(fPosOut);
+        TVirtualMC::GetMC()->TrackMomentum(fMomOut);
         if (fELoss == 0.)
-            return kFALSE;
-
-        if (gMC->IsTrackExiting())
         {
-            const Double_t* oldpos;
-            const Double_t* olddirection;
-            Double_t newpos[3];
-            Double_t newdirection[3];
-            Double_t safety;
-
-            gGeoManager->FindNode(fPosOut.X(), fPosOut.Y(), fPosOut.Z());
-            oldpos = gGeoManager->GetCurrentPoint();
-            olddirection = gGeoManager->GetCurrentDirection();
-
-            for (Int_t i = 0; i < 3; i++)
-            {
-                newdirection[i] = -1 * olddirection[i];
-            }
-
-            gGeoManager->SetCurrentDirection(newdirection);
-            //   TGeoNode *bla = gGeoManager->FindNextBoundary(2);
-            safety = gGeoManager->GetSafeDistance();
-
-            gGeoManager->SetCurrentDirection(-newdirection[0], -newdirection[1], -newdirection[2]);
-
-            for (Int_t i = 0; i < 3; i++)
-            {
-                newpos[i] = oldpos[i] - (3 * safety * olddirection[i]);
-            }
-
-            fPosOut.SetX(newpos[0]);
-            fPosOut.SetY(newpos[1]);
-            fPosOut.SetZ(newpos[2]);
+            return kFALSE;
         }
 
         AddHit(fTrackID,
@@ -466,29 +436,24 @@ Bool_t R3BTra::ProcessHits(FairVolume* vol)
                fTime,
                fLength,
                fELoss,
-               gMC->TrackPid());
+               TVirtualMC::GetMC()->TrackPid());
 
         // Increment number of TraPoints for this track
-        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
+        auto stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kTRA);
-
         ResetParameters();
     }
-
     return kTRUE;
 }
-
-// -----   Public method EndOfEvent   -----------------------------------------
-void R3BTra::BeginEvent() {}
 
 // -----   Public method EndOfEvent   -----------------------------------------
 void R3BTra::EndOfEvent()
 {
     if (fVerboseLevel)
+    {
         Print();
-    fTraCollection->Clear();
-
-    ResetParameters();
+    }
+    this->Reset();
 }
 // ----------------------------------------------------------------------------
 
@@ -500,19 +465,21 @@ void R3BTra::Register() { FairRootManager::Instance()->Register("TraPoint", GetN
 TClonesArray* R3BTra::GetCollection(Int_t iColl) const
 {
     if (iColl == 0)
+    {
         return fTraCollection;
+    }
     else
-        return NULL;
+    {
+        return nullptr;
+    }
 }
-// ----------------------------------------------------------------------------
 
 // -----   Public method Print   ----------------------------------------------
-void R3BTra::Print(Option_t* option) const
+void R3BTra::Print(Option_t*) const
 {
     Int_t nHits = fTraCollection->GetEntriesFast();
     LOG(info) << "R3BTra: " << nHits << " points registered in this event";
 }
-// ----------------------------------------------------------------------------
 
 // -----   Public method Reset   ----------------------------------------------
 void R3BTra::Reset()
@@ -520,30 +487,11 @@ void R3BTra::Reset()
     fTraCollection->Clear();
     ResetParameters();
 }
-// ----------------------------------------------------------------------------
-
-// -----   Public method CopyClones   -----------------------------------------
-void R3BTra::CopyClones(TClonesArray* cl1, TClonesArray* cl2, Int_t offset)
-{
-    Int_t nEntries = cl1->GetEntriesFast();
-    LOG(info) << "R3BTra: " << nEntries << " entries to add";
-    TClonesArray& clref = *cl2;
-    R3BTraPoint* oldpoint = NULL;
-    for (Int_t i = 0; i < nEntries; i++)
-    {
-        oldpoint = dynamic_cast<R3BTraPoint*>(cl1->At(i));
-        Int_t index = oldpoint->GetTrackID() + offset;
-        oldpoint->SetTrackID(index);
-        new (clref[fPosIndex]) R3BTraPoint(*oldpoint);
-        fPosIndex++;
-    }
-    LOG(info) << "R3BTra: " << cl2->GetEntriesFast() << " merged entries";
-}
 
 // -----   Private method AddHit   --------------------------------------------
 R3BTraPoint* R3BTra::AddHit(Int_t trackID,
                             Int_t detID,
-                            Int_t detCopyID, // added by Marc
+                            Int_t detCopyID,
                             TVector3 posIn,
                             TVector3 posOut,
                             TVector3 momIn,
@@ -558,25 +506,16 @@ R3BTraPoint* R3BTra::AddHit(Int_t trackID,
     if (fVerboseLevel > 1)
         LOG(info) << "R3BTra: Adding Point at (" << posIn.X() << ", " << posIn.Y() << ", " << posIn.Z()
                   << ") cm,  detector " << detID << ", track " << trackID << ", energy loss " << eLoss * 1e06 << " keV";
-    return new (clref[size]) R3BTraPoint(trackID,
-                                         detID,
-                                         detCopyID,
-                                         posIn,
-                                         posOut, // detCopyID added by Marc
-                                         momIn,
-                                         momOut,
-                                         time,
-                                         length,
-                                         eLoss,
-                                         pdgcode);
+    return new (clref[size])
+        R3BTraPoint(trackID, detID, detCopyID, posIn, posOut, momIn, momOut, time, length, eLoss, pdgcode);
 }
 
+// -----   Public method CheckIfSensitive   -----------------------------------
 Bool_t R3BTra::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("TraLog") || TString(name).Contains("Strip") || TString(name).Contains("Alpide") ||
-        TString(name).Contains("Foot_"))
+    if (TString(name).Contains("TraLog") || TString(name).Contains("Strip") || TString(name).Contains("Foot"))
     {
-        // LOG(info) << "Found TRA geometry from ROOT file: " << name;
+        LOG(debug) << "Found geometry from ROOT file named: " << name;
         return kTRUE;
     }
     return kFALSE;

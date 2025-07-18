@@ -15,15 +15,19 @@
 // Usage after loading:
 // create_califa_geo_selector(A, B)
 // A: known alignment for some experiments
-//    [nominal, s522, s509, s455, s515, s494, s444, s467]
+//    [nominal, s522, s515, s509, s494, s467, s455, s444, s118, s091 and g249]
 // B: geoTag. Name tagging the output root file.
-// Requires file CLF-ALL-oneCrystal.txt for crystals coordinates
+// Requires file CLF-ALL-oneCrystal.txt for crystal coordinates
 // Requires file CLF-ALL-onePart.txt for alveoli coordinates
+// Requires file CLF-CEPA-CSI_Crystal.txt for CEPA crystal coordinates
 
-#include "TGeoManager.h"
-#include "TMath.h"
-#include "TRotation.h"
-#include "TVector3.h"
+#include <TGeoManager.h>
+#include <TGeoMatrix.h>
+#include <TGeoVolume.h>
+#include <TMath.h>
+#include <TRotation.h>
+#include <TVector3.h>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <memory>
@@ -31,43 +35,15 @@
 
 const int nbcrystals = 2544;
 
-Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[]);
+bool isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[]);
 
-void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTag = "full")
+void CreateCarbonFiberBackSide(TGeoVolume* pWorld,
+                               TGeoMedium* med,
+                               TGeoCombiTrans* disCalMes,
+                               TGeoCombiTrans* disCalWix);
+
+void create_califa_geo_selector(const std::string expNumber = "nominal", std::string geoTag = "full")
 {
-    /* TGeoManager* tileGeom1 = TGeoManager::Import("tile_2111.gdml");
-
-     TGeoVolume* tileVol1 = tileGeom1->GetTopVolume();
-
-     auto tile_2111 = std::unique_ptr<TGeoVolume>(static_cast<TGeoVolume*>(tileVol1->Clone("Tile2111")));
-
-     delete tileGeom1;
-
-
-           TGeoManager* tileGeom2 = TGeoManager::Import("tile_2113.gdml");
-
-           TGeoVolume* tileVol2 = tileGeom2->GetTopVolume();
-           TGeoVolume* tile_2113 = (TGeoVolume*)tileVol2->Clone("Tile2113");
-
-           delete tileVol2;
-           delete tileGeom2;
-
-           TGeoManager* tileGeom3 = TGeoManager::Import("tile_2103.gdml");
-
-           TGeoVolume* tileVol3 = tileGeom3->GetTopVolume();
-           TGeoVolume* tile_2103 = (TGeoVolume*)tileVol3->Clone("Tile2103");
-
-           delete tileVol3;
-           delete tileGeom3;
-
-           TGeoManager* tileGeom4 = TGeoManager::Import("tile_2101.gdml");
-
-           TGeoVolume* tileVol4 = tileGeom4->GetTopVolume();
-           TGeoVolume* tile_2101 = (TGeoVolume*)tileVol4->Clone("Tile2101");
-
-           delete tileVol4;
-           delete tileGeom4;*/
-
     auto fRefRot = std::make_unique<TGeoRotation>();
     TGeoManager* gGeoMan = nullptr;
 
@@ -77,51 +53,74 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
     TString geoPath = gSystem->Getenv("VMCWORKDIR");
     if (geoPath.IsNull())
     {
-        std::cerr << "ERROR: VMCWORKDIR is not defined" << std::endl;
+        std::cerr << "\033[35mERROR: VMCWORKDIR is not defined\033[0m" << std::endl;
         gApplication->Terminate();
     }
     TString medFile = geoPath + "/geometry/media_r3b.geo";
+    medFile.ReplaceAll("./", "/");
+    medFile.ReplaceAll("//", "/");
     geoFace->setMediaFile(medFile);
     geoFace->readMedia();
     gGeoMan = gGeoManager;
+    bool isCepaUsed = true;
 
-    TString installedCrystalsFile = "califa_AllCrystalsInstalled.txt";
-    if ((strncmp(expNumber, "s091", 4) == 0) || (strncmp(expNumber, "s118", 4) == 0) ||
-        (strncmp(expNumber, "g249", 4) == 0))
+    auto alignWixRotX = new TGeoRotation();
+    auto alignWixRotY = new TGeoRotation();
+    auto alignWixRotZ = new TGeoRotation();
+    auto alignWixRotationX = new TRotation();
+    auto alignWixRotationY = new TRotation();
+    auto alignWixRotationZ = new TRotation();
+    auto alignMesRotX = new TGeoRotation();
+    auto alignMesRotY = new TGeoRotation();
+    auto alignMesRotZ = new TGeoRotation();
+    auto alignMesRotationX = new TRotation();
+    auto alignMesRotationY = new TRotation();
+    auto alignMesRotationZ = new TRotation();
+
+    std::string installedCrystalsFile = "califa_AllCrystalsInstalled.txt";
+    std::string_view expId(expNumber);
+
+    if (expId.compare(0, 4, "g249") == 0)
+    {
+        installedCrystalsFile = "califa_InstalledCrystals_Jan2024.txt";
+        geoTag = "v2025.6";
+    }
+    else if (expId.compare(0, 4, "s091") == 0 || expId.compare(0, 4, "s118") == 0)
     {
         installedCrystalsFile = "califa_InstalledCrystals_Jan2024.txt";
         geoTag = "v2024.1";
     }
-    else if ((strncmp(expNumber, "s522", 4) == 0) || (strncmp(expNumber, "s515", 4) == 0) ||
-             (strncmp(expNumber, "s509", 4) == 0) || (strncmp(expNumber, "s494", 4) == 0) ||
-             (strncmp(expNumber, "s455", 4) == 0) || (strncmp(expNumber, "s444", 4) == 0))
+    else if (expId.compare(0, 4, "s522") == 0 || expId.compare(0, 4, "s509") == 0)
+    {
+        installedCrystalsFile = "califa_InstalledCrystals_March2021.txt";
+        geoTag = "v2022.5";
+        isCepaUsed = false;
+    }
+    else if (expId.compare(0, 4, "s515") == 0 || expId.compare(0, 4, "s494") == 0 || expId.compare(0, 4, "s455") == 0 ||
+             expId.compare(0, 4, "s444") == 0)
     {
         installedCrystalsFile = "califa_InstalledCrystals_March2021.txt";
         geoTag = "v2021.3";
+        isCepaUsed = false;
     }
-    else if (strncmp(expNumber, "s467", 4) == 0)
+    else if (expId.compare(0, 4, "s467") == 0)
     {
         installedCrystalsFile = "califa_InstalledCrystals_Nov2019.txt";
         geoTag = "v2019.11";
+        isCepaUsed = false;
     }
-    else if (strncmp(expNumber, "nominal", 7) == 0)
+    else if (expId.compare(0, 7, "nominal") == 0)
     {
-        // Nominal configuration, nothing to say.
         std::cout << std::endl;
-        std::cout << "\033[35m"
-                  << "Loading the ideal nominal configuration."
-                  << " \033[0m" << std::endl;
+        std::cout << "\033[35mLoading the ideal nominal configuration.\033[0m" << std::endl;
     }
     else
     {
         std::cout << std::endl
                   << "\033[35m WARNING: Using a non-standard experiment number (" << expNumber
                   << ") therefore the CALIFA geometry will be generated with all crystals using the file "
-                     "<califa_AllCrystalsInstalled.txt> \033[0m"
-                  << std::endl;
-        std::cout << "\033[33m"
-                  << "  -> Is this really what you want??"
-                  << " \033[0m" << std::endl;
+                  << "<califa_AllCrystalsInstalled.txt> \033[0m" << std::endl;
+        std::cout << "\033[33m  -> Is this really what you want?? \033[0m" << std::endl;
     }
 
     TString fFilePath = geoPath + "/califa/geobase/files/" + installedCrystalsFile;
@@ -137,14 +136,47 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
               << "\033[33m" << fFilePath.Data() << " \033[0m" << std::endl
               << std::endl;
 
-    if (strncmp(expNumber, "g249", 4) == 0 || strncmp(expNumber, "s091", 4) == 0 ||
-        strncmp(expNumber, "s118", 4) == 0 || strncmp(expNumber, "s522", 4) == 0 ||
-        strncmp(expNumber, "s509", 4) == 0 || strncmp(expNumber, "s494", 4) == 0 ||
-        strncmp(expNumber, "s444", 4) == 0 || strncmp(expNumber, "s467", 4) == 0)
+    // General CALIFA alignment for both halves depending on the experiment
+    std::vector<TVector3> DisplCalifa(2); // 0: Mes, 1: Wix
+
+    if (expId.compare(0, 4, "g249") == 0 || expId.compare(0, 4, "s494") == 0 || expId.compare(0, 4, "s444") == 0 ||
+        expId.compare(0, 4, "s467") == 0)
     {
         std::cout << "\033[31m No alignment data for this experiment yet \033[0m " << std::endl << std::endl;
     }
+    else if (expId.compare(0, 4, "s522") == 0 || expId.compare(0, 4, "s509") == 0)
+    {
+        alignWixRotX->RotateX(0);
+        alignWixRotationX->RotateX(0);
+        alignWixRotY->RotateY(0);
+        alignWixRotationY->RotateY(0);
+        alignWixRotZ->RotateZ(-0.003 * 180 / TMath::Pi());
+        alignWixRotationZ->RotateZ(-0.003);
+        DisplCalifa[0].SetX(0.5);
+        DisplCalifa[0].SetZ(-2.7);
+        DisplCalifa[1].SetX(-0.5);
+        DisplCalifa[1].SetZ(-1.7);
+    }
+    else if (expId.compare(0, 4, "s455") == 0 || expId.compare(0, 4, "s515") == 0)
+    {
+        DisplCalifa[0].SetX(1.25);
+        DisplCalifa[1].SetX(-1.25);
+    }
+    else if (expId.compare(0, 4, "s091") == 0 || expId.compare(0, 4, "s118") == 0)
+    {
+        DisplCalifa[0].SetY(0.54);
+        DisplCalifa[0].SetZ(-3.14);
+        DisplCalifa[1].SetY(0.54);
+        DisplCalifa[1].SetZ(-2.23);
+    }
 
+    // General TGeoCombiTrans for CALIFA alignment of both halves
+    auto rotCalifaMes = new TGeoRotation((*alignMesRotX) * (*alignMesRotY) * (*alignMesRotZ));
+    auto dispCalMes = new TGeoCombiTrans(DisplCalifa[0].X(), DisplCalifa[0].Y(), DisplCalifa[0].Z(), rotCalifaMes);
+    auto rotCalifaWis = new TGeoRotation((*alignWixRotX) * (*alignWixRotY) * (*alignWixRotZ));
+    auto dispCalWix = new TGeoCombiTrans(DisplCalifa[1].X(), DisplCalifa[1].Y(), DisplCalifa[1].Z(), rotCalifaWis);
+
+    // Reading input files
     ifstream wc1, in1, in2, in3;
     wc1.open(fFilePath.Data());
 
@@ -163,7 +195,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         std::cout << "\033[31m FATAL ERROR: Unable to open file or read problem in \033[0m "
                   << "\033[31m" << installedCrystalsFile << " \033[0m" << std::endl
                   << std::endl;
-        return;
+        gApplication->Terminate();
     }
 
     int read = 0;
@@ -175,15 +207,15 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         {
             std::cerr << "\033[31m FATAL ERROR: more lines than crystals in the file \033[0m "
                       << "\033[31m" << installedCrystalsFile << " \033[0m\n\n";
-            return;
+            gApplication->Terminate();
         }
-
         installedCrystals[crycounter++] = read;
     }
 
     // -------   Geometry file name (output)   ------------------------
     TString geoFileName = geoPath + "/geometry/califa_";
     geoFileName = geoFileName + geoTag + ".geo.root";
+    geoFileName.ReplaceAll("//", "/");
 
     // -----------------   Get and create the required media    -------
     FairGeoMedia* geoMedia = geoFace->getMedia();
@@ -237,17 +269,13 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
     if (!pVacMedium)
         Fatal("Main", "Medium vacuum not found");
 
-    // ----------------------------------------------------------------
-
     // --------------   Create geometry and top volume  ---------------
     gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
     gGeoMan->SetName("CALIFAgeom");
     TGeoVolume* top = new TGeoVolumeAssembly("TOP");
     gGeoMan->SetTopVolume(top);
-    // ----------------------------------------------------------------
 
-    // Defintion of the Mother Volume
-
+    // Defintion of the Mother Volume  --------------------------------
     auto tgeotrans0 = new TGeoCombiTrans("tgeotrans0", 0., 0., 9., fRefRot.get());
     tgeotrans0->RegisterYourself();
     auto tgeotrans1 = new TGeoCombiTrans("tgeotrans1", 0, 0, 0., fRefRot.get());
@@ -261,54 +289,32 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         "califa_mother", "mother_outer:tgeotrans0 - inner_hole:tgeotrans0 + mother_endcap:tgeotrans1");
 
     auto pWorld = std::make_unique<TGeoVolume>("CalifaWorld", califa_mother, pAirMedium);
-
     top->AddNode(pWorld.get(), 0, tgeotrans1);
 
     // FINAL CALIFA CARREL + iPHOS VERSION (SINCE NOV 2019)
     const size_t N_ALV_TYPES = 23; // alveolar structures
     const size_t N_CRY_TYPES = 85; // crystal elements
-    // CALIFA CEPA USC VERSION (JAN 2024) PARAMETERS
-    const size_t N_ALV_TYPES_CEPA = 3;  // alveolar structures
-    const size_t N_CRY_TYPES_CEPA = 14; // crystal elements
 
     int counter = 0;
-    double x, y, z;
-
-    double wrapping_thickness = 0.0065;            // in cm.
-    const double wrapping_thickness_CEPA = 0.0080; // (80 microns recomended by E. Casarejos)
-    const double cf_thickness_CEPA = 0.0300;       // carbon fiber (300 microns recomended by E. Casarejos)
-    const double security_margin =
-        0.0110; // between wrapping and carbon fiber inner volume (minimum 40 microns, depends on crystal_reduction)
+    double x = 0., y = 0., z = 0.;
+    double wrapping_thickness = 0.0065; // in cm
+    // between wrapping and carbon fiber inner volume (minimum 40 microns, depends on crystal_reduction)
+    const double security_margin = 0.0110;
     const double crystal_reduction = -0.0330; // minimum -220 microns as there was a small overlap among sectors
     // the last two parameters depends one on the other... the minimum values recommended in the comment
     // avoids a given type of extrusion (security_margin) or overlap (crystal_reduction), but to avoid simultaneously
     // both problems below 1 micron, the minimum settings are security_margin = 0.0110 and crystal_reduction = -0.0330
 
-    // target reference in mm. OFFSET INFO FROM UVIGO
+    // Target reference in mm. OFFSET INFO FROM UVIGO
     TVector3 target_ref(4.1, 2304.0809, 325.0);
-    TVector3 target_ref_CEPA(0.0, 0.0, 24.9);
 
     // 23 geometries, 8 vertices, outer and inner: (23*8*2)
     std::vector<TVector3> points(N_ALV_TYPES * 8 * 2);
     std::vector<TVector3> points_local(N_ALV_TYPES * 8 * 2);
 
     // 18 alv with 4 cry, 4 with 3 cry, 1 with 1 cry, 8 vertices each: (15*4+4*3+3*4+1)*8=85*8
-    // TVector3 points_cry[N_CRY_TYPES * 8];
-    // TVector3 points_cry_local[N_CRY_TYPES * 8];
     std::vector<TVector3> points_cry(N_CRY_TYPES * 8);
     std::vector<TVector3> points_cry_local(N_CRY_TYPES * 8);
-
-    // CEPA 3 geometries, 8 vertices = 24
-    std::vector<TVector3> points_CEPA(N_ALV_TYPES_CEPA * 8);
-    std::vector<TVector3> points_local_CEPA(N_ALV_TYPES_CEPA * 8);
-    std::vector<TVector3> points_inn_CEPA(N_ALV_TYPES_CEPA * 8);
-    std::vector<TVector3> points_inn_local_CEPA(N_ALV_TYPES_CEPA * 8);
-
-    // 14 geometries, 8 vertices = 112
-    std::vector<TVector3> points_cry_CEPA(N_CRY_TYPES_CEPA * 8);
-    std::vector<TVector3> points_cry_wrap_CEPA(N_CRY_TYPES_CEPA * 8);
-    std::vector<TVector3> points_cry_local_CEPA(N_CRY_TYPES_CEPA * 8);
-    std::vector<TVector3> points_cry_wrap_local_CEPA(N_CRY_TYPES_CEPA * 8);
 
     // reading the file with all alveoli vertices
     while (in1 >> x >> y >> z)
@@ -318,7 +324,6 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
 
         if (points[counter].X() > 100 || points[counter].Y() > 100 || points[counter].Z() > 100)
             std::cout << "warn: points exceed top volume!!" << std::endl;
-
         counter++;
     }
     if (counter != N_ALV_TYPES * 8 * 2)
@@ -335,7 +340,6 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         {
             std::cout << "warn: points exceed top volume!!" << std::endl;
         }
-
         counter++;
         // printf("x=%8f, y=%8f, z=%8f\n", x, y, z);
     }
@@ -343,29 +347,8 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         cout << "PROBLEM! Counter2=" << counter << endl;
     counter = 0;
 
-    while (in3 >> x >> y >> z)
-    {
-        points_cry_CEPA[counter].SetXYZ((x - target_ref_CEPA.X()) / 10.,
-                                        (y - target_ref_CEPA.Y()) / 10.,
-                                        (z - target_ref_CEPA.Z()) / 10.); // in cm
-
-        if (points_cry_CEPA[counter].X() > 100 || points_cry_CEPA[counter].Y() > 100 ||
-            points_cry_CEPA[counter].Z() > 100)
-        {
-            std::cout << "WARNING: points exceed top volume!!" << std::endl;
-        }
-
-        counter++;
-        // printf("x=%8f, y=%8f, z=%8f\n", x, y, z);
-    }
-
-    if (counter != N_CRY_TYPES_CEPA * 8)
-        std::cout << "PROBLEM! Counter3=" << counter << std::endl;
-
-    counter = 0;
-
     // BARREL+iPHOS PART
-    //  centers of faces
+    // Centers of faces
     // 23 geometries, 2 face centers, outer and inner (23*2*2)
     std::vector<TVector3> center(N_ALV_TYPES * 2 * 2); // face centers
     std::vector<TVector3> x_uni(N_ALV_TYPES * 2 * 2);  // unit vectors for each face
@@ -426,7 +409,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         alv_cm[i] = center[2 * i] + center[2 * i + 1];
         alv_cm[i] *= 0.5; // volume center for all alv (outer and inner)
         // alv_cm[i].Print();
-        for (Int_t j = 0; j < 8; j++)
+        for (size_t j = 0; j < 8; j++)
         { // for the 8 vertices of each alveolus
             points_local[i * 8 + j] = rot[2 * i].Inverse() * (points[i * 8 + j] - alv_cm[i]);
             // cout<< "Points in cm coordinates: "<< endl;
@@ -446,7 +429,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         x_uni_cry[i] = points_cry[i * 4 + 1] - points_cry[i * 4];
         if (i > 145)
         { // for the irregular crystals at the end of the iPhos, the X axis is taken from other vertices
-            x_uni[i] = points_cry[i * 4 + 2] - points_cry[i * 4 + 3];
+            x_uni_cry[i] = points_cry[i * 4 + 2] - points_cry[i * 4 + 3];
         }
         x_uni_cry[i] = x_uni_cry[i].Unit();              // unit along X
         y_uni_cry[i] = z_uni_cry[i].Cross(x_uni_cry[i]); // unit along Y
@@ -460,7 +443,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         cry_cm[i] = center_cry[2 * i] + center_cry[2 * i + 1];
         cry_cm[i] *= 0.5; // volume center for each cry
         // cry_cm[i].Print();
-        for (Int_t j = 0; j < 8; j++)
+        for (size_t j = 0; j < 8; j++)
         { // for the 8 vertices of each crystal
             points_cry_local[i * 8 + j] = rot_cry[2 * i].Inverse() * (points_cry[i * 8 + j] - cry_cm[i]);
             // reducing 1mm the first crystal vertices to avoid collision with inner volume,
@@ -496,8 +479,8 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
     }
 
     // location of the crystals in the alveoli
-    TVector3 cry_position[N_CRY_TYPES];       // 85 types of crystals
-    TVector3 cry_position_local[N_CRY_TYPES]; // 85 types of crystals
+    std::vector<TVector3> cry_position(N_CRY_TYPES);       // 85 types of crystals
+    std::vector<TVector3> cry_position_local(N_CRY_TYPES); // 85 types of crystals
 
     cry_position[0] = cry_cm[0] - alv_cm[1]; // first alveolus with a single crystal wrt inner alv
     cry_position_local[0] = rot[1].Inverse() * (cry_cm[0] - alv_cm[0]);
@@ -543,9 +526,9 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         vertices_inner_Alv[i].resize(16);
     }
 
-    for (int i = 0; i < N_ALV_TYPES; i++)
+    for (size_t i = 0; i < N_ALV_TYPES; i++)
     {
-        for (int j = 0; j < 8; j++)
+        for (uint8_t j = 0; j < 8; j++)
         {
             if ((4 - j) > 0)
             { // reversing order for being clockwise filling TGeoArb8
@@ -567,7 +550,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
     // Redefinition of vertices for the construction of the Crystals, using TGeoArb8
     std::vector<std::vector<double>> vertices_Cry(N_CRY_TYPES);      // 680/8=85 (85 crystal types)
     std::vector<std::vector<double>> vertices_Cry_Wrap(N_CRY_TYPES); // 680/8=85 (85 crystal types)
-    for (Int_t i = 0; i < N_CRY_TYPES; i++)
+    for (size_t i = 0; i < N_CRY_TYPES; i++)
     {
         vertices_Cry[i].resize(16);
         vertices_Cry_Wrap[i].resize(16);
@@ -575,7 +558,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
 
     for (size_t i = 0; i < N_CRY_TYPES; i++)
     {
-        for (Int_t j = 0; j < 8; j++)
+        for (uint8_t j = 0; j < 8; j++)
         {
             if ((4 - j) > 0)
             { // reversing order for being clockwise filling TGeoArb8
@@ -597,365 +580,6 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
                 vertices_Cry[i][j] = vertices_Cry_Wrap[i][j] - wrapping_thickness;
             else
                 vertices_Cry[i][j] = vertices_Cry_Wrap[i][j] + wrapping_thickness;
-        }
-    }
-
-    // CEPA USC PART
-    //  centers of faces
-    // 3 geometries, 2 face centers, (3*2)
-    std::vector<TVector3> center_CEPA(N_ALV_TYPES_CEPA * 2);
-    std::vector<TVector3> x_uni_CEPA(N_ALV_TYPES_CEPA * 2); // unit vectors for each face
-    std::vector<TVector3> y_uni_CEPA(N_ALV_TYPES_CEPA * 2);
-    std::vector<TVector3> z_uni_CEPA(N_ALV_TYPES_CEPA * 2);
-
-    std::vector<TVector3> center_inn_CEPA(N_ALV_TYPES_CEPA * 2); // 3 geometries, 2 face centers, (3*2)
-    std::vector<TVector3> x_inn_uni_CEPA(N_ALV_TYPES_CEPA * 2);  // unit vectors for each face
-    std::vector<TVector3> y_inn_uni_CEPA(N_ALV_TYPES_CEPA * 2);
-    std::vector<TVector3> z_inn_uni_CEPA(N_ALV_TYPES_CEPA * 2);
-
-    // 12 types of crystals, 2 face centers (12*2)
-    std::vector<TVector3> center_cry_CEPA(N_CRY_TYPES_CEPA * 2);
-    std::vector<TVector3> x_uni_cry_CEPA(N_CRY_TYPES_CEPA * 2); // unit vectors for each face for crystals
-    std::vector<TVector3> y_uni_cry_CEPA(N_CRY_TYPES_CEPA * 2);
-    std::vector<TVector3> z_uni_cry_CEPA(N_CRY_TYPES_CEPA * 2);
-
-    std::vector<TRotation> rot_CEPA(N_ALV_TYPES_CEPA * 2);     // calculated in each face
-    std::vector<TRotation> rot_inn_CEPA(N_ALV_TYPES_CEPA * 2); // calculated in each face
-    std::vector<TRotation> rot_cry_CEPA(N_CRY_TYPES_CEPA * 2); // only a few are really different if all is ok
-
-    // volume centers
-    std::vector<TVector3> alv_cm_CEPA(N_ALV_TYPES_CEPA);     // 3 geometries
-    std::vector<TVector3> alv_cm_rot_CEPA(N_ALV_TYPES_CEPA); // 3 geometries, after final rotation
-    std::vector<TVector3> alv_inn_cm_CEPA(N_ALV_TYPES_CEPA); // 3 geometries
-    std::vector<TVector3> cry_cm_CEPA(N_CRY_TYPES_CEPA);     // 12 types of crystals
-
-    // The center of the crystal faces are first calculated. Then, the unit vectors defining the axis in each faces
-    // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
-    // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
-    // the vertices in the coordinate system of the volume center of mass (cm)
-    for (Int_t i = 0; i < N_CRY_TYPES_CEPA * 2; i++)
-    { // 14 types of crystals, 2 face centers (14*2)
-        center_cry_CEPA[i] = points_cry_CEPA[i * 4] + points_cry_CEPA[i * 4 + 1] + points_cry_CEPA[i * 4 + 2] +
-                             points_cry_CEPA[i * 4 + 3]; // face centers
-        center_cry_CEPA[i] *= 0.25;                      // face centers
-        // center_cry_CEPA[i].Print();
-        z_uni_cry_CEPA[i] = (points_cry_CEPA[i * 4 + 1] - points_cry_CEPA[i * 4])
-                                .Cross(points_cry_CEPA[i * 4 + 2] - points_cry_CEPA[i * 4 + 1]);
-        z_uni_cry_CEPA[i] = z_uni_cry_CEPA[i].Unit(); // normal to face center
-        x_uni_cry_CEPA[i] =
-            points_cry_CEPA[i * 4 + 2] - points_cry_CEPA[i * 4 + 1]; // MODIFIED FROM BARREL+IPHOS DEFINITION!!!!
-
-        x_uni_cry_CEPA[i] = x_uni_cry_CEPA[i].Unit();                   // unit along X
-        y_uni_cry_CEPA[i] = z_uni_cry_CEPA[i].Cross(x_uni_cry_CEPA[i]); // unit along Y
-        // x_uni_cry_CEPA[i].Print();  y_uni_cry_CEPA[i].Print();    z_uni_cry_CEPA[i].Print();
-
-        // calculate rotation matrix (should be repeated 4 times, just checking)
-        rot_cry_CEPA[i].SetZAxis(z_uni_cry_CEPA[i], x_uni_cry_CEPA[i]);
-    }
-    for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
-    { // 14 types of crystals
-        cry_cm_CEPA[i] = center_cry_CEPA[2 * i] + center_cry_CEPA[2 * i + 1];
-        cry_cm_CEPA[i] *= 0.5; // volume center for each cry
-        // cry_cm_CEPA[i].Print();
-        for (size_t j = 0; j < 8; j++)
-        { // for the 8 vertices of each crystal
-            points_cry_local_CEPA[i * 8 + j] =
-                rot_cry_CEPA[2 * i].Inverse() * (points_cry_CEPA[i * 8 + j] - cry_cm_CEPA[i]);
-        }
-    }
-
-    // Reducing the crystals from the UVIGO plans, as they seem to be too large...
-    TVector3 reducedis0(crystal_reduction, -crystal_reduction, crystal_reduction);
-    TVector3 reducedis1(crystal_reduction, crystal_reduction, crystal_reduction);
-    TVector3 reducedis2(-crystal_reduction, crystal_reduction, crystal_reduction);
-    TVector3 reducedis3(-crystal_reduction, -crystal_reduction, crystal_reduction);
-    TVector3 reducedis4(crystal_reduction, -crystal_reduction, -crystal_reduction);
-    TVector3 reducedis5(crystal_reduction, crystal_reduction, -crystal_reduction);
-    TVector3 reducedis6(-crystal_reduction, crystal_reduction, -crystal_reduction);
-    TVector3 reducedis7(-crystal_reduction, -crystal_reduction, -crystal_reduction);
-
-    for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
-    { // for 14 geometries
-        points_cry_local_CEPA[i * 8 + 0] = points_cry_local_CEPA[i * 8 + 0] - reducedis0;
-        points_cry_local_CEPA[i * 8 + 1] = points_cry_local_CEPA[i * 8 + 1] - reducedis1;
-        points_cry_local_CEPA[i * 8 + 2] = points_cry_local_CEPA[i * 8 + 2] - reducedis2;
-        points_cry_local_CEPA[i * 8 + 3] = points_cry_local_CEPA[i * 8 + 3] - reducedis3;
-        points_cry_local_CEPA[i * 8 + 4] = points_cry_local_CEPA[i * 8 + 4] - reducedis4;
-        points_cry_local_CEPA[i * 8 + 5] = points_cry_local_CEPA[i * 8 + 5] - reducedis5;
-        points_cry_local_CEPA[i * 8 + 6] = points_cry_local_CEPA[i * 8 + 6] - reducedis6;
-        points_cry_local_CEPA[i * 8 + 7] = points_cry_local_CEPA[i * 8 + 7] - reducedis7;
-        // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
-        for (size_t j = 0; j < 8; j++)
-        { // for the 8 vertices (inverse of the normal point to point local)
-            points_cry_CEPA[i * 8 + j] = cry_cm_CEPA[i] + rot_cry_CEPA[2 * i] * points_cry_local_CEPA[i * 8 + j];
-            // cout<< "Points in cm coordinates: "<< endl;
-            // points_inn_CEPA[i*8+j].Print();
-        }
-    }
-
-    // Adding the wrapping
-    Double_t partAddition = wrapping_thickness_CEPA;
-    TVector3 adddis0(partAddition, -partAddition, partAddition);
-    TVector3 adddis1(partAddition, partAddition, partAddition);
-    TVector3 adddis2(-partAddition, partAddition, partAddition);
-    TVector3 adddis3(-partAddition, -partAddition, partAddition);
-    TVector3 adddis4(partAddition, -partAddition, -partAddition);
-    TVector3 adddis5(partAddition, partAddition, -partAddition);
-    TVector3 adddis6(-partAddition, partAddition, -partAddition);
-    TVector3 adddis7(-partAddition, -partAddition, -partAddition);
-    for (Int_t i = 0; i < N_CRY_TYPES_CEPA; i++)
-    { // for 14 geometries
-        points_cry_wrap_local_CEPA[i * 8 + 0] = points_cry_local_CEPA[i * 8 + 0] - adddis0;
-        points_cry_wrap_local_CEPA[i * 8 + 1] = points_cry_local_CEPA[i * 8 + 1] - adddis1;
-        points_cry_wrap_local_CEPA[i * 8 + 2] = points_cry_local_CEPA[i * 8 + 2] - adddis2;
-        points_cry_wrap_local_CEPA[i * 8 + 3] = points_cry_local_CEPA[i * 8 + 3] - adddis3;
-        points_cry_wrap_local_CEPA[i * 8 + 4] = points_cry_local_CEPA[i * 8 + 4] - adddis4;
-        points_cry_wrap_local_CEPA[i * 8 + 5] = points_cry_local_CEPA[i * 8 + 5] - adddis5;
-        points_cry_wrap_local_CEPA[i * 8 + 6] = points_cry_local_CEPA[i * 8 + 6] - adddis6;
-        points_cry_wrap_local_CEPA[i * 8 + 7] = points_cry_local_CEPA[i * 8 + 7] - adddis7;
-        // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
-        for (Int_t j = 0; j < 8; j++)
-        { // for the 8 vertices (inverse of the normal point to point local)
-            points_cry_wrap_CEPA[i * 8 + j] =
-                cry_cm_CEPA[i] + rot_cry_CEPA[2 * i] * points_cry_wrap_local_CEPA[i * 8 + j];
-            // cout<< "Points in cm coordinates: "<< endl;
-            // points_inn_CEPA[i*8+j].Print();
-        }
-    }
-
-    // internal alveoli corners (calculated crystals corners)
-    // They require a later correction to enlarge the alveoli inner space and avoid extrusions
-    // as the points_cry_CEPA are given without wrapping
-    for (Int_t uOrD = 0; uOrD < 2; uOrD++)
-    {                                                                       // upper or lower face
-        points_inn_CEPA[uOrD * 4 + 0] = points_cry_wrap_CEPA[uOrD * 4 + 0]; // alveoli 1, first corner of crystal 1
-        points_inn_CEPA[uOrD * 4 + 1] = points_cry_wrap_CEPA[1 * 8 + uOrD * 4 + 1]; // second corner of crystal 2
-        points_inn_CEPA[uOrD * 4 + 2] = points_cry_wrap_CEPA[2 * 8 + uOrD * 4 + 2]; // third corner of crystal 3
-        points_inn_CEPA[uOrD * 4 + 3] = points_cry_wrap_CEPA[3 * 8 + uOrD * 4 + 3]; // fourth corner of crystal 4
-
-        points_inn_CEPA[8 + uOrD * 4 + 0] =
-            points_cry_wrap_CEPA[4 * 8 + uOrD * 4 + 0]; // alveoli 2, first corner of crystal 5
-        points_inn_CEPA[8 + uOrD * 4 + 1] = points_cry_wrap_CEPA[5 * 8 + uOrD * 4 + 1]; // second corner of crystal 6
-        points_inn_CEPA[8 + uOrD * 4 + 2] = points_cry_wrap_CEPA[7 * 8 + uOrD * 4 + 2]; // third corner of crystal 8
-        points_inn_CEPA[8 + uOrD * 4 + 3] = points_cry_wrap_CEPA[8 * 8 + uOrD * 4 + 3]; // fourth corner of crystal 9
-
-        points_inn_CEPA[2 * 8 + uOrD * 4 + 0] =
-            points_cry_wrap_CEPA[10 * 8 + uOrD * 4 + 0]; // alveoli 3, first corner of crystal 11
-        points_inn_CEPA[2 * 8 + uOrD * 4 + 1] =
-            points_cry_wrap_CEPA[11 * 8 + uOrD * 4 + 1]; // second corner of crystal 12
-        points_inn_CEPA[2 * 8 + uOrD * 4 + 2] =
-            points_cry_wrap_CEPA[12 * 8 + uOrD * 4 + 2]; // third corner of crystal 13
-        points_inn_CEPA[2 * 8 + uOrD * 4 + 3] =
-            points_cry_wrap_CEPA[13 * 8 + uOrD * 4 + 3]; // fourth corner of crystal 14
-    }
-
-    // The center of the faces are first calculated. Then, the unit vectors defining the axis in each faces
-    // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
-    // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
-    // the vertices in the coordinate system of the volume center of mass (cm)
-    for (Int_t i = 0; i < N_ALV_TYPES_CEPA * 2; i++)
-    { // for 3 geometries, 2 face centers (3*2)
-        center_inn_CEPA[i] = points_inn_CEPA[i * 4] + points_inn_CEPA[i * 4 + 1] + points_inn_CEPA[i * 4 + 2] +
-                             points_inn_CEPA[i * 4 + 3]; // face centers
-        center_inn_CEPA[i] *= 0.25;                      // face centers
-        // cout<< "Alv centers coordinates: "<< endl; center_inn_CEPA[i].Print(); cout<< "END OF Alv centers
-        // coordinates: "<< endl;
-        z_inn_uni_CEPA[i] = (points_inn_CEPA[i * 4 + 1] - points_inn_CEPA[i * 4])
-                                .Cross(points_inn_CEPA[i * 4 + 2] - points_inn_CEPA[i * 4 + 1]);
-        z_inn_uni_CEPA[i] = z_inn_uni_CEPA[i].Unit(); // normal to face center
-        x_inn_uni_CEPA[i] =
-            points_inn_CEPA[i * 4 + 2] - points_inn_CEPA[i * 4 + 1]; // MODIFIED FROM BARREL+IPHOS DEFINITION!!!!
-
-        x_inn_uni_CEPA[i] = x_inn_uni_CEPA[i].Unit();                   // unit along X
-        y_inn_uni_CEPA[i] = z_inn_uni_CEPA[i].Cross(x_inn_uni_CEPA[i]); // unit along Y
-        // x_inn_uni_CEPA[i].Print();  y_inn_uni_CEPA[i].Print();   z_inn_uni_CEPA[i].Print();
-        //  calculate rotation matrix for the 3 geometries (should be repeated 4 times, just checking)
-        rot_inn_CEPA[i].SetZAxis(z_inn_uni_CEPA[i], x_inn_uni_CEPA[i]);
-    }
-    for (Int_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    { // for 3 geometries
-        alv_inn_cm_CEPA[i] = center_inn_CEPA[2 * i] + center_inn_CEPA[2 * i + 1];
-        alv_inn_cm_CEPA[i] *= 0.5; // volume center for all alv (outer and inner)
-        // alv_inn_cm_CEPA[i].Print();
-        for (Int_t j = 0; j < 8; j++)
-        { // for the 8 vertices of each alveolus
-            points_inn_local_CEPA[i * 8 + j] =
-                rot_inn_CEPA[2 * i].Inverse() * (points_inn_CEPA[i * 8 + j] - alv_inn_cm_CEPA[i]);
-            // cout<< "Points in cm coordinates: "<< endl;
-            // points_inn_local_CEPA[i*8+j].Print();
-        }
-    }
-
-    // Adding now the wrapping and security margin to the inner alveoli points
-    Double_t totalAddition = security_margin;
-    TVector3 dis0(totalAddition, -totalAddition, totalAddition);
-    TVector3 dis1(totalAddition, totalAddition, totalAddition);
-    TVector3 dis2(-totalAddition, totalAddition, totalAddition);
-    TVector3 dis3(-totalAddition, -totalAddition, totalAddition);
-    TVector3 dis4(totalAddition, -totalAddition, -totalAddition);
-    TVector3 dis5(totalAddition, totalAddition, -totalAddition);
-    TVector3 dis6(-totalAddition, totalAddition, -totalAddition);
-    TVector3 dis7(-totalAddition, -totalAddition, -totalAddition);
-    for (Int_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    { // for 3 geometries
-        points_inn_local_CEPA[i * 8 + 0] = points_inn_local_CEPA[i * 8 + 0] - dis0;
-        points_inn_local_CEPA[i * 8 + 1] = points_inn_local_CEPA[i * 8 + 1] - dis1;
-        points_inn_local_CEPA[i * 8 + 2] = points_inn_local_CEPA[i * 8 + 2] - dis2;
-        points_inn_local_CEPA[i * 8 + 3] = points_inn_local_CEPA[i * 8 + 3] - dis3;
-        points_inn_local_CEPA[i * 8 + 4] = points_inn_local_CEPA[i * 8 + 4] - dis4;
-        points_inn_local_CEPA[i * 8 + 5] = points_inn_local_CEPA[i * 8 + 5] - dis5;
-        points_inn_local_CEPA[i * 8 + 6] = points_inn_local_CEPA[i * 8 + 6] - dis6;
-        points_inn_local_CEPA[i * 8 + 7] = points_inn_local_CEPA[i * 8 + 7] - dis7;
-        // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
-        for (Int_t j = 0; j < 8; j++)
-        { // for the 8 vertices of each inner alveolus (inverse of the normal point to point local)
-            points_inn_CEPA[i * 8 + j] = alv_inn_cm_CEPA[i] + rot_inn_CEPA[2 * i] * points_inn_local_CEPA[i * 8 + j];
-            // cout<< "Points in cm coordinates: "<< endl;
-            // points_inn_CEPA[i*8+j].Print();
-        }
-    }
-
-    // calculating the OUTER points from the INNER ones
-    TVector3 d0(cf_thickness_CEPA, -cf_thickness_CEPA, cf_thickness_CEPA);
-    TVector3 d1(cf_thickness_CEPA, cf_thickness_CEPA, cf_thickness_CEPA);
-    TVector3 d2(-cf_thickness_CEPA, cf_thickness_CEPA, cf_thickness_CEPA);
-    TVector3 d3(-cf_thickness_CEPA, -cf_thickness_CEPA, cf_thickness_CEPA);
-    TVector3 d4(cf_thickness_CEPA, -cf_thickness_CEPA, -cf_thickness_CEPA);
-    TVector3 d5(cf_thickness_CEPA, cf_thickness_CEPA, -cf_thickness_CEPA);
-    TVector3 d6(-cf_thickness_CEPA, cf_thickness_CEPA, -cf_thickness_CEPA);
-    TVector3 d7(-cf_thickness_CEPA, -cf_thickness_CEPA, -cf_thickness_CEPA);
-    for (Int_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    { // for 3 geometries
-        points_local_CEPA[i * 8 + 0] = points_inn_local_CEPA[i * 8 + 0] - d0;
-        points_local_CEPA[i * 8 + 1] = points_inn_local_CEPA[i * 8 + 1] - d1;
-        points_local_CEPA[i * 8 + 2] = points_inn_local_CEPA[i * 8 + 2] - d2;
-        points_local_CEPA[i * 8 + 3] = points_inn_local_CEPA[i * 8 + 3] - d3;
-        points_local_CEPA[i * 8 + 4] = points_inn_local_CEPA[i * 8 + 4] - d4;
-        points_local_CEPA[i * 8 + 5] = points_inn_local_CEPA[i * 8 + 5] - d5;
-        points_local_CEPA[i * 8 + 6] = points_inn_local_CEPA[i * 8 + 6] - d6;
-        points_local_CEPA[i * 8 + 7] = points_inn_local_CEPA[i * 8 + 7] - d7;
-        // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
-        for (Int_t j = 0; j < 8; j++)
-        { // for the 8 vertices of each inner alveolus (inverse of the normal point to point local)
-            points_CEPA[i * 8 + j] = alv_inn_cm_CEPA[i] + rot_inn_CEPA[2 * i] * points_local_CEPA[i * 8 + j];
-            // cout<< "Points in cm coordinates: "<< endl;
-            // points_inn_CEPA[i*8+j].Print();
-        }
-    }
-
-    for (Int_t i = 0; i < N_ALV_TYPES_CEPA * 2; i++)
-    { // for 3 geometries, 2 face centers (3*2)
-        center_CEPA[i] = points_CEPA[i * 4] + points_CEPA[i * 4 + 1] + points_CEPA[i * 4 + 2] +
-                         points_CEPA[i * 4 + 3]; // face centers
-        center_CEPA[i] *= 0.25;                  // face centers
-        // center_CEPA[i].Print();
-        z_uni_CEPA[i] =
-            (points_CEPA[i * 4 + 1] - points_CEPA[i * 4]).Cross(points_CEPA[i * 4 + 2] - points_CEPA[i * 4 + 1]);
-        z_uni_CEPA[i] = z_uni_CEPA[i].Unit();                            // normal to face center
-        x_uni_CEPA[i] = points_CEPA[i * 4 + 2] - points_CEPA[i * 4 + 1]; // MODIFIED FROM BARREL+IPHOS DEFINITION!!!!
-
-        x_uni_CEPA[i] = x_uni_CEPA[i].Unit();               // unit along X
-        y_uni_CEPA[i] = z_uni_CEPA[i].Cross(x_uni_CEPA[i]); // unit along Y
-        // x_uni_CEPA[i].Print();  y_uni_CEPA[i].Print();   z_uni_CEPA[i].Print();
-        // calculate rotation matrix for the 3 geometries (should be repeated 4 times, just checking)
-        rot_CEPA[i].SetZAxis(z_uni_CEPA[i], x_uni_CEPA[i]);
-    }
-
-    // outer alv
-    for (Int_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    { // for 3 geometries
-        alv_cm_CEPA[i] = center_CEPA[2 * i] + center_CEPA[2 * i + 1];
-        alv_cm_CEPA[i] *= 0.5; // volume center for all alv (outer and inner)
-    }
-
-    // location of the crystals in the alveoli
-    std::vector<TVector3> cry_position_CEPA(N_CRY_TYPES_CEPA);       // global positions
-    std::vector<TVector3> cry_position_local_CEPA(N_CRY_TYPES_CEPA); // local positions
-
-    // Relative Crystal rotation in each alveoli. Obtained from the crystal unit vector in
-    for (Int_t i = 0; i < N_CRY_TYPES_CEPA; i++)
-    { // four crystals per alv
-        if (i < 4)
-        { // first alveoli crystals
-            cry_position_CEPA[i] = cry_cm_CEPA[i] - alv_cm_CEPA[0];
-            cry_position_local_CEPA[i] = rot_CEPA[0].Inverse() * (cry_cm_CEPA[i] - alv_cm_CEPA[0]);
-        }
-        if (i > 3 && i < 10)
-        { // second alveoli crystals
-            cry_position_CEPA[i] = cry_cm_CEPA[i] - alv_cm_CEPA[1];
-            cry_position_local_CEPA[i] = rot_CEPA[2].Inverse() * (cry_cm_CEPA[i] - alv_cm_CEPA[1]);
-        }
-        if (i > 9)
-        {
-            cry_position_CEPA[i] = cry_cm_CEPA[i] - alv_cm_CEPA[2]; // third alveoli crystals
-            cry_position_local_CEPA[i] = rot_CEPA[4].Inverse() * (cry_cm_CEPA[i] - alv_cm_CEPA[2]);
-        }
-    }
-
-    // Redefinition of vertices for the construction of the Alveoli, using TGeoArb8
-    std::vector<std::vector<Double_t>> vertices_Alv_CEPA(N_ALV_TYPES_CEPA);
-    std::vector<std::vector<Double_t>> vertices_inner_Alv_CEPA(N_ALV_TYPES_CEPA);
-    for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    {
-        vertices_Alv_CEPA[i].resize(16);
-        vertices_inner_Alv_CEPA[i].resize(16);
-    }
-    for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    {
-        for (size_t j = 0; j < 8; j++)
-        { // reversing order for being clockwise filling TGeoArb8
-            if (j == 1 || j == 5)
-            {
-                vertices_Alv_CEPA[i][2 * j] = points_local_CEPA[8 * i + j + 2].X();
-                vertices_Alv_CEPA[i][2 * j + 1] = points_local_CEPA[8 * i + j + 2].Y();
-                vertices_inner_Alv_CEPA[i][2 * j] = points_inn_local_CEPA[8 * i + j + 2].X();
-                vertices_inner_Alv_CEPA[i][2 * j + 1] = points_inn_local_CEPA[8 * i + j + 2].Y();
-            }
-            else if (j == 3 || j == 7)
-            {
-                vertices_Alv_CEPA[i][2 * j] = points_local_CEPA[8 * i + j - 2].X();
-                vertices_Alv_CEPA[i][2 * j + 1] = points_local_CEPA[8 * i + j - 2].Y();
-                vertices_inner_Alv_CEPA[i][2 * j] = points_inn_local_CEPA[8 * i + j - 2].X();
-                vertices_inner_Alv_CEPA[i][2 * j + 1] = points_inn_local_CEPA[8 * i + j - 2].Y();
-            }
-            else
-            {
-                vertices_Alv_CEPA[i][2 * j] = points_local_CEPA[8 * i + j].X();
-                vertices_Alv_CEPA[i][2 * j + 1] = points_local_CEPA[8 * i + j].Y();
-                vertices_inner_Alv_CEPA[i][2 * j] = points_inn_local_CEPA[8 * i + j].X();
-                vertices_inner_Alv_CEPA[i][2 * j + 1] = points_inn_local_CEPA[8 * i + j].Y();
-            }
-        }
-    }
-
-    // Redefinition of vertices for the construction of the Crystals, using TGeoArb8
-    // In this version, points correspond to the crystal and the wrapping should be added
-    std::vector<std::vector<Double_t>> vertices_Cry_CEPA(N_CRY_TYPES_CEPA);      // (14 crystal types)
-    std::vector<std::vector<Double_t>> vertices_Cry_Wrap_CEPA(N_CRY_TYPES_CEPA); // (14 crystal types)
-    for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
-    {
-        vertices_Cry_CEPA[i].resize(16);
-        vertices_Cry_Wrap_CEPA[i].resize(16);
-    }
-
-    for (int i = 0; i < N_CRY_TYPES_CEPA; i++)
-    {
-        for (int j = 0; j < 8; j++)
-        {
-            if ((4 - j) > 0)
-            { // reversing order for being clockwise filling TGeoArb8
-                vertices_Cry_CEPA[i][2 * j] = points_cry_local_CEPA[8 * i + 3 - j].X();
-                vertices_Cry_CEPA[i][2 * j + 1] = points_cry_local_CEPA[8 * i + 3 - j].Y();
-                vertices_Cry_Wrap_CEPA[i][2 * j] = points_cry_wrap_local_CEPA[8 * i + 3 - j].X();
-                vertices_Cry_Wrap_CEPA[i][2 * j + 1] = points_cry_wrap_local_CEPA[8 * i + 3 - j].Y();
-            }
-            else
-            {
-                vertices_Cry_CEPA[i][2 * j] = points_cry_local_CEPA[8 * i + 11 - j].X();
-                vertices_Cry_CEPA[i][2 * j + 1] = points_cry_local_CEPA[8 * i + 11 - j].Y();
-                vertices_Cry_Wrap_CEPA[i][2 * j] = points_cry_wrap_local_CEPA[8 * i + 11 - j].X();
-                vertices_Cry_Wrap_CEPA[i][2 * j + 1] = points_cry_wrap_local_CEPA[8 * i + 11 - j].Y();
-            }
         }
     }
 
@@ -1005,8 +629,6 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
     {
         rotCry.push_back(std::make_unique<TGeoRotation>());
     }
-
-    std::vector<double> rotEle(9);
 
     // rotation
     std::vector<std::unique_ptr<TGeoRotation>> rotOnZ;
@@ -1147,6 +769,7 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
         // Inner volume center is displaced 150 microns along Z
         Alv_vol[i]->AddNode(Alv_inner_vol[i], 0, new TGeoCombiTrans(0, 0, 0.015, rotUni.get()));
 
+        std::vector<double> rotEle(9);
         rotEle[0] = rot[4 * i].XX();
         rotEle[1] = rot[4 * i].XY();
         rotEle[2] = rot[4 * i].XZ();
@@ -1160,315 +783,720 @@ void create_califa_geo_selector(const char* expNumber = "nominal", TString geoTa
 
         for (size_t j = 0; j < 32; j++)
         { // rotation around Z
-            // rotAlvFinal[i * 32 + j] = new TGeoRotation((*rotOnZ[j]) * (*rotAlv[i]));
-            // alv_cm_rot[2 * i] = (*rotationOnZ[j]) * alv_cm[2 * i];
-
-            // ALIGNMENT DISPLACEMENT FOR SOME EXPERIMENTS
-            double disp_halfBarrel = 0;
-            if (strncmp(expNumber, "s455", 4) == 0 || strncmp(expNumber, "s515", 4) == 0)
-            {
-                if (j < 16)
-                    disp_halfBarrel = 1.25;
-                else
-                    disp_halfBarrel = -1.25;
-            }
+            // ALIGNMENT DISPLACEMENT
+            auto disp_halfBarrel = (j < 16) ? DisplCalifa[0] : DisplCalifa[1];
 
             if (i > 18 && j > 7)
                 continue;
 
             if (i > 18)
             {
-                // ALIGNMENT DISPLACEMENT FOR SOME EXPERIMENTS
-                if (strncmp(expNumber, "s455", 4) == 0 || strncmp(expNumber, "s515", 4) == 0)
+                disp_halfBarrel = (j < 4) ? DisplCalifa[0] : DisplCalifa[1];
+
+                if (j < 4)
                 {
-                    if (j < 4)
-                        disp_halfBarrel = 1.25;
-                    else
-                        disp_halfBarrel = -1.25;
+                    rotAlvFinal[i * 32 + 4 * j] = new TGeoRotation((*alignMesRotX) * (*alignMesRotY) * (*alignMesRotZ) *
+                                                                   (*rotOnZ[4 * j]) * (*rotAlv[i]));
+                    alv_cm_rot[2 * i] = (*alignMesRotationX) * (*alignMesRotationY) * (*alignMesRotationZ) *
+                                        (*rotationOnZ[4 * j]) * alv_cm[2 * i];
+                }
+                else
+                {
+                    rotAlvFinal[i * 32 + 4 * j] = new TGeoRotation((*alignWixRotX) * (*alignWixRotY) * (*alignWixRotZ) *
+                                                                   (*rotOnZ[4 * j]) * (*rotAlv[i]));
+                    alv_cm_rot[2 * i] = (*alignWixRotationX) * (*alignWixRotationY) * (*alignWixRotationZ) *
+                                        (*rotationOnZ[4 * j]) * alv_cm[2 * i];
                 }
 
-                rotAlvFinal[i * 32 + 4 * j] = new TGeoRotation((*rotOnZ[4 * j]) * (*rotAlv[i]));
-                alv_cm_rot[2 * i] = (*rotationOnZ[4 * j]) * alv_cm[2 * i];
                 if (isCrystalInstalled(i + 1, j, installedCrystals.data()))
                 {
                     pWorld->AddNode(Alv_vol[i],
                                     j,
-                                    new TGeoCombiTrans(alv_cm_rot[2 * i].X() + disp_halfBarrel,
-                                                       alv_cm_rot[2 * i].Y(),
-                                                       alv_cm_rot[2 * i].Z(),
+                                    new TGeoCombiTrans(alv_cm_rot[2 * i].X() + disp_halfBarrel.X(),
+                                                       alv_cm_rot[2 * i].Y() + disp_halfBarrel.Y(),
+                                                       alv_cm_rot[2 * i].Z() + disp_halfBarrel.Z(),
                                                        rotAlvFinal[i * 32 + 4 * j]));
                 }
             }
             else
             {
-                rotAlvFinal[i * 32 + j] = new TGeoRotation((*rotOnZ[j]) * (*rotAlv[i]));
-                alv_cm_rot[2 * i] = (*rotationOnZ[j]) * alv_cm[2 * i];
+                // rotAlvFinal[i * 32 + j] = new TGeoRotation((*rotOnZ[j]) * (*rotAlv[i]));
+                // alv_cm_rot[2 * i] = (*rotationOnZ[j]) * alv_cm[2 * i];
+                if (j < 16)
+                {
+                    rotAlvFinal[i * 32 + j] = new TGeoRotation((*alignMesRotX) * (*alignMesRotY) * (*alignMesRotZ) *
+                                                               (*rotOnZ[j]) * (*rotAlv[i]));
+                    alv_cm_rot[2 * i] = (*alignMesRotationX) * (*alignMesRotationY) * (*alignMesRotationZ) *
+                                        (*rotationOnZ[j]) * alv_cm[2 * i];
+                }
+                else
+                {
+                    rotAlvFinal[i * 32 + j] = new TGeoRotation((*alignWixRotX) * (*alignWixRotY) * (*alignWixRotZ) *
+                                                               (*rotOnZ[j]) * (*rotAlv[i]));
+                    alv_cm_rot[2 * i] = (*alignWixRotationX) * (*alignWixRotationY) * (*alignWixRotationZ) *
+                                        (*rotationOnZ[j]) * alv_cm[2 * i];
+                }
+
                 if (isCrystalInstalled(i + 1, j, installedCrystals.data()))
                 {
                     pWorld->AddNode(Alv_vol[i],
                                     j,
-                                    new TGeoCombiTrans(alv_cm_rot[2 * i].X() + disp_halfBarrel,
-                                                       alv_cm_rot[2 * i].Y(),
-                                                       alv_cm_rot[2 * i].Z(),
+                                    new TGeoCombiTrans(alv_cm_rot[2 * i].X() + disp_halfBarrel.X(),
+                                                       alv_cm_rot[2 * i].Y() + disp_halfBarrel.Y(),
+                                                       alv_cm_rot[2 * i].Z() + disp_halfBarrel.Z(),
                                                        rotAlvFinal[i * 32 + j]));
                 }
             }
         }
     }
 
-    // CONSTRUCTING CEPA_USC PART
-    std::vector<TGeoVolume*> Alv_vol_CEPA(N_ALV_TYPES_CEPA);
-    std::vector<TGeoVolume*> Alv_inner_vol_CEPA(N_ALV_TYPES_CEPA);
-    std::vector<TGeoVolume*> Cry_vol_wrap_CEPA(N_CRY_TYPES_CEPA);
-    std::vector<TGeoVolume*> Cry_vol_CEPA(N_CRY_TYPES_CEPA);
-
-    TString AlvGlobalName_CEPA = "Alveolus_CCSI_";
-    TString AlvGlobalNameInner_CEPA = "InnerAlv_CCSI_";
-    // Substitute names in previous array (CAD names) to simplify the R3BRoot code
-    std::vector<TString> name_Alv_CEPA = { "01", "02", "03" };
-    Double_t halfLengthAlv_CEPA[N_ALV_TYPES] = { points_local_CEPA[4].Z(),
-                                                 points_local_CEPA[12].Z(),
-                                                 points_local_CEPA[20].Z() }; // cm
-    Double_t halfLengthAlv_inner_CEPA[N_ALV_TYPES] = { points_inn_local_CEPA[4].Z(),
-                                                       points_inn_local_CEPA[12].Z(),
-                                                       points_inn_local_CEPA[20].Z() }; // cm
-
-    TString WrapCryGlobalName_CEPA = "WrapCry_CCSI_";
-    TString CryGlobalName_CEPA = "Crystal_CCSI_";
-    std::vector<TString> name_Cry_CEPA = { "_1", "_2", "_3", "_4" };
-    std::vector<TString> name_Cry_CEPA_6 = { "_1", "_2", "_3", "_4", "_5", "_6" };
-    // For the moment same length as the inner alveoli
-    Double_t halfLengthCry_CEPA[N_ALV_TYPES_CEPA] = { points_cry_local_CEPA[4].Z(),
-                                                      points_cry_local_CEPA[12].Z(),
-                                                      points_cry_local_CEPA[20].Z() }; // cm
-
-    std::vector<std::unique_ptr<TGeoRotation>> rotAlv_CEPA(N_ALV_TYPES_CEPA);
-    for (auto& rot : rotAlv_CEPA)
+    if (isCepaUsed)
     {
-        rot = std::make_unique<TGeoRotation>();
-    }
+        // CALIFA CEPA USC VERSION (JAN 2024) PARAMETERS
+        const size_t N_ALV_TYPES_CEPA = 3;             // alveolar structures
+        const size_t N_CRY_TYPES_CEPA = 14;            // crystal elements
+        const double wrapping_thickness_CEPA = 0.0080; // (80 microns recomended by E. Casarejos)
+        const double cf_thickness_CEPA = 0.0300;       // carbon fiber (300 microns recomended by E. Casarejos)
 
-    std::vector<std::unique_ptr<TGeoRotation>> rotCry_CEPA(N_CRY_TYPES_CEPA);
-    for (auto& rot : rotCry_CEPA)
-    {
-        rot = std::make_unique<TGeoRotation>();
-    }
+        // Target reference in mm. OFFSET INFO FROM UVIGO
+        TVector3 target_ref_CEPA(0.0, 0.0, 24.9);
 
-    std::vector<double> rotEle_CEPA(9);
+        // CEPA 3 geometries, 8 vertices = 24
+        std::vector<TVector3> points_CEPA(N_ALV_TYPES_CEPA * 8);
+        std::vector<TVector3> points_local_CEPA(N_ALV_TYPES_CEPA * 8);
+        std::vector<TVector3> points_inn_CEPA(N_ALV_TYPES_CEPA * 8);
+        std::vector<TVector3> points_inn_local_CEPA(N_ALV_TYPES_CEPA * 8);
 
-    // rotation
-    std::vector<TGeoRotation> rotOnZ_CEPA;
-    rotOnZ_CEPA.reserve(8);
-    for (size_t i = 0; i < 8; ++i)
-    {
-        TGeoRotation rot;
-        rot.RotateZ(-45.0 * i); // 67.5 is the offset to put the first alveoli below the first of the barrel
-        rotOnZ_CEPA.push_back(rot);
-    }
+        // 14 geometries, 8 vertices = 112
+        std::vector<TVector3> points_cry_CEPA(N_CRY_TYPES_CEPA * 8);
+        std::vector<TVector3> points_cry_wrap_CEPA(N_CRY_TYPES_CEPA * 8);
+        std::vector<TVector3> points_cry_local_CEPA(N_CRY_TYPES_CEPA * 8);
+        std::vector<TVector3> points_cry_wrap_local_CEPA(N_CRY_TYPES_CEPA * 8);
 
-    std::vector<TRotation> rotationOnZ_CEPA(8);
-    for (size_t i = 0; i < 8; i++)
-    {
-        rotationOnZ_CEPA[i].RotateZ((i * -45.0) * TMath::Pi() / 180);
-    }
-
-    std::vector<TGeoRotation*> rotAlvFinal_CEPA(8 * N_ALV_TYPES_CEPA, nullptr);
-    for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    {
-        for (size_t j = 0; j < 8; j++)
+        while (in3 >> x >> y >> z)
         {
-            rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation(rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
-        }
-    }
+            points_cry_CEPA[counter].SetXYZ((x - target_ref_CEPA.X()) / 10.,
+                                            (y - target_ref_CEPA.Y()) / 10.,
+                                            (z - target_ref_CEPA.Z()) / 10.); // in cm
 
-    for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
-    {
-        Alv_vol_CEPA[i] = gGeoManager->MakeArb8(AlvGlobalName_CEPA + name_Alv_CEPA[i],
-                                                pCarbonFibreMedium,
-                                                halfLengthAlv_CEPA[i],
-                                                vertices_Alv_CEPA[i].data());
-        Alv_vol_CEPA[i]->SetLineColor(kBlue);
-        Alv_vol_CEPA[i]->SetVisLeaves(kTRUE);
-        Alv_vol_CEPA[i]->SetVisibility(kTRUE);
-        Alv_vol_CEPA[i]->SetVisContainers(kTRUE);
-
-        Alv_inner_vol_CEPA[i] = gGeoManager->MakeArb8(AlvGlobalNameInner_CEPA + name_Alv_CEPA[i],
-                                                      pAirMedium,
-                                                      halfLengthAlv_inner_CEPA[i],
-                                                      vertices_inner_Alv_CEPA[i].data());
-        Alv_inner_vol_CEPA[i]->SetLineColor(kRed);
-        Alv_inner_vol_CEPA[i]->SetVisLeaves(kTRUE);
-        Alv_inner_vol_CEPA[i]->SetVisibility(kTRUE);
-        Alv_inner_vol_CEPA[i]->SetVisContainers(kTRUE);
-
-        // four crystals per alv, but alveolus 2 with 6 crystals
-        if (i == 0) // 4 crystal alveoli
-        {
-            for (size_t j = 0; j < 4; j++)
+            if (points_cry_CEPA[counter].X() > 100 || points_cry_CEPA[counter].Y() > 100 ||
+                points_cry_CEPA[counter].Z() > 100)
             {
-                Cry_vol_CEPA[j] = gGeoManager->MakeArb8(CryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
-                                                        pCsIMedium,
-                                                        halfLengthCry_CEPA[i],
-                                                        vertices_Cry_CEPA[j].data());
-                Cry_vol_CEPA[j]->SetLineColor(kMagenta);
-                Cry_vol_CEPA[j]->SetVisLeaves(kTRUE);
-                Cry_vol_CEPA[j]->SetVisibility(kTRUE);
-                Cry_vol_CEPA[j]->SetVisContainers(kTRUE);
+                std::cout << "WARNING: points exceed top volume!!" << std::endl;
+            }
+            counter++;
+        }
+        if (counter != N_CRY_TYPES_CEPA * 8)
+            std::cout << "PROBLEM! Counter3=" << counter << std::endl;
 
-                Cry_vol_wrap_CEPA[j] =
-                    gGeoManager->MakeArb8(WrapCryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
-                                          pWrappingMedium,
-                                          halfLengthCry_CEPA[i] + wrapping_thickness_CEPA,
-                                          vertices_Cry_Wrap_CEPA[j].data());
-                Cry_vol_wrap_CEPA[j]->SetLineColor(kGreen);
-                Cry_vol_wrap_CEPA[j]->SetVisLeaves(kTRUE);
-                Cry_vol_wrap_CEPA[j]->SetVisibility(kTRUE);
-                Cry_vol_wrap_CEPA[j]->SetVisContainers(kTRUE);
+        // CEPA USC PART
+        // Centers of faces
+        // 3 geometries, 2 face centers, (3*2)
+        std::vector<TVector3> center_CEPA(N_ALV_TYPES_CEPA * 2);
+        std::vector<TVector3> x_uni_CEPA(N_ALV_TYPES_CEPA * 2); // unit vectors for each face
+        std::vector<TVector3> y_uni_CEPA(N_ALV_TYPES_CEPA * 2);
+        std::vector<TVector3> z_uni_CEPA(N_ALV_TYPES_CEPA * 2);
 
-                Cry_vol_wrap_CEPA[j]->AddNode(Cry_vol_CEPA[j], 0, new TGeoCombiTrans(0, 0, 0, rotUni.get()));
-                Alv_inner_vol_CEPA[i]->AddNode(Cry_vol_wrap_CEPA[j],
-                                               0,
-                                               new TGeoCombiTrans(cry_position_local_CEPA[j].X(),
-                                                                  cry_position_local_CEPA[j].Y(),
-                                                                  cry_position_local_CEPA[j].Z(),
-                                                                  rotUni.get()));
+        std::vector<TVector3> center_inn_CEPA(N_ALV_TYPES_CEPA * 2); // 3 geometries, 2 face centers, (3*2)
+        std::vector<TVector3> x_inn_uni_CEPA(N_ALV_TYPES_CEPA * 2);  // unit vectors for each face
+        std::vector<TVector3> y_inn_uni_CEPA(N_ALV_TYPES_CEPA * 2);
+        std::vector<TVector3> z_inn_uni_CEPA(N_ALV_TYPES_CEPA * 2);
+
+        // 12 types of crystals, 2 face centers (12*2)
+        std::vector<TVector3> center_cry_CEPA(N_CRY_TYPES_CEPA * 2);
+        std::vector<TVector3> x_uni_cry_CEPA(N_CRY_TYPES_CEPA * 2); // unit vectors for each face for crystals
+        std::vector<TVector3> y_uni_cry_CEPA(N_CRY_TYPES_CEPA * 2);
+        std::vector<TVector3> z_uni_cry_CEPA(N_CRY_TYPES_CEPA * 2);
+
+        std::vector<TRotation> rot_CEPA(N_ALV_TYPES_CEPA * 2);     // calculated in each face
+        std::vector<TRotation> rot_inn_CEPA(N_ALV_TYPES_CEPA * 2); // calculated in each face
+        std::vector<TRotation> rot_cry_CEPA(N_CRY_TYPES_CEPA * 2); // only a few are really different if all is ok
+
+        // Volume centers
+        std::vector<TVector3> alv_cm_CEPA(N_ALV_TYPES_CEPA);     // 3 geometries
+        std::vector<TVector3> alv_cm_rot_CEPA(N_ALV_TYPES_CEPA); // 3 geometries, after final rotation
+        std::vector<TVector3> alv_inn_cm_CEPA(N_ALV_TYPES_CEPA); // 3 geometries
+        std::vector<TVector3> cry_cm_CEPA(N_CRY_TYPES_CEPA);     // 12 types of crystals
+
+        // The center of the crystal faces are first calculated. Then, the unit vectors defining the axis in each faces
+        // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
+        // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
+        // the vertices in the coordinate system of the volume center of mass (cm)
+        for (size_t i = 0; i < N_CRY_TYPES_CEPA * 2; i++)
+        { // 14 types of crystals, 2 face centers (14*2)
+            center_cry_CEPA[i] = points_cry_CEPA[i * 4] + points_cry_CEPA[i * 4 + 1] + points_cry_CEPA[i * 4 + 2] +
+                                 points_cry_CEPA[i * 4 + 3]; // face centers
+            center_cry_CEPA[i] *= 0.25;                      // face centers
+            // center_cry_CEPA[i].Print();
+            z_uni_cry_CEPA[i] = (points_cry_CEPA[i * 4 + 1] - points_cry_CEPA[i * 4])
+                                    .Cross(points_cry_CEPA[i * 4 + 2] - points_cry_CEPA[i * 4 + 1]);
+            z_uni_cry_CEPA[i] = z_uni_cry_CEPA[i].Unit(); // normal to face center
+            x_uni_cry_CEPA[i] =
+                points_cry_CEPA[i * 4 + 2] - points_cry_CEPA[i * 4 + 1]; // MODIFIED FROM BARREL+IPHOS DEFINITION!!!!
+
+            x_uni_cry_CEPA[i] = x_uni_cry_CEPA[i].Unit();                   // unit along X
+            y_uni_cry_CEPA[i] = z_uni_cry_CEPA[i].Cross(x_uni_cry_CEPA[i]); // unit along Y
+            // x_uni_cry_CEPA[i].Print();  y_uni_cry_CEPA[i].Print();    z_uni_cry_CEPA[i].Print();
+
+            // calculate rotation matrix (should be repeated 4 times, just checking)
+            rot_cry_CEPA[i].SetZAxis(z_uni_cry_CEPA[i], x_uni_cry_CEPA[i]);
+        }
+        for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
+        { // 14 types of crystals
+            cry_cm_CEPA[i] = center_cry_CEPA[2 * i] + center_cry_CEPA[2 * i + 1];
+            cry_cm_CEPA[i] *= 0.5; // volume center for each cry
+            // cry_cm_CEPA[i].Print();
+            for (size_t j = 0; j < 8; j++)
+            { // for the 8 vertices of each crystal
+                points_cry_local_CEPA[i * 8 + j] =
+                    rot_cry_CEPA[2 * i].Inverse() * (points_cry_CEPA[i * 8 + j] - cry_cm_CEPA[i]);
             }
         }
-        if (i == 1) // 6 crystal alveoli
-        {
-            for (size_t j = 0; j < 6; j++)
+
+        // Reducing the crystals from the UVIGO plans, as they seem to be too large...
+        TVector3 reducedis0(crystal_reduction, -crystal_reduction, crystal_reduction);
+        TVector3 reducedis1(crystal_reduction, crystal_reduction, crystal_reduction);
+        TVector3 reducedis2(-crystal_reduction, crystal_reduction, crystal_reduction);
+        TVector3 reducedis3(-crystal_reduction, -crystal_reduction, crystal_reduction);
+        TVector3 reducedis4(crystal_reduction, -crystal_reduction, -crystal_reduction);
+        TVector3 reducedis5(crystal_reduction, crystal_reduction, -crystal_reduction);
+        TVector3 reducedis6(-crystal_reduction, crystal_reduction, -crystal_reduction);
+        TVector3 reducedis7(-crystal_reduction, -crystal_reduction, -crystal_reduction);
+
+        for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
+        { // for 14 geometries
+            points_cry_local_CEPA[i * 8 + 0] = points_cry_local_CEPA[i * 8 + 0] - reducedis0;
+            points_cry_local_CEPA[i * 8 + 1] = points_cry_local_CEPA[i * 8 + 1] - reducedis1;
+            points_cry_local_CEPA[i * 8 + 2] = points_cry_local_CEPA[i * 8 + 2] - reducedis2;
+            points_cry_local_CEPA[i * 8 + 3] = points_cry_local_CEPA[i * 8 + 3] - reducedis3;
+            points_cry_local_CEPA[i * 8 + 4] = points_cry_local_CEPA[i * 8 + 4] - reducedis4;
+            points_cry_local_CEPA[i * 8 + 5] = points_cry_local_CEPA[i * 8 + 5] - reducedis5;
+            points_cry_local_CEPA[i * 8 + 6] = points_cry_local_CEPA[i * 8 + 6] - reducedis6;
+            points_cry_local_CEPA[i * 8 + 7] = points_cry_local_CEPA[i * 8 + 7] - reducedis7;
+            // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
+            for (size_t j = 0; j < 8; j++)
+            { // for the 8 vertices (inverse of the normal point to point local)
+                points_cry_CEPA[i * 8 + j] = cry_cm_CEPA[i] + rot_cry_CEPA[2 * i] * points_cry_local_CEPA[i * 8 + j];
+                // cout<< "Points in cm coordinates: "<< endl;
+                // points_inn_CEPA[i*8+j].Print();
+            }
+        }
+
+        // Adding the wrapping
+        double partAddition = wrapping_thickness_CEPA;
+        TVector3 adddis0(partAddition, -partAddition, partAddition);
+        TVector3 adddis1(partAddition, partAddition, partAddition);
+        TVector3 adddis2(-partAddition, partAddition, partAddition);
+        TVector3 adddis3(-partAddition, -partAddition, partAddition);
+        TVector3 adddis4(partAddition, -partAddition, -partAddition);
+        TVector3 adddis5(partAddition, partAddition, -partAddition);
+        TVector3 adddis6(-partAddition, partAddition, -partAddition);
+        TVector3 adddis7(-partAddition, -partAddition, -partAddition);
+        for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
+        { // for 14 geometries
+            points_cry_wrap_local_CEPA[i * 8 + 0] = points_cry_local_CEPA[i * 8 + 0] - adddis0;
+            points_cry_wrap_local_CEPA[i * 8 + 1] = points_cry_local_CEPA[i * 8 + 1] - adddis1;
+            points_cry_wrap_local_CEPA[i * 8 + 2] = points_cry_local_CEPA[i * 8 + 2] - adddis2;
+            points_cry_wrap_local_CEPA[i * 8 + 3] = points_cry_local_CEPA[i * 8 + 3] - adddis3;
+            points_cry_wrap_local_CEPA[i * 8 + 4] = points_cry_local_CEPA[i * 8 + 4] - adddis4;
+            points_cry_wrap_local_CEPA[i * 8 + 5] = points_cry_local_CEPA[i * 8 + 5] - adddis5;
+            points_cry_wrap_local_CEPA[i * 8 + 6] = points_cry_local_CEPA[i * 8 + 6] - adddis6;
+            points_cry_wrap_local_CEPA[i * 8 + 7] = points_cry_local_CEPA[i * 8 + 7] - adddis7;
+            // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
+            for (size_t j = 0; j < 8; j++)
+            { // for the 8 vertices (inverse of the normal point to point local)
+                points_cry_wrap_CEPA[i * 8 + j] =
+                    cry_cm_CEPA[i] + rot_cry_CEPA[2 * i] * points_cry_wrap_local_CEPA[i * 8 + j];
+                // cout<< "Points in cm coordinates: "<< endl;
+                // points_inn_CEPA[i*8+j].Print();
+            }
+        }
+
+        // internal alveoli corners (calculated crystals corners)
+        // They require a later correction to enlarge the alveoli inner space and avoid extrusions
+        // as the points_cry_CEPA are given without wrapping
+        for (size_t uOrD = 0; uOrD < 2; uOrD++)
+        {                                                                       // upper or lower face
+            points_inn_CEPA[uOrD * 4 + 0] = points_cry_wrap_CEPA[uOrD * 4 + 0]; // alveoli 1, first corner of crystal 1
+            points_inn_CEPA[uOrD * 4 + 1] = points_cry_wrap_CEPA[1 * 8 + uOrD * 4 + 1]; // second corner of crystal 2
+            points_inn_CEPA[uOrD * 4 + 2] = points_cry_wrap_CEPA[2 * 8 + uOrD * 4 + 2]; // third corner of crystal 3
+            points_inn_CEPA[uOrD * 4 + 3] = points_cry_wrap_CEPA[3 * 8 + uOrD * 4 + 3]; // fourth corner of crystal 4
+
+            points_inn_CEPA[8 + uOrD * 4 + 0] =
+                points_cry_wrap_CEPA[4 * 8 + uOrD * 4 + 0]; // alveoli 2, first corner of crystal 5
+            points_inn_CEPA[8 + uOrD * 4 + 1] =
+                points_cry_wrap_CEPA[5 * 8 + uOrD * 4 + 1]; // second corner of crystal 6
+            points_inn_CEPA[8 + uOrD * 4 + 2] = points_cry_wrap_CEPA[7 * 8 + uOrD * 4 + 2]; // third corner of crystal 8
+            points_inn_CEPA[8 + uOrD * 4 + 3] =
+                points_cry_wrap_CEPA[8 * 8 + uOrD * 4 + 3]; // fourth corner of crystal 9
+
+            points_inn_CEPA[2 * 8 + uOrD * 4 + 0] =
+                points_cry_wrap_CEPA[10 * 8 + uOrD * 4 + 0]; // alveoli 3, first corner of crystal 11
+            points_inn_CEPA[2 * 8 + uOrD * 4 + 1] =
+                points_cry_wrap_CEPA[11 * 8 + uOrD * 4 + 1]; // second corner of crystal 12
+            points_inn_CEPA[2 * 8 + uOrD * 4 + 2] =
+                points_cry_wrap_CEPA[12 * 8 + uOrD * 4 + 2]; // third corner of crystal 13
+            points_inn_CEPA[2 * 8 + uOrD * 4 + 3] =
+                points_cry_wrap_CEPA[13 * 8 + uOrD * 4 + 3]; // fourth corner of crystal 14
+        }
+
+        // The center of the faces are first calculated. Then, the unit vectors defining the axis in each faces
+        // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
+        // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
+        // the vertices in the coordinate system of the volume center of mass (cm)
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA * 2; i++)
+        { // for 3 geometries, 2 face centers (3*2)
+            center_inn_CEPA[i] = points_inn_CEPA[i * 4] + points_inn_CEPA[i * 4 + 1] + points_inn_CEPA[i * 4 + 2] +
+                                 points_inn_CEPA[i * 4 + 3]; // face centers
+            center_inn_CEPA[i] *= 0.25;                      // face centers
+            // cout<< "Alv centers coordinates: "<< endl; center_inn_CEPA[i].Print(); cout<< "END OF Alv centers
+            // coordinates: "<< endl;
+            z_inn_uni_CEPA[i] = (points_inn_CEPA[i * 4 + 1] - points_inn_CEPA[i * 4])
+                                    .Cross(points_inn_CEPA[i * 4 + 2] - points_inn_CEPA[i * 4 + 1]);
+            z_inn_uni_CEPA[i] = z_inn_uni_CEPA[i].Unit(); // normal to face center
+            x_inn_uni_CEPA[i] =
+                points_inn_CEPA[i * 4 + 2] - points_inn_CEPA[i * 4 + 1]; // MODIFIED FROM BARREL+IPHOS DEFINITION!!!!
+
+            x_inn_uni_CEPA[i] = x_inn_uni_CEPA[i].Unit();                   // unit along X
+            y_inn_uni_CEPA[i] = z_inn_uni_CEPA[i].Cross(x_inn_uni_CEPA[i]); // unit along Y
+            // x_inn_uni_CEPA[i].Print();  y_inn_uni_CEPA[i].Print();   z_inn_uni_CEPA[i].Print();
+            //  calculate rotation matrix for the 3 geometries (should be repeated 4 times, just checking)
+            rot_inn_CEPA[i].SetZAxis(z_inn_uni_CEPA[i], x_inn_uni_CEPA[i]);
+        }
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        { // for 3 geometries
+            alv_inn_cm_CEPA[i] = center_inn_CEPA[2 * i] + center_inn_CEPA[2 * i + 1];
+            alv_inn_cm_CEPA[i] *= 0.5; // volume center for all alv (outer and inner)
+            // alv_inn_cm_CEPA[i].Print();
+            for (Int_t j = 0; j < 8; j++)
+            { // for the 8 vertices of each alveolus
+                points_inn_local_CEPA[i * 8 + j] =
+                    rot_inn_CEPA[2 * i].Inverse() * (points_inn_CEPA[i * 8 + j] - alv_inn_cm_CEPA[i]);
+                // cout<< "Points in cm coordinates: "<< endl;
+                // points_inn_local_CEPA[i*8+j].Print();
+            }
+        }
+
+        // Adding now the wrapping and security margin to the inner alveoli points
+        double totalAddition = security_margin;
+        TVector3 dis0(totalAddition, -totalAddition, totalAddition);
+        TVector3 dis1(totalAddition, totalAddition, totalAddition);
+        TVector3 dis2(-totalAddition, totalAddition, totalAddition);
+        TVector3 dis3(-totalAddition, -totalAddition, totalAddition);
+        TVector3 dis4(totalAddition, -totalAddition, -totalAddition);
+        TVector3 dis5(totalAddition, totalAddition, -totalAddition);
+        TVector3 dis6(-totalAddition, totalAddition, -totalAddition);
+        TVector3 dis7(-totalAddition, -totalAddition, -totalAddition);
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        { // for 3 geometries
+            points_inn_local_CEPA[i * 8 + 0] = points_inn_local_CEPA[i * 8 + 0] - dis0;
+            points_inn_local_CEPA[i * 8 + 1] = points_inn_local_CEPA[i * 8 + 1] - dis1;
+            points_inn_local_CEPA[i * 8 + 2] = points_inn_local_CEPA[i * 8 + 2] - dis2;
+            points_inn_local_CEPA[i * 8 + 3] = points_inn_local_CEPA[i * 8 + 3] - dis3;
+            points_inn_local_CEPA[i * 8 + 4] = points_inn_local_CEPA[i * 8 + 4] - dis4;
+            points_inn_local_CEPA[i * 8 + 5] = points_inn_local_CEPA[i * 8 + 5] - dis5;
+            points_inn_local_CEPA[i * 8 + 6] = points_inn_local_CEPA[i * 8 + 6] - dis6;
+            points_inn_local_CEPA[i * 8 + 7] = points_inn_local_CEPA[i * 8 + 7] - dis7;
+            // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
+            for (size_t j = 0; j < 8; j++)
+            { // for the 8 vertices of each inner alveolus (inverse of the normal point to point local)
+                points_inn_CEPA[i * 8 + j] =
+                    alv_inn_cm_CEPA[i] + rot_inn_CEPA[2 * i] * points_inn_local_CEPA[i * 8 + j];
+                // cout<< "Points in cm coordinates: "<< endl;
+                // points_inn_CEPA[i*8+j].Print();
+            }
+        }
+
+        // calculating the OUTER points from the INNER ones
+        TVector3 d0(cf_thickness_CEPA, -cf_thickness_CEPA, cf_thickness_CEPA);
+        TVector3 d1(cf_thickness_CEPA, cf_thickness_CEPA, cf_thickness_CEPA);
+        TVector3 d2(-cf_thickness_CEPA, cf_thickness_CEPA, cf_thickness_CEPA);
+        TVector3 d3(-cf_thickness_CEPA, -cf_thickness_CEPA, cf_thickness_CEPA);
+        TVector3 d4(cf_thickness_CEPA, -cf_thickness_CEPA, -cf_thickness_CEPA);
+        TVector3 d5(cf_thickness_CEPA, cf_thickness_CEPA, -cf_thickness_CEPA);
+        TVector3 d6(-cf_thickness_CEPA, cf_thickness_CEPA, -cf_thickness_CEPA);
+        TVector3 d7(-cf_thickness_CEPA, -cf_thickness_CEPA, -cf_thickness_CEPA);
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        { // for 3 geometries
+            points_local_CEPA[i * 8 + 0] = points_inn_local_CEPA[i * 8 + 0] - d0;
+            points_local_CEPA[i * 8 + 1] = points_inn_local_CEPA[i * 8 + 1] - d1;
+            points_local_CEPA[i * 8 + 2] = points_inn_local_CEPA[i * 8 + 2] - d2;
+            points_local_CEPA[i * 8 + 3] = points_inn_local_CEPA[i * 8 + 3] - d3;
+            points_local_CEPA[i * 8 + 4] = points_inn_local_CEPA[i * 8 + 4] - d4;
+            points_local_CEPA[i * 8 + 5] = points_inn_local_CEPA[i * 8 + 5] - d5;
+            points_local_CEPA[i * 8 + 6] = points_inn_local_CEPA[i * 8 + 6] - d6;
+            points_local_CEPA[i * 8 + 7] = points_inn_local_CEPA[i * 8 + 7] - d7;
+            // for (Int_t j = 0; j < 8; j++) points_local_CEPA[i*8+j].Print();
+            for (size_t j = 0; j < 8; j++)
+            { // for the 8 vertices of each inner alveolus (inverse of the normal point to point local)
+                points_CEPA[i * 8 + j] = alv_inn_cm_CEPA[i] + rot_inn_CEPA[2 * i] * points_local_CEPA[i * 8 + j];
+                // cout<< "Points in cm coordinates: "<< endl;
+                // points_inn_CEPA[i*8+j].Print();
+            }
+        }
+
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA * 2; i++)
+        { // for 3 geometries, 2 face centers (3*2)
+            center_CEPA[i] = points_CEPA[i * 4] + points_CEPA[i * 4 + 1] + points_CEPA[i * 4 + 2] +
+                             points_CEPA[i * 4 + 3]; // face centers
+            center_CEPA[i] *= 0.25;                  // face centers
+            // center_CEPA[i].Print();
+            z_uni_CEPA[i] =
+                (points_CEPA[i * 4 + 1] - points_CEPA[i * 4]).Cross(points_CEPA[i * 4 + 2] - points_CEPA[i * 4 + 1]);
+            z_uni_CEPA[i] = z_uni_CEPA[i].Unit(); // normal to face center
+            x_uni_CEPA[i] =
+                points_CEPA[i * 4 + 2] - points_CEPA[i * 4 + 1]; // MODIFIED FROM BARREL+IPHOS DEFINITION!!!!
+
+            x_uni_CEPA[i] = x_uni_CEPA[i].Unit();               // unit along X
+            y_uni_CEPA[i] = z_uni_CEPA[i].Cross(x_uni_CEPA[i]); // unit along Y
+            // x_uni_CEPA[i].Print();  y_uni_CEPA[i].Print();   z_uni_CEPA[i].Print();
+            // calculate rotation matrix for the 3 geometries (should be repeated 4 times, just checking)
+            rot_CEPA[i].SetZAxis(z_uni_CEPA[i], x_uni_CEPA[i]);
+        }
+
+        // Outer alveolus
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        { // for 3 geometries
+            alv_cm_CEPA[i] = center_CEPA[2 * i] + center_CEPA[2 * i + 1];
+            alv_cm_CEPA[i] *= 0.5; // volume center for all alv (outer and inner)
+        }
+
+        // Location of the crystals in the alveoli
+        std::vector<TVector3> cry_position_CEPA(N_CRY_TYPES_CEPA);       // global positions
+        std::vector<TVector3> cry_position_local_CEPA(N_CRY_TYPES_CEPA); // local positions
+
+        // Relative Crystal rotation in each alveoli. Obtained from the crystal unit vector in
+        for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
+        { // four crystals per alv
+            if (i < 4)
+            { // first alveoli crystals
+                cry_position_CEPA[i] = cry_cm_CEPA[i] - alv_cm_CEPA[0];
+                cry_position_local_CEPA[i] = rot_CEPA[0].Inverse() * (cry_cm_CEPA[i] - alv_cm_CEPA[0]);
+            }
+            if (i > 3 && i < 10)
+            { // second alveoli crystals
+                cry_position_CEPA[i] = cry_cm_CEPA[i] - alv_cm_CEPA[1];
+                cry_position_local_CEPA[i] = rot_CEPA[2].Inverse() * (cry_cm_CEPA[i] - alv_cm_CEPA[1]);
+            }
+            if (i > 9)
             {
-                Cry_vol_CEPA[4 + j] = gGeoManager->MakeArb8(CryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA_6[j],
+                cry_position_CEPA[i] = cry_cm_CEPA[i] - alv_cm_CEPA[2]; // third alveoli crystals
+                cry_position_local_CEPA[i] = rot_CEPA[4].Inverse() * (cry_cm_CEPA[i] - alv_cm_CEPA[2]);
+            }
+        }
+
+        // Redefinition of vertices for the construction of the Alveoli, using TGeoArb8
+        std::vector<std::vector<double>> vertices_Alv_CEPA(N_ALV_TYPES_CEPA);
+        std::vector<std::vector<double>> vertices_inner_Alv_CEPA(N_ALV_TYPES_CEPA);
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        {
+            vertices_Alv_CEPA[i].resize(16);
+            vertices_inner_Alv_CEPA[i].resize(16);
+        }
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        {
+            for (size_t j = 0; j < 8; j++)
+            { // reversing order for being clockwise filling TGeoArb8
+                if (j == 1 || j == 5)
+                {
+                    vertices_Alv_CEPA[i][2 * j] = points_local_CEPA[8 * i + j + 2].X();
+                    vertices_Alv_CEPA[i][2 * j + 1] = points_local_CEPA[8 * i + j + 2].Y();
+                    vertices_inner_Alv_CEPA[i][2 * j] = points_inn_local_CEPA[8 * i + j + 2].X();
+                    vertices_inner_Alv_CEPA[i][2 * j + 1] = points_inn_local_CEPA[8 * i + j + 2].Y();
+                }
+                else if (j == 3 || j == 7)
+                {
+                    vertices_Alv_CEPA[i][2 * j] = points_local_CEPA[8 * i + j - 2].X();
+                    vertices_Alv_CEPA[i][2 * j + 1] = points_local_CEPA[8 * i + j - 2].Y();
+                    vertices_inner_Alv_CEPA[i][2 * j] = points_inn_local_CEPA[8 * i + j - 2].X();
+                    vertices_inner_Alv_CEPA[i][2 * j + 1] = points_inn_local_CEPA[8 * i + j - 2].Y();
+                }
+                else
+                {
+                    vertices_Alv_CEPA[i][2 * j] = points_local_CEPA[8 * i + j].X();
+                    vertices_Alv_CEPA[i][2 * j + 1] = points_local_CEPA[8 * i + j].Y();
+                    vertices_inner_Alv_CEPA[i][2 * j] = points_inn_local_CEPA[8 * i + j].X();
+                    vertices_inner_Alv_CEPA[i][2 * j + 1] = points_inn_local_CEPA[8 * i + j].Y();
+                }
+            }
+        }
+
+        // Redefinition of vertices for the construction of the Crystals, using TGeoArb8
+        // In this version, points correspond to the crystal and the wrapping should be added
+        std::vector<std::vector<double>> vertices_Cry_CEPA(N_CRY_TYPES_CEPA);      // (14 crystal types)
+        std::vector<std::vector<double>> vertices_Cry_Wrap_CEPA(N_CRY_TYPES_CEPA); // (14 crystal types)
+
+        for (size_t i = 0; i < N_CRY_TYPES_CEPA; i++)
+        {
+            vertices_Cry_CEPA[i].resize(16);
+            vertices_Cry_Wrap_CEPA[i].resize(16);
+        }
+
+        for (int i = 0; i < N_CRY_TYPES_CEPA; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if ((4 - j) > 0)
+                { // reversing order for being clockwise filling TGeoArb8
+                    vertices_Cry_CEPA[i][2 * j] = points_cry_local_CEPA[8 * i + 3 - j].X();
+                    vertices_Cry_CEPA[i][2 * j + 1] = points_cry_local_CEPA[8 * i + 3 - j].Y();
+                    vertices_Cry_Wrap_CEPA[i][2 * j] = points_cry_wrap_local_CEPA[8 * i + 3 - j].X();
+                    vertices_Cry_Wrap_CEPA[i][2 * j + 1] = points_cry_wrap_local_CEPA[8 * i + 3 - j].Y();
+                }
+                else
+                {
+                    vertices_Cry_CEPA[i][2 * j] = points_cry_local_CEPA[8 * i + 11 - j].X();
+                    vertices_Cry_CEPA[i][2 * j + 1] = points_cry_local_CEPA[8 * i + 11 - j].Y();
+                    vertices_Cry_Wrap_CEPA[i][2 * j] = points_cry_wrap_local_CEPA[8 * i + 11 - j].X();
+                    vertices_Cry_Wrap_CEPA[i][2 * j + 1] = points_cry_wrap_local_CEPA[8 * i + 11 - j].Y();
+                }
+            }
+        }
+
+        // CONSTRUCTING CEPA_USC PART
+        std::vector<TGeoVolume*> Alv_vol_CEPA(N_ALV_TYPES_CEPA);
+        std::vector<TGeoVolume*> Alv_inner_vol_CEPA(N_ALV_TYPES_CEPA);
+        std::vector<TGeoVolume*> Cry_vol_wrap_CEPA(N_CRY_TYPES_CEPA);
+        std::vector<TGeoVolume*> Cry_vol_CEPA(N_CRY_TYPES_CEPA);
+
+        TString AlvGlobalName_CEPA = "Alveolus_CCSI_";
+        TString AlvGlobalNameInner_CEPA = "InnerAlv_CCSI_";
+        // Substitute names in previous array (CAD names) to simplify the R3BRoot code
+        std::vector<TString> name_Alv_CEPA = { "01", "02", "03" };
+        double halfLengthAlv_CEPA[N_ALV_TYPES] = { points_local_CEPA[4].Z(),
+                                                   points_local_CEPA[12].Z(),
+                                                   points_local_CEPA[20].Z() }; // cm
+        double halfLengthAlv_inner_CEPA[N_ALV_TYPES] = { points_inn_local_CEPA[4].Z(),
+                                                         points_inn_local_CEPA[12].Z(),
+                                                         points_inn_local_CEPA[20].Z() }; // cm
+
+        TString WrapCryGlobalName_CEPA = "WrapCry_CCSI_";
+        TString CryGlobalName_CEPA = "Crystal_CCSI_";
+        std::vector<TString> name_Cry_CEPA = { "_1", "_2", "_3", "_4" };
+        std::vector<TString> name_Cry_CEPA_6 = { "_1", "_2", "_3", "_4", "_5", "_6" };
+        // For the moment same length as the inner alveoli
+        double halfLengthCry_CEPA[N_ALV_TYPES_CEPA] = { points_cry_local_CEPA[4].Z(),
+                                                        points_cry_local_CEPA[12].Z(),
+                                                        points_cry_local_CEPA[20].Z() }; // cm
+
+        std::vector<std::unique_ptr<TGeoRotation>> rotAlv_CEPA(N_ALV_TYPES_CEPA);
+        for (auto& rot : rotAlv_CEPA)
+        {
+            rot = std::make_unique<TGeoRotation>();
+        }
+
+        std::vector<std::unique_ptr<TGeoRotation>> rotCry_CEPA(N_CRY_TYPES_CEPA);
+        for (auto& rot : rotCry_CEPA)
+        {
+            rot = std::make_unique<TGeoRotation>();
+        }
+
+        // Rotation
+        std::vector<TGeoRotation> rotOnZ_CEPA;
+        rotOnZ_CEPA.reserve(8);
+        for (size_t i = 0; i < 8; ++i)
+        {
+            TGeoRotation rot;
+            rot.RotateZ(-45.0 * i); // 67.5 is the offset to put the first alveoli below the first of the barrel
+            rotOnZ_CEPA.push_back(rot);
+        }
+
+        std::vector<TRotation> rotationOnZ_CEPA(8);
+        for (size_t i = 0; i < 8; i++)
+        {
+            rotationOnZ_CEPA[i].RotateZ((i * -45.0) * TMath::Pi() / 180);
+        }
+
+        std::vector<TGeoRotation*> rotAlvFinal_CEPA(8 * N_ALV_TYPES_CEPA, nullptr);
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        {
+            for (size_t j = 0; j < 8; j++)
+            {
+                rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation(rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
+            }
+        }
+
+        for (size_t i = 0; i < N_ALV_TYPES_CEPA; i++)
+        {
+            Alv_vol_CEPA[i] = gGeoManager->MakeArb8(AlvGlobalName_CEPA + name_Alv_CEPA[i],
+                                                    pCarbonFibreMedium,
+                                                    halfLengthAlv_CEPA[i],
+                                                    vertices_Alv_CEPA[i].data());
+            Alv_vol_CEPA[i]->SetLineColor(kBlue);
+            Alv_vol_CEPA[i]->SetVisLeaves(kTRUE);
+            Alv_vol_CEPA[i]->SetVisibility(kTRUE);
+            Alv_vol_CEPA[i]->SetVisContainers(kTRUE);
+
+            Alv_inner_vol_CEPA[i] = gGeoManager->MakeArb8(AlvGlobalNameInner_CEPA + name_Alv_CEPA[i],
+                                                          pAirMedium,
+                                                          halfLengthAlv_inner_CEPA[i],
+                                                          vertices_inner_Alv_CEPA[i].data());
+            Alv_inner_vol_CEPA[i]->SetLineColor(kRed);
+            Alv_inner_vol_CEPA[i]->SetVisLeaves(kTRUE);
+            Alv_inner_vol_CEPA[i]->SetVisibility(kTRUE);
+            Alv_inner_vol_CEPA[i]->SetVisContainers(kTRUE);
+
+            // four crystals per alv, but alveolus 2 with 6 crystals
+            if (i == 0) // 4 crystal alveoli
+            {
+                for (size_t j = 0; j < 4; j++)
+                {
+                    Cry_vol_CEPA[j] = gGeoManager->MakeArb8(CryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
                                                             pCsIMedium,
                                                             halfLengthCry_CEPA[i],
-                                                            vertices_Cry_CEPA[4 + j].data());
-                Cry_vol_CEPA[4 + j]->SetLineColor(kMagenta);
-                Cry_vol_CEPA[4 + j]->SetVisLeaves(kTRUE);
-                Cry_vol_CEPA[4 + j]->SetVisibility(kTRUE);
-                Cry_vol_CEPA[4 + j]->SetVisContainers(kTRUE);
+                                                            vertices_Cry_CEPA[j].data());
+                    Cry_vol_CEPA[j]->SetLineColor(kMagenta);
+                    Cry_vol_CEPA[j]->SetVisLeaves(kTRUE);
+                    Cry_vol_CEPA[j]->SetVisibility(kTRUE);
+                    Cry_vol_CEPA[j]->SetVisContainers(kTRUE);
 
-                Cry_vol_wrap_CEPA[4 + j] =
-                    gGeoManager->MakeArb8(WrapCryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA_6[j],
-                                          pWrappingMedium,
-                                          halfLengthCry_CEPA[i] + wrapping_thickness_CEPA,
-                                          vertices_Cry_Wrap_CEPA[4 + j].data());
-                Cry_vol_wrap_CEPA[4 + j]->SetLineColor(kGreen);
-                Cry_vol_wrap_CEPA[4 + j]->SetVisLeaves(kTRUE);
-                Cry_vol_wrap_CEPA[4 + j]->SetVisibility(kTRUE);
-                Cry_vol_wrap_CEPA[4 + j]->SetVisContainers(kTRUE);
+                    Cry_vol_wrap_CEPA[j] =
+                        gGeoManager->MakeArb8(WrapCryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
+                                              pWrappingMedium,
+                                              halfLengthCry_CEPA[i] + wrapping_thickness_CEPA,
+                                              vertices_Cry_Wrap_CEPA[j].data());
+                    Cry_vol_wrap_CEPA[j]->SetLineColor(kGreen);
+                    Cry_vol_wrap_CEPA[j]->SetVisLeaves(kTRUE);
+                    Cry_vol_wrap_CEPA[j]->SetVisibility(kTRUE);
+                    Cry_vol_wrap_CEPA[j]->SetVisContainers(kTRUE);
 
-                Cry_vol_wrap_CEPA[4 + j]->AddNode(Cry_vol_CEPA[4 + j], 0, new TGeoCombiTrans(0, 0, 0, rotUni.get()));
-                Alv_inner_vol_CEPA[i]->AddNode(Cry_vol_wrap_CEPA[4 + j],
-                                               0,
-                                               new TGeoCombiTrans(cry_position_local_CEPA[4 + j].X(),
-                                                                  cry_position_local_CEPA[4 + j].Y(),
-                                                                  cry_position_local_CEPA[4 + j].Z(),
-                                                                  rotUni.get()));
+                    Cry_vol_wrap_CEPA[j]->AddNode(Cry_vol_CEPA[j], 0, new TGeoCombiTrans(0, 0, 0, rotUni.get()));
+                    Alv_inner_vol_CEPA[i]->AddNode(Cry_vol_wrap_CEPA[j],
+                                                   0,
+                                                   new TGeoCombiTrans(cry_position_local_CEPA[j].X(),
+                                                                      cry_position_local_CEPA[j].Y(),
+                                                                      cry_position_local_CEPA[j].Z(),
+                                                                      rotUni.get()));
+                }
             }
-        }
-        if (i == 2) // 4 crystal alveoli
-        {
-            for (size_t j = 0; j < 4; j++)
+            if (i == 1) // 6 crystal alveoli
             {
-                Cry_vol_CEPA[10 + j] = gGeoManager->MakeArb8(CryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
-                                                             pCsIMedium,
-                                                             halfLengthCry_CEPA[i],
-                                                             vertices_Cry_CEPA[10 + j].data());
-                Cry_vol_CEPA[10 + j]->SetLineColor(kMagenta);
-                Cry_vol_CEPA[10 + j]->SetVisLeaves(kTRUE);
-                Cry_vol_CEPA[10 + j]->SetVisibility(kTRUE);
-                Cry_vol_CEPA[10 + j]->SetVisContainers(kTRUE);
+                for (size_t j = 0; j < 6; j++)
+                {
+                    Cry_vol_CEPA[4 + j] =
+                        gGeoManager->MakeArb8(CryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA_6[j],
+                                              pCsIMedium,
+                                              halfLengthCry_CEPA[i],
+                                              vertices_Cry_CEPA[4 + j].data());
+                    Cry_vol_CEPA[4 + j]->SetLineColor(kMagenta);
+                    Cry_vol_CEPA[4 + j]->SetVisLeaves(kTRUE);
+                    Cry_vol_CEPA[4 + j]->SetVisibility(kTRUE);
+                    Cry_vol_CEPA[4 + j]->SetVisContainers(kTRUE);
 
-                Cry_vol_wrap_CEPA[10 + j] =
-                    gGeoManager->MakeArb8(WrapCryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
-                                          pWrappingMedium,
-                                          halfLengthCry_CEPA[i] + wrapping_thickness_CEPA,
-                                          vertices_Cry_Wrap_CEPA[10 + j].data());
-                Cry_vol_wrap_CEPA[10 + j]->SetLineColor(kGreen);
-                Cry_vol_wrap_CEPA[10 + j]->SetVisLeaves(kTRUE);
-                Cry_vol_wrap_CEPA[10 + j]->SetVisibility(kTRUE);
-                Cry_vol_wrap_CEPA[10 + j]->SetVisContainers(kTRUE);
+                    Cry_vol_wrap_CEPA[4 + j] =
+                        gGeoManager->MakeArb8(WrapCryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA_6[j],
+                                              pWrappingMedium,
+                                              halfLengthCry_CEPA[i] + wrapping_thickness_CEPA,
+                                              vertices_Cry_Wrap_CEPA[4 + j].data());
+                    Cry_vol_wrap_CEPA[4 + j]->SetLineColor(kGreen);
+                    Cry_vol_wrap_CEPA[4 + j]->SetVisLeaves(kTRUE);
+                    Cry_vol_wrap_CEPA[4 + j]->SetVisibility(kTRUE);
+                    Cry_vol_wrap_CEPA[4 + j]->SetVisContainers(kTRUE);
 
-                Cry_vol_wrap_CEPA[10 + j]->AddNode(Cry_vol_CEPA[10 + j], 0, new TGeoCombiTrans(0, 0, 0, rotUni.get()));
-                Alv_inner_vol_CEPA[i]->AddNode(Cry_vol_wrap_CEPA[10 + j],
-                                               0,
-                                               new TGeoCombiTrans(cry_position_local_CEPA[10 + j].X(),
-                                                                  cry_position_local_CEPA[10 + j].Y(),
-                                                                  cry_position_local_CEPA[10 + j].Z(),
-                                                                  rotUni.get()));
+                    Cry_vol_wrap_CEPA[4 + j]->AddNode(
+                        Cry_vol_CEPA[4 + j], 0, new TGeoCombiTrans(0, 0, 0, rotUni.get()));
+                    Alv_inner_vol_CEPA[i]->AddNode(Cry_vol_wrap_CEPA[4 + j],
+                                                   0,
+                                                   new TGeoCombiTrans(cry_position_local_CEPA[4 + j].X(),
+                                                                      cry_position_local_CEPA[4 + j].Y(),
+                                                                      cry_position_local_CEPA[4 + j].Z(),
+                                                                      rotUni.get()));
+                }
             }
-        }
-
-        // Inner volume center is displaced cf_thickness_CEPA microns along Z
-        Alv_vol_CEPA[i]->AddNode(Alv_inner_vol_CEPA[i], 0, new TGeoCombiTrans(0, 0, cf_thickness_CEPA, rotUni.get()));
-
-        rotEle_CEPA[0] = rot_CEPA[2 * i].XX();
-        rotEle_CEPA[1] = rot_CEPA[2 * i].XY();
-        rotEle_CEPA[2] = rot_CEPA[2 * i].XZ();
-        rotEle_CEPA[3] = rot_CEPA[2 * i].YX();
-        rotEle_CEPA[4] = rot_CEPA[2 * i].YY();
-        rotEle_CEPA[5] = rot_CEPA[2 * i].YZ();
-        rotEle_CEPA[6] = rot_CEPA[2 * i].ZX();
-        rotEle_CEPA[7] = rot_CEPA[2 * i].ZY();
-        rotEle_CEPA[8] = rot_CEPA[2 * i].ZZ();
-        rotAlv_CEPA[i]->SetMatrix(rotEle_CEPA.data());
-
-        for (size_t j = 0; j < 8; j++)
-        { // rotation around Z
-            // rotAlvFinal_CEPA[i * 32 + j] = new TGeoRotation((*rotOnZ_CEPA[j]) * (*rotAlv_CEPA[i]));
-            // alv_cm_rot_CEPA[2 * i] = (*rotationOnZ_CEPA[j]) * alv_cm_CEPA[2 * i];
-
-            rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation(rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
-            alv_cm_rot_CEPA[i] = (rotationOnZ_CEPA[j]) * alv_cm_CEPA[i];
-
-            if (isCrystalInstalled(i + 24, j, installedCrystals.data())) // alveoli number stars in 24 for CEPA
+            if (i == 2) // 4 crystal alveoli
             {
-                pWorld->AddNode(Alv_vol_CEPA[i],
-                                j,
-                                new TGeoCombiTrans(alv_cm_rot_CEPA[i].X(),
-                                                   alv_cm_rot_CEPA[i].Y(),
-                                                   alv_cm_rot_CEPA[i].Z(),
-                                                   rotAlvFinal_CEPA[i * 8 + j]));
+                for (size_t j = 0; j < 4; j++)
+                {
+                    Cry_vol_CEPA[10 + j] =
+                        gGeoManager->MakeArb8(CryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
+                                              pCsIMedium,
+                                              halfLengthCry_CEPA[i],
+                                              vertices_Cry_CEPA[10 + j].data());
+                    Cry_vol_CEPA[10 + j]->SetLineColor(kMagenta);
+                    Cry_vol_CEPA[10 + j]->SetVisLeaves(kTRUE);
+                    Cry_vol_CEPA[10 + j]->SetVisibility(kTRUE);
+                    Cry_vol_CEPA[10 + j]->SetVisContainers(kTRUE);
+
+                    Cry_vol_wrap_CEPA[10 + j] =
+                        gGeoManager->MakeArb8(WrapCryGlobalName_CEPA + name_Alv_CEPA[i] + name_Cry_CEPA[j],
+                                              pWrappingMedium,
+                                              halfLengthCry_CEPA[i] + wrapping_thickness_CEPA,
+                                              vertices_Cry_Wrap_CEPA[10 + j].data());
+                    Cry_vol_wrap_CEPA[10 + j]->SetLineColor(kGreen);
+                    Cry_vol_wrap_CEPA[10 + j]->SetVisLeaves(kTRUE);
+                    Cry_vol_wrap_CEPA[10 + j]->SetVisibility(kTRUE);
+                    Cry_vol_wrap_CEPA[10 + j]->SetVisContainers(kTRUE);
+
+                    Cry_vol_wrap_CEPA[10 + j]->AddNode(
+                        Cry_vol_CEPA[10 + j], 0, new TGeoCombiTrans(0, 0, 0, rotUni.get()));
+                    Alv_inner_vol_CEPA[i]->AddNode(Cry_vol_wrap_CEPA[10 + j],
+                                                   0,
+                                                   new TGeoCombiTrans(cry_position_local_CEPA[10 + j].X(),
+                                                                      cry_position_local_CEPA[10 + j].Y(),
+                                                                      cry_position_local_CEPA[10 + j].Z(),
+                                                                      rotUni.get()));
+                }
+            }
+
+            // Inner volume center is displaced cf_thickness_CEPA microns along Z
+            Alv_vol_CEPA[i]->AddNode(
+                Alv_inner_vol_CEPA[i], 0, new TGeoCombiTrans(0, 0, cf_thickness_CEPA, rotUni.get()));
+
+            std::vector<double> rotEle_CEPA(9);
+            rotEle_CEPA[0] = rot_CEPA[2 * i].XX();
+            rotEle_CEPA[1] = rot_CEPA[2 * i].XY();
+            rotEle_CEPA[2] = rot_CEPA[2 * i].XZ();
+            rotEle_CEPA[3] = rot_CEPA[2 * i].YX();
+            rotEle_CEPA[4] = rot_CEPA[2 * i].YY();
+            rotEle_CEPA[5] = rot_CEPA[2 * i].YZ();
+            rotEle_CEPA[6] = rot_CEPA[2 * i].ZX();
+            rotEle_CEPA[7] = rot_CEPA[2 * i].ZY();
+            rotEle_CEPA[8] = rot_CEPA[2 * i].ZZ();
+            rotAlv_CEPA[i]->SetMatrix(rotEle_CEPA.data());
+
+            for (size_t j = 0; j < 8; j++)
+            { // rotation around Z
+
+                auto disp_halfCEPA = (j < 4) ? DisplCalifa[0] : DisplCalifa[1];
+
+                rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation(rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
+                alv_cm_rot_CEPA[i] = (rotationOnZ_CEPA[j]) * alv_cm_CEPA[i];
+
+                if (isCrystalInstalled(i + 24, j, installedCrystals.data())) // alveoli number stars in 24 for CEPA
+                {
+                    pWorld->AddNode(Alv_vol_CEPA[i],
+                                    j,
+                                    new TGeoCombiTrans(alv_cm_rot_CEPA[i].X() + disp_halfCEPA.X(),
+                                                       alv_cm_rot_CEPA[i].Y() + disp_halfCEPA.Y(),
+                                                       alv_cm_rot_CEPA[i].Z() + disp_halfCEPA.Z(),
+                                                       rotAlvFinal_CEPA[i * 8 + j]));
+                }
             }
         }
     }
 
-    // tile_2111->SetMedium(pAlMedium);
-    // tile_2111->SetLineColor(kYellow);
-    /*tile_2113->SetMedium(pAlMedium);
-    tile_2113->SetLineColor(kBlue);
-    tile_2103->SetMedium(pAlMedium);
-    tile_2103->SetLineColor(kRed);
-    tile_2101->SetMedium(pAlMedium);
-    tile_2101->SetLineColor(kGreen);*/
-
-    // pWorld->AddNode(tile_2111.get(), 1, new TGeoTranslation(0, 0, 10));
-    /*
-        pWorld->AddNode(tile_2113, 1, new TGeoTranslation(-30, -20, 10));
-
-        pWorld->AddNode(tile_2103, 1, new TGeoTranslation(-30, 20, 10));
-
-        pWorld->AddNode(tile_2101, 1, new TGeoTranslation(30, -20, 10));*/
+    // CreateCarbonFiberBackSide(pWorld.get(), pCarbonFibreMedium, dispCalMes, dispCalWix);
 
     gGeoMan->CloseGeometry();
     gGeoMan->CheckOverlaps(0.001);
     gGeoMan->PrintOverlaps();
     gGeoMan->Test();
 
-    TFile* geoFile = new TFile(geoFileName, "RECREATE");
+    TFile geoFile(geoFileName, "RECREATE");
     top->Write();
-    top->Draw("ogl");
-    geoFile->Close();
+    // top->Draw("ogl");
+    geoFile.Close();
 
     std::cout << "\033[34m Creating geometry:\033[0m "
               << "\033[33m" << geoFileName << " \033[0m" << std::endl;
     std::cout << "Macro finished successfully." << std::endl;
+    gApplication->Terminate();
 }
 
-Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[])
+bool isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[])
 {
     // reproduces partially the algorithm of R3BCalifaGeometry::GetCrystalId(const char* volumePath)
-    Bool_t found = kFALSE;
+    bool found = false;
     Int_t crystalId = 0;
     Int_t cryType = 1; // first crystal of the alveoli... if not present, alveoli is removed.
 
@@ -1488,21 +1516,55 @@ Bool_t isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[])
     {
         std::cout << "isCrystalInstalled: Wrong alveolus number ";
         std::cout << "---- alvType: " << alvType << std::endl;
-        return 0;
+        return false;
     }
 
     if (crystalId < 1 || crystalId > nbcrystals)
     { // crystalId runs from 1 to nbcrystals
         std::cout << "isCrystalInstalled: Wrong crystal number ";
         std::cout << "---- crystalId: " << crystalId << std::endl;
-        return 0;
+        return false;
     }
     for (size_t i = 0; i < nbcrystals; i++)
     {
         if (crystalId == instCry[i])
-            found = kTRUE;
+            found = true;
     }
     return found;
+}
+
+void CreateCarbonFiberBackSide(TGeoVolume* word, TGeoMedium* med, TGeoCombiTrans* disCalMes, TGeoCombiTrans* disCalWix)
+{
+    auto carbonfiber = new TGeoConeSeg("CarbonFiberCone", 1., 42., 42.04, 61.96, 62., -90, 90);
+    auto CarbonFiberBack = new TGeoVolume("CarbonFiberBack", carbonfiber, med);
+    CarbonFiberBack->SetVisLeaves(kTRUE);
+    CarbonFiberBack->SetLineColor(19);
+
+    auto make_trans = [](double x, double y, double z, TGeoRotation* rot, const TGeoCombiTrans* shift)
+    {
+        TGeoCombiTrans trans(x, y, z, rot);
+        std::array<double, 3> base = { trans.GetTranslation()[0],
+                                       trans.GetTranslation()[1],
+                                       trans.GetTranslation()[2] };
+        std::array<double, 3> offset = { shift->GetTranslation()[0],
+                                         shift->GetTranslation()[1],
+                                         shift->GetTranslation()[2] };
+        trans.SetTranslation(base[0] + offset[0], base[1] + offset[1], base[2] + offset[2]);
+        return new TGeoCombiTrans(trans); // still needs to be a pointer for ROOT
+    };
+
+    auto rot1 = new TGeoRotation();
+    rot1->RotateX(180);
+
+    auto rot2 = new TGeoRotation();
+    rot2->RotateX(180);
+    rot2->RotateZ(180);
+
+    auto trans1 = make_trans(0.05, 0.0, -49.54, rot1, disCalMes);
+    auto trans2 = make_trans(-0.05, 0.0, -49.54, rot2, disCalWix);
+
+    word->AddNode(CarbonFiberBack, 0, trans1);
+    word->AddNode(CarbonFiberBack, 1, trans2);
 }
 
 void create_califa_geo(const int index = 0)
@@ -1517,7 +1579,15 @@ void create_califa_geo(const int index = 0)
     }
     else if (index == 3)
     {
+        create_califa_geo_selector("s522");
+    }
+    else if (index == 4)
+    {
         create_califa_geo_selector("s118");
+    }
+    else if (index == 5)
+    {
+        create_califa_geo_selector("g249");
     }
     else
     {

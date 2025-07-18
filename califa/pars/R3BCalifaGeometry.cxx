@@ -11,8 +11,8 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include <R3BCalifaGeometry.h>
-#include <R3BLogger.h>
+#include "R3BCalifaGeometry.h"
+#include "R3BLogger.h"
 
 #include <FairLogger.h>
 
@@ -22,9 +22,8 @@
 #include <TGeoVolume.h>
 #include <TMath.h>
 #include <TSystem.h>
-#include <vector>
-
 #include <boost/regex.hpp>
+#include <vector>
 
 R3BCalifaGeometry* R3BCalifaGeometry::Instance()
 {
@@ -63,22 +62,36 @@ bool R3BCalifaGeometry::Init(int version)
             break;
 
         case 2020:
-            // Half BARREL+ 6 IPHOS sectors
+            // S467 experiment: Half BARREL + 6 IPHOS sectors
             geoPath += "califa_v2019.11.geo.root";
             fNumCrystals = 4864;
             fGeometryVersion = version;
             break;
 
         case 2021:
-            // s455, S515, S509, S522 experiments: Half Barrel + Full IPHOS
+            // S455, S515 and S494 experiments: Half Barrel + Full-IPHOS
             geoPath += "califa_v2021.3.geo.root";
             fNumCrystals = 4864;
             fGeometryVersion = version;
             break;
 
+        case 2022:
+            // S509 and S522 experiments: Half Barrel + Full-IPHOS
+            geoPath += "califa_v2022.5.geo.root";
+            fNumCrystals = 4864;
+            fGeometryVersion = version;
+            break;
+
         case 2024:
-            // S118, S091 experiments: Half Barrel (extended) + Full IPHOS + Full CEPA
+            // S118 and S091 experiments: Half Barrel (extended) + Full-IPHOS + Full-CEPA-CsI
             geoPath += "califa_v2024.1.geo.root";
+            fNumCrystals = 5088;
+            fGeometryVersion = version;
+            break;
+
+        case 2025:
+            // G249 experiment: Half Barrel (extended) + Full-IPHOS + Full-CEPA-CsI
+            geoPath += "califa_v2025.6.geo.root";
             fNumCrystals = 5088;
             fGeometryVersion = version;
             break;
@@ -90,6 +103,8 @@ bool R3BCalifaGeometry::Init(int version)
                    "Unsupported geometry version: " << version << ", so standard full configuration will be used.");
             // return kFALSE;
     }
+
+    geoPath.ReplaceAll("//", "/");
 
     if (gGeoManager && strcmp(gGeoManager->GetTopVolume()->GetName(), "cave") == 0)
     {
@@ -103,7 +118,7 @@ bool R3BCalifaGeometry::Init(int version)
     // Stand alone mode
     R3BLOG(info, "Open geometry file " << geoPath << " for analysis.");
     f = new TFile(geoPath, "READ");
-    TGeoVolume* v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
+    auto v = dynamic_cast<TGeoVolume*>(f->Get("TOP"));
     if (!v)
     {
         R3BLOG(error, "Could not open geometry file, No TOP volume");
