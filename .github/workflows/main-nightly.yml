@@ -25,7 +25,8 @@ name: CI-CD-nightly
 # Controls when the action will run. 
 on:
   schedule:
-    - cron: '0 22 * * *'
+    - cron: '0 22 * * 3'
+    - cron: '0 22 * * 6'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -64,7 +65,7 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy, r3broot-conan ]
-        os: [ debian11, ubuntu24.04 ]
+        os: [ debian11, debian12 ] # ubuntu24.04 ]
 
         # The list under "include" defines some properties for each group:
         #
@@ -149,6 +150,9 @@ jobs:
       # variables and mounts the cmvfs folder of fairroot and fairsoft.
       - name: pre-build
         uses: './.github/actions/pre-build'
+        
+      - name: set custom CMake path
+        run: echo "/usr/local/bin" >> $GITHUB_PATH && cmake --version && export PATH=/usr/local/bin:$PATH && cmake --version 
 
       # A self-defined composite action, which restores the caches of
       # dependencies and builds and install them if the cache doesn't exist.

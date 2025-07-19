@@ -99,9 +99,9 @@ The following systems are tested regularly.
 | Almalinux  | x86_64 | 9.4   | GCC 14.2.0                 | 3.30.6 |
 |   RHEL     | x86_64 | 9.6   | GCC 14.2.0                 | 3.30.6 |
 | Debian     | x86_64 | 10    | GCC 8.3.0                  | 3.27.4 |
-| Debian     | x86_64 | 11    | GCC 10.2.1                 | 3.27.4 |
-| Debian     | x86_64 | 12    | GCC 12.2.0                 | 3.27.4 |
-| Ubuntu     | x86_64 | 24.04 | GCC 13.3.0                 | 3.28.3 |
+| Debian     | x86_64 | 11    | GCC 10.2.1                 | 3.27.4 & 3.30.0 |
+| Debian     | x86_64 | 12    | GCC 12.2.0                 | 3.27.4 & 3.30.0 |
+| Ubuntu     | x86_64 | 24.04 | GCC 13.3.0                 | 3.28.3 & 4.0.3 |
 
 ## Security Policy
 
