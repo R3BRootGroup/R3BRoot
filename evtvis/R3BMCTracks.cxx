@@ -14,9 +14,9 @@
 #include "R3BMCTracks.h"
 #include "R3BEventManager.h"
 
-#include "FairEventManager.h" // for FairEventManager
-#include "FairLogger.h"
-#include "FairRootManager.h" // for FairRootManager
+#include <FairEventManager.h> // for FairEventManager
+#include <FairLogger.h>
+#include <FairRootManager.h> // for FairRootManager
 
 #include <TClonesArray.h>        // for TClonesArray
 #include <TEveManager.h>         // for TEveManager, gEve
@@ -29,37 +29,17 @@
 #include <TObjArray.h>           // for TObjArray
 #include <TParticle.h>           // for TParticle
 #include <cstring>               // for strcmp
-
 #include <iostream>
+#include <sstream>
+#include <string>
+
 using std::cout;
 using std::endl;
 
 // -----   Default constructor   -------------------------------------------
-R3BMCTracks::R3BMCTracks()
-    : FairTask("R3BMCTracks", 0)
-    , fTrackList(nullptr)
-    , fTrPr(nullptr)
-    , fEventManager(nullptr)
-    , fEveTrList(nullptr)
-    , fEvent("")
-    , fTrList(nullptr)
-    , MinEnergyLimit(-1.)
-    , MaxEnergyLimit(-1.)
-    , PEnergy(-1.)
-{
-}
-
 R3BMCTracks::R3BMCTracks(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fTrackList(nullptr)
-    , fTrPr(nullptr)
-    , fEventManager(nullptr)
     , fEveTrList(new TObjArray(16))
-    , fEvent("")
-    , fTrList(nullptr)
-    , MinEnergyLimit(-1.)
-    , MaxEnergyLimit(-1.)
-    , PEnergy(-1.)
 {
 }
 
@@ -68,7 +48,7 @@ InitStatus R3BMCTracks::Init()
     if (fVerbose > 1)
         cout << "R3BMCTracks::Init()" << endl;
 
-    FairRootManager* fManager = FairRootManager::Instance();
+    auto fManager = FairRootManager::Instance();
     fTrackList = dynamic_cast<TClonesArray*>(fManager->GetObject("GeoTracks"));
     if (fTrackList == 0)
     {
@@ -93,11 +73,10 @@ InitStatus R3BMCTracks::Init()
         return kERROR;
 }
 
-void R3BMCTracks::Exec(Option_t* option)
+void R3BMCTracks::Exec(Option_t*)
 {
     if (IsActive())
     {
-
         if (fVerbose > 1)
             cout << " FairMCTracks::Exec " << endl;
         TGeoTrack* tr;
@@ -105,14 +84,14 @@ void R3BMCTracks::Exec(Option_t* option)
 
         Reset();
 
-        for (Int_t i = 0; i < fTrackList->GetEntriesFast(); i++)
+        for (size_t i = 0; i < fTrackList->GetEntriesFast(); i++)
         {
             if (fVerbose > 2)
                 cout << "FairMCTracks::Exec " << i << endl;
             tr = dynamic_cast<TGeoTrack*>(fTrackList->At(i));
-            TParticle* P = dynamic_cast<TParticle*>(tr->GetParticle());
+            auto Par = dynamic_cast<TParticle*>(tr->GetParticle());
 
-            PEnergy = (P->Energy() - P->GetCalcMass()) * 1000; //[MeV]
+            PEnergy = (Par->Energy() - Par->GetCalcMass()) * 1000; //[MeV]
             MinEnergyLimit = TMath::Min(PEnergy - 10, MinEnergyLimit);
             MinEnergyLimit = TMath::Max(0.0, MinEnergyLimit);
             MaxEnergyLimit = TMath::Max(PEnergy + 10, MaxEnergyLimit);
@@ -121,7 +100,7 @@ void R3BMCTracks::Exec(Option_t* option)
 
             if (fVerbose > 2)
                 cout << "MinEnergyLimit " << MinEnergyLimit << " MaxEnergyLimit " << MaxEnergyLimit << endl;
-            if (fEventManager->IsPriOnly() && P->GetMother(0) > -1)
+            if (fEventManager->IsPriOnly() && Par->GetMother(0) > -1)
                 continue;
             if (fEventManager->GetCurrentPDG() != 0 && fEventManager->GetCurrentPDG() != tr->GetPDG())
                 continue;
@@ -136,13 +115,13 @@ void R3BMCTracks::Exec(Option_t* option)
             if (fVerbose > 3)
                 cout << "Particle with PDG " << tr->GetPDG() << " added to DataBase " << endl;
             if (fVerbose > 3)
-                cout << "Particle  " << P << " and propagator " << fTrPr << endl;
+                cout << "Particle  " << Par << " and propagator " << fTrPr << endl;
 
             Int_t Np = tr->GetNpoints();
-            fTrList = GetTrGroup(P);
+            fTrList = GetTrGroup(Par);
             if (fVerbose > 3)
                 cout << "Track list: " << fTrList << " - " << fTrList->GetLimP() << " - " << fTrList->GetMaxP() << endl;
-            TEveTrack* track = new TEveTrack(P, tr->GetPDG(), fTrPr);
+            auto track = new TEveTrack(Par, tr->GetPDG(), fTrPr);
             if (fVerbose > 3)
                 cout << "Track: " << track << " - " << track->GetPdg() << " - " << track->GetLabel() << endl;
             if (tr->GetPDG() > 5000000)
@@ -156,30 +135,37 @@ void R3BMCTracks::Exec(Option_t* option)
             track->SetLineStyle(9);
 
             // Set Title / Tooltip
-            char title[100];
-            sprintf(title,
-                    "pdg: %i, name: %s\nTrackID: %i, MotherID: %i\nE: %f MeV\nT: %f ns",
-                    tr->GetPDG(),
-                    P->GetTitle(),
-                    i,
-                    P->GetMother(0),
-                    PEnergy,
-                    P->T());
-            track->SetTitle(title);
+            std::ostringstream oss;
+            if (tr->GetPDG() < 5000000)
+            {
+                oss << "PDG: " << tr->GetPDG() << ", name: " << Par->GetTitle() << "\nTrackID: " << i
+                    << ", MotherID: " << Par->GetMother(0) << "\nMass: " << Par->GetMass() * 1000. << " MeV"
+                    << "\nE: " << PEnergy << " MeV"
+                    << "\nStrangeness: " << Par->Strangeness() << "\nT: " << Par->T() / 1e-9 << " ns";
+            }
+            else
+            {
+                auto mass = (tr->GetPDG() / 10) % 1000;
+                oss << "PDG: " << tr->GetPDG() << ", name: " << Par->GetTitle() << "\nTrackID: " << i
+                    << ", MotherID: " << Par->GetMother(0) << "\nMass: " << mass << " (A)"
+                    << "\nE: " << PEnergy / mass << " MeV/u"
+                    << "\nStrangeness: " << Par->Strangeness() << "\nT: " << Par->T() / 1e-9 << " ns";
+            }
+            track->SetTitle(oss.str().c_str());
 
             // Set the line width depending on energy
             if ((dynamic_cast<R3BEventManager*>(fEventManager))->IsScaleByEnergy())
             {
-                Int_t lineWidth =
+                auto lineWidth =
                     (Int_t)(PEnergy / TMath::Min(fEventManager->GetMaxEnergy(), (Float_t)MaxEnergyLimit) * 15.0);
                 if (fVerbose > 3)
-                    cout << "lineWidth: " << lineWidth << " for track " << track->GetPdg() << " - " << P->GetTitle()
+                    cout << "lineWidth: " << lineWidth << " for track " << track->GetPdg() << " - " << Par->GetTitle()
                          << endl;
 
                 if (lineWidth > 0)
                 {
                     track->SetLineWidth(lineWidth);
-                    if (P->GetMother(0) > -1)
+                    if (Par->GetMother(0) > -1)
                         track->SetLineStyle(2);
                 }
                 else
@@ -189,39 +175,30 @@ void R3BMCTracks::Exec(Option_t* option)
                 }
             }
 
-            for (Int_t n = 0; n < Np; n++)
+            for (size_t n = 0; n < Np; n++)
             {
                 point = tr->GetPoint(n);
                 track->SetPoint(n, point[0], point[1], point[2]);
-                TEveVector pos = TEveVector(point[0], point[1], point[2]);
-                TEvePathMark* path = new TEvePathMark();
+                auto pos = TEveVector(point[0], point[1], point[2]);
+                auto path = std::make_unique<TEvePathMark>();
                 path->fV = pos;
                 path->fTime = point[3];
                 if (n == 0)
                 {
-                    TEveVector Mom = TEveVector(P->Px(), P->Py(), P->Pz());
+                    auto Mom = TEveVector(Par->Px(), Par->Py(), Par->Pz());
                     path->fP = Mom;
                 }
                 if (fVerbose > 3)
-                    cout << "Path marker added " << path << endl;
+                    cout << "Path marker added " << path.get() << endl;
 
-#if ROOT_VERSION_CODE <= ROOT_VERSION(5, 18, 0)
-                track->AddPathMark(path);
-#else
                 track->AddPathMark(*path);
-#endif
+
                 if (fVerbose > 3)
-                    cout << "Path marker added " << path << endl;
+                    cout << "Path marker added " << path.get() << endl;
             }
             fTrList->AddElement(track);
             if (fVerbose > 3)
                 cout << "track added " << track->GetName() << endl;
-        }
-
-        for (Int_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
-        {
-            // TEveTrackList *TrListIn=( TEveTrackList *) fEveTrList->At(i);
-            // TrListIn->FindMomentumLimits(TrListIn, kFALSE);
         }
         fEventManager->SetEvtMaxEnergy(MaxEnergyLimit);
         fEventManager->SetEvtMinEnergy(MinEnergyLimit);
@@ -229,17 +206,11 @@ void R3BMCTracks::Exec(Option_t* option)
     }
 }
 
-R3BMCTracks::~R3BMCTracks() {}
-
-void R3BMCTracks::SetParContainers() {}
-
-void R3BMCTracks::Finish() {}
-
 void R3BMCTracks::Reset()
 {
-    for (Int_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
+    for (size_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
     {
-        TEveTrackList* ele = static_cast<TEveTrackList*>(fEveTrList->At(i));
+        auto ele = static_cast<TEveTrackList*>(fEveTrList->At(i));
         gEve->RemoveElement(ele, fEventManager);
     }
     fEveTrList->Clear();
@@ -248,9 +219,9 @@ void R3BMCTracks::Reset()
 TEveTrackList* R3BMCTracks::GetTrGroup(TParticle* P)
 {
     fTrList = 0;
-    for (Int_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
+    for (size_t i = 0; i < fEveTrList->GetEntriesFast(); i++)
     {
-        TEveTrackList* TrListIn = static_cast<TEveTrackList*>(fEveTrList->At(i));
+        auto TrListIn = static_cast<TEveTrackList*>(fEveTrList->At(i));
         if (strcmp(TrListIn->GetName(), P->GetName()) == 0)
         {
             fTrList = TrListIn;
@@ -269,4 +240,4 @@ TEveTrackList* R3BMCTracks::GetTrGroup(TParticle* P)
     return fTrList;
 }
 
-ClassImp(R3BMCTracks);
+ClassImp(R3BMCTracks)
