@@ -29,45 +29,43 @@ class R3BMCTracks : public FairTask
 {
   public:
     /** Default constructor **/
-    R3BMCTracks();
+    R3BMCTracks() = default;
 
     /** Standard constructor
      *@param name        Name of task
      *@param iVerbose    Verbosity level
      **/
-    R3BMCTracks(const char* name, Int_t iVerbose = 1);
+    explicit R3BMCTracks(const char* name = "R3BMCTracks", Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BMCTracks();
+    ~R3BMCTracks() = default;
 
     /** Set verbosity level. For this task and all of the subtasks. **/
     void SetVerbose(Int_t iVerbose) { fVerbose = iVerbose; }
     /** Executed task **/
-    virtual void Exec(Option_t* option);
-    virtual InitStatus Init();
-    virtual void SetParContainers();
+    void Exec(Option_t*) override;
+    InitStatus Init() override;
 
     /** Action after each event**/
-    virtual void Finish();
-    void Reset();
+    virtual void Reset();
     TEveTrackList* GetTrGroup(TParticle* P);
 
   protected:
-    TClonesArray* fTrackList; //!
-    TEveTrackPropagator* fTrPr;
-    FairEventManager* fEventManager; //!
-    TObjArray* fEveTrList;
-    TString fEvent;         //!
-    TEveTrackList* fTrList; //!
-    // TEveElementList *fTrackCont;
+    TClonesArray* fTrackList = nullptr;
+    TEveTrackPropagator* fTrPr = nullptr;
+    FairEventManager* fEventManager = nullptr;
+    TObjArray* fEveTrList = nullptr;
+    TString fEvent = "";
+    TEveTrackList* fTrList = nullptr;
 
-    Double_t MinEnergyLimit;
-    Double_t MaxEnergyLimit;
-    Double_t PEnergy;
+    Double_t MinEnergyLimit = -1.;
+    Double_t MaxEnergyLimit = -1.;
+    Double_t PEnergy = -1.;
 
   private:
     R3BMCTracks(const R3BMCTracks&);
     R3BMCTracks& operator=(const R3BMCTracks&);
 
-    ClassDef(R3BMCTracks, 1);
+  public:
+    ClassDefOverride(R3BMCTracks, 1);
 };
