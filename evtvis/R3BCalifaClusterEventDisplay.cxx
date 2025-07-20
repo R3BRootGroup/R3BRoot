@@ -111,11 +111,6 @@ R3BCalifaClusterEventDisplay::R3BCalifaClusterEventDisplay(const char* name, Int
     , fProjManager2(NULL)
 {
 }
-// -----------------------------------------------------------------------
-
-// -----   Destructor   ----------------------------------------------------
-R3BCalifaClusterEventDisplay::~R3BCalifaClusterEventDisplay() {}
-// -------------------------------------------------------------------------
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaClusterEventDisplay::Init()
@@ -260,9 +255,6 @@ void R3BCalifaClusterEventDisplay::Reset()
     if (fLego)
         delete fLego;
 }
-
-// ---- Public method Finish   --------------------------------------------------
-void R3BCalifaClusterEventDisplay::Finish() {}
 
 // -----   Private method CreateHistograms  -------------------------------------
 void R3BCalifaClusterEventDisplay::CreateHistograms()

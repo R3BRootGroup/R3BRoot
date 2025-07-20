@@ -44,7 +44,7 @@ class R3BCalifaClusterEventDisplay : public FairTask
     R3BCalifaClusterEventDisplay(const char* name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    ~R3BCalifaClusterEventDisplay();
+    ~R3BCalifaClusterEventDisplay() = default;
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -54,9 +54,6 @@ class R3BCalifaClusterEventDisplay : public FairTask
 
     /** Virtual method Init **/
     virtual InitStatus Init();
-
-    /** Virtual method Finish **/
-    virtual void Finish();
 
     /** Accessors **/
 

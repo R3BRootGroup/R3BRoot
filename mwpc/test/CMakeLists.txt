@@ -11,6 +11,14 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
+if(GTEST_FOUND)
+    add_executable(
+        MwpcUnitTests
+        testMwpcContainerPar.cxx)
+    target_link_libraries(MwpcUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BMwpc)
+    gtest_discover_tests(MwpcUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/test/testMwpcSimulation.C)
 add_test(NAME MwpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/mwpc/test/testMwpcSimulation.sh)

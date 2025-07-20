@@ -31,7 +31,7 @@ add_library_with_dictionary(
     LIBNAME
     R3BEvtVis
     LINKDEF
-    R3BEventDisplayLinkDef.h
+    EventDisplayLinkDef.h
     HEADERS
     ${HEADERS}
     SRCS
@@ -56,3 +56,5 @@ add_library_with_dictionary(
 #     Graf3d
 #     Geom
 #     GeomPainter)
+
+add_subdirectory(test)

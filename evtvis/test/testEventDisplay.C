@@ -11,33 +11,23 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BMwpc0CalPar.h"
-#include "R3BMwpc1CalPar.h"
-#include "R3BMwpc2CalPar.h"
-#include "gtest/gtest.h"
-#include <map>
-
-namespace
+void testEventDisplay()
 {
-    TEST(testMwpc0CalPar, GetNumPadsX)
-    {
-        R3BMwpc0CalPar par;
-        par.SetNumPadsX(64);
+    auto fRun = new FairRunAna();
+    fRun->SetSource(new FairFileSource("test.simu.root"));
+    fRun->SetSink(new FairRootFileSink("event.test.root"));
 
-        EXPECT_EQ(par.GetNumPadsX(), 64);
-    }
-    TEST(testMwpc1CalPar, GetNumPadsX)
-    {
-        R3BMwpc1CalPar par;
-        par.SetNumPadsX(128);
+    auto rtdb = fRun->GetRuntimeDb();
+    auto parIo1 = new FairParRootFileIo();
+    parIo1->open("test.para.root");
+    rtdb->setFirstInput(parIo1);
+    rtdb->print();
 
-        EXPECT_EQ(par.GetNumPadsX(), 128);
-    }
-    TEST(testMwpc2CalPar, GetNumPadsX)
-    {
-        R3BMwpc2CalPar par;
-        par.SetNumPadsX(128);
+    auto fMan = new R3BEventManager();
+    auto Track = new R3BMCTracks("Monte-Carlo Tracks");
 
-        EXPECT_EQ(par.GetNumPadsX(), 128);
-    }
-} // namespace
+    fMan->AddTask(Track);
+    // fMan->Init();
+
+    std::cout << "Macro finished successfully." << std::endl;
+}
