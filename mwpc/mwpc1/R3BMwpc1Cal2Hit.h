@@ -17,19 +17,17 @@
 // -----                  s455 method 17/06/22 by Antia GG           -----
 // -----------------------------------------------------------------------
 
-#ifndef R3BMwpc1Cal2Hit_H
-#define R3BMwpc1Cal2Hit_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
+#include <TH1F.h>
+#include <TRandom.h>
+
 #include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
-#include "TH1F.h"
-#include <TRandom.h>
 
 #define Mw1PadsX 64
 #define Mw1PadsY 40
-
-// Mw1PadsX 64
 
 using namespace std;
 
@@ -44,25 +42,26 @@ class R3BMwpc1Cal2Hit : public FairTask
     R3BMwpc1Cal2Hit();
 
     /** Standard constructor **/
-    R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose = 1);
+    explicit R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BMwpc1Cal2Hit();
+    virtual ~R3BMwpc1Cal2Hit() override;
 
-    /** Virtual method Exec **/
-    virtual void Exec(Option_t* option);
+    /** Method Exec **/
+    void Exec(Option_t* option) override;
 
     /** Virtual method Reset **/
     virtual void Reset();
 
     // Fair specific
-    /** Virtual method Init **/
-    virtual InitStatus Init();
+    /** Method Init **/
+    InitStatus Init() override;
 
-    /** Virtual method ReInit **/
-    virtual InitStatus ReInit();
+    /** Method ReInit **/
+    InitStatus ReInit() override;
 
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool option = true) { fOnline = option; }
+
     void SetExpId(Int_t exp)
     {
         fExpId = exp;
@@ -74,18 +73,18 @@ class R3BMwpc1Cal2Hit : public FairTask
     /** Private method Experiment s467 **/
     virtual void S467();
 
-    R3BEventHeader* header; /**< Event header. */
+    R3BEventHeader* header = nullptr; // Event header
 
-    Double_t fSize; // Detector size in X and Y
-    Double_t fwx;   // Pad width in X
-    Double_t fwy;   // Pad width in Y
+    Double_t fSize = 200.0; // Detector size in X and Y in mm
+    Double_t fwx = 5.0;     // Pad width in X in mm
+    Double_t fwy = 3.125;   // Pad width in Y in mm
     Int_t fx[Mw1PadsX], fx_p1[Mw1PadsX], fx_p2[Mw1PadsX], fy[Mw1PadsY];
 
-    Bool_t fOnline; // Don't store data for online
-    Int_t fExpId;
+    bool fOnline = false; // Don't store data for online if it is true
+    Int_t fExpId = 0;
 
-    TClonesArray* fMwpcCalDataCA; /**< Array with Cal input data. >*/
-    TClonesArray* fMwpcHitDataCA; /**< Array with Hit output data. >*/
+    TClonesArray* fMwpcCalDataCA = nullptr; // Array with Cal input data
+    TClonesArray* fMwpcHitDataCA = nullptr; // Array with Hit output data
 
     /** Private method AddHitData **/
     // Adds a MwpcHitData to the MwpcHitCollection
@@ -100,7 +99,5 @@ class R3BMwpc1Cal2Hit : public FairTask
 
   public:
     // Class definition
-    ClassDef(R3BMwpc1Cal2Hit, 1)
+    ClassDefOverride(R3BMwpc1Cal2Hit, 1); // NOLINT
 };
-
-#endif
