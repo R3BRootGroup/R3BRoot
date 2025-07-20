@@ -18,14 +18,14 @@
 // ------------------------------------------------------------------------
 
 // ROOT headers
-#include "TClonesArray.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TMath.h>
 
 // Fair headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRuntimeDb.h>
 
 // MWPC headers
 #include "R3BEventHeader.h"
@@ -46,13 +46,6 @@ R3BMwpc1Cal2Hit::R3BMwpc1Cal2Hit()
 // R3BMwpc1Cal2Hit: Standard Constructor --------------------------
 R3BMwpc1Cal2Hit::R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fMwpcCalDataCA(NULL)
-    , fMwpcHitDataCA(NULL)
-    , fwx(3.125)   // in mm
-    , fwy(5.000)   // in mm
-    , fSize(200.0) // in mm
-    , fOnline(kFALSE)
-    , fExpId(0)
 {
 }
 
@@ -60,8 +53,6 @@ R3BMwpc1Cal2Hit::R3BMwpc1Cal2Hit(const char* name, Int_t iVerbose)
 R3BMwpc1Cal2Hit::~R3BMwpc1Cal2Hit()
 {
     R3BLOG(debug1, "Destructor");
-    if (fMwpcCalDataCA)
-        delete fMwpcCalDataCA;
     if (fMwpcHitDataCA)
         delete fMwpcHitDataCA;
 }
@@ -70,8 +61,7 @@ R3BMwpc1Cal2Hit::~R3BMwpc1Cal2Hit()
 InitStatus R3BMwpc1Cal2Hit::Init()
 {
     R3BLOG(info, "");
-    // INPUT DATA
-    FairRootManager* rootManager = FairRootManager::Instance();
+    auto rootManager = FairRootManager::Instance();
     if (!rootManager)
     {
         R3BLOG(fatal, "FairRootManager not found");
@@ -82,6 +72,7 @@ InitStatus R3BMwpc1Cal2Hit::Init()
     if (!header)
         header = dynamic_cast<R3BEventHeader*>(rootManager->GetObject("R3BEventHeader"));
 
+    // INPUT DATA - Cal data
     fMwpcCalDataCA = dynamic_cast<TClonesArray*>(rootManager->GetObject("Mwpc1CalData"));
     if (!fMwpcCalDataCA)
     {
@@ -89,11 +80,10 @@ InitStatus R3BMwpc1Cal2Hit::Init()
         return kFATAL;
     }
 
-    // OUTPUT DATA
-    // Hit data
+    // OUTPUT DATA - Hit data
     fMwpcHitDataCA = new TClonesArray("R3BMwpcHitData");
     rootManager->Register("Mwpc1HitData", "MWPC1 Hit", fMwpcHitDataCA, !fOnline);
-    fMwpcHitDataCA->Clear();
+    this->Reset();
     return kSUCCESS;
 }
 
@@ -126,7 +116,7 @@ Double_t R3BMwpc1Cal2Hit::GetPositionYCoG(Double_t qmax, Int_t padmax, Double_t 
 /* ----   Protected method to obtain the position Y ---- */
 Double_t R3BMwpc1Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdown, Double_t qup)
 {
-    Double_t a2 = 0;
+    Double_t a2 = 0.;
     if (qdown != 0 && qup != 0)
     {
         Double_t a3 = TMath::Pi() * fwy / (TMath::ACosH(0.5 * (TMath::Sqrt(qmax / qdown) + TMath::Sqrt(qmax / qup))));
@@ -138,7 +128,7 @@ Double_t R3BMwpc1Cal2Hit::GetPositionY(Double_t qmax, Int_t padmax, Double_t qdo
 }
 
 /* ----   Public method Execution   ---- */
-void R3BMwpc1Cal2Hit::Exec(Option_t* option)
+void R3BMwpc1Cal2Hit::Exec(Option_t*)
 {
     // At the moment we will use the expid to select the reconstruction
     // this should be changed in the future because expid is not necessary
@@ -151,7 +141,6 @@ void R3BMwpc1Cal2Hit::Exec(Option_t* option)
     {
         S467();
     }
-
     return;
 }
 
@@ -162,15 +151,15 @@ void R3BMwpc1Cal2Hit::S467()
     Reset();
 
     // Reading the Input -- Cal Data --
-    Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
+    auto nHits = fMwpcCalDataCA->GetEntriesFast();
     if (nHits == 0)
+    {
         return;
+    }
 
     // Data from cal level
-    R3BMwpcCalData** calData;
-    calData = new R3BMwpcCalData*[nHits];
-    Int_t planeId;
-    Int_t padId;
+    Int_t planeId = 0;
+    Int_t padId = 0;
     Int_t padmx = -1, padmxu = -1, padmxd = -1, padmy = -1;
     Double_t q = 0., qmxu = 0., qmxd = 0., qleft = 0., qright = 0.;
     Double_t qmx = 0., qmy = 0., qdown = 0., qup = 0.;
@@ -183,10 +172,10 @@ void R3BMwpc1Cal2Hit::S467()
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
-        planeId = calData[i]->GetPlane();
-        padId = calData[i]->GetPad() - 1; // From 0 to 63 for X down and up
-        q = calData[i]->GetQ();
+        auto calData = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
+        planeId = calData->GetPlane();
+        padId = calData->GetPad() - 1; // From 0 to 63 for X down and up
+        q = calData->GetQ();
 
         // FIXME: in November this should be OK!
         if (planeId == 1 || planeId == 2)
@@ -229,9 +218,6 @@ void R3BMwpc1Cal2Hit::S467()
 
         AddHitData(x, y);
     }
-
-    if (calData)
-        delete calData;
     return;
 }
 
@@ -242,8 +228,11 @@ void R3BMwpc1Cal2Hit::S455()
     Reset();
 
     // Reading the Input -- Cal Data --
-    Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
-    R3BMwpcCalData** calData = new R3BMwpcCalData*[nHits];
+    auto nHits = fMwpcCalDataCA->GetEntriesFast();
+    if (nHits == 0)
+    {
+        return;
+    }
 
     Int_t planeId = 0;
     Int_t padId = 0;
@@ -264,8 +253,7 @@ void R3BMwpc1Cal2Hit::S455()
     Bool_t xexists_p1 = false;
     Bool_t xexists_p2 = false;
     Bool_t yexists = false;
-    // Double_t fx[Mw1PadsX], fy[Mw1PadsY];
-    // cout << "NUEVO EVENTO" << endl;
+
     for (Int_t i = 0; i < Mw1PadsX; i++)
         fx_p1[i] = 0;
     for (Int_t i = 0; i < Mw1PadsX; i++)
@@ -274,58 +262,44 @@ void R3BMwpc1Cal2Hit::S455()
         fy[i] = 0;
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
-        planeId = calData[i]->GetPlane();
-        padId = calData[i]->GetPad() - 1;
-        q = calData[i]->GetQ();
-        // cout << "i = " << i << ", q = " << q << ", padId = " << padId << ", planeId = " << planeId << endl;
+        auto calData = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
+        planeId = calData->GetPlane();
+        padId = calData->GetPad() - 1;
+        q = calData->GetQ();
         pair<Double_t, Int_t> hit_pair = make_pair(q, padId);
         if (planeId == 1)
         {
             fx_p1[padId] = q;
             QpadX_p1.push_back(hit_pair);
-            // xexists_p1 = true;
             nx_p1 = nx_p1 + 1;
         }
         if (planeId == 2)
         {
             fx_p2[padId] = q;
             QpadX_p2.push_back(hit_pair);
-            // xexists_p2 = true;
             nx_p2 = nx_p2 + 1;
         }
         if (planeId == 3)
         {
             fy[padId] = q;
             QpadY.push_back(hit_pair);
-            // yexists = true;
             ny = ny + 1;
         }
     }
 
     if ((nx_p1 > 0 || nx_p2 > 0) && ny > 0)
     {
-
         if (nx_p1 > 0)
         {
-            sort(QpadX_p1.begin(),
-                 QpadX_p1.end(),
-                 sortPairsmwpc1); // el vector se ordena por el primer elemento de cada par
+            sort(QpadX_p1.begin(), QpadX_p1.end(), sortPairsmwpc1);
             qmx_p1 = QpadX_p1[0].first;
             padmx_p1 = QpadX_p1[0].second;
-            // cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-            /*for (Int_t i=0; i<nx_p1; i++){
-              cout << "Loop i = " << i << " q = " << QpadX_p1[i].first << endl;
-            }*/
         }
         if (nx_p2 > 0)
         {
-            sort(QpadX_p2.begin(),
-                 QpadX_p2.end(),
-                 sortPairsmwpc1); // el vector se ordena por el primer elemento de cada par
+            sort(QpadX_p2.begin(), QpadX_p2.end(), sortPairsmwpc1);
             qmx_p2 = QpadX_p2[0].first;
             padmx_p2 = QpadX_p2[0].second;
-            // cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
         }
         if (qmx_p1 > qmx_p2 && padmx_p1 + 1 < Mw1PadsX && padmx_p2 + 1 < Mw1PadsX)
         {
@@ -334,9 +308,6 @@ void R3BMwpc1Cal2Hit::S455()
             qleft1 = fx_p1[padmx1 - 1];
             qright1 = fx_p1[padmx1 + 1];
             planex1 = 1;
-            /*cout << "1>2" << endl;
-            cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-            cout << "qmx2 = " << qmx2 << ", padmx2 = " << padmx2 << endl;*/
             if (qmx1 > 10 && qleft1 > 0 && qright1 > 0)
             {
                 x1 = GetPositionX(qmx1, padmx1, qleft1, qright1);
@@ -390,15 +361,11 @@ void R3BMwpc1Cal2Hit::S455()
 
         else if (qmx_p2 > qmx_p1 && padmx_p1 + 1 < Mw1PadsX && padmx_p2 + 1 < Mw1PadsX)
         {
-
             qmx1 = qmx_p2;
             padmx1 = padmx_p2;
             qleft1 = fx_p2[padmx1 - 1];
             qright1 = fx_p2[padmx1 + 1];
             planex1 = 2;
-            /*cout << "2>1" << endl;
-            cout << "qmx1 = " << qmx1 << ", padmx1 = " << padmx1 << endl;
-            cout << "qmx2 = " << qmx2 << ", padmx2 = " << padmx2 << endl;*/
             if (qmx1 > 10 && qleft1 > 0 && qright1 > 0)
             {
                 x1 = GetPositionX(qmx1, padmx1, qleft1, qright1);
@@ -456,7 +423,6 @@ void R3BMwpc1Cal2Hit::S455()
             sort(QpadY.begin(), QpadY.end(), sortPairsmwpc1);
             qmy1 = QpadY[0].first;
             padmy1 = QpadY[0].second;
-            // cout << "qmy1 = " << qmy1 << ", padmy1 = " << padmy1 << endl;
 
             if (padmy1 + 1 < Mw1PadsY)
             {
@@ -484,7 +450,6 @@ void R3BMwpc1Cal2Hit::S455()
             sort(QpadY.begin(), QpadY.end(), sortPairsmwpc1);
             qmy2 = QpadY[0].first;
             padmy2 = QpadY[0].second;
-            // cout << "qmy2 = " << qmy2 << ", padmy2 = " << padmy2 << endl;
 
             if (padmy2 + 1 < Mw1PadsY)
             {
@@ -499,14 +464,9 @@ void R3BMwpc1Cal2Hit::S455()
                     y2 = -1000.;
             }
         } // if y
-        // cout << "x1 = " << x1 << ", y1 = " << y1 << " ,planex1 = " << planex1 << ", x2 = " << x2 << ", y2 = " << y2
-        // << " ,planex2 = " << planex2 << endl;
         AddHitData(x1, y1, planex1);
         AddHitData(x2, y2, planex2);
     } // if all
-
-    if (calData)
-        delete[] calData;
     return;
 }
 
@@ -527,4 +487,4 @@ R3BMwpcHitData* R3BMwpc1Cal2Hit::AddHitData(Double_t x, Double_t y, Int_t plane)
     return new (clref[size]) R3BMwpcHitData(x, y, plane);
 }
 
-ClassImp(R3BMwpc1Cal2Hit);
+ClassImp(R3BMwpc1Cal2Hit)
