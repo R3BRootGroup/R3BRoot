@@ -11,6 +11,14 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
+if(GTEST_FOUND)
+    add_executable(
+        MusicUnitTests
+        testMusicContainerPar.cxx)
+    target_link_libraries(MusicUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BMusic)
+    gtest_discover_tests(MusicUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/music/test/testMusicSimulation.C)
 add_test(NAME MusicSimulation COMMAND ${R3BROOT_BINARY_DIR}/music/test/testMusicSimulation.sh)

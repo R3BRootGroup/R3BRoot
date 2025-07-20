@@ -12,14 +12,19 @@
  ******************************************************************************/
 
 #include "R3BEventManager.h"
-#include "FairLogger.h"
 #include "R3BIonName.h"
-#include "TDatabasePDG.h"
-#include "TEveGeoNode.h"
-#include "TEveManager.h"
-#include "TGeoManager.h"
 
+#include <FairLogger.h>
+#include <TDatabasePDG.h>
+#include <TEveGeoNode.h>
+#include <TEveManager.h>
+#include <TGeoManager.h>
+#include <TString.h>
+
+#include <fmt/core.h>
 #include <iostream>
+#include <string>
+
 using namespace std;
 
 R3BEventManager* R3BEventManager::fgRinstance = 0;
@@ -35,7 +40,6 @@ R3BEventManager::R3BEventManager()
 
 void R3BEventManager::AddParticlesToPdgDataBase(Int_t pdgCode)
 {
-
     TDatabasePDG* pdgDB = TDatabasePDG::Instance();
 
     if (!pdgDB->GetParticle(pdgCode))
@@ -46,15 +50,14 @@ void R3BEventManager::AddParticlesToPdgDataBase(Int_t pdgCode)
         int mass = (temp - element * 1E4) / 10;
 
         bool particleRecognised = true;
-        char name[20];
+        std::string name(64, '\0');
 
-        particleRecognised = ((R3BIonName*)fIonName)->GetIonName(element, name);
+        particleRecognised = static_cast<R3BIonName*>(fIonName)->GetIonName(element, name.data());
 
         if (particleRecognised)
         {
-            char title[30];
-            sprintf(title, "%s%i", name, mass);
-            pdgDB->AddParticle(name, title, mass, kTRUE, 0, 0, "Ion", pdgCode);
+            auto title = TString::Format("%s%d", name.c_str(), mass);
+            pdgDB->AddParticle(name.c_str(), title.Data(), mass, kTRUE, 0, 0, "Ion", pdgCode);
         }
     }
 }

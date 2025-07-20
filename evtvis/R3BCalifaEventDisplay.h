@@ -16,8 +16,7 @@
 // -----            Created 01/10/2012  by P.Cabanelas                 -----
 // -------------------------------------------------------------------------
 
-#ifndef R3BCALIFAEVENTDISPLAY_H
-#define R3BCALIFAEVENTDISPLAY_H
+#pragma once
 
 #include "FairTask.h"
 
@@ -45,7 +44,7 @@ class R3BCalifaEventDisplay : public FairTask
     R3BCalifaEventDisplay(const char* name, Int_t iVerbose = 1);
 
     /** Destructor **/
-    ~R3BCalifaEventDisplay();
+    ~R3BCalifaEventDisplay() = default;
 
     /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
@@ -55,9 +54,6 @@ class R3BCalifaEventDisplay : public FairTask
 
     /** Virtual method Init **/
     virtual InitStatus Init();
-
-    /** Virtual method Finish **/
-    virtual void Finish();
 
     /** Public method SelectGeometryVersion
      **
@@ -120,5 +116,3 @@ class R3BCalifaEventDisplay : public FairTask
 
     ClassDef(R3BCalifaEventDisplay, 2);
 };
-
-#endif

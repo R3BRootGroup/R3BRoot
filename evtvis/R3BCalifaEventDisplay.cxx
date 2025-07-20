@@ -118,11 +118,6 @@ R3BCalifaEventDisplay::R3BCalifaEventDisplay(const char* name, Int_t iVerbose)
     , fProjManager2(NULL)
 {
 }
-// -----------------------------------------------------------------------
-
-// -----   Destructor   ----------------------------------------------------
-R3BCalifaEventDisplay::~R3BCalifaEventDisplay() {}
-// -------------------------------------------------------------------------
 
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BCalifaEventDisplay::Init()
@@ -269,9 +264,6 @@ void R3BCalifaEventDisplay::Reset()
     if (fLego)
         delete fLego;
 }
-
-// ---- Public method Finish   --------------------------------------------------
-void R3BCalifaEventDisplay::Finish() {}
 
 // -----   Private method CreateHistograms  -------------------------------------
 void R3BCalifaEventDisplay::CreateHistograms()

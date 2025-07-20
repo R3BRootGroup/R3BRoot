@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2022-2023 Members of R3B Collaboration                     #
+#   Copyright (C) 2022-2025 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -10,6 +10,15 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+
+if(GTEST_FOUND)
+    add_executable(
+        AlpideUnitTests
+        testAlpideContainerPar.cxx)
+    target_link_libraries(AlpideUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BAlpide)
+    gtest_discover_tests(AlpideUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/alpide/test/testAlpideSimulation.C)
 add_test(NAME AlpideSimulation COMMAND ${R3BROOT_BINARY_DIR}/alpide/test/testAlpideSimulation.sh)

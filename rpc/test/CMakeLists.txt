@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2022-2023 Members of R3B Collaboration                     #
+#   Copyright (C) 2022-2025 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -11,6 +11,14 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
+if(GTEST_FOUND)
+    add_executable(
+        RpcUnitTests
+        testRpcContainerPar.cxx)
+    target_link_libraries(RpcUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BRpc)
+    gtest_discover_tests(RpcUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/rpc/test/testRpcSimulation.C)
 add_test(NAME RpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/rpc/test/testRpcSimulation.sh)
