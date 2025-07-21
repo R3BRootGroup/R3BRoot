@@ -1,4 +1,4 @@
-# This is the main CI workflow for nightly tests with the R3BRoot dev branch.
+# This is the main CI workflow for nightly simulation tests with the R3BRoot dev branch.
 #
 # To have successful and fast compilation and build processes, a Docker
 # container embedded with the cvmfs is also used in the workflow. The cvmfs is
@@ -20,13 +20,13 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-name: CI-CD-nightly
+name: CI-CD-nightly-sim
 
 # Controls when the action will run. 
 on:
   schedule:
-    - cron: '0 22 * * 3'
-    - cron: '0 22 * * 6'
+    - cron: '0 21 * * 3'
+    - cron: '0 21 * * 6'
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -87,7 +87,6 @@ jobs:
         # run
         include:
           # The R3BFileSource repo is used for testing unpacking.
-          - url: https://github.com/R3BRootGroup/R3BFileSource.git
           - cache: r3broot
           # disable conan build by default
           - preset: simple
@@ -111,7 +110,6 @@ jobs:
               https://github.com/R3BRootGroup/sofia.git
               https://github.com/R3BRootGroup/frs.git
               https://github.com/R3BRootGroup/asyeos.git
-              https://github.com/R3BRootGroup/R3BFileSource.git
             # Using own cache file
             cache: other-repos
 
@@ -160,11 +158,14 @@ jobs:
       # dependencies for the R3BRoot build, such as googletest and ucesb. The
       # cache restoring step is only used for the run triggered with
       # "pull_request" and disabled for the merge event.
-      - name: install dependencies
-        id: restore-cache
-        uses: './.github/actions/install-deps'
-        with: 
-          cache-name: ${{ matrix.cache }}
+#      - name: install dependencies
+#        id: restore-cache
+#        uses: './.github/actions/install-deps'
+#        with: 
+#          cache-name: ${{ matrix.cache }}
+      - name: unset UCESB_DIR for simulation tests
+        run: echo "UCESB_DIR=" >> $GITHUB_ENV
+        shell: bash
 
       # A self-defined composite action for the cmake configuration and build
       # of r3broot (along with necessary dep repos).
