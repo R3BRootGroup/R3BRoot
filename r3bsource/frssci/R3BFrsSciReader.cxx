@@ -17,27 +17,22 @@
 #include <FairLogger.h>
 #include <FairRootManager.h>
 
+/**
+ ** ext_h101_frssci.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:FRSSCI,id=h101_FRSSCI,NOTRIGEVENTNO,ext_h101_frssci.h
+ **/
+
 extern "C"
 {
 #include "ext_data_client.h"
 #include "ext_h101_frssci.h"
 }
 
-#include <iostream>
-
-using namespace std;
-
-R3BFrsSciReader::R3BFrsSciReader(EXT_STR_h101_FRSSCI* data, size_t offset)
-    : R3BFrsSciReader(data, offset, 1)
-{
-}
-
 R3BFrsSciReader::R3BFrsSciReader(EXT_STR_h101_FRSSCI* data, size_t offset, UShort_t NumSci)
     : R3BReader("R3BFrsSciReader")
     , fData(data)
     , fOffset(offset)
-    , fOnline(kFALSE)
-    , fArray(new TClonesArray("R3BFrsSciMappedData")) // class name
+    , fArray(new TClonesArray("R3BFrsSciMappedData"))
     , fNumSci(NumSci)
 {
 }

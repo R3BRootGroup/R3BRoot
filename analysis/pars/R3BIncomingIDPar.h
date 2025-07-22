@@ -11,19 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BIncomingIDPar_H
-#define R3BIncomingIDPar_H
+#pragma once
 
 #include "R3BTcutPar.h"
 
-#include "FairParGenericSet.h"
-#include "TCutG.h"
-#include "TObject.h"
+#include <FairParGenericSet.h>
 #include <Rtypes.h>
-
-#include "TArrayF.h"
-#include "TObjArray.h"
-#include <TObjString.h>
+#include <TArrayF.h>
+#include <TCutG.h>
+#include <TObject.h>
 
 class FairParamList;
 
@@ -39,17 +35,17 @@ class R3BIncomingIDPar : public FairParGenericSet
     virtual ~R3BIncomingIDPar();
 
     /** Reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Print values of parameters to the standard output **/
-    virtual void print();
-    void printParams();
+    void print() override;
+    void printParams() override;
 
     /** Accessor functions **/
     const Float_t GetToFoffset(Int_t det) { return fToFoffset->GetAt(det - 1); }
@@ -82,9 +78,11 @@ class R3BIncomingIDPar : public FairParGenericSet
     void SetTof2InvV_p1(Float_t value, Int_t det) { fTof2InvV_p1->AddAt(value, det - 1); }
     void SetCutS2(TCutG* cut) { fTcutparS2->SetCut(cut); }
     void SetCutCave(TCutG* cut) { fTcutparCave->SetCut(cut); }
+    void SetBeta_min(Float_t val) { fBeta_min = val; }
+    void SetBeta_max(Float_t val) { fBeta_max = val; }
 
   private:
-    Int_t fNumDet;
+    Int_t fNumDet = 1;
     TArrayF* fToFoffset;
     TArrayF *fPosS2Left, *fPosS2Right;
     TArrayF *fTof2InvV_p0, *fTof2InvV_p1;
@@ -100,7 +98,6 @@ class R3BIncomingIDPar : public FairParGenericSet
     const R3BIncomingIDPar& operator=(const R3BIncomingIDPar&);
     R3BIncomingIDPar(const R3BIncomingIDPar&);
 
-    ClassDef(R3BIncomingIDPar, 1);
+  public:
+    ClassDefOverride(R3BIncomingIDPar, 1); // NOLINT
 };
-
-#endif // R3BIncomingIDPar_H

@@ -13,20 +13,15 @@
 
 #pragma once
 
-#include "FairLogger.h"
-#include "FairParGenericSet.h"
-#include "TArrayD.h"
-#include "TArrayF.h"
-#include "TObjArray.h"
-#include "TObject.h"
-
-#include <TObjString.h>
+#include <FairLogger.h>
+#include <FairParGenericSet.h>
+#include <TArrayD.h>
+#include <TArrayF.h>
 
 class FairParamList;
 
 class R3BFrsSciCalPar : public FairParGenericSet
 {
-
   public:
     /** Standard constructor **/
     R3BFrsSciCalPar(const char* name = "FrsSciCalPar",
@@ -37,22 +32,22 @@ class R3BFrsSciCalPar : public FairParGenericSet
     virtual ~R3BFrsSciCalPar();
 
     /** Method to reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Method to store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Method to retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Method to print values of parameters to the standard output **/
-    void printParams();
+    void printParams() override;
 
     /** Accessor functions : SET **/
 
-    void SetNumDets(Int_t nDets) { fNumDets = nDets; }
-    void SetNumPmts(Int_t nPmts) { fNumPmts = nPmts; }
-    void SetNumTofs(Int_t nDets)
+    inline void SetNumDets(Int_t nDets) { fNumDets = nDets; }
+    inline void SetNumPmts(Int_t nPmts) { fNumPmts = nPmts; }
+    inline void SetNumTofs(Int_t nDets)
     {
         switch (nDets)
         {
@@ -74,22 +69,22 @@ class R3BFrsSciCalPar : public FairParGenericSet
         LOG(info) << "R3BFrsSciCalPar::SetNumTofs(Int_t nDets = " << fNumDets << ") --> fNumTofs = " << fNumTofs;
     }
 
-    void SetDetIdS2(Int_t id) { fDetIdS2 = id; }
-    void SetDetIdS8(Int_t id) { fDetIdS8 = id; }
-    void SetDetIdCaveC(Int_t id) { fDetIdCaveC = id; }
+    inline void SetDetIdS2(Int_t id) { fDetIdS2 = id; }
+    inline void SetDetIdS8(Int_t id) { fDetIdS8 = id; }
+    inline void SetDetIdCaveC(Int_t id) { fDetIdCaveC = id; }
 
-    void SetMinPos(Float_t min, UInt_t rank) { fMinPos->AddAt(min, rank); }
-    void SetMaxPos(Float_t max, UInt_t rank) { fMaxPos->AddAt(max, rank); }
-    void SetMinTof(Double_t min, UInt_t rank) { fMinTofs->AddAt(min, rank); }
-    void SetMaxTof(Double_t max, UInt_t rank) { fMaxTofs->AddAt(max, rank); }
+    inline void SetMinPos(Float_t min, UInt_t rank) { fMinPos->AddAt(min, rank); }
+    inline void SetMaxPos(Float_t max, UInt_t rank) { fMaxPos->AddAt(max, rank); }
+    inline void SetMinTof(Double_t min, UInt_t rank) { fMinTofs->AddAt(min, rank); }
+    inline void SetMaxTof(Double_t max, UInt_t rank) { fMaxTofs->AddAt(max, rank); }
 
-    void SetTofCalGain(Double_t gain, UInt_t rank) { fTofCalGains->AddAt(gain, rank); }
-    void SetTofCalOffset(Double_t offset, UInt_t rank) { fTofCalOffsets->AddAt(offset, rank); }
-    void SetPosCalGain(Float_t gain, UInt_t rank) { fPosCalGains->AddAt(gain, rank); }
-    void SetPosCalOffset(Float_t offset, UInt_t rank) { fPosCalOffsets->AddAt(offset, rank); }
+    inline void SetTofCalGain(Double_t gain, UInt_t rank) { fTofCalGains->AddAt(gain, rank); }
+    inline void SetTofCalOffset(Double_t offset, UInt_t rank) { fTofCalOffsets->AddAt(offset, rank); }
+    inline void SetPosCalGain(Float_t gain, UInt_t rank) { fPosCalGains->AddAt(gain, rank); }
+    inline void SetPosCalOffset(Float_t offset, UInt_t rank) { fPosCalOffsets->AddAt(offset, rank); }
 
-    void SetBRho0(Double_t brho, UInt_t rank) { fBRho0->AddAt(brho, rank); }
-    void SetDispersion(Double_t D, UInt_t rank) { fDisp->AddAt(D, rank); }
+    inline void SetBRho0(Double_t brho, UInt_t rank) { fBRho0->AddAt(brho, rank); }
+    inline void SetDispersion(Double_t D, UInt_t rank) { fDisp->AddAt(D, rank); }
 
     /** Accessor functions : GET **/
 
@@ -158,5 +153,6 @@ class R3BFrsSciCalPar : public FairParGenericSet
     const R3BFrsSciCalPar& operator=(const R3BFrsSciCalPar&);
     R3BFrsSciCalPar(const R3BFrsSciCalPar&);
 
-    ClassDef(R3BFrsSciCalPar, 1);
+  public:
+    ClassDefOverride(R3BFrsSciCalPar, 1); // NOLINT
 };

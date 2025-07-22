@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,11 +17,11 @@
 
 class FairContainer;
 
-class R3BAnalysisContFact : public FairContFact
+class R3BFrsSciContFact : public FairContFact
 {
   public:
-    R3BAnalysisContFact();
-    virtual ~R3BAnalysisContFact() = default;
+    R3BFrsSciContFact();
+    virtual ~R3BFrsSciContFact() = default;
 
     FairParSet* createContainer(FairContainer*) override;
 
@@ -29,5 +29,5 @@ class R3BAnalysisContFact : public FairContFact
     void setAllContainers();
 
   public:
-    ClassDefOverride(R3BAnalysisContFact, 0); // NOLINT
+    ClassDefOverride(R3BFrsSciContFact, 0); // NOLINT
 };

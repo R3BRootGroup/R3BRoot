@@ -20,16 +20,18 @@
  * This task should make the analysis of the incoming projectiles from FRS
  */
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRunOnline.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRunOnline.h>
+#include <FairRuntimeDb.h>
 
 #include "R3BAnalysisIncomingID.h"
 #include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
 #include "R3BFrsData.h"
+#include "R3BFrsSciCalPar.h"
+#include "R3BFrsSciTcalData.h"
 #include "R3BIncomingIDPar.h"
 #include "R3BLogger.h"
 #include "R3BLosCalData.h"
@@ -41,8 +43,8 @@
 #include "R3BMusliHitData.h"
 #include "R3BPspxHitData.h"
 
-#include "TClonesArray.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TMath.h>
 
 R3BAnalysisIncomingID::R3BAnalysisIncomingID()
     : R3BAnalysisIncomingID("AnalysisIncomingID", 1)
@@ -51,13 +53,6 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID()
 
 R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fHitItemsMus(NULL)
-    , fHitItemsMusli(NULL)
-    , fHitLos(NULL)
-    , fTriggerLos(NULL)
-    , fHitPspx1_x(NULL)
-    , fHitPspx1_y(NULL)
-    , fFrsDataCA(NULL)
     , fPos_p0(-11)
     , fPos_p1(54.7)
     , fP0(-2.12371e7)
@@ -65,42 +60,30 @@ R3BAnalysisIncomingID::R3BAnalysisIncomingID(const char* name, Int_t iVerbose)
     , fP2(-2.87635e7)
     , fZprimary(50.)
     , fZoffset(-1.3)
-    , fOnline(kFALSE)
-    , fIncomingID_Par(NULL)
-    , fNumDet(1)
-    , fUseLOS(kFALSE)
-    , fUsePspx1(kTRUE)
-    , fUseTref(kFALSE)
-    , fTimeStitch(nullptr)
-    , fCutS2(NULL)
-    , fCutCave(NULL)
 {
-    fToFoffset = new TArrayF(fNumDet);
-    fPosS2Left = new TArrayF(fNumDet);
-    fPosS2Right = new TArrayF(fNumDet);
-    fBrho0_S2toCC = new TArrayF(fNumDet);
-    fDispersionS2 = new TArrayF(fNumDet);
-    fTof2InvV_p0 = new TArrayF(fNumDet);
-    fTof2InvV_p1 = new TArrayF(fNumDet);
 }
 
 R3BAnalysisIncomingID::~R3BAnalysisIncomingID()
 {
     R3BLOG(debug1, "");
-    if (fFrsDataCA)
-        delete fFrsDataCA;
+    if (fFrsHitData)
+        delete fFrsHitData;
 }
 
 void R3BAnalysisIncomingID::SetParContainers()
 {
     R3BLOG(info, "");
     // Reading IncomingIDPar from FairRuntimeDb
-    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    auto rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
 
     fIncomingID_Par = dynamic_cast<R3BIncomingIDPar*>(rtdb->getContainer("IncomingIDPar"));
     R3BLOG_IF(fatal, !fIncomingID_Par, "Couldn't get handle on IncomingIDPar container");
     R3BLOG_IF(info, fIncomingID_Par, "IncomingIDPar container was found");
+
+    fCalPar = dynamic_cast<R3BFrsSciCalPar*>(rtdb->getContainer("FrsSciCalPar"));
+    R3BLOG_IF(fatal, !fCalPar, "Couldn't get handle on IncomingIDPar container");
+    R3BLOG_IF(info, fCalPar, "IncomingIDPar container was found");
 
     return;
 }
@@ -120,7 +103,15 @@ void R3BAnalysisIncomingID::SetParameter()
     fCutS2 = fIncomingID_Par->GetCutS2();
     fCutCave = fIncomingID_Par->GetCutCave();
 
-    for (Int_t i = 1; i < fNumDet + 1; i++)
+    fToFoffset = new TArrayF(fNumDet);
+    fPosS2Left = new TArrayF(fNumDet);
+    fPosS2Right = new TArrayF(fNumDet);
+    fBrho0_S2toCC = new TArrayF(fNumDet);
+    fDispersionS2 = new TArrayF(fNumDet);
+    fTof2InvV_p0 = new TArrayF(fNumDet);
+    fTof2InvV_p1 = new TArrayF(fNumDet);
+
+    for (Int_t i = 1; i <= fNumDet; i++)
     {
         fToFoffset->AddAt(fIncomingID_Par->GetToFoffset(i), i - 1);
         fPosS2Left->AddAt(fIncomingID_Par->GetPosS2Left(i), i - 1);
@@ -130,7 +121,8 @@ void R3BAnalysisIncomingID::SetParameter()
         fDispersionS2->AddAt(fIncomingID_Par->GetDispersionS2(i), i - 1);
         fBrho0_S2toCC->AddAt(fIncomingID_Par->GetBrho0_S2toCC(i), i - 1);
     }
-    R3BLOG(info, "Brho:" << fBrho0_S2toCC->GetAt(0));
+    // fIncomingID_Par->printParams();
+    // fCalPar->printParams();
     return;
 }
 
@@ -138,8 +130,8 @@ InitStatus R3BAnalysisIncomingID::Init()
 {
     R3BLOG(info, "");
 
-    FairRootManager* mgr = FairRootManager::Instance();
-    R3BLOG_IF(fatal, NULL == mgr, "FairRootManager not found");
+    auto mgr = FairRootManager::Instance();
+    R3BLOG_IF(fatal, nullptr == mgr, "FairRootManager not found");
 
     fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
 
@@ -149,6 +141,9 @@ InitStatus R3BAnalysisIncomingID::Init()
 
     fHitItemsMusli = dynamic_cast<TClonesArray*>(mgr->GetObject("MusliHitData"));
     R3BLOG_IF(warn, !fHitItemsMusli, "MusliHitData not found");
+
+    fFrsSci_Tcal = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsSciTcalData"));
+    R3BLOG_IF(warn, !fFrsSci_Tcal, "FrsSciTcalData not found");
 
     // Get access to hit data of the LOS
     fHitLos = dynamic_cast<TClonesArray*>(mgr->GetObject("LosHit"));
@@ -168,11 +163,11 @@ InitStatus R3BAnalysisIncomingID::Init()
     R3BLOG_IF(warn, !fHitPspx1_y, "Pspx1_yHit not found");
 
     // Output data
-    fFrsDataCA = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
-    if (fFrsDataCA == NULL)
+    fFrsHitData = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
+    if (fFrsHitData == nullptr)
     {
-        fFrsDataCA = new TClonesArray("R3BFrsData");
-        mgr->Register("FrsData", "Analysis FRS", fFrsDataCA, !fOnline);
+        fFrsHitData = new TClonesArray("R3BFrsData");
+        mgr->Register("FrsData", "Analysis FRS", fFrsHitData, !fOnline);
     }
 
     // Definition of a time stich object to correlate times coming from different systems
@@ -189,240 +184,346 @@ InitStatus R3BAnalysisIncomingID::ReInit()
     return kSUCCESS;
 }
 
-void R3BAnalysisIncomingID::Exec(Option_t* option)
+void R3BAnalysisIncomingID::Exec(Option_t*)
 {
-    double Zmusic = 0., Music_ang = 0.;
-    if (!fHitItemsMusli && fHitItemsMus && fHitItemsMus->GetEntriesFast() > 0)
+    if (fHeader->GetExpId() == 249)
     {
-        Int_t nHits = fHitItemsMus->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
+        double Zcharge = 0.;
+        size_t multLosHit = 0;
+        if (fHitLos && fHitLos->GetEntriesFast() > 0)
         {
-            auto hit = dynamic_cast<R3BMusicHitData*>(fHitItemsMus->At(ihit));
-            if (!hit)
-                continue;
-            Zmusic = hit->GetZcharge();
-            Music_ang = hit->GetTheta() * 1000.; // mrad
-        }
-    }
-
-    if (!fHitItemsMus && fHitItemsMusli && fHitItemsMusli->GetEntriesFast() > 0)
-    {
-        Int_t nHits = fHitItemsMusli->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            auto hit = dynamic_cast<R3BMusliHitData*>(fHitItemsMusli->At(ihit));
-            if (!hit)
-                continue;
-            if (hit->GetType() == 2)
-                Zmusic = hit->GetZcharge(); // for data with mean signals from 4 anodes
-            if (hit->GetType() == 1)
-                Music_ang = hit->GetTheta() * 1000.; // mrad, for data with mean signals from 2 anodes
-        }
-    }
-
-    // --- local variables --- //
-    Double_t Zlos[fNumDet];
-    UInt_t nHits = 0;
-    Double_t posLosX_cm[fNumDet];
-    Double_t trigTimeV[fNumDet];
-    Double_t Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
-    Double_t AoQ_m1_corr = 0.;
-    Int_t multLos[fNumDet];
-    Double_t en_pspx = 0., en_pspy = 0., ZPsp = 0.;
-
-    for (Int_t i = 0; i < fNumDet; i++)
-    {
-        multLos[i] = 0;
-        Zlos[i] = 0.;
-        posLosX_cm[i] = 0.;
-        trigTimeV[i] = 0.;
-    }
-    // --- read Trigger data from LOS --- //
-    if (fTriggerLos && fTriggerLos->GetEntriesFast() > 0)
-    {
-        Int_t numDet = 1;
-        Int_t tHits = fTriggerLos->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < tHits; ihit++)
-        {
-            R3BLosTCalData* hittcal = dynamic_cast<R3BLosTCalData*>(fTriggerLos->At(ihit));
-            numDet = hittcal->GetDetector();
-            if (hittcal->GetType() == 0)
-                trigTimeV[numDet - 1] = hittcal->GetRawTimeNs();
-        } // --- end of loop over hit data --- //
-    }
-
-    // --- read hit from LOS data --- //
-    if (fHitLos && fHitLos->GetEntriesFast() > 0)
-    {
-        Int_t numDet = 1;
-        nHits = fHitLos->GetEntriesFast();
-        for (Int_t ihit = 0; ihit < nHits; ihit++)
-        {
-            R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
-            numDet = hittcal->GetDetector();
-            if (fUseTref)
+            auto nHits = fHitLos->GetEntriesFast();
+            for (size_t ihit = 0; ihit < nHits; ihit++)
             {
-                Double_t time = fTimeStitch->GetTime(hittcal->GetTime() - trigTimeV[numDet - 1], "vftx", "vftx");
-                if (time == fHeader->GetTStart())
+                auto hit_los = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
+                Zcharge = hit_los->GetZ();
+                multLosHit++;
+            }
+        }
+        // Only events with multi=1 are considered for analysis
+        if (multLosHit != 1)
+            return;
+        // Only good charges are considered for analysis
+        if (Zcharge < fMinLosCharge)
+            return;
+
+        auto fFrsSciNbDets = fCalPar->GetNumDets();
+        auto fFrsSciNbPmts = fCalPar->GetNumPmts();
+
+        std::vector<UInt_t> multFrsSciTcal(fFrsSciNbDets * fFrsSciNbPmts, 0);
+        std::vector<UInt_t> multTofRaw(fFrsSciNbDets, 0);
+
+        std::vector<std::vector<double>> FrsSciTraw;
+        FrsSciTraw.resize(fFrsSciNbDets * fFrsSciNbPmts);
+
+        for (auto& row : FrsSciTraw)
+        {
+            row.resize(64, 0.0);
+        }
+
+        Double_t StartTraw_atTcal = -1;
+
+        for (size_t i = 0; i < fFrsSciNbDets; i++)
+        {
+            for (size_t j = 0; j < fFrsSciNbPmts; j++)
+            {
+                multFrsSciTcal[i * fFrsSciNbPmts + j] = 0;
+                for (size_t k = 0; k < 63; k++)
                 {
-                    posLosX_cm[numDet - 1] = hittcal->GetX_cm();
-                    Zlos[numDet - 1] = hittcal->GetZ();
+                    FrsSciTraw[i * fFrsSciNbPmts + j][k] = -1;
                 }
             }
-            else
+            multTofRaw[i] = 0;
+        }
+
+        if (fFrsSci_Tcal && fFrsSci_Tcal->GetEntriesFast() > 0)
+        {
+            auto nHits = fFrsSci_Tcal->GetEntriesFast();
+            for (size_t ihit = 0; ihit < nHits; ihit++)
             {
-                if (multLos[numDet - 1] == 0)
-                {
-                    posLosX_cm[numDet - 1] = hittcal->GetX_cm();
-                    Zlos[numDet - 1] = hittcal->GetZ();
-                }
+                auto hitscitcal = dynamic_cast<R3BFrsSciTcalData*>(fFrsSci_Tcal->At(ihit));
+                auto iDet = hitscitcal->GetDetector() - 1;
+                auto iPmt = hitscitcal->GetPmt() - 1;
+                FrsSciTraw[iDet * fFrsSciNbPmts + iPmt][multFrsSciTcal[iDet * fFrsSciNbPmts + iPmt]] =
+                    hitscitcal->GetRawTimeNs();
+                multFrsSciTcal[iDet * fFrsSciNbPmts + iPmt]++;
             }
-            multLos[numDet - 1]++;
-        } // --- end of loop over hit data --- //
-    }
-
-    // --- read hit from PSP data --- //
-
-    if (fHitPspx1_x || fHitPspx1_y)
-    {
-        // For now only multiplicity = 1 events are taken. Proper
-        // treatment of multihit events needs to be implemented.
-        if (fHitPspx1_x && fHitPspx1_x->GetEntriesFast() == 1)
-        {
-            auto pspx1hitx = dynamic_cast<R3BPspxHitData*>(fHitPspx1_x->At(0));
-            en_pspx = pspx1hitx->GetEnergy();
         }
 
-        if (fHitPspx1_y && fHitPspx1_y->GetEntriesFast() == 1)
+        std::vector<Int_t> indexl(2, -1);
+        std::vector<Int_t> indexr(2, -1);
+
+        for (size_t i = 0; i < fFrsSciNbDets; i++)
         {
-            auto pspx1hity = dynamic_cast<R3BPspxHitData*>(fHitPspx1_y->At(0));
-            en_pspy = pspx1hity->GetEnergy();
-        }
-
-        ZPsp = en_pspx;
-    }
-
-    for (int i = 0; i < fNumDet; i++)
-    {
-        // --- secondary beam identification ---
-
-        // if X is increasing from left to right:
-        //    Brho = fBhro0 * (1 - xMwpc0/fDCC + xS2/fDS2)
-        // in R3BRoot, X is increasing from right to left
-        //    Bro = fBrho0 * (1 + xMwpc0/fDCC - xS2/fDS2)
-
-        if (multLos[i] > 0)
-        {
-            Double_t betaS2 = 0.;
-            Double_t PosXS2 = 0.;
-            R3BFrsData* hitfrs = nullptr;
-            if (fFrsDataCA && fFrsDataCA->GetEntriesFast() > 0)
+            for (size_t hitr = 0; hitr < multFrsSciTcal[i * fFrsSciNbPmts]; hitr++)
             {
-                nHits = fFrsDataCA->GetEntriesFast();
-                R3BLOG_IF(error, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
-                for (Int_t ihit = 0; ihit < nHits; ihit++)
+                for (size_t hitl = 0; hitl < multFrsSciTcal[i * fFrsSciNbPmts + i]; hitl++)
                 {
-                    hitfrs = dynamic_cast<R3BFrsData*>(fFrsDataCA->At(ihit));
-                    if (!hitfrs)
-                        continue;
-                    betaS2 = hitfrs->GetBeta();
-                    PosXS2 = hitfrs->GetXS2();
-                    if (TMath::IsNaN(PosXS2) && fHeader->GetExpId() == 509) // NaN indicator for one S2 pmt missing
-                        PosXS2 = 0.;
+                    StartTraw_atTcal = fTimeStitch->GetTime(
+                        0.5 * (FrsSciTraw[i * fFrsSciNbPmts][hitr] + FrsSciTraw[i * fFrsSciNbPmts + 1][hitl]) -
+                            FrsSciTraw[i * fFrsSciNbPmts + 2][0],
+                        "vftx",
+                        "vftx");
+
+                    auto TofRaw = fTimeStitch->GetTime(fHeader->GetTStartMaster() - StartTraw_atTcal, "vftx", "vftx");
+                    // Right - left
+                    auto PosRaw = FrsSciTraw[i * fFrsSciNbPmts][hitr] - FrsSciTraw[i * fFrsSciNbPmts + 1][hitl];
+
+                    if (fCalPar->GetMinTofAtRank(i) < TofRaw && TofRaw < fCalPar->GetMaxTofAtRank(i) &&
+                        fCalPar->GetMinPosAtRank(i) < PosRaw && PosRaw < fCalPar->GetMaxPosAtRank(i))
+                    {
+                        indexr[i] = hitr;
+                        indexl[i] = hitl;
+                        multTofRaw[i]++;
+                    }
                 }
             }
 
-            if (betaS2 < fBeta_max && betaS2 > fBeta_min)
+            if (indexr[i] >= 0 && indexl[i] >= 0 && multTofRaw[i] == 1)
             {
-                Gamma_m1 = 1. / (TMath::Sqrt(1. - TMath::Power(betaS2, 2)));
-                Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. + PosXS2 / fDispersionS2->GetAt(i));
-                AoQ_m1 = Brho_m1 / (3.10716 * betaS2 * Gamma_m1);
-                AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
+                StartTraw_atTcal = fTimeStitch->GetTime(0.5 * (FrsSciTraw[i * fFrsSciNbPmts][indexr[i]] +
+                                                               FrsSciTraw[i * fFrsSciNbPmts + 1][indexl[i]]) -
+                                                            FrsSciTraw[i * fFrsSciNbPmts + 2][0],
+                                                        "vftx",
+                                                        "vftx") -
+                                   (i == 1 ? 130. : 0.);
 
-                if (fCutS2 && fCutS2->IsInside(PosXS2, AoQ_m1_corr))
+                auto TofRaw = fTimeStitch->GetTime(fHeader->GetTStartMaster() - StartTraw_atTcal, "vftx", "vftx");
+                auto PosRaw = FrsSciTraw[i * fFrsSciNbPmts][indexr[i]] - FrsSciTraw[i * fFrsSciNbPmts + 1][indexl[i]] -
+                              (i == 1 ? 45.51 : 0.);
+
+                auto PosCal = fCalPar->GetPosCalGainAtRank(i) * PosRaw + fCalPar->GetPosCalOffsetAtRank(i);
+                auto Velocity = 1. / (fTof2InvV_p0->GetAt(0) + fTof2InvV_p1->GetAt(0) * TofRaw);
+                auto Beta = Velocity / 0.299792458;
+                auto Gamma = 1. / TMath::Sqrt(1. - Beta * Beta);
+                auto Brho = fBrho0_S2toCC->GetAt(0) * (1. - PosCal / fDispersionS2->GetAt(0));
+                auto AoQcal = Brho / (3.10716 * Beta * Gamma);
+                if (Beta > fIncomingID_Par->GetBeta_min() && Beta < fIncomingID_Par->GetBeta_max())
+                    this->AddData(i + 1, 1, Zcharge, AoQcal, Beta, Brho, PosCal, 0., TofRaw);
+            }
+        }
+    }
+    else
+    {
+        double Zmusic = 0.; //, Music_ang = 0.;
+        if (!fHitItemsMusli && fHitItemsMus && fHitItemsMus->GetEntriesFast() > 0)
+        {
+            Int_t nHits = fHitItemsMus->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hit = dynamic_cast<R3BMusicHitData*>(fHitItemsMus->At(ihit));
+                if (!hit)
+                    continue;
+                Zmusic = hit->GetZcharge();
+                // Music_ang = hit->GetTheta() * 1000.; // mrad
+            }
+        }
+
+        if (!fHitItemsMus && fHitItemsMusli && fHitItemsMusli->GetEntriesFast() > 0)
+        {
+            Int_t nHits = fHitItemsMusli->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto hit = dynamic_cast<R3BMusliHitData*>(fHitItemsMusli->At(ihit));
+                if (!hit)
+                    continue;
+                if (hit->GetType() == 2)
+                    Zmusic = hit->GetZcharge(); // for data with mean signals from 4 anodes
+                // if (hit->GetType() == 1)
+                // Music_ang = hit->GetTheta() * 1000.; // mrad, for data with mean signals from 2 anodes
+            }
+        }
+
+        // --- local variables --- //
+        UInt_t nHits = 0;
+        std::vector<Double_t> Zlos(fNumDet, 0);
+        std::vector<Double_t> posLosX_cm(fNumDet, 0);
+        std::vector<Double_t> trigTimeV(fNumDet, 0);
+        Double_t Gamma_m1 = 0., Brho_m1 = 0., AoQ_m1 = 0.;
+        Double_t AoQ_m1_corr = 0.;
+        std::vector<Int_t> multLos(fNumDet, 0);
+        Double_t en_pspx = 0., ZPsp = 0.;
+
+        // --- read Trigger data from LOS --- //
+        if (fTriggerLos && fTriggerLos->GetEntriesFast() > 0)
+        {
+            Int_t numDet = 1;
+            Int_t tHits = fTriggerLos->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < tHits; ihit++)
+            {
+                R3BLosTCalData* hittcal = dynamic_cast<R3BLosTCalData*>(fTriggerLos->At(ihit));
+                numDet = hittcal->GetDetector();
+                if (hittcal->GetType() == 0)
+                    trigTimeV[numDet - 1] = hittcal->GetRawTimeNs();
+            } // --- end of loop over hit data --- //
+        }
+
+        // --- read hit from LOS data --- //
+        if (fHitLos && fHitLos->GetEntriesFast() > 0)
+        {
+            Int_t numDet = 1;
+            nHits = fHitLos->GetEntriesFast();
+            for (Int_t ihit = 0; ihit < nHits; ihit++)
+            {
+                R3BLosHitData* hittcal = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
+                numDet = hittcal->GetDetector();
+                if (fUseTref)
                 {
-                    if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
+                    Double_t time = fTimeStitch->GetTime(hittcal->GetTime() - trigTimeV[numDet - 1], "vftx", "vftx");
+                    if (time == fHeader->GetTStart())
                     {
-                        // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                        // double zcor = sqrt(Emus * Beta_m1) * 0.277;
-                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zmusic))
-                        {
-                            hitfrs->SetZ(Zmusic);
-                            hitfrs->SetAq(AoQ_m1_corr);
-                            hitfrs->SetBrho(Brho_m1);
-                        }
-                        else if (!fCutCave)
-                        {
-                            hitfrs->SetZ(Zmusic);
-                            hitfrs->SetAq(AoQ_m1_corr);
-                            hitfrs->SetBrho(Brho_m1);
-                        }
-                    }
-
-                    if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
-                    {
-                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
-                        {
-                            hitfrs->SetZ(Zlos[i]);
-                            hitfrs->SetAq(AoQ_m1_corr);
-                            hitfrs->SetBrho(Brho_m1);
-                        }
-                        else if (!fCutCave)
-                        {
-                            hitfrs->SetZ(Zlos[i]);
-                            hitfrs->SetAq(AoQ_m1_corr);
-                            hitfrs->SetBrho(Brho_m1);
-                        }
-                    }
-
-                    if (ZPsp > 0. && !fUseLOS && fUsePspx1)
-                    {
-                        hitfrs->SetZ(ZPsp);
-                        hitfrs->SetAq(AoQ_m1_corr);
-                        hitfrs->SetBrho(Brho_m1);
+                        posLosX_cm[numDet - 1] = hittcal->GetX_cm();
+                        Zlos[numDet - 1] = hittcal->GetZ();
                     }
                 }
-                else if (!fCutS2)
+                else
                 {
-                    if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
+                    if (multLos[numDet - 1] == 0)
                     {
-                        // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
-                        // double zcor = sqrt(Emus * Beta_m1) * 0.277;
-                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zmusic))
+                        posLosX_cm[numDet - 1] = hittcal->GetX_cm();
+                        Zlos[numDet - 1] = hittcal->GetZ();
+                    }
+                }
+                multLos[numDet - 1]++;
+            } // --- end of loop over hit data --- //
+        }
+
+        // --- read hit from PSP data --- //
+
+        if (fHitPspx1_x)
+        {
+            // For now only multiplicity = 1 events are taken. Proper
+            // treatment of multihit events needs to be implemented.
+            if (fHitPspx1_x && fHitPspx1_x->GetEntriesFast() == 1)
+            {
+                auto pspx1hitx = dynamic_cast<R3BPspxHitData*>(fHitPspx1_x->At(0));
+                en_pspx = pspx1hitx->GetEnergy();
+            }
+            ZPsp = en_pspx;
+        }
+
+        for (int i = 0; i < fNumDet; i++)
+        {
+            // --- secondary beam identification ---
+
+            // if X is increasing from left to right:
+            //    Brho = fBhro0 * (1 - xMwpc0/fDCC + xS2/fDS2)
+            // in R3BRoot, X is increasing from right to left
+            //    Bro = fBrho0 * (1 + xMwpc0/fDCC - xS2/fDS2)
+
+            if (multLos[i] > 0)
+            {
+                Double_t betaS2 = 0.;
+                Double_t PosXS2 = 0.;
+                R3BFrsData* hitfrs = nullptr;
+                if (fFrsHitData && fFrsHitData->GetEntriesFast() > 0)
+                {
+                    nHits = fFrsHitData->GetEntriesFast();
+                    R3BLOG_IF(error, nHits > 1, "Multiplicity from FRS detector larger than 1: " << nHits);
+                    for (Int_t ihit = 0; ihit < nHits; ihit++)
+                    {
+                        hitfrs = dynamic_cast<R3BFrsData*>(fFrsHitData->At(ihit));
+                        if (!hitfrs)
+                            continue;
+                        betaS2 = hitfrs->GetBeta();
+                        PosXS2 = hitfrs->GetXS2();
+                        if (TMath::IsNaN(PosXS2) && fHeader->GetExpId() == 509) // NaN indicator for one S2 pmt missing
+                            PosXS2 = 0.;
+                    }
+                }
+
+                if (betaS2 < fBeta_max && betaS2 > fBeta_min && hitfrs)
+                {
+                    Gamma_m1 = 1. / (TMath::Sqrt(1. - TMath::Power(betaS2, 2)));
+                    Brho_m1 = fBrho0_S2toCC->GetAt(i) * (1. + PosXS2 / fDispersionS2->GetAt(i));
+                    AoQ_m1 = Brho_m1 / (3.10716 * betaS2 * Gamma_m1);
+                    AoQ_m1_corr = fy0_Aq + (posLosX_cm[i] - fx0_Aq) * sin(fang_Aq) + (AoQ_m1 - fy0_Aq) * cos(fang_Aq);
+
+                    if (fCutS2 && fCutS2->IsInside(PosXS2, AoQ_m1_corr))
+                    {
+                        if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
                         {
-                            hitfrs->SetZ(Zmusic);
-                            hitfrs->SetAq(AoQ_m1_corr);
-                            hitfrs->SetBrho(Brho_m1);
+                            // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                            // double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                            if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zmusic))
+                            {
+                                hitfrs->SetZ(Zmusic);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                            else if (!fCutCave)
+                            {
+                                hitfrs->SetZ(Zmusic);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
                         }
-                        else if (!fCutCave)
+
+                        if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
                         {
-                            hitfrs->SetZ(Zmusic);
+                            if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
+                            {
+                                hitfrs->SetZ(Zlos[i]);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                            else if (!fCutCave)
+                            {
+                                hitfrs->SetZ(Zlos[i]);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                        }
+
+                        if (ZPsp > 0. && !fUseLOS && fUsePspx1)
+                        {
+                            hitfrs->SetZ(ZPsp);
                             hitfrs->SetAq(AoQ_m1_corr);
                             hitfrs->SetBrho(Brho_m1);
                         }
                     }
-
-                    if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
+                    else if (!fCutS2)
                     {
-                        if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
+                        if (Zmusic > 0. && !fUseLOS && !fUsePspx1)
                         {
-                            hitfrs->SetZ(Zlos[i]);
+                            // double Emus = ((Zmusic + 4.7) / 0.28) * ((Zmusic + 4.7) / 0.28);
+                            // double zcor = sqrt(Emus * Beta_m1) * 0.277;
+                            if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zmusic))
+                            {
+                                hitfrs->SetZ(Zmusic);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                            else if (!fCutCave)
+                            {
+                                hitfrs->SetZ(Zmusic);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                        }
+
+                        if (Zlos[i] > 0. && fUseLOS && !fUsePspx1)
+                        {
+                            if (fCutCave && fCutCave->IsInside(AoQ_m1_corr, Zlos[i]))
+                            {
+                                hitfrs->SetZ(Zlos[i]);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                            else if (!fCutCave)
+                            {
+                                hitfrs->SetZ(Zlos[i]);
+                                hitfrs->SetAq(AoQ_m1_corr);
+                                hitfrs->SetBrho(Brho_m1);
+                            }
+                        }
+
+                        if (ZPsp > 0. && !fUseLOS && fUsePspx1)
+                        {
+                            hitfrs->SetZ(ZPsp);
                             hitfrs->SetAq(AoQ_m1_corr);
                             hitfrs->SetBrho(Brho_m1);
                         }
-                        else if (!fCutCave)
-                        {
-                            hitfrs->SetZ(Zlos[i]);
-                            hitfrs->SetAq(AoQ_m1_corr);
-                            hitfrs->SetBrho(Brho_m1);
-                        }
-                    }
-
-                    if (ZPsp > 0. && !fUseLOS && fUsePspx1)
-                    {
-                        hitfrs->SetZ(ZPsp);
-                        hitfrs->SetAq(AoQ_m1_corr);
-                        hitfrs->SetBrho(Brho_m1);
                     }
                 }
             }
@@ -444,6 +545,10 @@ void R3BAnalysisIncomingID::FinishEvent()
     {
         fHitItemsMusli->Clear();
     }
+    if (fFrsSci_Tcal)
+    {
+        fFrsSci_Tcal->Clear();
+    }
     if (fHitPspx1_x)
     {
         fHitPspx1_x->Clear();
@@ -452,10 +557,26 @@ void R3BAnalysisIncomingID::FinishEvent()
     {
         fHitPspx1_y->Clear();
     }
-    if (fFrsDataCA)
+    if (fFrsHitData)
     {
-        fFrsDataCA->Clear();
+        fFrsHitData->Clear();
     }
 }
 
-ClassImp(R3BAnalysisIncomingID);
+R3BFrsData* R3BAnalysisIncomingID::AddData(Int_t StaId,
+                                           Int_t StoId,
+                                           Double_t z,
+                                           Double_t aq,
+                                           Double_t beta,
+                                           Double_t brho,
+                                           Double_t xs2,
+                                           Double_t xc,
+                                           Double_t tof)
+{
+    // It fills the R3BFrsData
+    TClonesArray& clref = *fFrsHitData;
+    Int_t size = clref.GetEntriesFast();
+    return new (clref[size]) R3BFrsData(StaId, StoId, z, aq, beta, brho, xs2, xc, tof);
+}
+
+ClassImp(R3BAnalysisIncomingID)

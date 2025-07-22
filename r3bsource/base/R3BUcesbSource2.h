@@ -15,13 +15,14 @@
 
 #include "R3BReader.h"
 #include <FairSource.h>
-#include <R3BUcesbLauncher.h>
 #include <R3BUcesbMappingFlag.h>
 #include <R3BUcesbStructInfo.h>
 #include <Rtypes.h>
+#include <chrono>
 #include <cstddef>
 #include <ext_data_clnt.hh>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -31,15 +32,17 @@ using EventStructType = EXT_STR_h101_t;
 
 namespace R3B
 {
+    class UcesbServerLauncher;
     class UcesbSource : public FairSource
     {
       public:
-        UcesbSource() = default;
+        UcesbSource();
         UcesbSource(std::string_view lmdfile_name,
                     std::string_view ntuple_options,
                     std::string_view ucesb_path,
                     EventStructType* event_struct,
                     size_t event_struct_size);
+
         // rule of five:
         ~UcesbSource() override;
         UcesbSource(const UcesbSource&) = delete;
@@ -48,16 +51,19 @@ namespace R3B
         UcesbSource& operator=(UcesbSource&&) = delete;
 
         // setters:
-        void SetMaxEvents(unsigned int max_event_num) { max_event_num_ = max_event_num; }
+        void SetMaxEvents(int max_event_num) { max_event_num_ = max_event_num; }
         void SetLMDFileName(std::string_view lmdfile_name) { lmdfile_name_ = lmdfile_name; }
         void SetNTupleOptions(std::string_view ntuple_options) { ntuple_options_ = ntuple_options; }
         void SetUcesbPath(std::string_view ucesb_path) { ucesb_path_ = ucesb_path; }
         void SetEventStructSize(size_t event_size) { event_struct_size_ = event_size; }
+        void SetInfiniteRun(bool is_infinite = true) { is_infinite_run_ = is_infinite; }
         // non-owning
         void SetEventStruct(EventStructType* event_struct) { event_struct_ = event_struct; }
         void SetRawDataPrint(bool print_raw_data) { has_raw_data_printing_ = print_raw_data; }
         void SetRunID(unsigned int run_id) { run_id_ = run_id; }
         void AllowExtraMap(UcesbMap flag) { ucesb_client_struct_info_.SetExtraMapFlags(flag); }
+
+        void RestartUcesbServer();
 
         template <typename ReaderType>
         auto AddReader(std::unique_ptr<ReaderType> reader) -> ReaderType*;
@@ -78,8 +84,9 @@ namespace R3B
 
       private:
         bool has_raw_data_printing_ = false;
+        bool is_infinite_run_ = false;
         unsigned int run_id_ = 0;
-        unsigned int max_event_num_ = 0;
+        int max_event_num_ = 0;
         size_t event_struct_size_ = 0;
         EventStructType* event_struct_ = nullptr; // non-owning
         R3BEventHeader* event_header_ = nullptr;  // non-owning
@@ -87,10 +94,13 @@ namespace R3B
         std::string lmdfile_name_;
         std::string ntuple_options_;
         std::string ucesb_path_;
+        std::mutex event_reader_mutex_;
+        std::chrono::time_point<std::chrono::system_clock> last_start_time_ = std::chrono::system_clock::now();
+        std::chrono::minutes waiting_time_{ 0 };
 
         ext_data_clnt ucesb_client_;
         UcesbStructInfo ucesb_client_struct_info_;
-        UcesbServerLauncher ucesb_server_launcher_ = UcesbServerLauncher{ &ucesb_client_ };
+        std::unique_ptr<UcesbServerLauncher> ucesb_server_launcher_; //!
 
         // private non-virtual methods:
 
@@ -100,6 +110,8 @@ namespace R3B
         void init_readers();
         void setup_ucesb();
         void print_raw_data();
+        void restart_ucesb_server();
+        void restart_ucesb_server_delayed();
 
         // private virtual methods:
         bool Init() override;

@@ -15,8 +15,7 @@
 // -----     Created July 2019 by L.Bott                -----
 // ----------------------------------------------------------
 
-#ifndef R3BTOFICAL2HISTO_H
-#define R3BTOFICAL2HISTO_H
+#pragma once
 
 #define N_TOFI_HIT_PLANE_MAX 1
 #define N_TOFI_HIT_PADDLE_MAX 24
@@ -32,13 +31,9 @@ class TClonesArray;
 class R3BEventHeader;
 class TH1F;
 class TH2F;
-#ifdef __CINT__
-#pragma link C++ class R3BTofiHitModulePar + ;
-#endif
 
 class R3BTofiCal2Histo : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -197,5 +192,3 @@ class R3BTofiCal2Histo : public FairTask
   public:
     ClassDef(R3BTofiCal2Histo, 1)
 };
-
-#endif

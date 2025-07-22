@@ -18,8 +18,7 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_EXT_H101_FRSSCI_H__
-#define __GUARD_H101_EXT_H101_FRSSCI_H__
+#pragma once
 
 #ifndef __CINT__
 #include <stdint.h>
@@ -169,7 +168,5 @@ typedef struct EXT_STR_h101_FRSSCI_onion_t
             ok, si, offset, struct_t, printerr, FRSSCI3VTCv, UINT32, "FRSSCI3VTCv", "FRSSCI3VTC", 0 /*flags*/);    \
                                                                                                                    \
     } while (0);
-
-#endif /*__GUARD_H101_EXT_H101_FRSSCI_H__*/
 
 /*******************************************************/

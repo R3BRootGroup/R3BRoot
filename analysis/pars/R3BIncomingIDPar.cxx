@@ -26,7 +26,6 @@
 // ---- Standard Constructor ---------------------------------------------------
 R3BIncomingIDPar::R3BIncomingIDPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
-    , fNumDet(1)
 {
     fToFoffset = new TArrayF(fNumDet);
     fPosS2Left = new TArrayF(fNumDet);
@@ -201,12 +200,15 @@ void R3BIncomingIDPar::printParams()
 
     LOG(info) << "Brho: " << fBrho0_S2toCC->GetAt(0) << ", DispersionS2toCC: " << fDispersionS2->GetAt(0);
 
-    for (Int_t d = 0; d < fNumDet; d++)
-        LOG(info) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d) << " PosS2Left" << fPosS2Left->GetAt(d)
-                  << ", PosS2Right: " << fPosS2Right->GetAt(d);
+    for (size_t d = 0; d < fNumDet; d++)
+    {
+        LOG(info) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d)
+                  << "\nPosS2Left: " << fPosS2Left->GetAt(d) << ", PosS2Right: " << fPosS2Right->GetAt(d)
+                  << "\nBeta range: " << fBeta_min << ", " << fBeta_max;
+    }
 
     fTcutparS2->print();
     fTcutparCave->print();
 }
 
-ClassImp(R3BIncomingIDPar);
+ClassImp(R3BIncomingIDPar)

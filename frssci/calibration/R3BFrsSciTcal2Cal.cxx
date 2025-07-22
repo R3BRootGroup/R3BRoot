@@ -20,6 +20,9 @@
 // FrsSci headers
 #include "R3BFrsSciTcal2Cal.h"
 
+// 64 hits max per VFTX channel
+constexpr std::size_t maxHits = 64;
+
 #define SPEED_OF_LIGHT_MNS 0.299792458
 
 // --- Default Constructor
@@ -89,7 +92,7 @@ InitStatus R3BFrsSciTcal2Cal::Init()
 {
     LOG(info) << "R3BFrsSciTcal2Cal::Init()";
 
-    FairRootManager* rm = FairRootManager::Instance();
+    auto rm = FairRootManager::Instance();
     if (!rm)
     {
         LOG(error) << "R3BFrsSciTcal2Cal::Init() Couldn't instance the FairRootManager";
@@ -107,25 +110,11 @@ InitStatus R3BFrsSciTcal2Cal::Init()
         LOG(info) << "R3BFrsSciTcal2Cal::Init() FrsSciTcalData items found";
 
     // Register output arrays in tree
-    fPosCal = new TClonesArray("R3BFrsSciPosCalData", 25);
-    if (!fOnline)
-    {
-        rm->Register("FrsSciPosCalData", "FrsSci", fPosCal, kTRUE);
-    }
-    else
-    {
-        rm->Register("FrsSciPosCalData", "FrsSci", fPosCal, kFALSE);
-    }
+    fPosCal = new TClonesArray("R3BFrsSciPosCalData");
+    rm->Register("FrsSciPosCalData", "FrsSci", fPosCal, !fOnline);
 
-    fTofCal = new TClonesArray("R3BFrsSciTofCalData", 25);
-    if (!fOnline)
-    {
-        rm->Register("FrsSciTofCalData", "FrsSci", fTofCal, kTRUE);
-    }
-    else
-    {
-        rm->Register("FrsSciTofCalData", "FrsSci", fTofCal, kFALSE);
-    }
+    fTofCal = new TClonesArray("R3BFrsSciTofCalData");
+    rm->Register("FrsSciTofCalData", "FrsSci", fTofCal, !fOnline);
 
     return kSUCCESS;
 }
@@ -136,40 +125,40 @@ InitStatus R3BFrsSciTcal2Cal::ReInit()
     return kSUCCESS;
 }
 
-void R3BFrsSciTcal2Cal::Exec(Option_t* option)
+void R3BFrsSciTcal2Cal::Exec(Option_t*)
 {
+    auto nHitsPerEvent_FrsSci = fTcal->GetEntriesFast();
+    if (nHitsPerEvent_FrsSci == 0)
+        return;
+
     // Reset entries in output arrays, local arrays
     Reset();
+
     // Variables to read the Tcal data
-    UShort_t nDets = (UShort_t)fCalPar->GetNumDets();
-    UShort_t nPmts = (UShort_t)fCalPar->GetNumPmts();
-    // UShort_t nDets = 2;
-    // UShort_t nPmts = 3;
+    auto nDets = fCalPar->GetNumDets();
+    auto nPmts = fCalPar->GetNumPmts();
+
     UShort_t iDet = 0;
     UShort_t iPmt = 0;
-    Double_t iTraw[nDets * nPmts][64]; // 64 hits max per VFTX channel
-    UShort_t mult[nDets * nPmts];
-    // ULong64_t maskR[nDets];
-    // ULong64_t maskL[nDets];
-    for (UShort_t i = 0; i < nDets * nPmts; i++)
+
+    std::vector<std::vector<double>> iTraw;
+    iTraw.resize(nDets * nPmts);
+    for (auto& row : iTraw)
     {
-        mult[i] = 0;
-        for (UShort_t j = 0; j < 64; j++)
-        {
-            iTraw[i][j] = 0;
-        }
+        row.resize(maxHits, 0.0);
     }
 
+    std::vector<UShort_t> mult(nDets * nPmts, 0);
+
     // Loop over the entries of the Tcal TClonesArray
-    UInt_t nHitsPerEvent_FrsSci = fTcal->GetEntries();
     for (UInt_t ihit = 0; ihit < nHitsPerEvent_FrsSci; ihit++)
     {
-        R3BFrsSciTcalData* hit = (R3BFrsSciTcalData*)fTcal->At(ihit);
+        auto hit = (R3BFrsSciTcalData*)fTcal->At(ihit);
         if (!hit)
             continue;
         iDet = hit->GetDetector() - 1;
         iPmt = hit->GetPmt() - 1;
-        if (mult[iDet * nPmts + iPmt] < 64) // always true, max mult=64 per vftx channel
+        if (mult[iDet * nPmts + iPmt] < maxHits) // always true, max mult=64 per vftx channel
         {
             iTraw[iDet * nPmts + iPmt][mult[iDet * nPmts + iPmt]] = hit->GetRawTimeNs();
             mult[iDet * nPmts + iPmt]++;
@@ -224,23 +213,15 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
         Float_t iRawPosSto = NAN;
         Double_t iRawTof = NAN, iCalTof = -1, iCalVelo = NAN;
         Double_t iBeta = NAN, iGamma = NAN, iBRho = NAN, iAoQ = NAN;
-        Int_t selectLeftHit[nDets];
-        Int_t selectRightHit[nDets];
-        for (UShort_t det = 0; det < nDets; det++)
-        {
-            selectLeftHit[det] = -1;
-            selectRightHit[det] = -1;
-        }
+
+        std::vector<int> selectLeftHit(nDets, -1);
+        std::vector<int> selectRightHit(nDets, -1);
 
         // stop detector is the last detector
-        Int_t dSto = nDets - 1; // 0-based
-        UShort_t selectRightHit_dSto[nDets - 1];
-        UShort_t selectLeftHit_dSto[nDets - 1];
-        for (UShort_t det = 0; det < nDets - 1; det++)
-        {
-            selectLeftHit_dSto[det] = -1;
-            selectRightHit_dSto[det] = -1;
-        }
+        int dSto = nDets - 1; // 0-based
+        std::vector<int> selectRightHit_dSto(nDets - 1, -1);
+        std::vector<int> selectLeftHit_dSto(nDets - 1, -1);
+
         Bool_t selectHit = kFALSE;
         Bool_t selectSameHit = kTRUE;
 
@@ -313,17 +294,11 @@ void R3BFrsSciTcal2Cal::Exec(Option_t* option)
         }                         // end of if data in Left and Right of Sto detector
 
         // Fill CalData levels
-        Double_t iRawTime[nDets];
-        Double_t iRawTime_wtref[nDets];
-        Float_t iRawPos[nDets];
-        Float_t iCalPos[nDets];
-        for (UShort_t det = 0; det < nDets; det++)
-        {
-            iRawTime[det] = NAN;
-            iRawTime_wtref[det] = NAN;
-            iRawPos[det] = NAN;
-            iCalPos[det] = NAN;
-        }
+        std::vector<Double_t> iRawTime(nDets, NAN);
+        std::vector<Double_t> iRawTime_wtref(nDets, NAN);
+        std::vector<Float_t> iRawPos(nDets, NAN);
+        std::vector<Float_t> iCalPos(nDets, NAN);
+
         // if hit at stop detector is the same for all Sta detector
         if (selectSameHit == kTRUE)
         {
@@ -456,4 +431,4 @@ R3BFrsSciTofCalData* R3BFrsSciTcal2Cal::AddTofCalData(UShort_t rank,
         R3BFrsSciTofCalData(rank, detsta, detsto, calpossta, calpossto, rawtof, caltof, beta, brho, aoq);
 }
 
-ClassImp(R3BFrsSciTcal2Cal);
+ClassImp(R3BFrsSciTcal2Cal)

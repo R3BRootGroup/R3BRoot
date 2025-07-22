@@ -12,10 +12,10 @@
  ******************************************************************************/
 
 // Fair headers
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
+#include <FairLogger.h>
+#include <FairRootManager.h>
+#include <FairRunAna.h>
+#include <FairRuntimeDb.h>
 
 // FrsSci headers
 #include "R3BFrsSciMapped2Tcal.h"
@@ -25,22 +25,12 @@
 // --- Default Constructor
 R3BFrsSciMapped2Tcal::R3BFrsSciMapped2Tcal()
     : FairTask("R3BFrsSciMapped2Tcal", 1)
-    , fNevent(0)
-    , fMapped(NULL)
-    , fTcalPar(NULL)
-    , fTcal(NULL)
-    , fOnline(kFALSE)
 {
 }
 
 // --- Standard Constructor
 R3BFrsSciMapped2Tcal::R3BFrsSciMapped2Tcal(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fNevent(0)
-    , fMapped(NULL)
-    , fTcalPar(NULL)
-    , fTcal(NULL)
-    , fOnline(kFALSE)
 {
 }
 
@@ -48,10 +38,6 @@ R3BFrsSciMapped2Tcal::R3BFrsSciMapped2Tcal(const char* name, Int_t iVerbose)
 R3BFrsSciMapped2Tcal::~R3BFrsSciMapped2Tcal()
 {
     LOG(info) << "R3BFrsSciMapped2Tcal: Delete instance";
-    if (fMapped)
-    {
-        delete fMapped;
-    }
     if (fTcal)
     {
         delete fTcal;
@@ -101,15 +87,8 @@ InitStatus R3BFrsSciMapped2Tcal::Init()
         LOG(info) << "R3BFrsSciMapped2Tcal::Init() FrsSciMappedData items found";
 
     // Register output array in tree
-    fTcal = new TClonesArray("R3BFrsSciTcalData", 25);
-    if (!fOnline)
-    {
-        rm->Register("FrsSciTcalData", "FrsSci", fTcal, kTRUE);
-    }
-    else
-    {
-        rm->Register("FrsSciTcalData", "FrsSci", fTcal, kFALSE);
-    }
+    fTcal = new TClonesArray("R3BFrsSciTcalData");
+    rm->Register("FrsSciTcalData", "FrsSci", fTcal, !fOnline);
 
     return kSUCCESS;
 }
@@ -132,10 +111,10 @@ void R3BFrsSciMapped2Tcal::Exec(Option_t* option)
     Reset();
 
     // Loop over the entries of the Mapped TClonesArray
-    UInt_t nHitsPerEvent_FrsSci = fMapped->GetEntries();
-    for (UInt_t ihit = 0; ihit < nHitsPerEvent_FrsSci; ihit++)
+    auto nHitsPerEvent_FrsSci = fMapped->GetEntriesFast();
+    for (size_t ihit = 0; ihit < nHitsPerEvent_FrsSci; ihit++)
     {
-        R3BFrsSciMappedData* hit = (R3BFrsSciMappedData*)fMapped->At(ihit);
+        auto hit = (R3BFrsSciMappedData*)fMapped->At(ihit);
         if (!hit)
             continue;
         det = hit->GetDetector();
@@ -156,7 +135,7 @@ void R3BFrsSciMapped2Tcal::Exec(Option_t* option)
             continue;
         }
         tns = CalculateTimeNs(det, pmt, tf, tc);
-        AddTcalData(det, pmt, tns);
+        AddTcalData(det, pmt, tns, tc);
     }
 
     if (nHitsPerEvent_FrsSci != fTcal->GetEntries())
@@ -198,12 +177,12 @@ Double_t R3BFrsSciMapped2Tcal::CalculateTimeNs(UShort_t iDet, UShort_t iPmt, UIn
 }
 
 // -----   Private method AddCalData  --------------------------------------------
-R3BFrsSciTcalData* R3BFrsSciMapped2Tcal::AddTcalData(UShort_t det, UShort_t pmt, Double_t tns)
+R3BFrsSciTcalData* R3BFrsSciMapped2Tcal::AddTcalData(UShort_t det, UShort_t pmt, Double_t tns, UInt_t tc)
 {
     // It fills the R3BFrsSciTcalData
     TClonesArray& clref = *fTcal;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BFrsSciTcalData(det, pmt, tns);
+    return new (clref[size]) R3BFrsSciTcalData(det, pmt, tns, tc);
 }
 
 ClassImp(R3BFrsSciMapped2Tcal)
