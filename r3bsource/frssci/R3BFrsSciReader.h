@@ -25,23 +25,22 @@ class R3BFrsSciReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BFrsSciReader(EXT_STR_h101_FRSSCI*, size_t);
-    R3BFrsSciReader(EXT_STR_h101_FRSSCI*, size_t, UShort_t);
+    R3BFrsSciReader(EXT_STR_h101_FRSSCI*, size_t, UShort_t nbsci = 1);
 
     // Destructor
     virtual ~R3BFrsSciReader();
 
     // Setup structure information
-    virtual Bool_t Init(ext_data_struct_info*) override;
+    Bool_t Init(ext_data_struct_info*) override;
 
     // Read data from full event structure
-    virtual Bool_t R3BRead() override;
+    Bool_t R3BRead() override;
 
     // Reset
-    virtual void Reset() override;
+    void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     // Reader specific data structure from ucesb
@@ -49,12 +48,12 @@ class R3BFrsSciReader : public R3BReader
     // Data offset
     size_t fOffset;
     // Don't store data for online
-    Bool_t fOnline;
+    bool fOnline = false;
     // Output array of type R3BFrsSciMapped
     TClonesArray* fArray;
 
     UInt_t fNumEntries;
-    UShort_t fNumSci;
+    UShort_t fNumSci = 1;
 
   public:
     ClassDefOverride(R3BFrsSciReader, 0);

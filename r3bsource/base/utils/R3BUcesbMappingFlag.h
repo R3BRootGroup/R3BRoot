@@ -15,8 +15,11 @@
 #include <bitset>
 #include <cstdint>
 #include <ext_data_client.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
-#include <ostream>
+#include <iostream>
+#include <string>
+#include <type_traits>
 
 constexpr auto UCESB_MAP_BITSIZE = 32;
 
@@ -116,12 +119,12 @@ class fmt::formatter<R3B::UcesbMap>
 
         if (specifier_iter == ctx.end())
         {
-            throw format_error("UcesbMap format failed: missing right curly bracket!");
+            throw fmt::format_error("UcesbMap format failed: missing right curly bracket!");
         }
 
         if (*specifier_iter != '}')
         {
-            throw format_error("UcesbMap format failed: only one speicifier is allowed");
+            throw fmt::format_error("UcesbMap format failed: only one speicifier is allowed");
         }
         return specifier_iter;
     }
@@ -133,9 +136,9 @@ class fmt::formatter<R3B::UcesbMap>
         {
             default:
             case 's':
-                return format_to(ctn.out(), "{}", R3B::UcesbMap2String(flag));
+                return fmt::format_to(ctn.out(), "{}", R3B::UcesbMap2String(flag));
             case 'b':
-                return format_to(ctn.out(), "0x{:b}", static_cast<R3B::UcesbMapUType>(flag));
+                return fmt::format_to(ctn.out(), "0x{:b}", static_cast<R3B::UcesbMapUType>(flag));
         }
     }
 

@@ -1,6 +1,7 @@
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2025 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,20 +12,32 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#pragma once
+#include "R3BIncomingIDPar.h"
+#include "R3BMSOffsetPar.h"
+#include "gtest/gtest.h"
+#include <map>
 
-#include "FairContFact.h"
-
-class FairContainer;
-
-class R3BFrsSciContFact : public FairContFact
+namespace
 {
-  private:
-    void setAllContainers();
+    TEST(testAnaIncomingPar, GetBeta_min)
+    {
+        R3BIncomingIDPar par;
+        par.SetBeta_min(0.5);
 
-  public:
-    R3BFrsSciContFact();
-    ~R3BFrsSciContFact() {}
-    FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BFrsSciContFact, 0)
-};
+        EXPECT_EQ(par.GetBeta_min(), 0.5);
+    }
+    TEST(testAnaIncomingPar, GetBeta_max)
+    {
+        R3BIncomingIDPar par;
+        par.SetBeta_max(1.0);
+
+        EXPECT_EQ(par.GetBeta_max(), 1.0);
+    }
+    TEST(testAnaMSOffsetPar, GetMSOffset)
+    {
+        R3BMSOffsetPar par;
+        par.SetMSOffset(3.5);
+
+        EXPECT_EQ(par.GetMSOffset(), 3.5);
+    }
+} // namespace

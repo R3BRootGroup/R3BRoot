@@ -115,7 +115,6 @@
 #pragma link C++ class EXT_STR_h101_SCI2_onion_t;
 #pragma link C++ class EXT_STR_h101_SCI8_onion_t;
 #pragma link C++ class EXT_STR_h101_ROLU_onion_t;
-#pragma link C++ class EXT_STR_h101_ROLU_NOTRIG_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFD_onion_t;
 #pragma link C++ class EXT_STR_h101_TOFI_onion_t;
 #pragma link C++ class EXT_STR_h101_PTOF_onion_t;

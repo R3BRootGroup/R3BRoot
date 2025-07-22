@@ -1,6 +1,7 @@
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2025 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -10,24 +11,40 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-#pragma once
 
-#include "FairContFact.h"
+#include "R3BFrsSciCalPar.h"
+#include "R3BFrsSciTcalPar.h"
+#include "gtest/gtest.h"
+#include <map>
 
-class FairContainer;
-
-class R3BMSOffsetContFact : public FairContFact
+namespace
 {
-  private:
-    void setAllContainers();
+    TEST(testFrsSciTcalPar, GetNumDets)
+    {
+        R3BFrsSciTcalPar par;
+        par.SetNumDets(2);
 
-  public:
-    R3BMSOffsetContFact();
-    R3BMSOffsetContFact(const R3BMSOffsetContFact&) = delete;
-    R3BMSOffsetContFact(R3BMSOffsetContFact&&) = delete;
-    R3BMSOffsetContFact& operator=(const R3BMSOffsetContFact&) = delete;
-    R3BMSOffsetContFact& operator=(R3BMSOffsetContFact&&) = delete;
-    ~R3BMSOffsetContFact() override = default;
-    FairParSet* createContainer(FairContainer* /*unused*/) override;
-    ClassDefOverride(R3BMSOffsetContFact, 0) // Factory for all MSOffset parameter containers
-};
+        EXPECT_EQ(par.GetNumDets(), 2);
+    }
+    TEST(testFrsSciTcalPar, GetNumPmts)
+    {
+        R3BFrsSciTcalPar par;
+        par.SetNumPmts(3);
+
+        EXPECT_EQ(par.GetNumPmts(), 3);
+    }
+    TEST(testFrsSciCalPar, GetNumDets)
+    {
+        R3BFrsSciCalPar par;
+        par.SetNumDets(2);
+
+        EXPECT_EQ(par.GetNumDets(), 2);
+    }
+    TEST(testFrsSciCalPar, GetNumPmts)
+    {
+        R3BFrsSciCalPar par;
+        par.SetNumPmts(3);
+
+        EXPECT_EQ(par.GetNumPmts(), 3);
+    }
+} // namespace

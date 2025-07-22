@@ -31,16 +31,16 @@ class R3BFrsSciTcalPar : public FairParGenericSet
     virtual ~R3BFrsSciTcalPar();
 
     /** Method to reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Method to store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Method to retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Method to print values of parameters to the standard output **/
-    void printParams();
+    void printParams() override;
 
     /** Accessor functions **/
 
@@ -68,5 +68,6 @@ class R3BFrsSciTcalPar : public FairParGenericSet
     const R3BFrsSciTcalPar& operator=(const R3BFrsSciTcalPar&);
     R3BFrsSciTcalPar(const R3BFrsSciTcalPar&);
 
-    ClassDef(R3BFrsSciTcalPar, 1);
+  public:
+    ClassDefOverride(R3BFrsSciTcalPar, 1); // NOLINT
 };

@@ -94,55 +94,51 @@ Bool_t R3BLosHitPar::getParams(FairParamList* list)
 
     if (!(list->fill("xoffset_MCFD", &fxoffset_MCFD)))
     {
-        LOG(info) << "---Could not initialize LosHit xoffset_MCFD Par";
-        return kFALSE;
+        LOG(warn) << "Could not initialize LosHit xoffset_MCFD Par";
     }
 
     if (!(list->fill("yoffset_MCFD", &fyoffset_MCFD)))
     {
-        LOG(info) << "---Could not initialize LosHit yoffset_MCFD Par";
-        return kFALSE;
+        LOG(warn) << "Could not initialize LosHit yoffset_MCFD Par";
     }
 
     if (!(list->fill("xveff_MCFD", &fxveff_MCFD)))
     {
-        LOG(info) << "---Could not initialize LosHit xveff_MCFD Par";
-        return kFALSE;
+        LOG(warn) << "Could not initialize LosHit xveff_MCFD Par";
     }
 
     if (!(list->fill("yveff_MCFD", &fyveff_MCFD)))
     {
-        LOG(info) << "---Could not initialize LosHit yveff_MCFD Par";
-        return kFALSE;
+        LOG(warn) << "Could not initialize LosHit yveff_MCFD Par";
     }
 
     if (!list->fill("NumParamsTamexLE", &fNumParamsTamexLE))
     {
-        LOG(info) << "Could not initialize NumParamsTamexLE";
-        return kFALSE;
+        LOG(warn) << "Could not initialize NumParamsTamexLE";
     }
 
     if (!list->fill("NumParamsTamexTE", &fNumParamsTamexTE))
     {
-        LOG(info) << "Could not initialize NumParamsTamexTE";
-        return kFALSE;
+        LOG(warn) << "Could not initialize NumParamsTamexTE";
     }
 
     Int_t array_LE = 8 * fNumParamsTamexLE;
     fLEMatchParams->Set(array_LE);
-    if (!(list->fill("LosLEMatchPar", fLEMatchParams)))
-    {
-        LOG(info) << "Could not initialize LosLEMatchPar";
-        return kFALSE;
-    }
+    if (fNumParamsTamexLE > 0)
+        if (!(list->fill("LosLEMatchPar", fLEMatchParams)))
+        {
+            LOG(error) << "Could not initialize LosLEMatchPar";
+            return kFALSE;
+        }
 
     Int_t array_TE = 8 * fNumParamsTamexTE;
     fLEMatchParams->Set(array_TE);
-    if (!(list->fill("LosTEMatchPar", fTEMatchParams)))
-    {
-        LOG(info) << "Could not initialize LosTEMatchPar";
-        return kFALSE;
-    }
+    if (fNumParamsTamexTE > 0)
+        if (!(list->fill("LosTEMatchPar", fTEMatchParams)))
+        {
+            LOG(error) << "Could not initialize LosTEMatchPar";
+            return kFALSE;
+        }
 
     return kTRUE;
 }

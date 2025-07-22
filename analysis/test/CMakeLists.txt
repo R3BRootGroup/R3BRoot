@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2025 Members of R3B Collaboration                          #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -11,40 +11,11 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-file(
-    GLOB
-    SRCS
-    ./online/*.cxx
-    ./offline/*.cxx
-    ./pars/*.cxx)
-
-change_file_extension(*.cxx *.h HEADERS "${SRCS}")
-
-add_library_with_dictionary(
-    LIBNAME
-    R3BAnalysis
-    LINKDEF
-    AnaLinkDef.h
-    HEADERS
-    ${HEADERS}
-    SRCS
-    ${SRCS}
-    INCLUDEDIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    offline
-    online
-    pars
-    DEPENDENCIES
-    R3BTraRene
-    R3BLos
-    R3BCalifa
-    R3BMwpc
-    R3BSsd
-    R3BTofD
-    R3BTofi
-    R3BTwim
-    R3BMusic
-    R3BBunchedFiber
-    R3BFrsSci)
-    
-add_subdirectory(test)
+if(GTEST_FOUND)
+    add_executable(
+        AnaUnitTests
+        testAnaContainerPar.cxx)
+    target_link_libraries(AnaUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BAnalysis)
+    gtest_discover_tests(AnaUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)

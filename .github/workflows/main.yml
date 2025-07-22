@@ -44,7 +44,7 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-name: CI-CD
+name: CI-CD-C++17
 
 # Controls when the action will run. 
 on:

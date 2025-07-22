@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,14 +11,18 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "R3BFrsSciContFact.h"
-#include "R3BFrsSciCalPar.h"
-#include "R3BFrsSciTcalPar.h"
+// ----------------------------------------------------------------
+// -----            R3BFrsSciContFact source file             -----
+// -----         Created 20/01/2024 by A. Chatillon           -----
+// ----- Factory for the parameter containers in libR3BFrsSci -----
+//-----------------------------------------------------------------
 
-#include <FairLogger.h>
-#include <FairParAsciiFileIo.h>
-#include <FairParRootFileIo.h>
 #include <FairRuntimeDb.h>
+
+#include "R3BFrsSciCalPar.h"
+#include "R3BFrsSciContFact.h"
+#include "R3BFrsSciTcalPar.h"
+#include "R3BLogger.h"
 
 #include <TClass.h>
 
@@ -38,15 +42,14 @@ void R3BFrsSciContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them to
     // the list of containers for the STS library.
 
-    FairContainer* p1 = new FairContainer(
+    auto p1 = new FairContainer(
         "FrsSciTcalPar", "FrsSci Tcal parameters for VFTX time calibration in ns", "FrsSciTcalParContext");
     p1->addContext("FrsSciTcalParContext");
     containers->Add(p1);
 
-    FairContainer* p2 =
-        new FairContainer("FrsSciCalPar",
-                          "FrsSci Cal parameters: multi hit to single hit + params for position and Tofs",
-                          "FrsSciCalParContext");
+    auto p2 = new FairContainer("FrsSciCalPar",
+                                "FrsSci Cal parameters: multi hit to single hit + params for position and Tofs",
+                                "FrsSciCalParContext");
     p2->addContext("FrsSciCalParContext");
     containers->Add(p2);
 }
@@ -57,14 +60,15 @@ FairParSet* R3BFrsSciContFact::createContainer(FairContainer* c)
     // For an actual context, which is not an empty string and not the default context
     // of this container, the name is concatinated with the context.
 
-    const char* name = c->GetName();
-    LOG(info) << "R3BFrsSciContFact: Create container name: " << name;
-    FairParSet* p = 0;
-    if (strcmp(name, "FrsSciTcalPar") == 0)
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
+
+    FairParSet* p = nullptr;
+    if (name == "FrsSciTcalPar")
     {
         p = new R3BFrsSciTcalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    if (strcmp(name, "FrsSciCalPar") == 0)
+    else if (name == "FrsSciCalPar")
     {
         p = new R3BFrsSciCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

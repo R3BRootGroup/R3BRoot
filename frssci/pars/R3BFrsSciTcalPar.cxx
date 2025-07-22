@@ -18,7 +18,6 @@
 #include <FairParamList.h>
 #include <TMath.h>
 #include <TString.h>
-
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------

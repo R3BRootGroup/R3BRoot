@@ -207,7 +207,7 @@ namespace
     uint64_t n1, n2;
 };
 
-void R3BTofiCal2Histo::Exec(Option_t* option)
+void R3BTofiCal2Histo::Exec(Option_t*)
 {
 
     if (fNEvents / 10000. == fNEvents / 10000)
@@ -337,7 +337,14 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
                 // std::cout << "Hit!\n";
                 Int_t iPlane = top->GetDetectorId(); // 1..n
                 Int_t iBar = top->GetBarId();        // 1..n
-                if (iPlane > fNofPlanes)             // this also errors for iDetector==0
+
+                if (iPlane > N_TOFI_HIT_PLANE_MAX)
+                    LOG(fatal) << "Plane number larger than N_TOFI_HIT_PLANE_MAX";
+
+                if (iBar > N_TOFI_HIT_PADDLE_MAX)
+                    LOG(fatal) << "Paddle number larger than N_TOFI_HIT_PADDLE_MAX";
+
+                if (iPlane > fNofPlanes) // this also errors for iDetector==0
                 {
                     // LOG(error) << "R3BTofiCal2HitPar::Exec() : more detectors than expected! Det: " << iPlane
                     //           << " allowed are 1.." << fNofPlanes;
@@ -556,94 +563,97 @@ void R3BTofiCal2Histo::Exec(Option_t* option)
 
 void R3BTofiCal2Histo::CreateHistograms(Int_t iPlane, Int_t iBar)
 {
-    Double_t max_charge = 60.;
-    if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
+    if (iPlane <= N_TOFI_HIT_PLANE_MAX && iBar <= N_TOFI_HIT_PADDLE_MAX)
     {
-        char strName[255];
-        sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        if (iPlane < 3)
-            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        if (iPlane > 2)
-            fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-        fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+        Double_t max_charge = 60.;
+        if (NULL == fhTot1vsPos[iPlane - 1][iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Tot1_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+            if (iPlane < 3)
+                fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+            if (iPlane > 2)
+                fhTot1vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+            fhTot1vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+            fhTot1vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+        }
+        if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+            if (iPlane < 3)
+                fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+            if (iPlane > 2)
+                fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
+            fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
+            fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
+        }
+        if (NULL == fhTdiff[iPlane - 1])
+        {
+            char strName1[255];
+            char strName2[255];
+            sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
+            sprintf(strName2, "Time Diff Plane %d", iPlane);
+            fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 4000, -20., 20.);
+            fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
+        }
+        if (NULL == fhTsync[iPlane - 1])
+        {
+            char strName[255];
+            char strName2[255];
+            sprintf(strName, "Time_Sync_Plane_%d", iPlane);
+            sprintf(strName2, "Time Sync Plane %d", iPlane);
+            fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 4000, -2000, 2000.);
+            fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
+        }
+        if (NULL == fh_Tofi_TotPm[iPlane - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Tofi_ToT_plane_%d", iPlane);
+            char strName2[255];
+            sprintf(strName2, "Tofi ToT plane %d", iPlane);
+            fh_Tofi_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 300, 0., 300.);
+            fh_Tofi_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
+            fh_Tofi_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT / ns");
+        }
+        if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Plane_%d_Bar_%d_LogToT1vsLogToT2", iPlane, iBar);
+            fhLogTot1vsLogTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 400, 2., 6., 400, 2., 6.);
+            fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Log(ToT) of PM2");
+            fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Log(ToT) of PM1");
+        }
+        if (NULL == fhSqrtQvsPosToT[iPlane - 1][iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
+            fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
+                new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
+            fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
+            fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
+        }
+        if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
+            fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 20000, -100, 100, max_charge * 10, 0., max_charge);
+            fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
+            fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
+        }
+        /*
+        if (NULL == fhTot1vsTot2[iPlane - 1][iBar - 1])
+        {
+            char strName[255];
+            sprintf(strName, "Plane_%d_Bar_%d_ToT1vsToT2", iPlane, iBar);
+            fhTot1vsTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 300, 0., 300., 300, 0., 300.);
+            fhTot1vsTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
+            fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
+        }
+        */
     }
-    if (NULL == fhTot2vsPos[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Tot2_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        if (iPlane < 3)
-            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        if (iPlane > 2)
-            fhTot2vsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 200, -100, 100, 400, 0., 200.);
-        fhTot2vsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Pos in cm");
-        fhTot2vsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM2 in ns");
-    }
-    if (NULL == fhTdiff[iPlane - 1])
-    {
-        char strName1[255];
-        char strName2[255];
-        sprintf(strName1, "Time_Diff_Plane_%d", iPlane);
-        sprintf(strName2, "Time Diff Plane %d", iPlane);
-        fhTdiff[iPlane - 1] = new TH2F(strName1, strName2, 50, 0, 50, 4000, -20., 20.);
-        fhTdiff[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhTdiff[iPlane - 1]->GetYaxis()->SetTitle("Time difference (PM1 - PM2) in ns");
-    }
-    if (NULL == fhTsync[iPlane - 1])
-    {
-        char strName[255];
-        char strName2[255];
-        sprintf(strName, "Time_Sync_Plane_%d", iPlane);
-        sprintf(strName2, "Time Sync Plane %d", iPlane);
-        fhTsync[iPlane - 1] = new TH2F(strName, strName2, 50, 0, 50, 4000, -2000, 2000.);
-        fhTsync[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fhTsync[iPlane - 1]->GetYaxis()->SetTitle("THit in ns");
-    }
-    if (NULL == fh_Tofi_TotPm[iPlane - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Tofi_ToT_plane_%d", iPlane);
-        char strName2[255];
-        sprintf(strName2, "Tofi ToT plane %d", iPlane);
-        fh_Tofi_TotPm[iPlane - 1] = new TH2F(strName, strName2, 90, -45, 45, 300, 0., 300.);
-        fh_Tofi_TotPm[iPlane - 1]->GetXaxis()->SetTitle("Bar #");
-        fh_Tofi_TotPm[iPlane - 1]->GetYaxis()->SetTitle("ToT / ns");
-    }
-    if (NULL == fhLogTot1vsLogTot2[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Plane_%d_Bar_%d_LogToT1vsLogToT2", iPlane, iBar);
-        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 400, 2., 6., 400, 2., 6.);
-        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Log(ToT) of PM2");
-        fhLogTot1vsLogTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Log(ToT) of PM1");
-    }
-    if (NULL == fhSqrtQvsPosToT[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "SqrtQ_vs_PosToT_Plane_%d_Bar_%d", iPlane, iBar);
-        fhSqrtQvsPosToT[iPlane - 1][iBar - 1] =
-            new TH2F(strName, "", 20000, -100, 100, max_charge * 4, 0., max_charge * 4);
-        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("sqrt(PM1*PM2)");
-        fhSqrtQvsPosToT[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position from ToT in cm");
-    }
-    if (NULL == fhQvsPos[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Q_vs_Pos_Plane_%d_Bar_%d", iPlane, iBar);
-        fhQvsPos[iPlane - 1][iBar - 1] = new TH2F(strName, "", 20000, -100, 100, max_charge * 10, 0., max_charge);
-        fhQvsPos[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("Charge");
-        fhQvsPos[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("Position in cm");
-    }
-    /*
-    if (NULL == fhTot1vsTot2[iPlane - 1][iBar - 1])
-    {
-        char strName[255];
-        sprintf(strName, "Plane_%d_Bar_%d_ToT1vsToT2", iPlane, iBar);
-        fhTot1vsTot2[iPlane - 1][iBar - 1] = new TH2F(strName, "", 300, 0., 300., 300, 0., 300.);
-        fhTot1vsTot2[iPlane - 1][iBar - 1]->GetXaxis()->SetTitle("ToT of PM2 in ns");
-        fhTot1vsTot2[iPlane - 1][iBar - 1]->GetYaxis()->SetTitle("ToT of PM1 in ns");
-    }
-    */
 }
 
 void R3BTofiCal2Histo::FinishEvent() {}

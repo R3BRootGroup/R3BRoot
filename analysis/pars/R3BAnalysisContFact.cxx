@@ -12,15 +12,15 @@
  ******************************************************************************/
 
 #include "R3BAnalysisContFact.h"
-
-#include "FairLogger.h"
-#include "FairParAsciiFileIo.h"
-#include "FairParRootFileIo.h"
-#include "FairRuntimeDb.h"
-
 #include "R3BIncomingIDPar.h"
+#include "R3BLogger.h"
+#include "R3BMSOffsetPar.h"
 #include "R3BTGeoPar.h"
-#include "TClass.h"
+
+#include <FairLogger.h>
+#include <FairRuntimeDb.h>
+
+#include <TClass.h>
 
 static R3BAnalysisContFact gR3BAnalysisContFact;
 
@@ -35,12 +35,13 @@ R3BAnalysisContFact::R3BAnalysisContFact()
 
 void R3BAnalysisContFact::setAllContainers()
 {
-    // Creates the Container objects with all accepted contexts and adds them to
-    // the list of containers for the STS library.
-
-    FairContainer* p1 = new FairContainer("IncomingIDPar", "Incoming ID parameters", "IncomingIDParContext");
+    auto p1 = std::make_unique<FairContainer>("IncomingIDPar", "Incoming ID parameters", "IncomingIDParContext");
     p1->addContext("IncomingIDParContext");
-    containers->Add(p1);
+    containers->Add(p1.release());
+
+    auto p2 = std::make_unique<FairContainer>("MSOffsetPar", "MSOffsetPar Offset Parameters", "MSOffsetParContext");
+    p2->addContext("MSOffsetParContext");
+    containers->Add(p2.release());
 }
 
 FairParSet* R3BAnalysisContFact::createContainer(FairContainer* c)
@@ -48,15 +49,19 @@ FairParSet* R3BAnalysisContFact::createContainer(FairContainer* c)
     // Trals the constructor of the corresponding parameter container.
     // For an actual context, which is not an empty string and not the default context
     // of this container, the name is concatinated with the context.
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
 
-    const char* name = c->GetName();
-    LOG(info) << "R3BIncomingIDContFact::Create container name: " << name;
-    FairParSet* p = 0;
-    if (strcmp(name, "IncomingIDPar") == 0)
+    FairParSet* p = nullptr;
+    if (name == "IncomingIDPar")
     {
         p = new R3BIncomingIDPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (name == "MSOffsetPar")
+    {
+        p = new R3BMSOffsetPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }
 
-ClassImp(R3BAnalysisContFact);
+ClassImp(R3BAnalysisContFact)
