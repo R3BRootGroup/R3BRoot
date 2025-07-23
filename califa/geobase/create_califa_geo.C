@@ -37,29 +37,45 @@ const int nbcrystals = 2544;
 
 bool isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[]);
 
-void CreateCarbonFiberBackSide(TGeoVolume* pWorld,
-                               TGeoMedium* med,
-                               TGeoCombiTrans* disCalMes,
-                               TGeoCombiTrans* disCalWix);
+void CreateHoldingStructure(TGeoVolume* pWorld,
+                            TGeoVolume* holding_structure,
+                            TGeoMedium* med1,
+                            TGeoMedium* med2,
+                            TGeoCombiTrans* disCalMes,
+                            TGeoCombiTrans* disCalWix);
 
-void create_califa_geo_selector(const std::string expNumber = "nominal", std::string geoTag = "full")
+void create_califa_geo_selector(const std::string expNumber = "nominal",
+                                std::string geoTag = "full",
+                                bool fMakeStr = false)
 {
-    auto fRefRot = std::make_unique<TGeoRotation>();
-    TGeoManager* gGeoMan = nullptr;
-
-    // -------   Load media from media file   -------------------------
-    FairGeoLoader* geoLoad = new FairGeoLoader("TGeo", "FairGeoLoader");
-    FairGeoInterface* geoFace = geoLoad->getGeoInterface();
     TString geoPath = gSystem->Getenv("VMCWORKDIR");
     if (geoPath.IsNull())
     {
         std::cerr << "\033[35mERROR: VMCWORKDIR is not defined\033[0m" << std::endl;
         gApplication->Terminate();
     }
+
+    TString geoStru = geoPath + "/califa/geobase/files/califa_holding_structure.root";
+    geoStru.ReplaceAll("//", "/");
+    TFile* f = TFile::Open(geoStru.Data());
+    auto StruGeom = (static_cast<TGeoManager*>(f->Get("CalifaHoldingStructure")));
+
+    auto StruVol = StruGeom->GetTopVolume();
+    auto holding_structure = (static_cast<TGeoVolume*>(StruVol->Clone("CalifaHoldingStructureGeo")));
+    f->Close();
+    delete StruGeom;
+
+    auto fRefRot = std::make_unique<TGeoRotation>();
+    TGeoManager* gGeoMan = nullptr;
+
+    // -------   Load media from media file   -------------------------
+    FairGeoLoader* geoLoad = new FairGeoLoader("TGeo", "FairGeoLoader");
+    FairGeoInterface* geoFace = geoLoad->getGeoInterface();
+
     TString medFile = geoPath + "/geometry/media_r3b.geo";
     medFile.ReplaceAll("./", "/");
     medFile.ReplaceAll("//", "/");
-    geoFace->setMediaFile(medFile);
+    geoFace->setMediaFile(medFile.Data());
     geoFace->readMedia();
     gGeoMan = gGeoManager;
     bool isCepaUsed = true;
@@ -214,7 +230,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal", std::st
 
     // -------   Geometry file name (output)   ------------------------
     TString geoFileName = geoPath + "/geometry/califa_";
-    geoFileName = geoFileName + geoTag + ".geo.root";
+    geoFileName = geoFileName + geoTag + (fMakeStr ? "_stru" : "") + ".geo.root";
     geoFileName.ReplaceAll("//", "/");
 
     // -----------------   Get and create the required media    -------
@@ -281,12 +297,17 @@ void create_califa_geo_selector(const std::string expNumber = "nominal", std::st
     auto tgeotrans1 = new TGeoCombiTrans("tgeotrans1", 0, 0, 0., fRefRot.get());
     tgeotrans1->RegisterYourself();
 
-    auto mother_outer = new TGeoTube("mother_outer", 0., 75., (52. + 70.) / 2.);
+    auto mother_outer = new TGeoTube("mother_outer", 0., 81., (58. + 73.5) / 2.);
     auto inner_hole = new TGeoTube("inner_hole", 0., 29., 130. / 2.);
     auto mother_endcap = new TGeoSphere("mother_endcap", 38., 73.5, 7., 90., 0., 360.);
 
+    auto mother_endcap2 = new TGeoPgon("mother_endcap2", 0, 360, 16, 2);
+    mother_endcap2->DefineSection(0, 54., 40., 80.);
+    mother_endcap2->DefineSection(1, 85., 12., 34.);
+
     auto califa_mother = new TGeoCompositeShape(
-        "califa_mother", "mother_outer:tgeotrans0 - inner_hole:tgeotrans0 + mother_endcap:tgeotrans1");
+        "califa_mother",
+        "mother_outer:tgeotrans0 - inner_hole:tgeotrans0 + mother_endcap:tgeotrans1 + mother_endcap2:tgeotrans1");
 
     auto pWorld = std::make_unique<TGeoVolume>("CalifaWorld", califa_mother, pAirMedium);
     top->AddNode(pWorld.get(), 0, tgeotrans1);
@@ -1456,10 +1477,9 @@ void create_califa_geo_selector(const std::string expNumber = "nominal", std::st
 
             for (size_t j = 0; j < 8; j++)
             { // rotation around Z
-
                 auto disp_halfCEPA = (j < 4) ? DisplCalifa[0] : DisplCalifa[1];
 
-                rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation(rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
+                rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation((rotOnZ_CEPA[j]) * (*rotAlv_CEPA[i]));
                 alv_cm_rot_CEPA[i] = (rotationOnZ_CEPA[j]) * alv_cm_CEPA[i];
 
                 if (isCrystalInstalled(i + 24, j, installedCrystals.data())) // alveoli number stars in 24 for CEPA
@@ -1475,7 +1495,8 @@ void create_califa_geo_selector(const std::string expNumber = "nominal", std::st
         }
     }
 
-    // CreateCarbonFiberBackSide(pWorld.get(), pCarbonFibreMedium, dispCalMes, dispCalWix);
+    if (fMakeStr)
+        CreateHoldingStructure(pWorld.get(), holding_structure, pCarbonFibreMedium, pAlMedium, dispCalMes, dispCalWix);
 
     gGeoMan->CloseGeometry();
     gGeoMan->CheckOverlaps(0.001);
@@ -1533,10 +1554,23 @@ bool isCrystalInstalled(Int_t alvType, Int_t alveolusCopy, Int_t instCry[])
     return found;
 }
 
-void CreateCarbonFiberBackSide(TGeoVolume* word, TGeoMedium* med, TGeoCombiTrans* disCalMes, TGeoCombiTrans* disCalWix)
+void CreateHoldingStructure(TGeoVolume* world,
+                            TGeoVolume* holding_structure,
+                            TGeoMedium* med1,
+                            TGeoMedium* med2,
+                            TGeoCombiTrans* disCalMes,
+                            TGeoCombiTrans* disCalWix)
 {
-    auto carbonfiber = new TGeoConeSeg("CarbonFiberCone", 1., 42., 42.04, 61.96, 62., -90, 90);
-    auto CarbonFiberBack = new TGeoVolume("CarbonFiberBack", carbonfiber, med);
+    const int numSides = 16;
+    const double phiStart = 0.;
+    const double phiTotal = 360.;
+    const int numZPlanes = 2;
+
+    auto carbonfiber = new TGeoPgon("CarbonFiberCone", -90., 180., 8, numZPlanes);
+    carbonfiber->DefineSection(0, -50.44, 58.36 - 0.6, 58.4 - 0.6);
+    carbonfiber->DefineSection(1, -48.54, 42.0, 42.04);
+
+    auto CarbonFiberBack = new TGeoVolume("CarbonFiberBack", carbonfiber, med1);
     CarbonFiberBack->SetVisLeaves(kTRUE);
     CarbonFiberBack->SetLineColor(19);
 
@@ -1553,18 +1587,174 @@ void CreateCarbonFiberBackSide(TGeoVolume* word, TGeoMedium* med, TGeoCombiTrans
         return new TGeoCombiTrans(trans); // still needs to be a pointer for ROOT
     };
 
+    const double offsetX = 0.5; // 0.5 cm
     auto rot1 = new TGeoRotation();
-    rot1->RotateX(180);
-
     auto rot2 = new TGeoRotation();
-    rot2->RotateX(180);
     rot2->RotateZ(180);
 
-    auto trans1 = make_trans(0.05, 0.0, -49.54, rot1, disCalMes);
-    auto trans2 = make_trans(-0.05, 0.0, -49.54, rot2, disCalWix);
+    auto trans1 = make_trans(0.05, 0.0, 0.0, rot1, disCalMes);
+    auto trans2 = make_trans(-0.05, 0.0, 0.0, rot2, disCalWix);
 
-    word->AddNode(CarbonFiberBack, 0, trans1);
-    word->AddNode(CarbonFiberBack, 1, trans2);
+    world->AddNode(CarbonFiberBack, 1, trans1);
+    world->AddNode(CarbonFiberBack, 2, trans2);
+
+    auto rot10 = new TGeoRotation();
+    rot10->RotateY(-90.0);
+    rot10->RotateZ(-90.0);
+
+    auto vmatrix0 = new TGeoCombiTrans(0., 0., 0., rot10);
+    vmatrix0->RegisterYourself();
+    auto vmatrix1 = new TGeoCombiTrans(-offsetX, 0., 0., rot1);
+    vmatrix1->RegisterYourself();
+
+    auto hstr = (static_cast<TGeoVolume*>(holding_structure->Clone()));
+    auto shape0 = hstr->GetShape();
+
+    auto rot20 = new TGeoRotation();
+    rot20->RotateZ(180.0);
+    auto vmatrix2 = new TGeoCombiTrans(offsetX, 0., 0., rot20);
+    vmatrix2->RegisterYourself();
+
+    auto trans3 = make_trans(-offsetX, 0.0, 0.0, rot1, disCalMes);
+    auto trans4 = make_trans(offsetX, 0.0, 0.0, rot2, disCalWix);
+
+    // world->AddNode(hstr, 0, vmatrix1);
+
+    auto pgon0 = new TGeoPgon("Outer_cyl0", phiStart, phiTotal, numSides, numZPlanes);
+    pgon0->DefineSection(0, -90.0, 64.7, 100.);
+    pgon0->DefineSection(1, 90., 64.7, 100.);
+
+    auto pgon1 = new TGeoPgon("Inner_cyl0", phiStart, phiTotal, numSides, numZPlanes);
+    pgon1->DefineSection(0, -60.0, 0.0, 58.4);
+    pgon1->DefineSection(1, 52.1, 0.0, 58.4);
+
+    // auto volCone = new TGeoVolume("str1", pgon1, med2);
+    // volCone->SetLineColor(17);
+    // world->AddNode(volCone, 1);
+
+    auto pgon2 = new TGeoPgon("cone2", phiStart, phiTotal, numSides, numZPlanes);
+    pgon2->DefineSection(0, 53.1, 0.0, 55.0);
+    pgon2->DefineSection(1, 84.5, 0.0, 9.5);
+
+    // auto volCone2 = new TGeoVolume("str2", pgon2, med2);
+    // world->AddNode(volCone2, 1);
+
+    auto pgon3 = new TGeoPgon("cone3", phiStart, phiTotal, numSides, numZPlanes);
+    pgon3->DefineSection(0, 60.0, 0.0, 20.0);
+    pgon3->DefineSection(1, 114.5, 0.0, 40.);
+
+    // auto volCone3 = new TGeoVolume("str3", pgon3, med2);
+    // world->AddNode(volCone3, 1);
+
+    auto pgon4 = new TGeoPgon("cone4", phiStart, phiTotal, numSides, numZPlanes);
+    pgon4->DefineSection(0, 53.1 + 8., 55.5, 72.0);
+    pgon4->DefineSection(1, 84.5 + 9., 9.5, 9.5 + 7.);
+
+    // auto volCone4 = new TGeoVolume("str4", pgon4, med2);
+    // world->AddNode(volCone4, 1);
+
+    auto pSubHolding0 = new TGeoSubtraction(shape0, pgon0, vmatrix0, 0);
+
+    auto holdingComp0 = new TGeoCompositeShape("holdingComp0", pSubHolding0);
+
+    auto pSubHolding1 = new TGeoSubtraction(holdingComp0, pgon1, 0, 0);
+
+    auto holdingComp1 = new TGeoCompositeShape("holdingComp1", pSubHolding1);
+
+    auto pSubHolding2 = new TGeoSubtraction(holdingComp1, pgon2, 0, 0);
+
+    auto holdingComp2 = new TGeoCompositeShape("holdingComp2", pSubHolding2);
+
+    auto pSubHolding3 = new TGeoSubtraction(holdingComp2, pgon3, 0, 0);
+
+    auto holdingComp3 = new TGeoCompositeShape("holdingComp3", pSubHolding3);
+
+    auto pSubHolding4 = new TGeoSubtraction(holdingComp3, pgon4, 0, 0);
+
+    auto holdingComp4 = new TGeoCompositeShape("holdingComp4", pSubHolding4);
+
+    auto box_mother1 = new TGeoBBox("box_mother1", 12.7 / 2., 15., 13.1 / 2.);
+    // auto volbox = new TGeoVolume("volbox1", box_mother1, med2);
+    // volbox->SetLineColor(3);
+
+    auto box_mother2 = new TGeoBBox("box_mother2", 19.1 / 2., 3., 19.3 / 2.);
+    // auto volbox2 = new TGeoVolume("volbox2", box_mother2, med2);
+    // volbox2->SetLineColor(3);
+
+    auto box_tape = new TGeoBBox("box_tape", 17. / 2., 0.15, 16.3 / 2.);
+    // auto volbox_tape = new TGeoVolume("volbox_tape", box_tape, med2);
+    // volbox_tape->SetLineColor(19);
+
+    TGeoCompositeShape* GeoCompObj;
+    std::vector<double> disz = { -31.1, -6.2, 18., 31.1 + 10.4, 65. };
+    for (size_t j = 0; j < 4; j++)
+        for (size_t i = 0; i < 8; i++)
+        {
+            auto rot22 = new TGeoRotation();
+            auto ang = -11.25 - 22.5 * i;
+            rot22->RotateZ(ang);
+            auto xi = 58.4 * TMath::Cos((90. + ang) * TMath::DegToRad());
+            auto yi = 58.4 * TMath::Sin((90. + ang) * TMath::DegToRad());
+            auto vmatrix22 = new TGeoCombiTrans(xi, yi, disz[j], rot22);
+            vmatrix22->RegisterYourself();
+            // world->AddNode(volbox, i, vmatrix22);
+
+            if (i == 0)
+            {
+                auto phole = new TGeoSubtraction(holdingComp4, box_mother1, 0, vmatrix22);
+                TString name = TString::Format("hole1_%zu", i + 8 * j);
+                GeoCompObj = new TGeoCompositeShape(name.Data(), phole);
+            }
+            else
+            {
+                auto phole = new TGeoSubtraction(GeoCompObj, box_mother1, 0, vmatrix22);
+                TString name = TString::Format("hole1_%zu", i + 8 * j);
+                GeoCompObj = new TGeoCompositeShape(name.Data(), phole);
+            }
+        }
+
+    for (size_t j = 0; j < 5; j++)
+        for (size_t i = 0; i < 8; i++)
+        {
+            auto rot22 = new TGeoRotation();
+            auto ang = -11.25 - 22.5 * i;
+            rot22->RotateZ(ang);
+            auto xi = 63.55 * TMath::Cos((90. + ang) * TMath::DegToRad());
+            auto yi = 63.55 * TMath::Sin((90. + ang) * TMath::DegToRad());
+            auto vmatrix22 = new TGeoCombiTrans(xi, yi, disz[j], rot22);
+            vmatrix22->RegisterYourself();
+            // world->AddNode(volbox2, i, vmatrix22);
+
+            auto phole = new TGeoSubtraction(GeoCompObj, box_mother2, 0, vmatrix22);
+            TString name = TString::Format("hole2_%zu", i + 8 * j);
+            GeoCompObj = new TGeoCompositeShape(name.Data(), phole);
+        }
+
+    for (size_t j = 0; j < 4; j++)
+        for (size_t i = 0; i < 8; i++)
+        {
+            auto rot22 = new TGeoRotation();
+            auto ang = -11.25 - 22.5 * i;
+            rot22->RotateZ(ang);
+            auto xi = 60.7 * TMath::Cos((90. + ang) * TMath::DegToRad());
+            auto yi = 60.7 * TMath::Sin((90. + ang) * TMath::DegToRad());
+            auto vmatrix22 = new TGeoCombiTrans(xi, yi, disz[j], rot22);
+            vmatrix22->RegisterYourself();
+
+            // auto trs = make_trans(xi-offsetX, yi, disz[j], rot22, disCalMes);
+            // world->AddNode(volbox_tape, i+1, trs);
+
+            auto tape = new TGeoUnion(GeoCompObj, box_tape, 0, vmatrix22);
+            TString name = TString::Format("tape_%zu", i + 8 * j);
+            GeoCompObj = new TGeoCompositeShape(name.Data(), tape);
+        }
+
+    // Final holding structure
+    auto holding_structure_final = new TGeoVolume("Holding_Structure", GeoCompObj, med2);
+    holding_structure_final->SetVisLeaves(kTRUE);
+    holding_structure_final->SetLineColor(16);
+    world->AddNode(holding_structure_final, 1, trans3);
+    world->AddNode(holding_structure_final, 2, trans4);
 }
 
 void create_califa_geo(const int index = 0)
@@ -1588,6 +1778,10 @@ void create_califa_geo(const int index = 0)
     else if (index == 5)
     {
         create_califa_geo_selector("g249");
+    }
+    else if (index == 6)
+    {
+        create_califa_geo_selector("nominal", "full", true);
     }
     else
     {

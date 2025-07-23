@@ -59,8 +59,22 @@ else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_full.geo.root")
 message(STATUS "${BYellow}Full CALIFA standard root geometry already exists${CR} ")
 endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_full.geo.root")
 
+if(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_full_stru.geo.root")
+message(STATUS "Starting to generate the standard root geometry for CALIFA (FULL + Holding Structure)")
+execute_process(COMMAND root -l -q -x "${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_geo.C(6)")
+message(STATUS "${BYellow}Full CALIFA + Structure standard root geometry has been created${CR} ")
+else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_full_stru.geo.root")
+message(STATUS "${BYellow}Full CALIFA + Structure standard root geometry already exists${CR} ")
+endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/califa_full_stru.geo.root")
+
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_geo.C)
 add_test(NAME CalifaRootGeometry COMMAND ${R3BROOT_BINARY_DIR}/califa/geobase/create_califa_geo.sh)
 set_tests_properties(CalifaRootGeometry PROPERTIES TIMEOUT "2000")
 set_tests_properties(CalifaRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
+                                                  "Macro finished successfully.")
+                                                  
+generate_root_test_script(${R3BROOT_SOURCE_DIR}/califa/geobase/create_califa_stru_geo.C)
+add_test(NAME CalifaStruRootGeometry COMMAND ${R3BROOT_BINARY_DIR}/califa/geobase/create_califa_stru_geo.sh)
+set_tests_properties(CalifaStruRootGeometry PROPERTIES TIMEOUT "2000")
+set_tests_properties(CalifaStruRootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
