@@ -5,6 +5,8 @@
 [![CI-CD](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main.yml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main.yml)
 [![Static Analysis](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/static_analysis.yml)
 [![Validate Codemeta](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/codemeta_validate.yaml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/codemeta_validate.yaml)
+[![CI-CD-nightly](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main-nightly.yml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main-nightly.yml)
+[![CI-CD-nightly-sim](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main-nightly-sim.yml/badge.svg)](https://github.com/R3BRootGroup/R3BRoot/actions/workflows/main-nightly-sim.yml)
 [![dashboard](https://img.shields.io/badge/dashboard-r3broot-blue?labelColor=gray&style=flat)](https://cdash.gsi.de/index.php?project=R3BRoot)
 
 ## The R3BRoot Framework
@@ -93,15 +95,15 @@ source util/clang-format-all.sh
 
 The following systems are tested regularly.
 
-| **OS Name** | **Arch** | **OS Version** | **Compiler** | **CMake** |
-| --- | --- | --- | --- | --- |
-| Almalinux  | x86_64 | 9.3   | GCC 11.4.1                 | 3.27.9 |
-| Almalinux  | x86_64 | 9.4   | GCC 14.2.0                 | 3.30.6 |
-|   RHEL     | x86_64 | 9.6   | GCC 14.2.0                 | 3.30.6 |
-| Debian     | x86_64 | 10    | GCC 8.3.0                  | 3.27.4 & 4.0.3 |
-| Debian     | x86_64 | 11    | GCC 10.2.1                 | 3.27.4 & 3.30.0 |
-| Debian     | x86_64 | 12    | GCC 12.2.0                 | 3.27.4 & 3.30.0 |
-| Ubuntu     | x86_64 | 24.04 | GCC 13.3.0                 | 3.28.3 & 4.0.3 |
+| **OS Name** | **Arch** | **OS Version** | **Compiler** | **CMake**       | **C++ Version** |
+| ----------- | -------- | -------------- | ------------ | --------------- | --------------- |
+| Almalinux   | x86\_64  | 9.3            | GCC 11.4.1   | 3.27.9 / 4.0.3  | C++17 / C++20   |
+| Almalinux   | x86\_64  | 9.4            | GCC 14.2.0   | 3.30.6          | C++17           |
+| RHEL        | x86\_64  | 9.6            | GCC 14.2.0   | 3.30.6          | C++17           |
+| Debian      | x86\_64  | 10             | GCC 8.3.0    | 3.27.4 / 4.0.3  | C++17           |
+| Debian      | x86\_64  | 11             | GCC 10.2.1   | 3.27.4 / 3.30.0 | C++17           |
+| Debian      | x86\_64  | 12             | GCC 12.2.0   | 3.27.4 / 3.30.0 | C++17           |
+| Ubuntu      | x86\_64  | 24.04          | GCC 13.3.0   | 3.28.3 / 4.0.3  | C++17           |
 
 ## Security Policy
 
