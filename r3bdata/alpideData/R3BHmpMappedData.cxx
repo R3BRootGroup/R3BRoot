@@ -43,7 +43,7 @@ R3BHmpMappedData::R3BHmpMappedData(uint32_t TSYS_LO,
 
 std::string R3BHmpMappedData::toString() const
 {
-    return fmt::format("TSLO: {}, Region: {}, TSHI: {}, Volt1: {}, Curr1: {}, Volt2: {}, Curr2: {}, Volt3: {}, Curr3: "
+    return fmt::format("TSLO: {}, TSHI: {}, Volt1: {}, Curr1: {}, Volt2: {}, Curr2: {}, Volt3: {}, Curr3: "
                        "{}, Volt4: {}, Curr4: {}",
                        GetTSLO(),
                        GetTSHI(),
