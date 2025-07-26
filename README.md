@@ -97,7 +97,7 @@ The following systems are tested regularly.
 
 | **OS Name** | **Arch** | **OS Version** | **Compiler** | **CMake**       | **C++ Version** |
 | ----------- | -------- | -------------- | ------------ | --------------- | --------------- |
-| Almalinux   | x86\_64  | 9.3            | GCC 11.4.1   | 3.27.9 / 4.0.3  | C++17 / C++20   |
+| Almalinux   | x86\_64  | 9.3            | GCC 11.4.1   | 3.27.9 / 4.0.3  | C++17 / C++20 / C++23   |
 | Almalinux   | x86\_64  | 9.4            | GCC 14.2.0   | 3.30.6          | C++17           |
 | RHEL        | x86\_64  | 9.6            | GCC 14.2.0   | 3.30.6          | C++17           |
 | Debian      | x86\_64  | 10             | GCC 8.3.0    | 3.27.4 / 4.0.3  | C++17           |
