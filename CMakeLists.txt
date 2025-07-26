@@ -32,15 +32,6 @@ project(R3BROOT LANGUAGES C CXX Fortran)
 # use default gnu install convention:
 include(GNUInstallDirs)
 
-if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
-    message(STATUS "  ")
-    message(
-        ERROR
-        " macros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git"
-    )
-    message(STATUS "  ")
-endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
-
 # Check for needed environment variables
 if(NOT DEFINED ENV{SIMPATH})
     message(

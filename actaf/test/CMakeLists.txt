@@ -1,6 +1,6 @@
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2025 Members of R3B Collaboration                          #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -11,44 +11,11 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3BActaf" which includes the source files given 
-# in the array. The extension is already found. Any number of sources could be
-# listed here.
-
-file(
-    GLOB
-    SRCS
-    ./sim/*.cxx
-    ./pars/*.cxx
-    ./online/*.cxx
-#    ./calibration/*.cxx
-#    ./ana/*.cxx
-    )
-
-change_file_extension(*.cxx *.h HEADERS "${SRCS}")
-
-add_library_with_dictionary(
-    LIBNAME
-    R3BActaf
-    LINKDEF
-    ActafLinkDef.h
-    HEADERS
-    ${HEADERS}
-    SRCS
-    ${SRCS}
-    INCLUDEDIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    sim
-    pars
-    online
-    calibration
-    ana
-    DEPENDENCIES
-    R3BBase 
-    R3BTracking
-    R3BData)
-
-if(BUILD_GEOMETRY)
-#    add_subdirectory(geobase)
-endif()
-add_subdirectory(test)
+if(GTEST_FOUND)
+    add_executable(
+        ActafUnitTests
+        testActafContainerPar.cxx)
+    target_link_libraries(ActafUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BActaf)
+    gtest_discover_tests(ActafUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)
