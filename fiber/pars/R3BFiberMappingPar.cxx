@@ -18,35 +18,25 @@
 
 #include "R3BFiberMappingPar.h"
 
-#include "FairParamList.h"
 #include "R3BLogger.h"
+#include <FairParamList.h>
 
-#include "TMath.h"
-#include "TString.h"
+#include <TMath.h>
+#include <TString.h>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BFiberMappingPar::R3BFiberMappingPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
-    , fNbSides(2)
-    , fNbChannels(512)
 {
-    for (Int_t s = 0; s < fNbSides; s++)
+    fTrigmap.resize(fNbSides);
+    for (size_t s = 0; s < fNbSides; s++)
     {
         fTrigmap[s] = new TArrayI(fNbChannels);
-        for (Int_t c = 0; c < fNbChannels; c++)
+        for (size_t c = 0; c < fNbChannels; c++)
         {
             fTrigmap[s]->AddAt(0, c);
         }
     }
-}
-
-// ----  Destructor ------------------------------------------------------------
-R3BFiberMappingPar::~R3BFiberMappingPar()
-{
-    clear();
-    for (Int_t s = 0; s < fNbSides; s++)
-        if (fTrigmap[s])
-            delete fTrigmap[s];
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -71,12 +61,11 @@ void R3BFiberMappingPar::putParams(FairParamList* list)
     R3BLOG(info, "Nb of channels: " << fNbChannels);
     R3BLOG(info, "Nb of sides: " << fNbSides);
 
-    char name[300];
-    for (Int_t s = 0; s < fNbSides; s++)
+    for (size_t s = 0; s < fNbSides; s++)
     {
         fTrigmap[s]->Set(fNbChannels);
-        sprintf(name, "fiberside%dPar", s + 1);
-        list->add(name, *fTrigmap[s]);
+        TString name = Form("fiberside%zuPar", s + 1);
+        list->add(name.Data(), *fTrigmap[s]);
     }
 }
 
@@ -100,13 +89,11 @@ Bool_t R3BFiberMappingPar::getParams(FairParamList* list)
         return kFALSE;
     }
 
-    char name[300];
-    for (Int_t s = 0; s < fNbSides; s++)
+    for (size_t s = 0; s < fNbSides; s++)
     {
         fTrigmap[s]->Set(fNbChannels);
-        sprintf(name, "fiberside%dPar", s + 1);
-
-        if (!(list->fill(name, fTrigmap[s])))
+        TString name = Form("fiberside%zuPar", s + 1);
+        if (!(list->fill(name.Data(), fTrigmap[s])))
         {
             R3BLOG(error, "Could not initialize " << name);
             return kFALSE;
@@ -123,11 +110,11 @@ void R3BFiberMappingPar::print() { printParams(); }
 void R3BFiberMappingPar::printParams()
 {
     R3BLOG(info, "Mapping params for Fiber: Num of sides: " << fNbSides << " and channels: " << fNbChannels);
-    for (Int_t s = 0; s < fNbSides; s++)
-        for (Int_t c = 0; c < fNbChannels; c++)
+    for (size_t s = 0; s < fNbSides; s++)
+        for (size_t c = 0; c < fNbChannels; c++)
         {
             R3BLOG(info, "Side: " << s + 1 << " , channel:" << c + 1 << ", value: " << fTrigmap[s]->GetAt(c));
         }
 }
 
-ClassImp(R3BFiberMappingPar);
+ClassImp(R3BFiberMappingPar)

@@ -186,4 +186,4 @@ void R3BAlpideMappingPar::printParams()
     }
 }
 
-ClassImp(R3BAlpideMappingPar);
+ClassImp(R3BAlpideMappingPar)

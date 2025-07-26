@@ -77,3 +77,8 @@ add_library_with_dictionary(
     DEPENDENCIES
     R3BTCal
     R3BTracking)
+    
+if(BUILD_GEOMETRY)
+#    add_subdirectory(geobase)
+endif()
+add_subdirectory(test)

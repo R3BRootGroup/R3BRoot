@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include "FairParGenericSet.h"
+#include <FairParGenericSet.h>
 
 #include "TArrayI.h"
-#include "TObjArray.h"
 #include <Rtypes.h>
+#include <TString.h>
 #include <stdint.h>
 #include <vector>
 
@@ -37,20 +37,20 @@ class R3BFiberMappingPar : public FairParGenericSet
                        const TString& context = "fiberMappingContext");
 
     /** Destructor **/
-    virtual ~R3BFiberMappingPar();
+    virtual ~R3BFiberMappingPar() = default;
 
     /** Reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Print values of parameters to the standard output **/
-    virtual void print();
-    void printParams();
+    void print() override;
+    void printParams() override;
 
     /** Accessor functions **/
     const Int_t GetNbChannels() { return fNbChannels; }
@@ -58,19 +58,19 @@ class R3BFiberMappingPar : public FairParGenericSet
     // GetTrigMap in 1-base for side(1-2) and channel(1-X)
     const Int_t GetTrigMap(UInt_t side, UInt_t ch) { return fTrigmap[side - 1]->GetAt(ch - 1); }
 
-    void SetNbChannels(Int_t p) { fNbChannels = p; }
-    void SetNbSides(Int_t p) { fNbSides = p; }
+    inline void SetNbChannels(Int_t p) { fNbChannels = p; }
+    inline void SetNbSides(Int_t p) { fNbSides = p; }
     // SetTrigMap in 1-base for side(1-2) and channel(1-X)
-    void SetTrigMap(Int_t value, UInt_t side, UInt_t ch) { fTrigmap[side - 1]->AddAt(value, ch - 1); }
+    inline void SetTrigMap(Int_t value, UInt_t side, UInt_t ch) { fTrigmap[side - 1]->AddAt(value, ch - 1); }
 
   private:
-    Int_t fNbChannels;
-    Int_t fNbSides;
-    TArrayI* fTrigmap[2]; // Two sides per fiber
+    Int_t fNbChannels = 512;
+    Int_t fNbSides = 2; // Two sides per fiber
+    std::vector<TArrayI*> fTrigmap;
 
     const R3BFiberMappingPar& operator=(const R3BFiberMappingPar&);
     R3BFiberMappingPar(const R3BFiberMappingPar&);
 
   public:
-    ClassDef(R3BFiberMappingPar, 1);
+    ClassDefOverride(R3BFiberMappingPar, 1);
 };
