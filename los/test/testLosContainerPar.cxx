@@ -1,6 +1,7 @@
+
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2025 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,23 +12,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BLosContFact_H
-#define R3BLosContFact_H
+#include "R3BLosHitPar.h"
+#include "gtest/gtest.h"
+#include <map>
 
-#include "FairContFact.h"
-
-class FairContainer;
-
-class R3BLosContFact : public FairContFact
+namespace
 {
-  private:
-    void setAllContainers();
+    TEST(testLosHitPar, Getp0)
+    {
+        R3BLosHitPar par;
+        par.Setp0(3);
 
-  public:
-    R3BLosContFact();
-    ~R3BLosContFact() {}
-    FairParSet* createContainer(FairContainer*);
-    ClassDef(R3BLosContFact, 0)
-};
+        EXPECT_EQ(par.Getp0(), 3);
+    }
+    TEST(testLosHitPar, Getp1)
+    {
+        R3BLosHitPar par;
+        par.Setp1(2);
 
-#endif
+        EXPECT_EQ(par.Getp1(), 2);
+    }
+    TEST(testLosHitPar, GetNumParamsTamexLE)
+    {
+        R3BLosHitPar par;
+
+        EXPECT_EQ(par.GetNumParamsTamexLE(), 2);
+    }
+} // namespace

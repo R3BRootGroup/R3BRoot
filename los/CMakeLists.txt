@@ -18,23 +18,23 @@
 set(SRCS
     calib/R3BLosMapped2Cal.cxx
     calib/R3BLosMapped2TCal.cxx
-    params/R3BLosMapped2CalPar.cxx
+    pars/R3BLosMapped2CalPar.cxx
     calib/R3BLosCal2Hit.cxx
     calib/R3BLosTCal2Hit.cxx
     R3BLosProvideTStart.cxx
-    params/R3BLosHitPar.cxx
-    params/R3BLosContFact.cxx
+    pars/R3BLosHitPar.cxx
+    pars/R3BLosContFact.cxx
     online/R3BLosOnlineSpectra.cxx)
 
 set(HEADERS
     calib/R3BLosMapped2Cal.h
     calib/R3BLosMapped2TCal.h
-    params/R3BLosMapped2CalPar.h
+    pars/R3BLosMapped2CalPar.h
     calib/R3BLosCal2Hit.h
     calib/R3BLosTCal2Hit.h
     R3BLosProvideTStart.h
-    params/R3BLosHitPar.h
-    params/R3BLosContFact.h
+    pars/R3BLosHitPar.h
+    pars/R3BLosContFact.h
     online/R3BLosOnlineSpectra.h)
 
 add_library_with_dictionary(
@@ -50,9 +50,12 @@ add_library_with_dictionary(
     ${CMAKE_CURRENT_SOURCE_DIR}
     calib
     online
-    params
+    pars
     DEPENDENCIES
     R3BTracking
     R3BTCal
     # TODO: only due to TCAConnector.
     R3BNeulandShared)
+    
+add_subdirectory(test)
+

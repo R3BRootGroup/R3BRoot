@@ -16,8 +16,7 @@
 // -----         Created February 2020 by A. Kelic-Heil   -----
 // ------------------------------------------------------------
 
-#ifndef R3BLOSCAL2HITPAR
-#define R3BLOSCAL2HITPAR
+#pragma once
 
 #include "FairTask.h"
 #include <array>
@@ -150,5 +149,3 @@ class R3BLosCal2HitPar : public FairTask
   public:
     ClassDef(R3BLosCal2HitPar, 2)
 };
-
-#endif
