@@ -24,13 +24,6 @@ set(SRCS
     calibration/R3BTofDMapped2Cal.cxx
     calibration/R3BTofDCal2Hit.cxx
     online/R3BTofDOnlineSpectra.cxx
-    #R3BTofDCal2Histo.cxx
-    #R3BTofDCal2HistoPar.cxx
-    #R3BTofDChangePar.cxx
-    #R3BTofDCal2Hit.cxx
-    #R3BGeoTofD.cxx
-    #R3BGeoTofDPar.cxx
-    #R3BTofDContFact.cxx
     #R3BTofDDigiPar.cxx
 )
 
@@ -47,13 +40,6 @@ set(HEADERS
     calibration/R3BTofDMapped2Cal.h
     calibration/R3BTofDCal2Hit.h
     online/R3BTofDOnlineSpectra.h
-    #R3BTofDCal2Histo.h
-    #R3BTofDCal2HistoPar.h
-    #R3BTofDChangePar.h
-    #R3BTofDCal2Hit.h
-    #R3BGeoTofD.h
-    #R3BGeoTofDPar.h
-    #R3BTofDContFact.h
     #R3BTofDDigiPar.h
 )
 
@@ -77,3 +63,8 @@ add_library_with_dictionary(
     R3BTracking
     ROOT::Spectrum
     R3BTCal)
+    
+if(BUILD_GEOMETRY)
+    add_subdirectory(geobase)
+endif()
+add_subdirectory(test)
