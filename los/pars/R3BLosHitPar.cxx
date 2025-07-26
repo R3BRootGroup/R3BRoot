@@ -12,19 +12,16 @@
  ******************************************************************************/
 
 #include "R3BLosHitPar.h"
-#include "FairLogger.h"
-#include "FairParamList.h"
-#include "TArrayF.h"
-#include "TMath.h"
-#include "TString.h"
+
+#include <FairLogger.h>
+#include <FairParamList.h>
+#include <TMath.h>
 
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BLosHitPar::R3BLosHitPar(const TString& name, const TString& title, const TString& context)
     : FairParGenericSet(name, title, context)
-    , fNumParamsTamexLE(2)
-    , fNumParamsTamexTE(2)
 {
     fLEMatchParams = new TArrayF(8 * fNumParamsTamexLE);
     fTEMatchParams = new TArrayF(8 * fNumParamsTamexTE);
@@ -33,7 +30,6 @@ R3BLosHitPar::R3BLosHitPar(const TString& name, const TString& title, const TStr
 // ----  Destructor ------------------------------------------------------------
 R3BLosHitPar::~R3BLosHitPar()
 {
-    clear();
     if (fLEMatchParams)
         delete fLEMatchParams;
     if (fTEMatchParams)

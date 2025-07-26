@@ -11,14 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BLosHitPar_H
-#define R3BLosHitPar_H
+#pragma once
 
-#include "FairParGenericSet.h"
-#include "TArrayF.h"
-#include "TObjArray.h"
-#include "TObject.h"
-#include <TObjString.h>
+#include <FairParGenericSet.h>
+#include <TArrayF.h>
+#include <TObjArray.h>
+#include <TString.h>
 
 class FairParamList;
 
@@ -34,17 +32,17 @@ class R3BLosHitPar : public FairParGenericSet
     virtual ~R3BLosHitPar();
 
     /** Reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Print values of parameters to the standard output **/
-    virtual void print();
-    void printParams();
+    void print() override;
+    void printParams() override;
 
     /** Accessor functions **/
     const Float_t Getp0() { return fp0; }
@@ -58,16 +56,16 @@ class R3BLosHitPar : public FairParGenericSet
     TArrayF* GetLEMatchParams() { return fLEMatchParams; }
     TArrayF* GetTEMatchParams() { return fTEMatchParams; }
 
-    void Setp0(Float_t value) { fp0 = value; }
-    void Setp1(Float_t value) { fp1 = value; }
+    inline void Setp0(Float_t value) { fp0 = value; }
+    inline void Setp1(Float_t value) { fp1 = value; }
 
-    void SetLEMatchParams(Float_t val, Int_t pmt, Int_t indexpar)
+    inline void SetLEMatchParams(Float_t val, Int_t pmt, Int_t indexpar)
     {
         // 0-base
         int index = (pmt - 1) * fNumParamsTamexLE + indexpar - 1;
         fLEMatchParams->AddAt(val, index);
     }
-    void SetTEMatchParams(Float_t val, Int_t pmt, Int_t indexpar)
+    inline void SetTEMatchParams(Float_t val, Int_t pmt, Int_t indexpar)
     {
         // 0-base
         int index = (pmt - 1) * fNumParamsTamexTE + indexpar - 1;
@@ -75,17 +73,17 @@ class R3BLosHitPar : public FairParGenericSet
     }
 
   private:
-    Float_t fp0, fp1;
-    Float_t fxoffset_MCFD, fyoffset_MCFD, fxveff_MCFD, fyveff_MCFD;
+    Float_t fp0 = 0., fp1 = 1.;
+    Float_t fxoffset_MCFD = 0., fyoffset_MCFD = 0., fxveff_MCFD = 1., fyveff_MCFD = 1.;
     TArrayF* fLEMatchParams; // Calibration parameters for Matching Tamex LE
     TArrayF* fTEMatchParams; // Calibration parameters for Matching Tamex TE
 
-    Int_t fNumParamsTamexLE; // number of parameters for matching Tamex LE
-    Int_t fNumParamsTamexTE; // number of parameters for matching Tamex TE
+    Int_t fNumParamsTamexLE = 2; // number of parameters for matching Tamex LE
+    Int_t fNumParamsTamexTE = 2; // number of parameters for matching Tamex TE
+
     const R3BLosHitPar& operator=(const R3BLosHitPar&);
     R3BLosHitPar(const R3BLosHitPar&);
 
-    ClassDef(R3BLosHitPar, 1);
+  public:
+    ClassDefOverride(R3BLosHitPar, 1);
 };
-
-#endif
