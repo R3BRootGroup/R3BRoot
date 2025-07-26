@@ -65,7 +65,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
     f->Close();
     delete StruGeom;
 
-    auto fRefRot = std::make_unique<TGeoRotation>();
+    auto fRefRot = new TGeoRotation();
     TGeoManager* gGeoMan = nullptr;
 
     // -------   Load media from media file   -------------------------
@@ -286,15 +286,15 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
         Fatal("Main", "Medium vacuum not found");
 
     // --------------   Create geometry and top volume  ---------------
-    gGeoMan = (TGeoManager*)gROOT->FindObject("FAIRGeom");
+    gGeoMan = static_cast<TGeoManager*>(gROOT->FindObject("FAIRGeom"));
     gGeoMan->SetName("CALIFAgeom");
-    TGeoVolume* top = new TGeoVolumeAssembly("TOP");
+    auto top = new TGeoVolumeAssembly("TOP");
     gGeoMan->SetTopVolume(top);
 
     // Defintion of the Mother Volume  --------------------------------
-    auto tgeotrans0 = new TGeoCombiTrans("tgeotrans0", 0., 0., 9., fRefRot.get());
+    auto tgeotrans0 = new TGeoCombiTrans("tgeotrans0", 0., 0., 9., fRefRot);
     tgeotrans0->RegisterYourself();
-    auto tgeotrans1 = new TGeoCombiTrans("tgeotrans1", 0, 0, 0., fRefRot.get());
+    auto tgeotrans1 = new TGeoCombiTrans("tgeotrans1", 0, 0, 0., fRefRot);
     tgeotrans1->RegisterYourself();
 
     auto mother_outer = new TGeoTube("mother_outer", 0., 81., (58. + 73.5) / 2.);
@@ -309,8 +309,8 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
         "califa_mother",
         "mother_outer:tgeotrans0 - inner_hole:tgeotrans0 + mother_endcap:tgeotrans1 + mother_endcap2:tgeotrans1");
 
-    auto pWorld = std::make_unique<TGeoVolume>("CalifaWorld", califa_mother, pAirMedium);
-    top->AddNode(pWorld.get(), 0, tgeotrans1);
+    auto pWorld = new TGeoVolume("CalifaWorld", califa_mother, pAirMedium);
+    top->AddNode(pWorld, 0, tgeotrans1);
 
     // FINAL CALIFA CARREL + iPHOS VERSION (SINCE NOV 2019)
     const size_t N_ALV_TYPES = 23; // alveolar structures
@@ -1496,7 +1496,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
     }
 
     if (fMakeStr)
-        CreateHoldingStructure(pWorld.get(), holding_structure, pCarbonFibreMedium, pAlMedium, dispCalMes, dispCalWix);
+        CreateHoldingStructure(pWorld, holding_structure, pCarbonFibreMedium, pAlMedium, dispCalMes, dispCalWix);
 
     gGeoMan->CloseGeometry();
     gGeoMan->CheckOverlaps(0.001);
