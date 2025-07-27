@@ -17,18 +17,11 @@
 
 #include <Rtypes.h>
 #include <TString.h>
+#include <string.h>
 #include <vector>
 
 class FairParSet;
 
-/**
- * Factory class for all TCAL parameter containers.
- * Currently supported:
- * NeuLAND - LandTCalPar
- * LOS - LosTCalPar
- * @author D. Kresan
- * @since September 3, 2015
- */
 class R3BTCalContFact : public FairContFact
 {
   public:
@@ -40,7 +33,7 @@ class R3BTCalContFact : public FairContFact
     /**
      * Destructor.
      */
-    ~R3BTCalContFact() {}
+    virtual ~R3BTCalContFact() = default;
 
     /**
      * Method to create a parameter container.
@@ -48,10 +41,10 @@ class R3BTCalContFact : public FairContFact
      * @param c a parameter container.
      * @return an instance of created parameter set.
      */
-    FairParSet* createContainer(FairContainer* c);
+    FairParSet* createContainer(FairContainer* c) override;
 
   private:
-    std::vector<const char*> containerNames;
+    std::vector<std::string> containerNames;
     /**
      * Method to add a standard container
      */
@@ -86,5 +79,5 @@ class R3BTCalContFact : public FairContFact
     void setAllContainers();
 
   public:
-    ClassDef(R3BTCalContFact, 1);
+    ClassDefOverride(R3BTCalContFact, 2);
 };

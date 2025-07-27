@@ -48,11 +48,12 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
     }
     if (NULL == fhData[plane - 1][paddle - 1][side - 1])
     {
-        char strName[255];
-        sprintf(strName, "%s_tcaldata_%d_%d_%d", fCal_Par->GetName(), plane, paddle, side);
-        fhData[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4097, -0.5, 4096.5);
-        sprintf(strName, "%s_time_%d_%d_%d", fCal_Par->GetName(), plane, paddle, side);
-        fhTime[plane - 1][paddle - 1][side - 1] = new TH1F(strName, "", 4097, -0.5, 4096.5);
+        TString strName;
+        strName.Form("%s_tcaldata_%d_%d_%d", fCal_Par->GetName(), plane, paddle, side);
+        fhData[plane - 1][paddle - 1][side - 1] = new TH1F(strName.Data(), "", 4097, -0.5, 4096.5);
+
+        strName.Form("%s_time_%d_%d_%d", fCal_Par->GetName(), plane, paddle, side);
+        fhTime[plane - 1][paddle - 1][side - 1] = new TH1F(strName.Data(), "", 4097, -0.5, 4096.5);
     }
     fhData[plane - 1][paddle - 1][side - 1]->Fill(tdc);
 
@@ -128,7 +129,6 @@ void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
             }
         }
     }
-
     fCal_Par->setChanged();
 }
 
@@ -168,8 +168,7 @@ void R3BTCalEngine::CalculateParamTacquila()
 
                 Int_t nparam = 0;
 
-                R3BTCalModulePar* pTCal = NULL;
-                pTCal = new R3BTCalModulePar();
+                auto pTCal = new R3BTCalModulePar();
                 pTCal->SetPlane(i + 1);
                 pTCal->SetPaddle(j + 1);
                 pTCal->SetSide(k + 1);
@@ -283,10 +282,6 @@ void R3BTCalEngine::CalculateParamVFTX()
 
             for (Int_t k = 0; k < N_SIDE_MAX; k++)
             {
-
-                // if(i == 0)   LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : Detector: "<<i<<", Channel: "<<j<<",
-                // Type: " << k;
-
                 if (NULL == fhData[i][j][k])
                 {
                     //			LOG(info) << "R3BTCalEngine::CalculateParamVFTX() : NULL: " << fhData[i][j][k];
@@ -316,8 +311,7 @@ void R3BTCalEngine::CalculateParamVFTX()
 
                 Int_t nparam = 0;
 
-                R3BTCalModulePar* pTCal = NULL;
-                pTCal = new R3BTCalModulePar();
+                auto pTCal = new R3BTCalModulePar();
                 pTCal->SetPlane(i + 1);
                 pTCal->SetPaddle(j + 1);
                 pTCal->SetSide(k + 1);

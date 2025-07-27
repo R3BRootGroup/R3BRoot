@@ -29,7 +29,7 @@ class TH1F;
 
 /**
  * Class with implementation of TCAL time calibration.
- * Currently supported electronics: Clock TDC, Tacquila, and VFTX.
+ * Currently supported electronics: Clock TDC, Tamex3, TRB3, Tacquila, and VFTX.
  * Clock frequency is set as a constant in MHz and the
  * clock cycle in ns is calculated from it.
  * Recommended value of minimum statistics per module is
@@ -144,5 +144,5 @@ class R3BTCalEngine : public TObject
     Double_t fClockFreq;      /**< A clock cycle in [ns]. */
 
   public:
-    ClassDef(R3BTCalEngine, 1)
+    ClassDef(R3BTCalEngine, 1);
 };

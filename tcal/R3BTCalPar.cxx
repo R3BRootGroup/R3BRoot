@@ -14,9 +14,9 @@
 #include "R3BTCalPar.h"
 #include "R3BLogger.h"
 
-#include "FairLogger.h"
-#include "FairParamList.h"
-#include "FairRtdbRun.h"
+#include <FairLogger.h>
+#include <FairParamList.h>
+#include <FairRtdbRun.h>
 
 R3BTCalPar::R3BTCalPar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
@@ -74,7 +74,7 @@ void R3BTCalPar::printParams()
     R3BLOG(info, "Number of TCal Parameters " << fTCalParams->GetEntries());
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
-        R3BTCalModulePar* t_par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
+        auto t_par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
         LOG(info) << "----------------------------------------------------------------------";
         if (t_par)
         {
@@ -88,21 +88,17 @@ R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t si
     if (!fMapInit)
     {
         fIndexMap.clear();
-        R3BTCalModulePar* par;
-        Int_t tplane;
-        Int_t tpaddle;
-        Int_t tside;
-        Int_t index;
-        for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
+        Int_t index = 0;
+        for (size_t i = 0; i < fTCalParams->GetEntriesFast(); i++)
         {
-            par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
+            auto par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
             if (NULL == par)
             {
                 continue;
             }
-            tplane = par->GetPlane();
-            tpaddle = par->GetPaddle();
-            tside = par->GetSide();
+            auto tplane = par->GetPlane();
+            auto tpaddle = par->GetPaddle();
+            auto tside = par->GetSide();
             if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX || tside < 1 ||
                 tside > N_SIDE_MAX)
             {
@@ -144,7 +140,7 @@ void R3BTCalPar::AddModulePar(R3BTCalModulePar* tch)
 
 void R3BTCalPar::PrintModuleParams(Int_t plane, Int_t paddle, Int_t side)
 {
-    R3BTCalModulePar* par = GetModuleParAt(plane, paddle, side);
+    auto par = GetModuleParAt(plane, paddle, side);
     if (NULL != par)
     {
         par->printParams();
@@ -153,7 +149,7 @@ void R3BTCalPar::PrintModuleParams(Int_t plane, Int_t paddle, Int_t side)
 
 void R3BTCalPar::DrawModuleParams(Int_t plane, Int_t paddle, Int_t side)
 {
-    R3BTCalModulePar* par = GetModuleParAt(plane, paddle, side);
+    auto par = GetModuleParAt(plane, paddle, side);
     if (NULL != par)
     {
         par->DrawParams();
@@ -162,7 +158,7 @@ void R3BTCalPar::DrawModuleParams(Int_t plane, Int_t paddle, Int_t side)
 
 Bool_t R3BTCalPar::SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_t tac_channel, Double_t value)
 {
-    R3BTCalModulePar* par = GetModuleParAt(plane, paddle, side);
+    auto par = GetModuleParAt(plane, paddle, side);
     if (NULL != par)
     {
         if (par->GetSlopeAt(0) > 0)
@@ -187,13 +183,13 @@ Bool_t R3BTCalPar::SetModuleParValue(Int_t plane, Int_t paddle, Int_t side, Int_
 void R3BTCalPar::SavePar(TString runNumber)
 {
     this->Write();
-    FairRtdbRun* r1 = dynamic_cast<FairRtdbRun*>(gDirectory->Get(runNumber));
+    auto r1 = dynamic_cast<FairRtdbRun*>(gDirectory->Get(runNumber));
     if (NULL == r1)
     {
         R3BLOG(error, "Run " << runNumber << " does not exist in parameter file! Aborting.");
         return;
     }
-    FairParVersion* ver = r1->getParVersion(GetName());
+    auto ver = r1->getParVersion(GetName());
     if (NULL == ver)
     {
         R3BLOG(error, "Parameter container " << GetName() << " does not exist in parameter file! Aborting.");
@@ -204,4 +200,4 @@ void R3BTCalPar::SavePar(TString runNumber)
     R3BLOG(info, "Container " << GetName() << " is written to ROOT file. Version: " << ver->getRootVersion());
 }
 
-ClassImp(R3BTCalPar);
+ClassImp(R3BTCalPar)
