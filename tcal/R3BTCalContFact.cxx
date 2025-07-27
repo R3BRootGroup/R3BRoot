@@ -11,15 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#include "FairParSet.h"
-#include "FairRuntimeDb.h"
+#include <FairParSet.h>
+#include <FairRuntimeDb.h>
 
 #include "R3BLogger.h"
 #include "R3BTCalContFact.h"
 #include "R3BTCalPar.h"
-
-#include "TList.h"
-#include <string.h>
 
 static R3BTCalContFact gR3BTCalContFact;
 
@@ -27,22 +24,22 @@ R3BTCalContFact::R3BTCalContFact()
 {
     // Constructor (called when the library is loaded)
     fName = "R3BTCalContFact";
-    fTitle = "Tutorial factory for parameter containers";
+    fTitle = "Factory for TCal parameter containers";
     setAllContainers();
     FairRuntimeDb::instance()->addContFactory(this);
 }
 
 void R3BTCalContFact::addContainer(TString name, TString description)
 {
-    auto container = new FairContainer(name, description, "TestDefaultContext");
-    container->addContext("TestNonDefaultContext");
-    containers->Add(container);
+    auto container = std::make_unique<FairContainer>(name.Data(), description.Data(), "DefaultContext");
+    containers->Add(container.release());
 }
 
 void R3BTCalContFact::setAllContainers()
-{
-    /** Creates the Container objects with all accepted contexts and adds
-     *  them to the list of containers.*/
+{ /**
+   ** Creates the Container objects with all accepted contexts and adds
+   ** them to the list of containers.
+   **/
     addContainer("LandTCalPar", "NeuLAND TCAL Calibration Parameters");
     addContainer("LosTCalPar", "LOS TCAL Calibration Parameters");
     addContainer("RoluTCalPar", "ROLU TCAL Calibration Parameters");
@@ -81,13 +78,13 @@ void R3BTCalContFact::setAllContainers()
 }
 
 FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
-{
-    /** Calls the constructor of the corresponding parameter container.
-     * For an actual context, which is not an empty string and not the default context
-     * of this container, the name is concatinated with the context. */
-
-    const char* name = c->GetName();
-    R3BLOG(info, name);
+{ /**
+   ** Calls the constructor of the corresponding parameter container. For an
+   ** actual context, which is not an empty string and not the default context
+   ** of this container, the name is concatinated with the context.
+   **/
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
 
     containerNames.push_back("LandTCalPar");
     containerNames.push_back("LosTCalPar");
@@ -125,25 +122,14 @@ FairParSet* R3BTCalContFact::createContainer(FairContainer* c)
     PUSH_FIBER(Fi32);
     PUSH_FIBER(Fi33);
 
-    // bool found = false;
     for (auto containerName : containerNames)
     {
-        if (strncmp(name, containerName, strlen(containerName)) == 0)
+        if (name == containerName)
         {
-            // found = true;
-            // break;
             return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
         }
     }
-
-    /* if (found == true)
-     {
-         return new R3BTCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
-     }
-     else
-     {*/
     return nullptr;
-    // }
 }
 
-ClassImp(R3BTCalContFact);
+ClassImp(R3BTCalContFact)

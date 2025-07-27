@@ -24,8 +24,6 @@
 #include "R3BLogger.h"
 #include "R3BTGeoPar.h"
 
-#include <TClass.h>
-
 static R3BActafContFact gR3BActafContFact;
 
 R3BActafContFact::R3BActafContFact()

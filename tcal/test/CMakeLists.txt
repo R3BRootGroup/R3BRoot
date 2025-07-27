@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2025 Members of R3B Collaboration                          #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -11,29 +11,11 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-set(SRCS 
-    R3BTCalModulePar.cxx 
-    R3BTCalPar.cxx 
-    R3BTCalContFact.cxx 
-    R3BTCalEngine.cxx)
-set(HEADERS 
-    R3BTCalModulePar.h 
-    R3BTCalPar.h 
-    R3BTCalContFact.h 
-    R3BTCalEngine.h)
-
-add_library_with_dictionary(
-    LIBNAME
-    R3BTCal
-    LINKDEF
-    TCalLinkDef.h
-    HEADERS
-    ${HEADERS}
-    SRCS
-    ${SRCS}
-    INCLUDEDIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    DEPENDENCIES
-    R3BBase)
-    
-add_subdirectory(test)
+if(GTEST_FOUND)
+    add_executable(
+        TCalUnitTests
+        testTCalContainerPar.cxx)
+    target_link_libraries(TCalUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BTCal)
+    gtest_discover_tests(TCalUnitTests DISCOVERY_TIMEOUT 600)
+endif(GTEST_FOUND)

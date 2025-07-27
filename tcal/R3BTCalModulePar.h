@@ -23,7 +23,7 @@ class FairParamList;
  * Parameter container for time calibration of a single module. This class is used for
  * storage of time calibration parameters for a detector module. It contains
  * parametrisation of a table, used for TDC -> time [ns] conversion. Currently
- * supported systems: TACQUILA and VFTX.
+ * supported systems: Clock TDC, Tamex3, TRB3, TACQUILA and VFTX.
  * @author D. Kresan
  * @since September 2, 2015
  */
@@ -47,31 +47,31 @@ class R3BTCalModulePar : public FairParGenericSet
      * Destructor.
      * Frees the memory allocated by the object.
      */
-    virtual ~R3BTCalModulePar(void);
+    virtual ~R3BTCalModulePar() = default;
 
     /**
      * A method to reset the parameter values. Sets all parameters to 0.
      */
-    void clear(void);
+    void clear() override;
 
     /**
      * A method to write parameters using RuntimeDB.
      * @param list a list of parameters.
      */
-    void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /**
      * A method to read parameters using RuntimeDB.
      * @param list a list of parameters.
      * @return kTRUE if successfull, else kFALSE.
      */
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /**
      * A method to print value of parameters to the standard
      * output using FairLogger.
      */
-    void printParams();
+    void printParams() override;
 
     /**
      * A method to draw vaues of parameters on the current Canvas.
@@ -111,25 +111,25 @@ class R3BTCalModulePar : public FairParGenericSet
     Double_t GetOffsetAt(Int_t i) const { return fOffset[i]; }
     Int_t GetBinLowAt(Int_t i) const { return fBinLow[i]; }
     Int_t GetBinUpAt(Int_t i) const { return fBinUp[i]; }
-    void SetPlane(Int_t i) { fPlane = i; }
-    void SetPaddle(Int_t i) { fPaddle = i; }
-    void SetSide(Int_t i) { fSide = i; }
-    void IncrementNofChannels() { fNofChannels += 1; }
-    void SetBinLowAt(Int_t ch, Int_t i) { fBinLow[i] = ch; }
-    void SetBinUpAt(Int_t ch, Int_t i) { fBinUp[i] = ch; }
-    void SetSlopeAt(Double_t slope, Int_t i) { fSlope[i] = slope; }
-    void SetOffsetAt(Double_t offset, Int_t i) { fOffset[i] = offset; }
+    inline void SetPlane(Int_t i) { fPlane = i; }
+    inline void SetPaddle(Int_t i) { fPaddle = i; }
+    inline void SetSide(Int_t i) { fSide = i; }
+    inline void IncrementNofChannels() { fNofChannels += 1; }
+    inline void SetBinLowAt(Int_t ch, Int_t i) { fBinLow[i] = ch; }
+    inline void SetBinUpAt(Int_t ch, Int_t i) { fBinUp[i] = ch; }
+    inline void SetSlopeAt(Double_t slope, Int_t i) { fSlope[i] = slope; }
+    inline void SetOffsetAt(Double_t offset, Int_t i) { fOffset[i] = offset; }
 
   private:
-    Int_t fPlane;             /**< Index of a plane. */
-    Int_t fPaddle;            /**< Index of a paddle. */
-    Int_t fSide;              /**< Side of a module: for NeuLAND - L/R PMT. */
-    Int_t fNofChannels;       /**< Number of calibration parameters. */
-    Int_t fBinLow[NCHMAX];    /**< Lower TDC range of a linear segment. */
-    Int_t fBinUp[NCHMAX];     /**< Upper TDC range of a linear segment. */
-    Double_t fSlope[NCHMAX];  /**< Slope of liear interpolation. */
-    Double_t fOffset[NCHMAX]; /**< Offset of linear interpolation [ns]. */
+    Int_t fPlane = 0;         // Index of a plane
+    Int_t fPaddle = 0;        // Index of a paddle
+    Int_t fSide = 0;          // Side of a module: for NeuLAND - L/R PMT
+    Int_t fNofChannels = 0;   // Number of calibration parameters
+    Int_t fBinLow[NCHMAX];    // Lower TDC range of a linear segment
+    Int_t fBinUp[NCHMAX];     // Upper TDC range of a linear segment
+    Double_t fSlope[NCHMAX];  // Slope of liear interpolation
+    Double_t fOffset[NCHMAX]; // Offset of linear interpolation [ns]
 
   public:
-    ClassDef(R3BTCalModulePar, 1);
+    ClassDefOverride(R3BTCalModulePar, 1);
 };

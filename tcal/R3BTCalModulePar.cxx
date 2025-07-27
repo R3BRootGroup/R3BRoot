@@ -14,30 +14,24 @@
 #include "R3BTCalModulePar.h"
 #include "R3BLogger.h"
 
-#include "FairLogger.h"
-#include "FairParamList.h"
+#include <FairLogger.h>
+#include <FairParamList.h>
 
-#include "TF1.h"
-#include "TH1F.h"
-#include "TPad.h"
-
-using namespace std;
+#include <TF1.h>
+#include <TH1F.h>
+#include <TPad.h>
 
 R3BTCalModulePar::R3BTCalModulePar(const char* name, const char* title, const char* context, Bool_t own)
     : FairParGenericSet(name, title, context, own)
-    , fPlane(0)
-    , fPaddle(0)
-    , fSide(0)
-    , fNofChannels(0)
 {
     // Reset all parameters
-    clear();
-}
-
-R3BTCalModulePar::~R3BTCalModulePar()
-{
-    // Reset all parameters
-    clear();
+    // <DB> Not so much overhead here.
+    for (size_t i = 0; i < NCHMAX; i++)
+    {
+        fBinLow[i] = fBinUp[i] = 0;
+        fSlope[i] = 0.;
+        fOffset[i] = 0.;
+    }
 }
 
 void R3BTCalModulePar::putParams(FairParamList* list)
@@ -104,9 +98,11 @@ Bool_t R3BTCalModulePar::getParams(FairParamList* list)
 
 void R3BTCalModulePar::clear()
 {
+    status = kFALSE;
+    resetInputVersions();
     fPlane = fPaddle = fSide = fNofChannels = 0;
     // <DB> Not so much overhead here.
-    for (Int_t i = 0; i < NCHMAX; i++)
+    for (size_t i = 0; i < NCHMAX; i++)
     {
         fBinLow[i] = fBinUp[i] = 0;
         fSlope[i] = 0.;
@@ -171,7 +167,7 @@ Double_t R3BTCalModulePar::GetTimeVFTX(Int_t tdc)
 
 void R3BTCalModulePar::DrawParams()
 {
-    Int_t type = 2; // VFTX
+    Int_t type = 2; // VFTX, Tamex3 or TRB3
     if (fNofChannels > 0)
     {
         if (fSlope[0] > 0)
@@ -212,4 +208,4 @@ void R3BTCalModulePar::DrawParams()
     gPad->Update();
 }
 
-ClassImp(R3BTCalModulePar);
+ClassImp(R3BTCalModulePar)
