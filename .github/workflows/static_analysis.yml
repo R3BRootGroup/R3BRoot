@@ -33,6 +33,7 @@ jobs:
       matrix:
         preset: [ default ]
         os: [ debian12 ]
+        fsv: [jan24p1]
     container: 
       image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
       volumes:

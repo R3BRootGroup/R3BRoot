@@ -21,7 +21,7 @@ runs:
       run: |
         echo "TEST_MODEL=Experimental" >> $GITHUB_ENV
         export PULL_NR=${{ github.event.number }}
-        echo "TEST_NAME=\"${{ inputs.repo }} (pull request No.${PULL_NR})\"" >> $GITHUB_ENV
+        echo "TEST_NAME=\"${{ inputs.repo }}_${{ matrix.os }}_${{ matrix.fsv }} (pull request No.${PULL_NR})\"" >> $GITHUB_ENV
       shell: bash
 
     - name: running ctest
