@@ -65,7 +65,8 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy ]
-        os: [ debian10, debian11, debian12 ] # ubuntu24.04 ]
+        os: [ debian11, debian12 ] # ubuntu24.04 ]
+        fsv: [jan24p1, jan24p5]
 
         # The list under "include" defines some properties for each group:
         #

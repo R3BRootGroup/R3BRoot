@@ -93,6 +93,7 @@ jobs:
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy, r3broot-conan ]
         os: [ debian10, debian11, debian12 ]
+        fsv: [jan24p1]
 
         # The list under "include" defines some properties for each group:
         #
