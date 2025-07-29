@@ -102,8 +102,9 @@ The following systems are tested regularly.
 | RHEL        | x86\_64  | 9.6            | GCC 14.2.0   | 3.30.6          | C++17           |
 | Debian      | x86\_64  | 10             | GCC 8.3.0    | 3.27.4 / 4.0.3  | C++17           |
 | Debian      | x86\_64  | 11             | GCC 10.2.1   | 3.27.4 / 3.30.0 | C++17           |
-| Debian      | x86\_64  | 12             | GCC 12.2.0   | 3.27.4 / 3.30.0 | C++17           |
-| Ubuntu      | x86\_64  | 24.04          | GCC 13.3.0   | 3.28.3 / 4.0.3  | C++17           |
+| Debian      | x86\_64  | 12             | GCC 12.2.0   | 3.27.4 / 3.30.0 | C++17 / C++20   |
+| Ubuntu      | x86\_64  | 24.04          | GCC 13.3.0   | 3.28.3 / 4.0.3  | C++17 / C++20   |
+| macOS       | arm64    | 15.3           | AppleClang 15 |   4.0.3        | C++17           |
 
 ## Security Policy
 
