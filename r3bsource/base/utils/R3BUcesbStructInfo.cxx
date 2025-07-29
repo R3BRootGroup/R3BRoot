@@ -12,9 +12,9 @@
  ******************************************************************************/
 
 #include "R3BUcesbStructInfo.h"
+#include "R3BException.h"
+#include "R3BLogger.h"
 #include "R3BUcesbDecl.h"
-#include <R3BException.h>
-#include <R3BLogger.h>
 #include <R3BUcesbSource2.h>
 
 namespace R3B
@@ -40,12 +40,13 @@ namespace R3B
             // no reader requries this item or reader accepts extra flag
             return true;
         }
+        /* Error in C++20/23: call of overloaded ‘format_to(fmt::v10::basic_format_context<fmt::v10::appender,
+           char>::iterator, const char [3], std::string)’ is ambiguous R3BLOG(error, fmt::format("Failed to map the item
+           {} required from {} due to the map flag: {}", item->_var_name, required_reader->GetName(), map_flag));*/
 
         R3BLOG(error,
-               fmt::format("Failed to map the item {} required from {} due to the map flag: {}",
-                           item->_var_name,
-                           required_reader->GetName(),
-                           map_flag));
+               "Failed to map the item " << item->_var_name << " required from " << required_reader->GetName()
+                                         << " due to the map flag: " << map_flag);
         return false;
     }
 
