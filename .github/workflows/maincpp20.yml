@@ -1,32 +1,19 @@
-# This is the main CI workflow for nightly simulation tests with the R3BRoot dev branch.
-#
-# To have successful and fast compilation and build processes, a Docker
-# container embedded with the cvmfs is also used in the workflow. The cvmfs is
-# very similar to sshfs which directly mounts a remote folder to the local
-# filesystem. Using cvmfs inside a docker container further improves the speed
-# of the workflow: saving install time for some essential dependencies (gcc,
-# llvm clang, cvmfs etc.).
-
-# It must be also noted that the speed of the worksflow varies a lot depending
-# on the CPUs of the Github hosted servers. Current servers (free version) have at
-# most 4 cores for each run and bigger servers (paid version) can have up
-# to 4, 8 or even 16 cores.
-
-# The workflow also submits the configure, build and test results to CDash
-# (cmake dashborad) with two different models: Experimental and Continuous for
-# the pull request and merge respectively. For the pull request (Experimental),
-# the project is built with the cache files from ccache while for the merge
-# (Continuous) it's built from scratch without using any cache files.
+# This is the main CI workflow for pull requests to the R3BRoot dev branch.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-name: CI-CD-nightly-sim
+name: CI-CD-C++20
 
 # Controls when the action will run. 
 on:
+  # Triggers the workflow in case of a push or pull request events
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
   schedule:
-    - cron: '0 21 * * 3'
-    - cron: '0 21 * * 6'
+    - cron: '0 21 * * 1'
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -64,11 +51,11 @@ jobs:
       matrix:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
-        repos: [ r3broot, glad-tpc, sofia-frs-asy ]
-        os: [ debian11, debian12 ] # ubuntu24.04 ]
-        fsv: [ jan24p1, jan24p5 ]
-        cpp: [ 17 ]
-        
+        repos: [ r3broot, glad-tpc, sofia-frs-asy, r3broot-conan ]
+        os: [ debian12 ]
+        fsv: [ jan24p5 ]
+        cpp: [ 20 ]
+
         # The list under "include" defines some properties for each group:
         #
         # repos: the name of the group. It must exist in matrix.repos as
@@ -89,6 +76,7 @@ jobs:
         # run
         include:
           # The R3BFileSource repo is used for testing unpacking.
+          - url: https://github.com/R3BRootGroup/R3BFileSource.git
           - cache: r3broot
           # disable conan build by default
           - preset: simple
@@ -112,14 +100,19 @@ jobs:
               https://github.com/R3BRootGroup/sofia.git
               https://github.com/R3BRootGroup/frs.git
               https://github.com/R3BRootGroup/asyeos.git
+              https://github.com/R3BRootGroup/R3BFileSource.git
             # Using own cache file
             cache: other-repos
+
+          # build with conan package manager
+          - repos: r3broot-conan
+            preset: default
 
     # Jobs are run inside a Docker container, which provides different compiled
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
     container: 
-      image: r3bdockers/${{ matrix.os }}
+      image: yanzhaowang/cvmfs_clang:${{ matrix.os }}
       volumes:
         - /tmp:/cvmfs
       env:
@@ -146,9 +139,6 @@ jobs:
       # variables and mounts the cmvfs folder of fairroot and fairsoft.
       - name: pre-build
         uses: './.github/actions/pre-build'
-        
-      - name: set custom CMake path
-        run: echo "/usr/local/bin" >> $GITHUB_PATH && cmake --version && export PATH=/usr/local/bin:$PATH && cmake --version 
 
       # A self-defined composite action, which restores the caches of
       # dependencies and builds and install them if the cache doesn't exist.
@@ -160,14 +150,11 @@ jobs:
       # dependencies for the R3BRoot build, such as googletest and ucesb. The
       # cache restoring step is only used for the run triggered with
       # "pull_request" and disabled for the merge event.
-#      - name: install dependencies
-#        id: restore-cache
-#        uses: './.github/actions/install-deps'
-#        with: 
-#          cache-name: ${{ matrix.cache }}
-      - name: unset UCESB_DIR for simulation tests
-        run: echo "UCESB_DIR=" >> $GITHUB_ENV
-        shell: bash
+      - name: install dependencies
+        id: restore-cache
+        uses: './.github/actions/install-deps'
+        with: 
+          cache-name: ${{ matrix.cache }}
 
       # A self-defined composite action for the cmake configuration and build
       # of r3broot (along with necessary dep repos).
