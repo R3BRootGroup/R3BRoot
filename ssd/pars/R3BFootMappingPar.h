@@ -14,6 +14,7 @@
 // ----------------------------------------------------------------
 // -----        R3BFootMappingPar source file                 -----
 // -----    Created 05/11/21 by J.L. Rodriguez-Sanchez        -----
+// -----    Modified 08/2025 by Pablo González Rusell         -----
 // ----------------------------------------------------------------
 
 #pragma once
@@ -51,21 +52,23 @@ class R3BFootMappingPar : public FairParGenericSet
     void printParams();
 
     /** Accessor functions **/
-    const Int_t GetGeometry() { return fGeo; }
-    const Int_t GetNumDets() { return fNumDet; }
-    const Float_t GetDist2target(Int_t det) { return fDistance2target->GetAt(det - 1); }
-    const Float_t GetAngleTheta(Int_t det) { return fAngleTheta->GetAt(det - 1); }
-    const Float_t GetAnglePhi(Int_t det) { return fAnglePhi->GetAt(det - 1); }
-    const Float_t GetOffsetX(Int_t det) { return fOffsetX->GetAt(det - 1); }
-    const Float_t GetOffsetY(Int_t det) { return fOffsetY->GetAt(det - 1); }
-    const Int_t GetPolPar() { return fPolPar; }
-    const Float_t GetEnevsPosCorr(Int_t order) { return fEnevsPosCorr->GetAt(order - 1); }
+    [[nodiscard]] const Int_t GetGeometry() { return fGeo; }
+    [[nodiscard]] const Int_t GetNumDets() { return fNumDet; }
+    [[nodiscard]] const Float_t GetDist2target(Int_t det) { return fDistance2target->GetAt(det - 1); }
+    [[nodiscard]] const Float_t GetAngleTheta(Int_t det) { return fAngleTheta->GetAt(det - 1); }
+    [[nodiscard]] const Float_t GetAnglePhi(Int_t det) { return fAnglePhi->GetAt(det - 1); }
+    [[nodiscard]] const Float_t GetAnglePsi(Int_t det) { return fAnglePsi->GetAt(det - 1); }
+    [[nodiscard]] const Float_t GetOffsetX(Int_t det) { return fOffsetX->GetAt(det - 1); }
+    [[nodiscard]] const Float_t GetOffsetY(Int_t det) { return fOffsetY->GetAt(det - 1); }
+    [[nodiscard]] const Int_t GetPolPar() { return fPolPar; }
+    [[nodiscard]] const Float_t GetEnevsPosCorr(Int_t order) { return fEnevsPosCorr->GetAt(order - 1); }
 
     void SetGeometry(Int_t geo) { fGeo = geo; }
     void SetNumDets(Int_t numberDet) { fNumDet = numberDet; }
     void SetDist2target(Float_t value, Int_t det) { fDistance2target->AddAt(value, det - 1); }
     void SetAngleTheta(Float_t value, Int_t det) { fAngleTheta->AddAt(value, det - 1); }
     void SetAnglePhi(Float_t value, Int_t det) { fAnglePhi->AddAt(value, det - 1); }
+    void SetAnglePsi(Float_t value, Int_t det) { fAnglePsi->AddAt(value, det - 1); }
     void SetOffsetX(Float_t value, Int_t det) { fOffsetX->AddAt(value, det - 1); }
     void SetOffsetY(Float_t value, Int_t det) { fOffsetY->AddAt(value, det - 1); }
     void SetPolPar(Int_t parPol) { fPolPar = parPol; }
@@ -75,8 +78,9 @@ class R3BFootMappingPar : public FairParGenericSet
     Int_t fGeo;                // Geometry of the foot detectors
     Int_t fNumDet;             // Number of foot detectors (from 1 to 10 for 2021 experiments)
     TArrayF* fDistance2target; // Distance to target
-    TArrayF* fAngleTheta;      // Angle with respect to beam direction
-    TArrayF* fAnglePhi;        // Rotation Angle around the Z direction
+    TArrayF* fAngleTheta;      // Rotation angle around the Y direction (from Z to X in lab frame)
+    TArrayF* fAnglePhi;        // Rotation angle around the Z direction (from X to Y in lab frame)
+    TArrayF* fAnglePsi;        // Rotation angle around the X direction (from Y to Z in lab frame)
     TArrayF* fOffsetX;         // Offset for x
     TArrayF* fOffsetY;         // Offset for y
     Int_t fPolPar;             // Number of parameters for polynomial for Energy Vs Position Correction
