@@ -17,12 +17,11 @@
 // ----- Convert time calibrated data to hit level (single time) ----
 // ------------------------------------------------------------------
 
-#ifndef R3BLOSCAL2HIT
-#define R3BLOSCAL2HIT
+#pragma once
 
 #include <map>
 
-#include "FairTask.h"
+#include <FairTask.h>
 
 class TClonesArray;
 class TH1F;
@@ -30,17 +29,8 @@ class TH2F;
 class R3BEventHeader;
 class R3BLosHitPar;
 
-/**
- * TODO: This explanation is humbug.
- * An analysis task to apply TCAL calibration for NeuLAND.
- * This class reads NeuLAND mapped items with TDC values and
- * produces time items with time in [ns]. It requires TCAL
- * calibration parameters, which are produced in a separate
- * analysis run containing R3BLosCal2HitFill task.
- */
 class R3BLosCal2Hit : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -244,7 +234,6 @@ class R3BLosCal2Hit : public FairTask
     TH2F* fhQ3_vs_Q7_corr;
     TH2F* fhQ4_vs_Q8;
     TH2F* fhQ4_vs_Q8_corr;
-    ;
     TH2F* fhTresX_M;
     TH2F* fhTresY_M;
     TH2F* fhTresX_T;
@@ -266,7 +255,5 @@ class R3BLosCal2Hit : public FairTask
     Int_t Icount = 0;
 
   public:
-    ClassDef(R3BLosCal2Hit, 1)
+    ClassDef(R3BLosCal2Hit, 1);
 };
-
-#endif

@@ -50,6 +50,7 @@
 #include <TRandom.h>
 #include <TStyle.h>
 #include <TVector3.h>
+#include <iostream>
 
 #define IS_NAN(x) TMath::IsNaN(x)
 

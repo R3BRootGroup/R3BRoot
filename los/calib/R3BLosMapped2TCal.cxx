@@ -136,7 +136,7 @@ InitStatus R3BLosMapped2TCal::ReInit()
     return kSUCCESS;
 }
 
-void R3BLosMapped2TCal::Exec(Option_t* option)
+void R3BLosMapped2TCal::Exec(Option_t*)
 {
     // check for requested trigger (Todo: should be done globablly / somewhere else)
 

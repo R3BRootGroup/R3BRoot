@@ -18,47 +18,40 @@
 
 #pragma once
 
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-
 #include <FairLogger.h>
+#include <fairlogger/Logger.h>
 
-// NOLINTBEGIN
-class R3BLogger;
+#include <Rtypes.h>
 
 class R3BLogger : public FairLogger
 {
   public:
-#define R3BLOG(severity, x)                                                                            \
-    if (true)                                                                                          \
-    {                                                                                                  \
-        std::string fN(__FILE__);                                                                      \
-        std::stringstream ss;                                                                          \
-        ss << fN.substr(fN.find_last_of("/") + 1) << ":" << __LINE__ << ":" << __FUNCTION__ << "(): "; \
-        LOG(severity) << ss.str() << x;                                                                \
-    }                                                                                                  \
-    else                                                                                               \
-        (void)0
+// NOLINTBEGIN
+#define R3BLOG(severity, x)                                                                                    \
+    do                                                                                                         \
+    {                                                                                                          \
+        std::string infile(__FILE__);                                                                          \
+        std::stringstream ss;                                                                                  \
+        ss << infile.substr(infile.find_last_of("/") + 1) << ":" << __LINE__ << ":" << __FUNCTION__ << "(): "; \
+        LOG(severity) << ss.str() << x;                                                                        \
+    } while (0)
 
-#define R3BLOG_IF(severity, condition, x)                                                                    \
-    if (true)                                                                                                \
-    {                                                                                                        \
-        std::string fNif(__FILE__);                                                                          \
-        std::stringstream ssif;                                                                              \
-        ssif << fNif.substr(fNif.find_last_of("/") + 1) << ":" << __LINE__ << ":" << __FUNCTION__ << "(): "; \
-        LOG_IF(severity, condition) << ssif.str() << x;                                                      \
-    }                                                                                                        \
-    else                                                                                                     \
-        (void)0
-
+#define R3BLOG_IF(severity, condition, x)                                                                          \
+    do                                                                                                             \
+    {                                                                                                              \
+        if (condition)                                                                                             \
+        {                                                                                                          \
+            std::string infile(__FILE__);                                                                          \
+            std::stringstream ss;                                                                                  \
+            ss << infile.substr(infile.find_last_of("/") + 1) << ":" << __LINE__ << ":" << __FUNCTION__ << "(): "; \
+            LOG(severity) << ss.str() << x;                                                                        \
+        }                                                                                                          \
+    } while (0)
+    // NOLINTEND
   private:
     R3BLogger();
-    ~R3BLogger();
+    ~R3BLogger() = default;
 
   public:
-    ClassDefOverride(R3BLogger, 0)
+    ClassDefOverride(R3BLogger, 0);
 };
-// NOLINTEND
