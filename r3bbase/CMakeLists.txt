@@ -23,7 +23,6 @@ set(SRCS
     R3BException.cxx
     R3BFileSource.cxx
     R3BFileSource2.cxx
-    R3BLogger.cxx
     R3BModule.cxx
     R3BTcutPar.cxx
     R3BTsplinePar.cxx

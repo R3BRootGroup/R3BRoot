@@ -26,6 +26,7 @@
 #include <fmt/chrono.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
+#include <iostream>
 #include <vector>
 
 namespace
