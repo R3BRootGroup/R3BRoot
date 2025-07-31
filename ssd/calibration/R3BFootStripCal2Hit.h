@@ -68,34 +68,50 @@ class R3BFootStripCal2Hit : public FairTask
     /** Accessor for selecting online mode **/
     inline void SetOnline(Bool_t option) { fOnline = option; }
 
-    /** Accessor for selecting max. number of clusters per ams detector **/
+    /** Accessor for selecting max. number of clusters per FOOT detector **/
     inline void SetMaxNumClusters(int max) { fMaxNumClusters = max; }
 
     /** Accessor to set up the threshold for the cluster energy sum **/
     inline void SetClusterEnergy(double thsum) { fThSum = thsum; }
 
+    // Method for setting the maximum number of strips for each cluster
+    inline void SetMaxNumStrips(int max) { fMaxNumStrips = max; }
+
   private:
     void SetParameter();
+    void FillCalData(double nHits);
+    void ClusterizeStrips();
+    void ComputeClusterParams();
+    void EtaCorrectionAndChargeCal();
+    TVector3 ComputeHitPosition(int detId, double pos);
 
-    double fPitch = 157.7;
-    double fMiddle = 50.;
+    static constexpr double fMiddle = 50.;
+    static constexpr int fNumAsic = 10;
+    static constexpr int fNumStrips = 640;
+    static constexpr double fEtaCenter = 0.5;
+
+    int fMaxNumDet = 16;
     double fThSum = 20.;
     double fTimesSigmas = 3.;
-    int fMaxNumDet = 16;
+
     int fMaxNumClusters = 10;
-    int fNumParsFit = 2;
+    int fMaxNumStrips = 640;
+
     std::vector<double> fDistTarget;
     std::vector<double> fAngleTheta;
     std::vector<double> fAnglePhi;
+    std::vector<double> fAnglePsi;
     std::vector<double> fOffsetX;
     std::vector<double> fOffsetY;
-    std::vector<TH1F*> hssd;
-    TArrayF* HitCalParams = nullptr;
 
+    std::vector<std::vector<int>> StripI;                   // Strip Id
+    std::vector<std::vector<double>> StripE;                // Strip energy
+    std::vector<std::vector<double>> StripS;                // Strip Sigma
     std::vector<int> ClusterMult;                           // Cluster multiplicity
     std::vector<std::vector<double>> ClusterPos;            // Position of Cluster from Weighted Average
     std::vector<std::vector<double>> Eta;                   // Decimal part of the average position of the cluster
     std::vector<std::vector<double>> ClusterESum;           // Sum of Energies in the Cluster
+    std::vector<std::vector<double>> ClusterCharge;         // Sum of Energies in the Cluster
     std::vector<std::vector<int>> ClusterNStrip;            // Number of Strips in Cluster
     std::vector<std::vector<std::vector<double>>> ClusterI; // Id Strip in Cluster
     std::vector<std::vector<std::vector<double>>> ClusterE; // Energy of Strip in Cluster
@@ -115,7 +131,6 @@ class R3BFootStripCal2Hit : public FairTask
     TClonesArray* fFootHitData = nullptr; // Array with FOOT Hit-output data
 
     bool fOnline = false; // Don't store data for online
-    Double_t* fChannelPeaks;
 
     // Private method AddHitData
     R3BFootHitData* AddHitData(uint8_t detid,
