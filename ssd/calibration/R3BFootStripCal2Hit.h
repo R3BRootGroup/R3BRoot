@@ -29,22 +29,17 @@
 #include <vector>
 
 class TClonesArray;
-class TH1F;
 class R3BFootMappingPar;
 class R3BFootHitPar;
 
 class R3BFootStripCal2Hit : public FairTask
 {
-
   public:
-    /** Default constructor **/
-    R3BFootStripCal2Hit();
-
     /** Standard constructor **/
-    R3BFootStripCal2Hit(const TString& name, Int_t iVerbose = 1);
+    R3BFootStripCal2Hit(const TString& name = "R3BFootStripCal2Hit", int iVerbose = 1);
 
     /** Destructor **/
-    virtual ~R3BFootStripCal2Hit();
+    ~R3BFootStripCal2Hit();
 
     /** Virtual method Exec **/
     void Exec(Option_t* /*option*/) override;
@@ -79,7 +74,7 @@ class R3BFootStripCal2Hit : public FairTask
 
   private:
     void SetParameter();
-    void FillCalData(double nHits);
+    void FillCalData(int nHits);
     void ClusterizeStrips();
     void ComputeClusterParams();
     void EtaCorrectionAndChargeCal();
@@ -144,5 +139,5 @@ class R3BFootStripCal2Hit : public FairTask
 
   public:
     // Class definition
-    ClassDefOverride(R3BFootStripCal2Hit, 1)
+    ClassDefOverride(R3BFootStripCal2Hit, 1);
 };
