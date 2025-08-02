@@ -35,7 +35,6 @@ add_library_with_dictionary(
     online
     pars
     DEPENDENCIES
-    R3BTraRene
     R3BLos
     R3BCalifa
     R3BMwpc

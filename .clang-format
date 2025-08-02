@@ -4,6 +4,7 @@ Language:        Cpp
 ConstructorInitializerIndentWidth: 4
 AlignEscapedNewlinesLeft: true
 AlignTrailingComments: true
+AlignAfterOpenBracket: Align
 AllowAllParametersOfDeclarationOnNextLine: false
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
@@ -51,4 +52,5 @@ SpaceBeforeAssignmentOperators: true
 ContinuationIndentWidth: 4
 CommentPragmas:  '^ IWYU pragma:'
 SpaceBeforeParens: ControlStatements
+SpaceBeforeCpp11BracedList: false
 ...

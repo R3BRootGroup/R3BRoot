@@ -22,6 +22,7 @@
 #include "FairRuntimeDb.h"
 #include "R3BCoarseTimeStitch.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BLosHitData.h"
 #include "R3BLosHitPar.h"
 #include "R3BLosMapped2TCal.h"
@@ -29,6 +30,7 @@
 #include "R3BLosTCalData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -51,13 +53,9 @@ R3BLosTCal2Hit::R3BLosTCal2Hit()
 
 R3BLosTCal2Hit::R3BLosTCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fTCalItems(NULL)
-    , fTCalTriggerItems(NULL)
     , fHitItems(new TClonesArray("R3BLosHitData"))
-    , fTimeStitch(NULL)
     , fLEMatchParams(NULL)
     , fTEMatchParams(NULL)
-    , fNofHitItems(0)
     , fNofDetectors(1)
     , fTrigger(-1)
     , fTpat(-1)
@@ -76,14 +74,13 @@ R3BLosTCal2Hit::R3BLosTCal2Hit(const char* name, Int_t iVerbose)
     , flosVeffYQ(1.)
     , flosOffsetXQ(0.)
     , flosOffsetYQ(0.)
-    , fOnline(kFALSE)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
 }
 
 R3BLosTCal2Hit::~R3BLosTCal2Hit()
 {
-    LOG(debug) << "R3BLosTCal2Hit::Destructor";
+    R3BLOG(debug, "");
     if (fHitItems)
     {
         delete fHitItems;
@@ -93,9 +90,9 @@ R3BLosTCal2Hit::~R3BLosTCal2Hit()
 
 void R3BLosTCal2Hit::SetParContainers()
 {
-    LOG(info) << "R3BLosTcal2Hit::SetParContainers()";
+    R3BLOG(info, "");
     // Parameter Container
-    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
         LOG(error) << "FairRuntimeDb not opened!";
@@ -116,6 +113,8 @@ void R3BLosTCal2Hit::SetParameter()
     //--- Parameter Container ---
     fp0 = fLosHit_Par->Getp0();
     fp1 = fLosHit_Par->Getp1();
+    fp2 = fLosHit_Par->Getp2();
+
     fNumParamsTamexLE = fLosHit_Par->GetNumParamsTamexLE();
     fNumParamsTamexTE = fLosHit_Par->GetNumParamsTamexTE();
 
@@ -137,27 +136,20 @@ void R3BLosTCal2Hit::SetParameter()
 
 InitStatus R3BLosTCal2Hit::Init()
 {
-    // get access to Cal data
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(error) << "FairRootManager not found";
+    R3BLOG(info, "");
+    auto* mgr = FairRootManager::Instance();
+    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     fTCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTCal"));
+    R3BLOG_IF(fatal, fTCalItems == nullptr, "Branch LosTCal not found");
 
     fTCalTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTriggerTCal"));
-    if (NULL == fTCalItems)
-    {
-        LOG(fatal) << "Branch LosTCal not found";
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, fTCalTriggerItems == nullptr, "Branch LosTriggerTCal not found");
 
     // request storage of Hit data in output tree
     mgr->Register("LosHit", "LosHitData", fHitItems, !fOnline);
-
     fHitItems->Clear();
 
     fTimeStitch = new R3BCoarseTimeStitch();
@@ -224,7 +216,7 @@ InitStatus R3BLosTCal2Hit::ReInit()
     return kSUCCESS;
 }
 
-void R3BLosTCal2Hit::Exec(Option_t* option)
+void R3BLosTCal2Hit::Exec(Option_t*)
 {
     // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
@@ -240,18 +232,23 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
             return;
     }
 
-    Int_t trigHits = fTCalTriggerItems->GetEntries();
+    auto trigHits = fTCalTriggerItems->GetEntriesFast();
     Double_t trigTime[trigHits];
     if (trigHits == 0)
         return;
     for (Int_t ihit = 0; ihit < trigHits; ihit++)
     {
-        R3BLosTCalData* hit = dynamic_cast<R3BLosTCalData*>(fTCalTriggerItems->At(ihit));
+        auto* hit = dynamic_cast<R3BLosTCalData*>(fTCalTriggerItems->At(ihit));
         Int_t typ = hit->GetType();
         trigTime[typ] = hit->GetRawTimeNs();
     }
 
-    Int_t nHits = fTCalItems->GetEntries();
+    auto nHits = fTCalItems->GetEntriesFast();
+    if (nHits == 0)
+    {
+        return;
+    }
+
     Int_t hits[fNofDetectors], v_npmt[fNofDetectors][nHits], tle_npmt[fNofDetectors][nHits],
         tte_npmt[fNofDetectors][nHits];
     Double_t vTime[fNofDetectors * 8][nHits], TLeTime[fNofDetectors * 8][nHits], TTeTime[fNofDetectors * 8][nHits],
@@ -278,17 +275,14 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
         }
     }
 
-    if (nHits == 0)
-        return;
-
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
-        R3BLosTCalData* hit = dynamic_cast<R3BLosTCalData*>(fTCalItems->At(ihit));
-        Int_t ch = hit->GetChannel();
-        Int_t typ = hit->GetType();
-        Int_t det = hit->GetDetector();
-        Double_t rawTime = hit->GetRawTimeNs();
-        Bool_t inHit = false;
+        auto* hit = dynamic_cast<R3BLosTCalData*>(fTCalItems->At(ihit));
+        auto ch = hit->GetChannel();
+        auto typ = hit->GetType();
+        auto det = hit->GetDetector();
+        auto rawTime = hit->GetRawTimeNs();
+        bool inHit = false;
 
         Int_t hitNo = 0, detNo = 0;
         for (Int_t d = 0; d < fNofDetectors; d++)
@@ -395,7 +389,6 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
     {
         for (Int_t i = 0; i < hits[d]; i++)
         {
-
             if (v_npmt[d][i] != 8)
                 continue;
             Double_t t_hit = 0., Z = 0., x_cm = 0., y_cm = 0.;
@@ -424,7 +417,7 @@ void R3BLosTCal2Hit::Exec(Option_t* option)
                     tot += fTimeStitch->GetTime(tte_ref - tle_ref, "tamex", "tamex");
                 }
                 tot = tot / 8.;
-                Z = tot * fp1 + fp0;
+                Z = tot * tot * fp2 + tot * fp1 + fp0;
             }
             else
                 Z = 0.;
@@ -439,46 +432,7 @@ void R3BLosTCal2Hit::FinishEvent()
     if (fHitItems)
     {
         fHitItems->Clear();
-        fNofHitItems = 0;
     }
 }
 
-Double_t R3BLosTCal2Hit::walk(Int_t inum, Double_t tot)
-{
-
-    Double_t y = 0. / 0., ysc = 0. / 0., term[8] = { 0. };
-    Double_t x;
-
-    x = tot;
-    term[0] = x;
-    for (Int_t i = 0; i < 7; i++)
-    {
-        term[i + 1] = term[i] * x;
-    }
-
-    ysc = walk_par[inum][2] + walk_par[inum][3] * term[0] + walk_par[inum][4] * term[1] + walk_par[inum][5] * term[2] +
-          walk_par[inum][6] * term[3] + walk_par[inum][7] * term[4] + walk_par[inum][8] * term[5] +
-          walk_par[inum][9] * term[6] + walk_par[inum][10] * term[7];
-
-    if (tot < walk_par[inum][0] || tot > walk_par[inum][1])
-        ysc = 0.0 / 0.0;
-
-    return ysc;
-}
-
-Double_t R3BLosTCal2Hit::satu(Int_t inum, Double_t tot, Double_t dt)
-{
-
-    Double_t ysc = 0. / 0.;
-
-    // if(tot_par[inum][0] > 0.)
-    // ysc  = (tot_par[inum][0]*tot+tot_par[inum][1])/(tot_par[inum][2]-tot)*tot_par[inum][3] ;
-
-    ysc = tot_par[inum][0] + tot_par[inum][1] * (1. - 1. / (exp((dt - tot_par[inum][2]) / tot_par[inum][3]) + 1.));
-    ysc = tot / ysc;
-    ysc = ysc * (tot_par[inum][0] + tot_par[inum][1]);
-
-    return ysc;
-}
-
-ClassImp(R3BLosTCal2Hit);
+ClassImp(R3BLosTCal2Hit)

@@ -17,16 +17,19 @@
 // ------------------------------------------------------------
 
 #include "R3BLosCal2Hit.h"
-#include "FairLogger.h"
-#include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
+#include "R3BLogger.h"
 #include "R3BLosCalData.h"
 #include "R3BLosHitData.h"
 #include "R3BLosHitPar.h"
 #include "R3BLosMapped2Cal.h"
 #include "R3BLosMappedData.h"
+#include "R3BShared.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
+
+#include "FairLogger.h"
+#include "FairRuntimeDb.h"
 #include "TClonesArray.h"
 #include "TH1F.h"
 #include "TH2F.h"
@@ -50,7 +53,6 @@ R3BLosCal2Hit::R3BLosCal2Hit()
 
 R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
     : FairTask(name, iVerbose)
-    , fCalItems(NULL)
     , fHitItems(new TClonesArray("R3BLosHitData"))
     , fNofHitItems(0)
     , fTrigger(-1)
@@ -71,210 +73,24 @@ R3BLosCal2Hit::R3BLosCal2Hit(const char* name, Int_t iVerbose)
     , fOnline(kFALSE)
     , fClockFreq(1. / VFTX_CLOCK_MHZ * 1000.)
 {
-    fhTres_M = NULL;
-    fhTres_T = NULL;
-    fhTres_T_corr = NULL;
-    fhTres_M_corr = NULL;
-    fhQ_L = NULL;
-    fhQ_B = NULL;
-    fhQ_R = NULL;
-    fhQ_T = NULL;
-    fhQ_L_corr = NULL;
-    fhQ_B_corr = NULL;
-    fhQ_R_corr = NULL;
-    fhQ_T_corr = NULL;
-    fhQ_LT = NULL;
-    fhQ_LB = NULL;
-    fhQ_RB = NULL;
-    fhQ_RT = NULL;
-    fhQ_LT_corr = NULL;
-    fhQ_LB_corr = NULL;
-    fhQ_RB_corr = NULL;
-    fhQ_RT_corr = NULL;
-    fhQ = NULL;
-    fhQ_vs_X = NULL;
-    fhQ_vs_Y = NULL;
-    fhQ_vs_X_corr = NULL;
-    fhQ_vs_Y_corr = NULL;
-    fhTM_vs_Q = NULL;
-    fhTT_vs_Q = NULL;
-    fhTM_vs_Q_corr = NULL;
-    fhTT_vs_Q_corr = NULL;
-    fhXY = NULL;
-    fhXYmean = NULL;
-    fhXY_ToT = NULL;
-    fhXYproj = NULL;
-    fhXYT = NULL;
-    fhQ1_vs_Q5 = NULL;
-    fhQ1_vs_Q5_corr = NULL;
-    fhQ2_vs_Q6 = NULL;
-    fhQ2_vs_Q6_corr = NULL;
-    fhQ3_vs_Q7 = NULL;
-    fhQ3_vs_Q7_corr = NULL;
-    fhQ4_vs_Q8 = NULL;
-    fhQ4_vs_Q8_corr = NULL;
-    fhQtest = NULL;
-    fhTresX_M = NULL;
-    fhTresY_M = NULL;
-    fhTresX_M_corr = NULL;
-    fhTresY_M_corr = NULL;
-    fhTresX_T = NULL;
-    fhTresY_T = NULL;
-    fhTresX_T_corr = NULL;
-    fhTresY_T_corr = NULL;
-    fhTresMvsIcount = NULL;
-    fhTresTvsIcount = NULL;
-    fhTreswcMvsIcount = NULL;
-    fhTreswcTvsIcount = NULL;
-    fh_los_dt_hits_ToT_corr = NULL;
-    fh_los_ihit_ToTcorr = NULL;
-    for (Int_t j = 0; j < 8; j++)
-    {
-        fhQvsdt[j] = NULL;
-        fhQcorrvsIcount[j] = NULL;
-        fhQvsIcount[j] = NULL;
-    }
 }
 
 R3BLosCal2Hit::~R3BLosCal2Hit()
 {
     LOG(debug) << "R3BLosCal2Hit::Destructor";
-    if (fhTres_M)
-        delete (fhTres_M);
-    if (fhTres_T)
-        delete (fhTres_T);
-    if (fhTres_T_corr)
-        delete (fhTres_T_corr);
-    if (fhTres_M_corr)
-        delete (fhTres_M_corr);
-    if (fhQ_L)
-        delete (fhQ_L);
-    if (fhQ_B)
-        delete (fhQ_B);
-    if (fhQ_R)
-        delete (fhQ_R);
-    if (fhQ_T)
-        delete (fhQ_T);
-    if (fhQ_L_corr)
-        delete (fhQ_L_corr);
-    if (fhQ_B_corr)
-        delete (fhQ_B_corr);
-    if (fhQ_R_corr)
-        delete (fhQ_R_corr);
-    if (fhQ_T_corr)
-        delete (fhQ_T_corr);
-    if (fhQ_LT)
-        delete (fhQ_LT);
-    if (fhQ_LB)
-        delete (fhQ_LB);
-    if (fhQ_RB)
-        delete (fhQ_RB);
-    if (fhQ_RT)
-        delete (fhQ_RT);
-    if (fhQ_LT_corr)
-        delete (fhQ_LT_corr);
-    if (fhQ_LB_corr)
-        delete (fhQ_LB_corr);
-    if (fhQ_RB_corr)
-        delete (fhQ_RB_corr);
-    if (fhQ_RT_corr)
-        delete (fhQ_RT_corr);
-    if (fhQ)
-        delete (fhQ);
-    if (fhQtest)
-        delete (fhQtest);
-    if (fhQ_vs_X)
-        delete (fhQ_vs_X);
-    if (fhQ_vs_Y)
-        delete (fhQ_vs_Y);
-    if (fhQ_vs_X_corr)
-        delete (fhQ_vs_X_corr);
-    if (fhQ_vs_Y_corr)
-        delete (fhQ_vs_Y_corr);
-    if (fhTM_vs_Q)
-        delete (fhTM_vs_Q);
-    if (fhTT_vs_Q)
-        delete (fhTT_vs_Q);
-    if (fhTM_vs_Q_corr)
-        delete (fhTM_vs_Q_corr);
-    if (fhTT_vs_Q_corr)
-        delete (fhTT_vs_Q_corr);
-    if (fhXY)
-        delete (fhXY);
-    if (fhXYmean)
-        delete (fhXYmean);
-    if (fhXY_ToT)
-        delete (fhXY_ToT);
-    if (fhXYproj)
-        delete (fhXYproj);
-    if (fhXYT)
-        delete (fhXYT);
-    if (fhQ1_vs_Q5)
-        delete (fhQ1_vs_Q5);
-    if (fhQ1_vs_Q5_corr)
-        delete (fhQ1_vs_Q5_corr);
-    if (fhQ2_vs_Q6)
-        delete (fhQ2_vs_Q6);
-    if (fhQ2_vs_Q6_corr)
-        delete (fhQ2_vs_Q6_corr);
-    if (fhQ3_vs_Q7)
-        delete (fhQ3_vs_Q7);
-    if (fhQ3_vs_Q7_corr)
-        delete (fhQ3_vs_Q7_corr);
-    if (fhQ4_vs_Q8)
-        delete (fhQ4_vs_Q8);
-    if (fhQ4_vs_Q8_corr)
-        delete (fhQ4_vs_Q8_corr);
-    if (fhTresX_M)
-        delete (fhTresX_M);
-    if (fhTresY_M)
-        delete (fhTresY_M);
-    if (fhTresX_M_corr)
-        delete (fhTresX_M_corr);
-    if (fhTresY_M_corr)
-        delete (fhTresY_M_corr);
-    if (fhTresX_T)
-        delete (fhTresX_T);
-    if (fhTresY_T)
-        delete (fhTresY_T);
-    if (fhTresX_T_corr)
-        delete (fhTresX_T_corr);
-    if (fhTresY_T_corr)
-        delete (fhTresY_T_corr);
-    if (fh_los_ihit_ToTcorr)
-        delete (fh_los_ihit_ToTcorr);
-    if (fhTresMvsIcount)
-        delete (fhTresMvsIcount);
-    if (fhTresTvsIcount)
-        delete (fhTresTvsIcount);
-    if (fhTreswcMvsIcount)
-        delete (fhTreswcMvsIcount);
-    if (fhTreswcTvsIcount)
-        delete (fhTreswcTvsIcount);
-    if (fh_los_dt_hits_ToT_corr)
-        delete (fh_los_dt_hits_ToT_corr);
-    for (Int_t j = 0; j < 8; j++)
-    {
-        if (fhQvsdt[j])
-            delete (fhQvsdt[j]);
-        if (fhQcorrvsIcount[j])
-            delete (fhQcorrvsIcount[j]);
-        if (fhQvsIcount[j])
-            delete (fhQvsIcount[j]);
-    }
 
     if (fHitItems)
     {
         delete fHitItems;
-        fHitItems = NULL;
+        fHitItems = nullptr;
     }
 }
 
 void R3BLosCal2Hit::SetParContainers()
 {
-    LOG(info) << "R3BLosTcal2Hit::SetParContainers()";
+    R3BLOG(info, "");
     // Parameter Container
-    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     if (!rtdb)
     {
         LOG(error) << "FairRuntimeDb not opened!";
@@ -295,6 +111,7 @@ void R3BLosCal2Hit::SetParameter()
     //--- Parameter Container ---
     fp0 = fLosHit_Par->Getp0();
     fp1 = fLosHit_Par->Getp1();
+    fp2 = fLosHit_Par->Getp2();
 
     flosOffsetX = fLosHit_Par->Getxoffset_MCFD();
     flosOffsetY = fLosHit_Par->Getyoffset_MCFD();
@@ -304,28 +121,23 @@ void R3BLosCal2Hit::SetParameter()
 
 InitStatus R3BLosCal2Hit::Init()
 {
-    // get access to Cal data
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-        LOG(error) << "FairRootManager not found";
+    R3BLOG(info, "");
+
+    auto* mgr = FairRootManager::Instance();
+    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
 
     fCalItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosCal"));
-    if (NULL == fCalItems)
-    {
-        LOG(fatal) << "Branch LosCal not found";
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, fCalItems == nullptr, "Branch LosCal not found");
 
     // request storage of Hit data in output tree
     mgr->Register("LosHit", "LosHitData", fHitItems, !fOnline);
-
     fHitItems->Clear();
 
     Icount = 0;
+
+    // NOLINTBEGIN
 
     // file with walk-correction parameters
     ifstream infile(fwalk_param_file.c_str());
@@ -394,7 +206,6 @@ InitStatus R3BLosCal2Hit::Init()
     if (fOptHisto)
         CreateHisto();
 
-    // cout << "R3BLosCal2Hit::Init END" << endl;
     SetParameter();
     return kSUCCESS;
 }
@@ -413,13 +224,8 @@ InitStatus R3BLosCal2Hit::ReInit()
  * particle, we need to average either over all four signals (right, top,
  * left, bottom) or over two opposite signals (left+right or top+bottom).
  */
-void R3BLosCal2Hit::Exec(Option_t* option)
+void R3BLosCal2Hit::Exec(Option_t*)
 {
-    // cout << "R3BLosCal2Hit::Exec BEGIN: " << Icount << endl;
-
-    // ofstream myFile("data_s473_run197.dat",ios_base::out|ios_base::app);
-
-    // check for requested trigger (Todo: should be done globablly / somewhere else)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
@@ -433,9 +239,11 @@ void R3BLosCal2Hit::Exec(Option_t* option)
             return;
     }
 
-    Int_t nHits = fCalItems->GetEntries();
+    auto nHits = fCalItems->GetEntriesFast();
     if (nHits == 0)
+    {
         return;
+    }
 
     // missing times are NAN, hence other times will also
     // be NAN if one time is missing.
@@ -709,8 +517,7 @@ void R3BLosCal2Hit::Exec(Option_t* option)
 
             x_cm[ihit] = xV_cm[ihit];
             y_cm[ihit] = yV_cm[ihit];
-            Z[ihit] = totsum_corr[ihit] * fp1 + fp0;
-            // Z[ihit] = totsum_corr[ihit];
+            Z[ihit] = totsum_corr[ihit] * totsum_corr[ihit] * fp2 + totsum_corr[ihit] * fp1 + fp0;
             t_hit[ihit] = timeLosM_corr[ihit];
 
             if (fOptHisto && nPMV == 8 && nPMT == 8 && Igood_event)
@@ -848,448 +655,395 @@ void R3BLosCal2Hit::CreateHisto()
 
     if (NULL == fhTres_M)
     {
-        char strName[255];
-        sprintf(strName, "LOS_dt_MCFD");
-        fhTres_M = new TH1F(strName, "", fhTbin, fhTmin, fhTmax);
+        TString strName("LOS_dt_MCFD");
+        fhTres_M = R3B::root_owned<TH1F>(strName.Data(), "", fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTres_M_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_dt_MCFD_wc");
-        fhTres_M_corr = new TH1F(strName, "", fhTbin, fhTmin, fhTmax);
+        TString strName("LOS_dt_MCFD_wc");
+        fhTres_M_corr = R3B::root_owned<TH1F>(strName.Data(), "", fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTres_T)
     {
-        char strName[255];
-        sprintf(strName, "LOS_dt_TAMEX");
-        fhTres_T = new TH1F(strName, "", fhTbin, fhTmin, fhTmax);
+        TString strName("LOS_dt_TAMEX");
+        fhTres_T = R3B::root_owned<TH1F>(strName.Data(), "", fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTres_T_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_dt_TAMEX_wc");
-        fhTres_T_corr = new TH1F(strName, "", fhTbin, fhTmin, fhTmax);
+        TString strName("LOS_dt_TAMEX_wc");
+        fhTres_T_corr = R3B::root_owned<TH1F>(strName.Data(), "", fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhQ_L)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QL_vs_X");
-        fhQ_L = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QL_vs_X");
+        fhQ_L = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_T)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QT_vs_Y");
-        fhQ_T = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QT_vs_Y");
+        fhQ_T = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_B)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QB_vs_Y");
-        fhQ_B = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QB_vs_Y");
+        fhQ_B = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_R)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QR_vs_X");
-        fhQ_R = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QR_vs_X");
+        fhQ_R = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_L_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QL_vs_X_corr");
-        fhQ_L_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QL_vs_X_corr");
+        fhQ_L_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_T_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QT_vs_Y_corr");
-        fhQ_T_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QT_vs_Y_corr");
+        fhQ_T_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_B_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QB_vs_Y_corr");
-        fhQ_B_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QB_vs_Y_corr");
+        fhQ_B_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_R_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QR_vs_X_corr");
-        fhQ_R_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QR_vs_X_corr");
+        fhQ_R_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_LB)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QLB_vs_X");
-        fhQ_LB = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QLB_vs_X");
+        fhQ_LB = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_LT)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QLT_vs_Y");
-        fhQ_LT = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QLT_vs_Y");
+        fhQ_LT = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_RB)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QRB_vs_Y");
-        fhQ_RB = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QRB_vs_Y");
+        fhQ_RB = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_RT)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QRT_vs_X");
-        fhQ_RT = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QRT_vs_X");
+        fhQ_RT = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_LB_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QLB_vs_X_corr");
-        fhQ_LB_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QLB_vs_X_corr");
+        fhQ_LB_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_LT_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QLT_vs_Y_corr");
-        fhQ_LT_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QLT_vs_Y_corr");
+        fhQ_LT_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_RB_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QRB_vs_Y_corr");
-        fhQ_RB_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QRB_vs_Y_corr");
+        fhQ_RB_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_RT_corr)
     {
-        char strName[255];
-        sprintf(strName, "LOS_QRT_vs_X_corr");
-        fhQ_RT_corr = new TH2F(strName, "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
+        TString strName("LOS_QRT_vs_X_corr");
+        fhQ_RT_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhRbin, fhRmin, fhRmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ)
     {
-        char strName[255];
-        sprintf(strName, "LOS_Q");
-        fhQ = new TH1F(strName, "", 10000, fhQmin, fhQmax);
+        TString strName("LOS_Q");
+        fhQ = R3B::root_owned<TH1F>(strName.Data(), "", 10000, fhQmin, fhQmax);
     }
 
     if (NULL == fhQtest)
     {
-        char strName[255];
-        sprintf(strName, "LOS_Q_test");
-        fhQtest = new TH1F(strName, "", 10000, fhQmin, fhQmax);
+        TString strName("LOS_Q_test");
+        fhQtest = R3B::root_owned<TH1F>(strName.Data(), "", 10000, fhQmin, fhQmax);
     }
 
     if (NULL == fhTM_vs_Q)
     {
-        char strName[255];
-        sprintf(strName, "TMCFD_vs_Q");
-        fhTM_vs_Q = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
+        TString strName("TMCFD_vs_Q");
+        fhTM_vs_Q = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTT_vs_Q)
     {
-        char strName[255];
-        sprintf(strName, "TTAMEX_vs_Q");
-        fhTT_vs_Q = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
+        TString strName("TTAMEX_vs_Q");
+        fhTT_vs_Q = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTM_vs_Q_corr)
     {
-        char strName[255];
-        sprintf(strName, "TMCFD_vs_Q_wc");
-        fhTM_vs_Q_corr = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
+        TString strName("TMCFD_vs_Q_wc");
+        fhTM_vs_Q_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTT_vs_Q_corr)
     {
-        char strName[255];
-        sprintf(strName, "TTAMEX_vs_Q_wc");
-        fhTT_vs_Q_corr = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
+        TString strName("TTAMEX_vs_Q_wc");
+        fhTT_vs_Q_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresX_M)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_X_MCFD");
-        fhTresX_M = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_X_MCFD");
+        fhTresX_M = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresY_M)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_Y_MCFD");
-        fhTresY_M = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_Y_MCFD");
+        fhTresY_M = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresX_M_corr)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_X_MCFD_wc");
-        fhTresX_M_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_X_MCFD_wc");
+        fhTresX_M_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresY_M_corr)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_Y_MCFD_wc");
-        fhTresY_M_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_Y_MCFD_wc");
+        fhTresY_M_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresX_T)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_X_TAMEX");
-        fhTresX_T = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_X_TAMEX");
+        fhTresX_T = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresY_T)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_Y_TAMEX");
-        fhTresY_T = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_Y_TAMEX");
+        fhTresY_T = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresX_T_corr)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_X_TAMEX_wc");
-        fhTresX_T_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_X_TAMEX_wc");
+        fhTresX_T_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhTresY_T_corr)
     {
-        char strName[255];
-        sprintf(strName, "Tres_vs_Y_TAMEX_wc");
-        fhTresY_T_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
+        TString strName("Tres_vs_Y_TAMEX_wc");
+        fhTresY_T_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhTbin, fhTmin, fhTmax);
     }
 
     if (NULL == fhXY)
     {
-        char strName[255];
-        sprintf(strName, "X_vs_Y");
-        fhXY = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhXbin, fhXmin, fhXmax);
+        TString strName("X_vs_Y");
+        fhXY = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhXbin, fhXmin, fhXmax);
     }
 
     if (NULL == fhXYT)
     {
-        char strName[255];
-        sprintf(strName, "X_vs_Y_TAMEX");
-        fhXYT = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhXbin, fhXmin, fhXmax);
+        TString strName("X_vs_Y_TAMEX");
+        fhXYT = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhXbin, fhXmin, fhXmax);
     }
 
     if (NULL == fhXYmean)
     {
-        char strName[255];
-        sprintf(strName, "X_vs_Y_mean");
-        fhXYmean = new TH2F(strName, "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);
+        TString strName("X_vs_Y_mean");
+        fhXYmean = R3B::root_owned<TH2F>(strName.Data(), "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);
     }
 
     if (NULL == fhXY_ToT)
     {
-        char strName[255];
-        sprintf(strName, "X_vs_Y_ToT");
-        fhXY_ToT = new TH2F(strName, "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);
+        TString strName("X_vs_Y_ToT");
+        fhXY_ToT = R3B::root_owned<TH2F>(strName.Data(), "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);
         fhXY_ToT->GetXaxis()->SetTitle("X position / cm");
         fhXY_ToT->GetYaxis()->SetTitle("Y position / cm");
     }
 
     if (NULL == fhXYproj)
     {
-        char strName[255];
-        sprintf(strName, "X2_vs_Y2_proj");
-        fhXYproj = new TH2F(strName, "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);
+        TString strName("X2_vs_Y2_proj");
+        fhXYproj = R3B::root_owned<TH2F>(strName.Data(), "", 4000, fhXmin, fhXmax, 4000, fhXmin, fhXmax);
     }
 
     if (NULL == fhQ_vs_X)
     {
-        char strName[255];
-        sprintf(strName, "Q_vs_X");
-        fhQ_vs_X = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
+        TString strName("Q_vs_X");
+        fhQ_vs_X = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_vs_Y)
     {
-        char strName[255];
-        sprintf(strName, "Q_vs_Y");
-        fhQ_vs_Y = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
+        TString strName("Q_vs_Y");
+        fhQ_vs_Y = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_vs_X_corr)
     {
-        char strName[255];
-        sprintf(strName, "Qcorr_vs_X");
-        fhQ_vs_X_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
+        TString strName("Qcorr_vs_X");
+        fhQ_vs_X_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ_vs_Y_corr)
     {
-        char strName[255];
-        sprintf(strName, "Qcorr_vs_Y");
-        fhQ_vs_Y_corr = new TH2F(strName, "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
+        TString strName("Qcorr_vs_Y");
+        fhQ_vs_Y_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhXbin, fhXmin, fhXmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ1_vs_Q5)
     {
-        char strName[255];
-        sprintf(strName, "QPM1_vs_QPM5");
-        fhQ1_vs_Q5 = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM1_vs_QPM5");
+        fhQ1_vs_Q5 = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ1_vs_Q5_corr)
     {
-        char strName[255];
-        sprintf(strName, "QPM1_vs_QPM5_corr");
-        fhQ1_vs_Q5_corr = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM1_vs_QPM5_corr");
+        fhQ1_vs_Q5_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ2_vs_Q6)
     {
-        char strName[255];
-        sprintf(strName, "QPM2_vs_QPM6");
-        fhQ2_vs_Q6 = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM2_vs_QPM6");
+        fhQ2_vs_Q6 = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ2_vs_Q6_corr)
     {
-        char strName[255];
-        sprintf(strName, "QPM2_vs_QPM6_corr");
-        fhQ2_vs_Q6_corr = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM2_vs_QPM6_corr");
+        fhQ2_vs_Q6_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ3_vs_Q7)
     {
-        char strName[255];
-        sprintf(strName, "QPM3_vs_QPM7");
-        fhQ3_vs_Q7 = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM3_vs_QPM7");
+        fhQ3_vs_Q7 = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ3_vs_Q7_corr)
     {
-        char strName[255];
-        sprintf(strName, "QPM3_vs_QPM7_corr");
-        fhQ3_vs_Q7_corr = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM3_vs_QPM7_corr");
+        fhQ3_vs_Q7_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ4_vs_Q8)
     {
-        char strName[255];
-        sprintf(strName, "QPM4_vs_QPM8");
-        fhQ4_vs_Q8 = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM4_vs_QPM8");
+        fhQ4_vs_Q8 = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     if (NULL == fhQ4_vs_Q8_corr)
     {
-        char strName[255];
-        sprintf(strName, "QPM4_vs_QPM8_corr");
-        fhQ4_vs_Q8_corr = new TH2F(strName, "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
+        TString strName("QPM4_vs_QPM8_corr");
+        fhQ4_vs_Q8_corr = R3B::root_owned<TH2F>(strName.Data(), "", fhQbin, fhQmin, fhQmax, fhQbin, fhQmin, fhQmax);
     }
 
     for (Int_t j = 0; j < 8; j++)
     {
         if (NULL == fhQvsdt[j])
         {
-            char strName[255];
-            sprintf(strName, "Q_vs_dt_ch%d", j + 1);
-            fhQvsdt[j] = new TH2F(strName, "", 6000, 0, 3000, fhQbin, fhQmin, fhQmax);
+            TString strName;
+            strName.Form("Q_vs_dt_ch%d", j + 1);
+            fhQvsdt[j] = R3B::root_owned<TH2F>(strName.Data(), "", 6000, 0, 3000, fhQbin, fhQmin, fhQmax);
             fhQvsdt[j]->GetXaxis()->SetTitle("time between two hits / ns");
-            char strYname[255];
-            sprintf(strYname, "ToT / ns of ch. %d", j + 1);
-            fhQvsdt[j]->GetYaxis()->SetTitle(strYname);
+
+            TString strYname;
+            strYname.Form("ToT / ns of ch. %d", j + 1);
+            fhQvsdt[j]->GetYaxis()->SetTitle(strYname.Data());
         }
+
         if (NULL == fhQcorrvsIcount[j])
         {
-            char strName[255];
-            sprintf(strName, "Qcorr_vs_dt_ch%d", j + 1);
-            fhQcorrvsIcount[j] = new TH2F(strName, "", 6000, 0, 3000, fhQbin, fhQmin, fhQmax);
+            TString strName;
+            strName.Form("Qcorr_vs_dt_ch%d", j + 1);
+            fhQcorrvsIcount[j] = R3B::root_owned<TH2F>(strName.Data(), "", 6000, 0, 3000, fhQbin, fhQmin, fhQmax);
             fhQcorrvsIcount[j]->GetXaxis()->SetTitle("Event number");
-            char strYname[255];
-            sprintf(strYname, "ToTcorr / ns of ch. %d", j + 1);
-            fhQcorrvsIcount[j]->GetYaxis()->SetTitle(strYname);
+
+            TString strYname;
+            strYname.Form("ToTcorr / ns of ch. %d", j + 1);
+            fhQcorrvsIcount[j]->GetYaxis()->SetTitle(strYname.Data());
         }
 
         if (NULL == fhQvsIcount[j])
         {
-            char strName[255];
-            sprintf(strName, "Q_vs_Icount_ch%d", j + 1);
-            fhQvsIcount[j] = new TH2F(strName, "", 10000, 0, 10000000, fhQbin, fhQmin, fhQmax);
+            TString strName;
+            strName.Form("Q_vs_Icount_ch%d", j + 1);
+            fhQvsIcount[j] = R3B::root_owned<TH2F>(strName.Data(), "", 10000, 0, 10000000, fhQbin, fhQmin, fhQmax);
             fhQvsIcount[j]->GetXaxis()->SetTitle("Event number");
-            char strYname[255];
-            sprintf(strYname, "ToT / ns of ch. %d", j + 1);
-            fhQvsIcount[j]->GetYaxis()->SetTitle(strYname);
+
+            TString strYname;
+            strYname.Form("ToT / ns of ch. %d", j + 1);
+            fhQvsIcount[j]->GetYaxis()->SetTitle(strYname.Data());
         }
     }
 
     if (NULL == fh_los_ihit_ToTcorr)
     {
-        char strName[255];
-        sprintf(strName, "los_totcorr_ihit");
-        fh_los_ihit_ToTcorr = new TH2F(strName, "", 10, 0, 10, 3100, -10., 300.);
+        TString strName("los_totcorr_ihit");
+        fh_los_ihit_ToTcorr = R3B::root_owned<TH2F>(strName.Data(), "", 10, 0, 10, 3100, -10., 300.);
         fh_los_ihit_ToTcorr->GetXaxis()->SetTitle("iHit");
         fh_los_ihit_ToTcorr->GetYaxis()->SetTitle("ToT / ns");
     }
 
     if (NULL == fhTresMvsIcount)
     {
-        char strName[255];
-        sprintf(strName, "TresM_vs_Icount");
-        fhTresMvsIcount = new TH2F(strName, "", 10000, 0, 10000000, fhTbin, fhTmin, fhTmax);
+        TString strName("TresM_vs_Icount");
+        fhTresMvsIcount = R3B::root_owned<TH2F>(strName.Data(), "", 10000, 0, 10000000, fhTbin, fhTmin, fhTmax);
         fhTresMvsIcount->GetXaxis()->SetTitle("Event number");
         fhTresMvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 
     if (NULL == fhTreswcMvsIcount)
     {
-        char strName[255];
-        sprintf(strName, "TreswcM_vs_dt");
-        fhTreswcMvsIcount = new TH2F(strName, "", 6000, 0, 3000, fhTbin, fhTmin, fhTmax);
+        TString strName("TreswcM_vs_dt");
+        fhTreswcMvsIcount = R3B::root_owned<TH2F>(strName.Data(), "", 6000, 0, 3000, fhTbin, fhTmin, fhTmax);
         fhTreswcMvsIcount->GetXaxis()->SetTitle("time between two hits / ns");
         fhTreswcMvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 
     if (NULL == fhTresTvsIcount)
     {
-        char strName[255];
-        sprintf(strName, "TresT_vs_Icount");
-        fhTresTvsIcount = new TH2F(strName, "", 10000, 0, 10000000, fhTbin, fhTmin, fhTmax);
+        TString strName("TresT_vs_Icount");
+        fhTresTvsIcount = R3B::root_owned<TH2F>(strName.Data(), "", 10000, 0, 10000000, fhTbin, fhTmin, fhTmax);
         fhTresTvsIcount->GetXaxis()->SetTitle("Event number");
         fhTresTvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 
     if (NULL == fhTreswcTvsIcount)
     {
-        char strName[255];
-        sprintf(strName, "TreswcT_vs_dt");
-        fhTreswcTvsIcount = new TH2F(strName, "", 6000, 0, 3000, fhTbin, fhTmin, fhTmax);
+        TString strName("TreswcT_vs_dt");
+        fhTreswcTvsIcount = R3B::root_owned<TH2F>(strName.Data(), "", 6000, 0, 3000, fhTbin, fhTmin, fhTmax);
         fhTreswcTvsIcount->GetXaxis()->SetTitle("time between two hits / ns");
         fhTreswcTvsIcount->GetYaxis()->SetTitle("MCFD time precision / ns");
     }
 
     if (NULL == fh_los_dt_hits_ToT_corr)
     {
-        char strName[255];
-        sprintf(strName, "los_dt_hits_ToT_corr");
-        fh_los_dt_hits_ToT_corr = new TH2F(strName, "", 6000, 0, 3000, fhQbin, fhQmin, fhQmax);
+        TString strName("los_dt_hits_ToT_corr");
+        fh_los_dt_hits_ToT_corr = R3B::root_owned<TH2F>(strName.Data(), "", 6000, 0, 3000, fhQbin, fhQmin, fhQmax);
     }
 }
 
@@ -1438,7 +1192,6 @@ void R3BLosCal2Hit::FinishTask()
 
 Double_t R3BLosCal2Hit::walk(Int_t inum, Double_t tot)
 {
-
     Double_t y = 0. / 0., ysc = 0. / 0., term[8] = { 0. };
     Double_t x;
 
@@ -1483,5 +1236,6 @@ Double_t R3BLosCal2Hit::satu(Int_t inum, Double_t tot, Double_t dt)
   */
     return ysc;
 }
+// NOLINTEND
 
-ClassImp(R3BLosCal2Hit);
+ClassImp(R3BLosCal2Hit)

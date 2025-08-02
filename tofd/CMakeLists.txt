@@ -20,7 +20,6 @@ set(SRCS
     pars/R3BTofDHitModulePar.cxx
     pars/R3BTofDMappingPar.cxx
     pars/R3BTofDMapped2CalPar.cxx
-    pars/R3BTofDCal2HitPar.cxx
     calibration/R3BTofDMapped2Cal.cxx
     calibration/R3BTofDCal2Hit.cxx
     online/R3BTofDOnlineSpectra.cxx
@@ -36,7 +35,6 @@ set(HEADERS
     pars/R3BTofDHitModulePar.h
     pars/R3BTofDMappingPar.h
     pars/R3BTofDMapped2CalPar.h
-    pars/R3BTofDCal2HitPar.h
     calibration/R3BTofDMapped2Cal.h
     calibration/R3BTofDCal2Hit.h
     online/R3BTofDOnlineSpectra.h

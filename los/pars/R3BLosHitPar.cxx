@@ -53,6 +53,7 @@ void R3BLosHitPar::putParams(FairParamList* list)
     }
     list->add("p0", fp0);
     list->add("p1", fp1);
+    list->add("p2", fp2);
     list->add("xoffset_MCFD", fxoffset_MCFD);
     list->add("yoffset_MCFD", fyoffset_MCFD);
     list->add("xveff_MCFD", fxveff_MCFD);
@@ -82,14 +83,19 @@ Bool_t R3BLosHitPar::getParams(FairParamList* list)
 
     if (!(list->fill("p0", &fp0)))
     {
-        LOG(info) << "---Could not initialize LosHit p0 Par";
+        LOG(error) << "Could not initialize LosHit p0 Par";
         return kFALSE;
     }
 
     if (!(list->fill("p1", &fp1)))
     {
-        LOG(info) << "---Could not initialize LosHit p1 Par";
+        LOG(error) << "Could not initialize LosHit p1 Par";
         return kFALSE;
+    }
+
+    if (!(list->fill("p2", &fp2)))
+    {
+        LOG(warn) << "Could not initialize LosHit p2 Par";
     }
 
     if (!(list->fill("xoffset_MCFD", &fxoffset_MCFD)))
@@ -154,9 +160,11 @@ void R3BLosHitPar::printParams()
     LOG(info) << "p0"
               << " "
               << "p1"
+              << " "
+              << "p2"
               << " ";
 
-    LOG(info) << fp0 << "\t" << fp1;
+    LOG(info) << fp0 << "\t" << fp1 << "\t" << fp2;
 
     LOG(info) << "R3BLosHitPar: LOS Tamex LE match par:";
     LOG(info) << "Nb of Tamex LE match Par: ";

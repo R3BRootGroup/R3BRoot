@@ -196,12 +196,13 @@ void R3BAnalysisIncomingID::Exec(Option_t*)
             for (size_t ihit = 0; ihit < nHits; ihit++)
             {
                 auto hit_los = dynamic_cast<R3BLosHitData*>(fHitLos->At(ihit));
-                Zcharge = hit_los->GetZ();
+                if (hit_los->GetZ() > Zcharge)
+                    Zcharge = hit_los->GetZ();
                 multLosHit++;
             }
         }
         // Only events with multi=1 are considered for analysis
-        if (multLosHit != 1)
+        if (multLosHit == 0)
             return;
         // Only good charges are considered for analysis
         if (Zcharge < fMinLosCharge)

@@ -29,14 +29,7 @@
 #pragma link C++ class R3BCalifaCrystalCalData+;
 #pragma link C++ class R3BCalifaClusterData+;
 #pragma link C++ class R3BCalifaPoint+;
-#pragma link C++ class R3BDchPoint+;
-#pragma link C++ class R3BDchFullPoint+;
-#pragma link C++ class R3BDchDigi+;
-#pragma link C++ class R3BDch2pDigi+;
-#pragma link C++ class R3BGfiPoint+;
-#pragma link C++ class R3BGfiDigi+;
-#pragma link C++ class R3BmTofPoint+;
-#pragma link C++ class R3BmTofDigi+;
+
 #pragma link C++ class R3BTofdPoint+;
 #pragma link C++ class R3BTofdDigi+;
 #pragma link C++ class R3BTofDigi+;
@@ -100,35 +93,44 @@
 #pragma link C++ class R3BTargetDigi+;
 #pragma link C++ class R3BTarget2pDigi+;
 #pragma link C++ class R3BSitrackerHit+;
+
 #pragma link C++ class R3BLandPoint+;
 #pragma link C++ class R3BNeutronTrack+;
 #pragma link C++ class R3BLandDigi+;
 #pragma link C++ class R3BLandFirstHits+;
 #pragma link C++ class R3BLandHit+;
+
 #pragma link C++ class R3BPaddleCrystalHit+;
 #pragma link C++ class R3BPspPoint+;
 #pragma link C++ class R3BPspDigi+;
+
 #pragma link C++ class R3BNeulandTacquilaMappedData+;
 #pragma link C++ class R3BNeulandPoint+;
 #pragma link C++ class R3BNeulandHit+;
 #pragma link C++ class R3BNeulandMultiplicity+;
 #pragma link C++ class R3BNeulandCluster+;
 #pragma link C++ class R3BNeulandNeutron+;
+#pragma link C++ class R3BNeulandCalData+;
+
 #pragma link C++ class R3BPspxMappedData+;
 #pragma link C++ class R3BPspxPrecalData+;
 #pragma link C++ class R3BPspxCalData+;
 #pragma link C++ class R3BPspxHitData+;
+
 #pragma link C++ class R3BLosMappedData+;
 #pragma link C++ class R3BLosCalData+;
 #pragma link C++ class R3BLosTCalData+;
 #pragma link C++ class R3BLosHitData+;
+
 #pragma link C++ class R3BRoluMappedData+;
 #pragma link C++ class R3BRoluCalData+;
 #pragma link C++ class R3BRoluHitData+;
+
 #pragma link C++ class R3BFrsSciMappedData+;
 #pragma link C++ class R3BFrsSciTcalData+;
 #pragma link C++ class R3BFrsSciPosCalData+;
 #pragma link C++ class R3BFrsSciTofCalData+;
+
 #pragma link C++ class R3BSci2MappedData+;
 #pragma link C++ class R3BSci2TcalData+;
 #pragma link C++ class R3BSci2CalData+;
@@ -136,43 +138,41 @@
 #pragma link C++ class R3BSci8MappedData+;
 #pragma link C++ class R3BSci8CalData+;
 #pragma link C++ class R3BSci8HitData+;
+
 #pragma link C++ class R3BPaddleTamexMappedData+;
 #pragma link C++ class R3BPaddleCalData+;
 #pragma link C++ class R3BTofdMappedData+;
 #pragma link C++ class R3BTofdCalData+;
 #pragma link C++ class R3BTofdHitData+;
+#pragma link C++ class R3BPtofHit+;
+
 #pragma link C++ class R3BPdcMappedData+;
 #pragma link C++ class R3BPdcCalData+;
 #pragma link C++ class R3BPdcHitData+;
-#pragma link C++ class R3BNeulandCalData+;
+
 #pragma link C++ class R3BActafPoint+;
 #pragma link C++ class R3BActafMappedData+;
-#pragma link C++ class R3BStrawtubesMappedData+;
-#pragma link C++ class R3BStrawtubesCalData+;
-#pragma link C++ class R3BStrawtubesHitData+;
-#pragma link C++ class R3BPtofHit+;
+
 #pragma link C++ class R3BBunchedFiberCalData+;
 #pragma link C++ class R3BBunchedFiberHitData+;
 #pragma link C++ class R3BBunchedFiberMappedData+;
+
 #pragma link C++ class R3BFiberMappedData+;
 #pragma link C++ class R3BFiberMAPMTCalData+;
 #pragma link C++ class R3BFiberMAPMTHitData+;
 #pragma link C++ class R3BFiberMAPMTMappedData+;
+
 #pragma link C++ class R3BFi4Point+;
 #pragma link C++ class R3BFi4CalItem+;
 #pragma link C++ class R3BFi4HitItem+;
 #pragma link C++ class R3BFibMappedData+;
 #pragma link C++ class R3BFibCalData+;
 #pragma link C++ class R3BFibPoint+;
-#pragma link C++ class R3BSci8MappedData+;
-#pragma link C++ class R3BSci8CalData+;
-#pragma link C++ class R3BSci8HitData+;
+
 #pragma link C++ class R3BBeamMonitorMappedData+;
 #pragma link C++ class R3BSamplerMappedData+;
 #pragma link C++ class R3BSampLosMappedData+;
-#pragma link C++ class R3BSfibMappedData+;
-#pragma link C++ class R3BSfibCalData+;
-#pragma link C++ class R3BSfibHitData+;
+
 #pragma link C++ class R3BFrsData+;
 #pragma link C++ class R3BSyncCheckData+;
 
