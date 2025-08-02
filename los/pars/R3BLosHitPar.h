@@ -47,6 +47,7 @@ class R3BLosHitPar : public FairParGenericSet
     /** Accessor functions **/
     const Float_t Getp0() { return fp0; }
     const Float_t Getp1() { return fp1; }
+    const Float_t Getp2() { return fp2; }
     const Float_t Getxoffset_MCFD() { return fxoffset_MCFD; }
     const Float_t Getyoffset_MCFD() { return fyoffset_MCFD; }
     const Float_t Getxveff_MCFD() { return fxveff_MCFD; }
@@ -58,6 +59,7 @@ class R3BLosHitPar : public FairParGenericSet
 
     inline void Setp0(Float_t value) { fp0 = value; }
     inline void Setp1(Float_t value) { fp1 = value; }
+    inline void Setp2(Float_t value) { fp2 = value; }
 
     inline void SetLEMatchParams(Float_t val, Int_t pmt, Int_t indexpar)
     {
@@ -73,7 +75,7 @@ class R3BLosHitPar : public FairParGenericSet
     }
 
   private:
-    Float_t fp0 = 0., fp1 = 1.;
+    Float_t fp0 = 0., fp1 = 1., fp2 = 0.;
     Float_t fxoffset_MCFD = 0., fyoffset_MCFD = 0., fxveff_MCFD = 1., fyveff_MCFD = 1.;
     TArrayF* fLEMatchParams; // Calibration parameters for Matching Tamex LE
     TArrayF* fTEMatchParams; // Calibration parameters for Matching Tamex TE
@@ -81,9 +83,9 @@ class R3BLosHitPar : public FairParGenericSet
     Int_t fNumParamsTamexLE = 2; // number of parameters for matching Tamex LE
     Int_t fNumParamsTamexTE = 2; // number of parameters for matching Tamex TE
 
-    const R3BLosHitPar& operator=(const R3BLosHitPar&);
-    R3BLosHitPar(const R3BLosHitPar&);
+    R3BLosHitPar(const R3BLosHitPar&) = default;
+    R3BLosHitPar& operator=(const R3BLosHitPar&) = default;
 
   public:
-    ClassDefOverride(R3BLosHitPar, 1);
+    ClassDefOverride(R3BLosHitPar, 2);
 };

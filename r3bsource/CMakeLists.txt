@@ -39,7 +39,6 @@ set(INCLUDE_DIRECTORIES
     sci2
     sci8
     strack
-    stubes
     sync_check
     tofd
     tofi
@@ -90,7 +89,6 @@ set(SRCS
     frssci/R3BFrsSciReader.cxx
     sci2/R3BSci2Reader.cxx
     sci8/R3BSci8Reader.cxx
-    fibers/R3BSfibReader.cxx
     tofd/R3BTofdReader.cxx
     tofi/R3BTofiReader.cxx
     pdc/R3BPdcReader.cxx
@@ -99,7 +97,6 @@ set(SRCS
     tofd/R3BPtofReader.cxx
     neuland/R3BNeulandTamexReader.cxx
     neuland/R3BNeulandTacquilaReader.cxx
-    stubes/R3BStrawtubesReader.cxx
     ams/R3BAmsReader.cxx
     foot/R3BFootReader.cxx
     foot/R3BFootSiReader.cxx
@@ -160,7 +157,6 @@ set(STRUCT_HEADERS
     frssci/ext_h101_frssci.h
     sci2/ext_h101_sci2.h
     sci8/ext_h101_sci8.h
-    fibers/ext_h101_sfib.h
     tofd/ext_h101_tofd.h
     tofi/ext_h101_tofi.h
     tofd/ext_h101_ptof.h
@@ -168,7 +164,6 @@ set(STRUCT_HEADERS
     califa/ext_h101_califa.h
     neuland/ext_h101_raw_nnp_tacquila.h
     neuland/ext_h101_raw_nnp_tamex.h
-    stubes/ext_h101_strawtubes.h
     ams/ext_h101_ams.h
     foot/ext_h101_foot.h
     alpide/ext_h101_alpide.h
@@ -228,12 +223,11 @@ set(HEADERS
     fibers/R3BFi8Reader.h
     fibers/R3BFiberReader.h
     frssci/R3BFrsSciReader.h
+    sci2/R3BSci2Reader.h
+    sci8/R3BSci8Reader.h
     los/R3BLosReader.h
     rolu/R3BRoluReader.h
     rolu/R3BRoluReaderOnline.h
-    sci2/R3BSci2Reader.h
-    sci8/R3BSci8Reader.h
-    fibers/R3BSfibReader.h
     tofd/R3BTofdReader.h
     tofi/R3BTofiReader.h
     pdc/R3BPdcReader.h
@@ -242,7 +236,6 @@ set(HEADERS
     tofd/R3BPtofReader.h
     neuland/R3BNeulandTamexReader.h
     neuland/R3BNeulandTacquilaReader.h
-    stubes/R3BStrawtubesReader.h
     ams/R3BAmsReader.h
     foot/R3BFootReader.h
     foot/R3BFootSiReader.h
@@ -281,7 +274,6 @@ set(DIRS
     rpc
     sci2
     sci8
-    stubes
     sync_check
     tofd
     tofi

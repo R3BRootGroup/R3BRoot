@@ -17,12 +17,8 @@
 // -------------------------------------------------------------
 
 #include "R3BFiberMappingPar.h"
-
-#include "R3BLogger.h"
 #include <FairParamList.h>
-
 #include <TMath.h>
-#include <TString.h>
 
 // ---- Standard Constructor ---------------------------------------------------
 R3BFiberMappingPar::R3BFiberMappingPar(const TString& name, const TString& title, const TString& context)
@@ -37,6 +33,15 @@ R3BFiberMappingPar::R3BFiberMappingPar(const TString& name, const TString& title
             fTrigmap[s]->AddAt(0, c);
         }
     }
+}
+
+R3BFiberMappingPar::~R3BFiberMappingPar()
+{
+    for (auto map : fTrigmap)
+    {
+        delete map;
+    }
+    fTrigmap.clear();
 }
 
 // ----  Method clear ----------------------------------------------------------
@@ -65,7 +70,7 @@ void R3BFiberMappingPar::putParams(FairParamList* list)
     {
         fTrigmap[s]->Set(fNbChannels);
         TString name = Form("fiberside%zuPar", s + 1);
-        list->add(name.Data(), *fTrigmap[s]);
+        list->add(name.Data(), *(fTrigmap[s]));
     }
 }
 
@@ -93,7 +98,7 @@ Bool_t R3BFiberMappingPar::getParams(FairParamList* list)
     {
         fTrigmap[s]->Set(fNbChannels);
         TString name = Form("fiberside%zuPar", s + 1);
-        if (!(list->fill(name.Data(), fTrigmap[s])))
+        if (!(list->fill(name.Data(), (fTrigmap[s]))))
         {
             R3BLOG(error, "Could not initialize " << name);
             return kFALSE;

@@ -17,14 +17,13 @@
 // ----- Convert time calibrated data to hit level (single time) ----
 // ------------------------------------------------------------------
 
-#ifndef R3BLOSTCAL2HIT
-#define R3BLOSTCAL2HIT
+#pragma once
 
 #include <map>
 
-#include "FairTask.h"
+#include <FairTask.h>
 
-#include "TArrayF.h"
+#include <TArrayF.h>
 
 class TClonesArray;
 class TH1F;
@@ -35,7 +34,6 @@ class R3BCoarseTimeStitch;
 
 class R3BLosTCal2Hit : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -126,37 +124,27 @@ class R3BLosTCal2Hit : public FairTask
     inline void SetTpat(Int_t tpat) { fTpat = tpat; }
     inline void SetNofDet(UInt_t nDets) { fNofDetectors = nDets; }
 
-    /**
-     * Method for walk calculation.
-     */
-    virtual Double_t walk(Int_t inum, Double_t tot);
-
-    /**
-     * Method for saturation correction.
-     */
-    virtual Double_t satu(Int_t inum, Double_t tot, Double_t dt);
-
     virtual void SetParContainers();
 
     /** Method to select online mode **/
-    void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
-    void SetVFTXWindow(Double_t window) { fWindowV = window; }
+    inline void SetVFTXWindow(Double_t window) { fWindowV = window; }
 
   private:
     void SetParameter();
-    R3BLosHitPar* fLosHit_Par;        // Parameter container
-    TClonesArray* fTCalItems;         /**< Array with Cal items - input data. */
-    TClonesArray* fTCalTriggerItems;  /**< Array with Trigger Cal items - input data. */
-    TClonesArray* fHitItems;          /**< Array with Hit items - output data. */
-    R3BCoarseTimeStitch* fTimeStitch; /**< Array with Hit items - output data. */
-    Float_t fp0, fp1;
+    R3BLosHitPar* fLosHit_Par = nullptr;        // Parameter container
+    TClonesArray* fTCalItems = nullptr;         /**< Array with Cal items - input data. */
+    TClonesArray* fTCalTriggerItems = nullptr;  /**< Array with Trigger Cal items - input data. */
+    TClonesArray* fHitItems = nullptr;          /**< Array with Hit items - output data. */
+    R3BCoarseTimeStitch* fTimeStitch = nullptr; /**< Array with Hit items - output data. */
+    Float_t fp0 = 0., fp1 = 1., fp2 = 0.;
     TArrayF* fLEMatchParams;
     TArrayF* fTEMatchParams;
 
-    Bool_t fOnline; // Don't store data for online
+    bool fOnline = false; // Don't store data for online
 
-    R3BEventHeader* header; /**< Event header. */
+    R3BEventHeader* header = nullptr; /**< Event header. */
 
     // check for trigger
     Int_t fTrigger; /**< Trigger value. */
@@ -166,7 +154,6 @@ class R3BLosTCal2Hit : public FairTask
     Int_t fNumParamsTamexTE;
     UInt_t fNofDetectors; /**< Number of detectors. */
 
-    UInt_t fNofHitItems; /**< Number of hit items for cur event. */
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     Double_t fWindowV;   // VFTX coincidence window in ns
     Double_t flosVeffX;
@@ -186,12 +173,8 @@ class R3BLosTCal2Hit : public FairTask
     std::string fwalk_param_file;
     std::string ftot_param_file;
 
-    TClonesArray* fMapped; /**< Array with mapped data - input data. */
-
     Int_t Icount = 0;
 
   public:
     ClassDef(R3BLosTCal2Hit, 1)
 };
-
-#endif

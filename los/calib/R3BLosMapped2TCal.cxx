@@ -11,21 +11,6 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-// ------------------------------------------------------------
-// -----                  R3BLosMapped2Cal                -----
-// -----          Created Feb 4th 2016 by R.Plag          -----
-// ------------------------------------------------------------
-
-/* March 2016
- * Rewrote the Cal structure to provide individual leafs for the
- * left, top, right and bottom signals. This allows to plot
- * the time differences via cbmsim->Draw(...) interactively (aka without
- * looping over all channels) which is crucial for a quick check of the
- * detector status during the experiment.
- *
- *
- */
-
 #include "R3BLosMapped2TCal.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
@@ -39,8 +24,6 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TH1F.h"
-#include "TH2F.h"
 
 #include "TClonesArray.h"
 #include "TMath.h"
@@ -82,24 +65,15 @@ InitStatus R3BLosMapped2TCal::Init()
     R3BLOG(info, "");
     // try to get a handle on the EventHeader. EventHeader may not be
     // present though and hence may be null. Take care when using.
-    FairRootManager* mgr = FairRootManager::Instance();
-    if (NULL == mgr)
-    {
-        R3BLOG(fatal, "FairRootManager not found");
-        return kFATAL;
-    }
+    auto* mgr = FairRootManager::Instance();
+    R3BLOG_IF(fatal, mgr == nullptr, "FairRootManager not found");
 
     header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    if (!header)
-        header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("R3BEventHeader"));
+    R3BLOG_IF(error, header == nullptr, "EventHeader not found");
 
     // get access to Mapped data
     fMappedItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosMapped"));
-    if (NULL == fMappedItems)
-    {
-        R3BLOG(fatal, "LosMapped not found");
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, fMappedItems == nullptr, "LosMapped not found");
 
     // get access to Trigger Mapped data
     fMappedTriggerItems = dynamic_cast<TClonesArray*>(mgr->GetObject("LosTriggerMapped"));
@@ -143,24 +117,25 @@ void R3BLosMapped2TCal::Exec(Option_t*)
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
-    Int_t nHits = fMappedItems->GetEntriesFast();
-
+    auto nHits = fMappedItems->GetEntriesFast();
     if (nHits == 0)
+    {
         return;
+    }
 
     for (Int_t ihit = 0; ihit < nHits; ihit++) // nHits = Nchannel_LOS * NTypes = 4 or 8 * 3
     {
         Double_t times_ns = 0. / 0.;
         Double_t times_raw_ns = 0. / 0.;
 
-        R3BLosMappedData* hit = dynamic_cast<R3BLosMappedData*>(fMappedItems->At(ihit));
+        auto* hit = dynamic_cast<R3BLosMappedData*>(fMappedItems->At(ihit));
         if (!hit)
             continue;
 
         // channel numbers are stored 1-based (1..n)
-        UInt_t iDet = hit->GetDetector(); // 1..
-        UInt_t iCha = hit->GetChannel();  // 1..
-        UInt_t iType = hit->GetType();    // 0,1,2,3
+        auto iDet = hit->GetDetector(); // 1..
+        auto iCha = hit->GetChannel();  // 1..
+        auto iType = hit->GetType();    // 0,1,2,3
 
         if ((iDet < 1) || (iDet > fNofDetectors))
         {
@@ -179,7 +154,7 @@ void R3BLosMapped2TCal::Exec(Option_t*)
 
         if (iType < 3)
         {
-            R3BTCalModulePar* par = fTcalPar->GetModuleParAt(iDet, iCha, iType + 1);
+            auto* par = fTcalPar->GetModuleParAt(iDet, iCha, iType + 1);
 
             if (!par)
             {
@@ -243,7 +218,6 @@ void R3BLosMapped2TCal::Exec(Option_t*)
             }
         }
     }
-
     ++fNEvent;
 }
 
@@ -274,4 +248,4 @@ R3BLosTCalData* R3BLosMapped2TCal::AddTriggerTCalData(Int_t det, Int_t ch, Int_t
     Int_t size = clref.GetEntriesFast();
     return new (clref[size]) R3BLosTCalData(det, ch, typ, tns);
 }
-ClassImp(R3BLosMapped2TCal);
+ClassImp(R3BLosMapped2TCal)

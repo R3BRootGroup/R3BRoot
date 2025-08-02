@@ -19,26 +19,14 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class R3BAnalysisIncomingFrs+;
 #pragma link C++ class R3BAnalysisIncomingID+;
 #pragma link C++ class R3BIncomingBeta+;
 #pragma link C++ class R3BIncomingIDPar+;
 #pragma link C++ class R3BAnalysisContFact+;
-#pragma link C++ class R3BGlobalAnalysis+;
-#pragma link C++ class R3BGlobalAnalysisS454+;
-#pragma link C++ class R3BTrackS454+;
-#pragma link C++ class R3BTrackerTestS454+;
 
-#pragma link C++ class R3BOnlineSpectra+;
-#pragma link C++ class R3BOnlineSpectraDec2019+;
 #pragma link C++ class R3BOnlineSpectraPdc+;
-#pragma link C++ class R3BOnlineSpectraSfib+;
 #pragma link C++ class R3BOnlineSpillAnalysis+;
 #pragma link C++ class R3BOnlineSpectraLosVsSci2+;
-#pragma link C++ class R3BOnlineSpectraFibvsToFDS494+;
-#pragma link C++ class R3BOnlineSpectraBMON_S494+;
-#pragma link C++ class R3BOnlineSpectraFiber23+;
-#pragma link C++ class R3BOnlineSpectraToFI_S494+;
 #pragma link C++ class R3BTwimvsFootOnlineSpectra+;
 #pragma link C++ class R3BIncomingTrackingOnlineSpectra+;
 #pragma link C++ class R3BIncomingTrackingFootOnlineSpectra+;
@@ -51,7 +39,6 @@
 #pragma link C++ class R3BFibervsTofDOnlineSpectra+;
 #pragma link C++ class R3BFiberTrackingOnlineSpectra+;
 #pragma link C++ class R3BFootVsAlpideOnlineSpectra+;
-#pragma link C++ class R3BGeneralOnlineSpectra+;
 #pragma link C++ class R3BIncomingIDOnlineSpectra+;
 #pragma link C++ class R3BTofDvsTttxOnlineSpectra+;
 #pragma link C++ class R3BOnlineSyncCheck+;

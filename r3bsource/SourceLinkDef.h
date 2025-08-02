@@ -43,7 +43,6 @@
 #pragma link C++ class R3BS515PspxReader+;
 #pragma link C++ class R3BBunchedFiberReader+;
 #pragma link C++ class R3BBunchedFiberSPMTTrigReader+;
-#pragma link C++ class R3BSfibReader+;
 #pragma link C++ class R3BFi0Reader+;
 #pragma link C++ class R3BFi1aReader+;
 #pragma link C++ class R3BFi1bReader+;
@@ -68,7 +67,6 @@
 #pragma link C++ class R3BPtofReader+;
 #pragma link C++ class R3BNeulandTamexReader+;
 #pragma link C++ class R3BNeulandTacquilaReader+;
-#pragma link C++ class R3BStrawtubesReader+;
 #pragma link C++ class R3BAmsReader+;
 #pragma link C++ class R3BMusicReader+;
 #pragma link C++ class R3BFootReader+;
