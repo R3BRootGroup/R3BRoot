@@ -453,6 +453,8 @@ TVector3 R3BFootStripCal2Hit::ComputeHitPosition(int i, double pos)
 
     master.Transform(det2lab);
 
+    master += TVector3(fOffsetX[i], fOffsetY[i], fDistTarget[i]);
+
     return master;
 }
 
