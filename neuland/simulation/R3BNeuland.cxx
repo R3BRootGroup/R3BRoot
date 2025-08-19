@@ -17,12 +17,11 @@
 #include "R3BMCStack.h"
 #include "R3BNeulandGeoPar.h"
 #include "R3BNeulandPoint.h"
-#include "TClonesArray.h"
-#include "TGeoBBox.h"
-#include "TGeoManager.h"
-#include "TParticle.h"
-#include "TVirtualMC.h"
 #include <FairRootManager.h>
+#include <TClonesArray.h>
+#include <TGeoManager.h>
+#include <TVirtualMC.h>
+#include <fmt/core.h>
 
 // Initialize variables from Birk' s Law
 static constexpr Double_t BirkdP = 1.032;
@@ -71,7 +70,7 @@ R3BNeuland::R3BNeuland(Int_t nDP, const TGeoTranslation& trans, const TGeoRotati
 }
 
 R3BNeuland::R3BNeuland(const Int_t nDP, const TGeoCombiTrans& combi)
-    : R3BNeuland(TString::Format("neuland_v3_%ddp.geo.root", nDP), combi)
+    : R3BNeuland(fmt::format("neuland_{}dp.geo.root", nDP), combi)
 {
 }
 

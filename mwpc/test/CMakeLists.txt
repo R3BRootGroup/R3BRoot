@@ -22,6 +22,6 @@ endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/test/testMwpcSimulation.C)
 add_test(NAME MwpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/mwpc/test/testMwpcSimulation.sh)
-set_tests_properties(MwpcSimulation PROPERTIES TIMEOUT "100")
+set_tests_properties(MwpcSimulation PROPERTIES TIMEOUT "500")
 set_tests_properties(MwpcSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

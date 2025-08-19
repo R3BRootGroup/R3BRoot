@@ -44,20 +44,22 @@ void Config()
     // Enable setting the physics list from outside via environment variable
     // physicsList = "QGSP_BERT_EMV";
     // physicsList = "QGSP_INCLXX_EMV";
+    // physicsList = "QGSP_INCLXX_HP_EMV"; For NeuLAND simulations
+    // physicsList = "FTFP_INCLXX_HP_EMV";
 
-    Bool_t mtMode = FairRunSim::Instance()->IsMT();
-    Bool_t specialStacking = false;
+    bool mtMode = FairRunSim::Instance()->IsMT();
+    bool specialStacking = false;
     // FairFastSimRunConfiguration* runConfiguration = new FairFastSimRunConfiguration(
-    //  "geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls", specialStacking, mtMode);
-    TG4RunConfiguration* runConfiguration = new TG4RunConfiguration(
-        "geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls", specialStacking, mtMode);
+    // "geomRoot", "QGSP_BERT_EMV", "stepLimiter+specialCuts+specialControls", specialStacking, mtMode);
+    auto* runConfiguration = new TG4RunConfiguration(
+        "geomRoot", "QGSP_INCLXX_EMV", "stepLimiter+specialCuts+specialControls", specialStacking, mtMode);
 
     // Create the G4 VMC
-    TGeant4* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
+    auto* geant4 = new TGeant4("TGeant4", "The Geant4 Monte Carlo", runConfiguration);
     LOG(info) << "Geant4 has been created.";
 
     // create the Specific stack
-    R3BStack* stack = new R3BStack(1000);
+    auto* stack = new R3BStack(1000);
     stack->SetDebug(kFALSE);
     stack->StoreSecondaries(kTRUE);
     stack->SetMinPoints(0);
@@ -65,7 +67,7 @@ void Config()
 
     if (FairRunSim::Instance()->IsExtDecayer())
     {
-        TVirtualMCDecayer* decayer = TVirtualMC::GetMC()->GetDecayer();
+        auto* decayer = dynamic_cast<TVirtualMCDecayer*>(TVirtualMC::GetMC()->GetDecayer());
         geant4->SetExternalDecayer(decayer);
     }
 

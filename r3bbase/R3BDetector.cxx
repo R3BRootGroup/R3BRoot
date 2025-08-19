@@ -17,13 +17,12 @@
 
 R3BDetector::R3BDetector()
     : FairDetector()
-    , fCutE(1e-3)
 {
 }
 
 R3BDetector::R3BDetector(const TString& name, const Int_t detId)
     : FairDetector(name, kTRUE, detId)
-    , fCutE(1e-3)
+    , fCutE(fCutEvalue)
 {
     SetVerboseLevel(1);
 }
@@ -39,7 +38,7 @@ R3BDetector::R3BDetector(const TString& name,
 
 R3BDetector::R3BDetector(const TString& name, const Int_t detId, const TString& geoFile, const TGeoCombiTrans& combi)
     : FairDetector(name, kTRUE, detId)
-    , fCutE(1e-3)
+    , fCutE(fCutEvalue)
     , fCombiTrans(combi)
 {
     SetVerboseLevel(1);

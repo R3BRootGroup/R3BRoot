@@ -2,7 +2,7 @@
 
 
 ## Detector
-`R3BNeuland` is the main class derived from `R3BDetector` for use in simulations. Note that it does not include the geometry itself, but takes `neuland_v3_` geometry files from `/geometry/`. Suitable geometry files require proper naming of the active volume and copy numbers.
+`R3BNeuland` is the main class derived from `R3BDetector` for use in simulations. Note that it does not include the geometry itself, but takes `neuland_XXdp.geo.root` geometry files (XX corresponds to the number of double planes) from `/geometry/`. Suitable geometry files require proper naming of the active volume and copy numbers.
 
 Output for each simulated event:
 - NeulandPoints (`R3BNeulandPoint`), each representing energy deposition and light yield of a track in a paddle.

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2023 Members of R3B Collaboration                          *
+ *   Copyright (C) 2023-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,7 +17,16 @@
 #include <iomanip>
 #include <iostream>
 
-void create_neuland_geo(const Int_t nPlanes = 26, const TString geoTag = "v3")
+/**
+ ** Comments:
+ ** - nPlanes = 26 corresponds to 13 double planes
+ ** - geoTag v2021.3 represents the standard configuration used for
+ **   experiments S455, S467, S473, S494, S515
+ ** - geoTag v2022.5 represents the standard configuration in use since May 2022
+ **   for experiments S509, S522, S091, S118 and G249
+ **/
+
+void create_neuland_geo(const Int_t nPlanes = 26 /*, const TString geoTag = "v2022.5"*/)
 {
     new FairGeoLoader("TGeo", "FairGeoLoader");
     gGeoManager->SetName("NEULANDgeom");
@@ -26,8 +35,6 @@ void create_neuland_geo(const Int_t nPlanes = 26, const TString geoTag = "v3")
     TGeoRotation* rot0 = nullptr;
     TGeoRotation* rot90 = new TGeoRotation();
     rot90->RotateZ(90.);
-    TGeoRotation* rot45 = new TGeoRotation();
-    rot45->RotateY(45.);
 
     TGeoVolume* volNeuland = new TGeoVolumeAssembly("volNeuland");
     Int_t nindex = 0, nPlane = 0;
@@ -61,13 +68,13 @@ void create_neuland_geo(const Int_t nPlanes = 26, const TString geoTag = "v3")
     gGeoManager->Test();
 
     // -------   Geometry file name (output)   ----------------------------------
-    TString geoFileName = TString::Format("%s/geometry/neuland_%s_%ddp.geo.root",
+    TString geoFileName = TString::Format("%s/geometry/neuland_%ddp.geo.root",
                                           TString(gSystem->Getenv("VMCWORKDIR")).Data(),
-                                          geoTag.Data(),
+                                          // geoTag.Data(),
                                           nPlanes / 2);
-    TFile* geoFile = new TFile(geoFileName, "RECREATE");
+    TFile geoFile(geoFileName, "RECREATE");
     top->Write();
-    geoFile->Close();
+    geoFile.Close();
 
     std::cout << std::endl;
     std::cout << "Done. " << nindex << " Paddles in " << nPlane << " Planes" << std::endl;

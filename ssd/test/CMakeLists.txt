@@ -22,6 +22,6 @@ endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/ssd/test/testAmsSimulation.C)
 add_test(NAME AmsSimulation COMMAND ${R3BROOT_BINARY_DIR}/ssd/test/testAmsSimulation.sh)
-set_tests_properties(AmsSimulation PROPERTIES TIMEOUT "100")
+set_tests_properties(AmsSimulation PROPERTIES TIMEOUT "500")
 set_tests_properties(AmsSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

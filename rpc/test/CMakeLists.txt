@@ -22,6 +22,6 @@ endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/rpc/test/testRpcSimulation.C)
 add_test(NAME RpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/rpc/test/testRpcSimulation.sh)
-set_tests_properties(RpcSimulation PROPERTIES TIMEOUT "100")
+set_tests_properties(RpcSimulation PROPERTIES TIMEOUT "500")
 set_tests_properties(RpcSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
