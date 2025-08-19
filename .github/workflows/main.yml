@@ -147,6 +147,10 @@ jobs:
           # build with conan package manager
           - repos: r3broot-conan
             preset: default
+            
+        exclude:
+          - repos: r3broot-conan
+            os: debian10
 
     # Jobs are run inside a Docker container, which provides different compiled
     # tool-kits for the building, such as clang-tidy and cvmfs. For more

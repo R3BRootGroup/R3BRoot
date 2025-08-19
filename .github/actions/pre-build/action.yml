@@ -31,17 +31,11 @@ runs:
 
     - name: mount cvmfs
       run: |
-        if [ "${{ matrix.os }}" == "debian10" ]; then
-          sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list
-          sed -i '/deb.debian.org/d' /etc/apt/sources.list
-          echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until
+        if [ "${{ matrix.os }}" != "debian10" ]; then
+          apt-get update
+          apt-get install --fix-missing -y sudo wget gnupg lsb-release
+          sudo -H pip3 install --ignore-installed -U conan
         fi
-        apt-get update
-        apt-get install --fix-missing -y sudo wget gnupg lsb-release
-        if [ "${{ matrix.os }}" == "debian10" ]; then
-          sudo apt upgrade libc6
-        fi
-        sudo -H pip3 install --ignore-installed -U conan
         wget https://cernbox.cern.ch/remote.php/dav/public-files/RmnTeeOZpYjCJQb/masterkey.gsi.de.pub
         mkdir -p /etc/cvmfs/keys
         mv masterkey.gsi.de.pub /etc/cvmfs/keys
