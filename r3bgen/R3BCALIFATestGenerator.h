@@ -25,6 +25,7 @@
 #include <FairGenerator.h>
 
 #include <iostream>
+#include <vector>
 
 class FairPrimaryGenerator;
 
@@ -41,62 +42,62 @@ class R3BCALIFATestGenerator : public FairGenerator
     R3BCALIFATestGenerator(Int_t pdgid, Int_t mult = 1);
 
     // Destructor
-    virtual ~R3BCALIFATestGenerator() = default;
+    ~R3BCALIFATestGenerator() = default;
 
     // Modifiers
     void SetPDGType(Int_t pdg) { fPDGType = pdg; };
 
     void SetMultiplicity(Int_t mult) { fMult = mult; };
 
-    void SetPRange(Double32_t pmin = 0, Double32_t pmax = 10)
+    void SetPRange(double pmin = 0, double pmax = 10)
     {
         fPMin = pmin;
         fPMax = pmax;
-        fPRangeIsSet = kTRUE;
+        fPRangeIsSet = true;
     }
 
-    void SetPtRange(Double32_t ptmin = 0, Double32_t ptmax = 10)
+    void SetPtRange(double ptmin = 0, double ptmax = 10)
     {
         fPtMin = ptmin;
         fPtMax = ptmax;
-        fPtRangeIsSet = kTRUE;
+        fPtRangeIsSet = true;
     };
 
-    void SetPhiRange(Double32_t phimin = 0, Double32_t phimax = 360)
+    void SetPhiRange(double phimin = 0, double phimax = 360)
     {
         fPhiMin = phimin;
         fPhiMax = phimax;
     };
 
-    void SetEtaRange(Double32_t etamin = -5, Double32_t etamax = 7)
+    void SetEtaRange(double etamin = -5, double etamax = 7)
     {
         fEtaMin = etamin;
         fEtaMax = etamax;
-        fEtaRangeIsSet = kTRUE;
+        fEtaRangeIsSet = true;
     };
 
-    void SetYRange(Double32_t ymin = -5, Double32_t ymax = 7)
+    void SetYRange(double ymin = -5, double ymax = 7)
     {
         fYMin = ymin;
         fYMax = ymax;
-        fYRangeIsSet = kTRUE;
+        fYRangeIsSet = true;
     };
 
-    void SetThetaRange(Double32_t thetamin = 0, Double32_t thetamax = 180)
+    void SetThetaRange(double thetamin = 0, double thetamax = 180)
     {
         fThetaMin = thetamin;
         fThetaMax = thetamax;
-        fThetaRangeIsSet = kTRUE;
+        fThetaRangeIsSet = true;
     };
 
-    void SetCosTheta() { fCosThetaIsSet = kTRUE; };
+    void SetCosTheta() { fCosThetaIsSet = true; };
 
     void SetXYZ(Double32_t x = 0, Double32_t y = 0, Double32_t z = 0)
     {
         fX = x;
         fY = y;
         fZ = z;
-        fPointVtxIsSet = kTRUE;
+        fPointVtxIsSet = true;
     }
 
     void SetBoxXYZ(Double32_t x1 = 0,
@@ -115,19 +116,19 @@ class R3BCALIFATestGenerator : public FairGenerator
         fBoxVtxIsSet = kTRUE;
     }
 
-    void SetDebug(Bool_t debug = 0) { fDebug = debug; }
+    void SetDebug(bool debug = false) { fDebug = debug; }
 
-    void SetLorentzBoost(Double32_t beta = 0)
+    void SetLorentzBoost(double beta)
     {
         SetFragmentVelocity(beta);
-        fLorentzBoostIsSet = kTRUE;
+        fLorentzBoostIsSet = true;
     };
 
     void SetFragmentVelocity(double beta = 0., double dispersion = 0.);
 
-    void SetNuclearDecayChain() { fNuclearDecayChainIsSet = kTRUE; };
+    void SetNuclearDecayChain() { fNuclearDecayChainIsSet = true; };
 
-    void SetDecayChainPoint(Double32_t gammaEnergy = 0, Double32_t branchingRatio = 0);
+    void SetDecayChainPoint(double gammaEnergy = 0, double branchingRatio = 0);
 
     /** Initializer **/
     Bool_t Init() override;
@@ -141,36 +142,36 @@ class R3BCALIFATestGenerator : public FairGenerator
     Int_t fPDGType; // Particle type (PDG encoding)
     Int_t fMult;    // Multiplicity
 
-    Double32_t fPDGMass;                     // Particle mass [GeV]
-    Double32_t fPtMin, fPtMax;               // Transverse momentum range [GeV]
-    Double32_t fPhiMin, fPhiMax;             // Azimuth angle range [degree]
-    Double32_t fEtaMin, fEtaMax;             // Pseudorapidity range in lab system
-    Double32_t fYMin, fYMax;                 // Rapidity range in lab system
-    Double32_t fPMin, fPMax;                 // Momentum range in lab system
-    Double32_t fThetaMin, fThetaMax;         // Polar angle range in lab system [degree]
-    Double32_t fX, fY, fZ;                   // Point vertex coordinates [cm]
-    Double32_t fX1, fY1, fZ1, fX2, fY2, fZ2; // Box vertex coords (x1,y1,z1)->(x2,y2,z2)
+    double fPDGMass;                         // Particle mass [GeV]
+    double fPtMin, fPtMax;                   // Transverse momentum range [GeV]
+    double fPhiMin = 0., fPhiMax = 360.;     // Azimuth angle range [degree]
+    double fEtaMin, fEtaMax;                 // Pseudorapidity range in lab system
+    double fYMin, fYMax;                     // Rapidity range in lab system
+    double fPMin, fPMax;                     // Momentum range in lab system
+    double fThetaMin = 0., fThetaMax = 180.; // Polar angle range in lab system [degree]
+    double fX, fY, fZ;                       // Point vertex coordinates [cm]
+    double fX1, fY1, fZ1, fX2, fY2, fZ2;     // Box vertex coords (x1,y1,z1)->(x2,y2,z2)
 
-    Bool_t fEtaRangeIsSet;   // True if eta range is set
-    Bool_t fYRangeIsSet;     // True if rapidity range is set
-    Bool_t fThetaRangeIsSet; // True if theta range is set
-    Bool_t fCosThetaIsSet;   // True if uniform distribution in
-                             // cos(theta) is set (default -> not set)
-    Bool_t fPtRangeIsSet;    // True if transverse momentum range is set
-    Bool_t fPRangeIsSet;     // True if abs.momentum range is set
-    Bool_t fPointVtxIsSet;   // True if point vertex is set
-    Bool_t fBoxVtxIsSet;     // True if box vertex is set
-    Bool_t fDebug;           // Debug switch
+    bool fEtaRangeIsSet = false;  // True if eta range is set
+    bool fYRangeIsSet = false;    // True if rapidity range is set
+    bool fThetaRangeIsSet = true; // True if theta range is set
+    bool fCosThetaIsSet = false;  // True if uniform distribution in
+                                  // cos(theta) is set (default -> not set)
+    bool fPtRangeIsSet;           // True if transverse momentum range is set
+    bool fPRangeIsSet;            // True if abs.momentum range is set
+    bool fPointVtxIsSet;          // True if point vertex is set
+    bool fBoxVtxIsSet;            // True if box vertex is set
+    bool fDebug = false;          // Debug switch
 
     // SPECIFIC OF CALIFA
-    Double32_t fGammaEnergies[8];        // Gamma energies for the nuclear decay chain [GeV] TEST UNITS!
-    Double32_t fGammaBranchingRatios[8]; // Gamma branching ratios for the nuclear decay chain
-    Int_t fGammasDefinedInNuclearDecay;  // Number of gammas defined (max 8)
-    double fBetaOfEmittingFragment;      // Velocity of the fragment emitting the gammas
-    double fGammaFactor;                 // Velocity of the fragment emitting the gammas
+    std::vector<double> fGammaEnergies;        // Gamma energies for the nuclear decay chain in GeV UNITS
+    std::vector<double> fGammaBranchingRatios; // Gamma branching ratios for the nuclear decay chain
 
-    Bool_t fLorentzBoostIsSet;      // True if Lorentz Boost is set
-    Bool_t fNuclearDecayChainIsSet; // True if a nuclear decay chain is set
+    double fBetaOfEmittingFragment = 0.; // Velocity of the fragment emitting the gammas
+    double fGammaFactor = 1.;            // Velocity of the fragment emitting the gammas
+
+    bool fLorentzBoostIsSet = false;      // True if Lorentz Boost is set
+    bool fNuclearDecayChainIsSet = false; // True if a nuclear decay chain is set
 
   public:
     ClassDefOverride(R3BCALIFATestGenerator, 1); // NOLINT

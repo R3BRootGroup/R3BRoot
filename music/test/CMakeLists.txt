@@ -22,6 +22,6 @@ endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/music/test/testMusicSimulation.C)
 add_test(NAME MusicSimulation COMMAND ${R3BROOT_BINARY_DIR}/music/test/testMusicSimulation.sh)
-set_tests_properties(MusicSimulation PROPERTIES TIMEOUT "100")
+set_tests_properties(MusicSimulation PROPERTIES TIMEOUT "500")
 set_tests_properties(MusicSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

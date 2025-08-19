@@ -107,8 +107,8 @@ class R3BCalifaDigitizer : public FairTask
 
     double fNonUniformity = 1.;      // Experimental non-uniformity parameter
     double fResolution = 0.;         // Experimental resolution
-    double fGammaResolution = 0.;    // Experimental resolution @ 1 MeV
-    double fProtonResolution = 0.;   // Experimental resolution for protons
+    double fGammaResolution = 5.5;   // Experimental resolution @ 1 MeV
+    double fProtonResolution = 1.;   // Experimental resolution for protons
     double fComponentRes = 0.;       // Experimental resolution for Nf and Ns
     double fThreshold = 0.;          // Minimum energy requested to create a Cal
     double fGammaSaturation = 31.;   // MeV

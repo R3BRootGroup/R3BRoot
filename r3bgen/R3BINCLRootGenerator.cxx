@@ -22,7 +22,7 @@
 
 R3BINCLRootGenerator::R3BINCLRootGenerator()
 {
-    R3BLOG(fatal, "This event generator must be used with an INCL ROOT file");
+    // Do not remove this initialization
 }
 
 R3BINCLRootGenerator::R3BINCLRootGenerator(const std::string& fileName)

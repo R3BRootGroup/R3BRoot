@@ -17,6 +17,8 @@
 #include <TGeoMatrix.h>
 #include <TString.h>
 
+constexpr double fCutEvalue = 1e-3; // 1 MeV
+
 class R3BDetector : public FairDetector
 {
   public:
@@ -27,7 +29,7 @@ class R3BDetector : public FairDetector
     R3BDetector(const TString& name,
                 const Int_t detId,
                 const TString& geoFile,
-                const TGeoTranslation& trans,
+                const TGeoTranslation& trans = TGeoTranslation(),
                 const TGeoRotation& rot = TGeoRotation());
 
     R3BDetector(const TString& name,
@@ -48,14 +50,14 @@ class R3BDetector : public FairDetector
     /** Method to setup the translation + rotation of the detector */
     virtual void SetCombiTrans(const TGeoCombiTrans& combi) { fCombiTrans = combi; }
 
-    virtual void SetEnergyCut(const Double_t cutE) { fCutE = cutE; }
+    virtual void SetEnergyCut(const double cutE) { fCutE = cutE; }
 
     virtual void SetActive(const Bool_t flag) { fActive = flag; }
 
   protected:
     TGeoCombiTrans fCombiTrans;
-    Double_t fCutE;
+    double fCutE; // NOLINT
 
   public:
-    ClassDefOverride(R3BDetector, 3)
+    ClassDefOverride(R3BDetector, 3) // NOLINT
 };
