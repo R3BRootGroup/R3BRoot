@@ -55,15 +55,19 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
         gApplication->Terminate();
     }
 
-    TString geoStru = geoPath + "/califa/geobase/files/califa_holding_structure.root";
-    geoStru.ReplaceAll("//", "/");
-    TFile* f = TFile::Open(geoStru.Data());
-    auto StruGeom = (static_cast<TGeoManager*>(f->Get("CalifaHoldingStructure")));
+    TGeoVolume* holding_structure = nullptr;
+    if (fMakeStr == true)
+    {
+        TString geoStru = geoPath + "/califa/geobase/files/califa_frame_structure.root";
+        geoStru.ReplaceAll("//", "/");
+        TFile* f = TFile::Open(geoStru.Data());
+        auto StruGeom = (static_cast<TGeoManager*>(f->Get("CalifaHoldingStructure")));
 
-    auto StruVol = StruGeom->GetTopVolume();
-    auto holding_structure = (static_cast<TGeoVolume*>(StruVol->Clone("CalifaHoldingStructureGeo")));
-    f->Close();
-    delete StruGeom;
+        auto StruVol = StruGeom->GetTopVolume();
+        holding_structure = (static_cast<TGeoVolume*>(StruVol->Clone("CalifaHoldingStructureGeo")));
+        f->Close();
+        delete StruGeom;
+    }
 
     auto fRefRot = new TGeoRotation();
     TGeoManager* gGeoMan = nullptr;
@@ -1749,12 +1753,12 @@ void CreateHoldingStructure(TGeoVolume* world,
             GeoCompObj = new TGeoCompositeShape(name.Data(), tape);
         }
 
-    // Final holding structure
-    auto holding_structure_final = new TGeoVolume("Holding_Structure", GeoCompObj, med2);
-    holding_structure_final->SetVisLeaves(kTRUE);
-    holding_structure_final->SetLineColor(16);
-    world->AddNode(holding_structure_final, 1, trans3);
-    world->AddNode(holding_structure_final, 2, trans4);
+    // Final califa frame
+    auto califa_frame = new TGeoVolume("Califa_Frame", GeoCompObj, med2);
+    califa_frame->SetVisLeaves(kTRUE);
+    califa_frame->SetLineColor(16);
+    world->AddNode(califa_frame, 1, trans3);
+    world->AddNode(califa_frame, 2, trans4);
 }
 
 void create_califa_geo(const int index = 0)
