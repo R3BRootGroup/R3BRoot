@@ -34,15 +34,16 @@
 #include "FairRunAna.h"
 #include "FairRunOnline.h"
 #include "FairRuntimeDb.h"
-#include "TCanvas.h"
-#include "TClonesArray.h"
-#include "TFolder.h"
-#include "TH1F.h"
-#include "TH2F.h"
-#include "THttpServer.h"
-#include "TMath.h"
-#include "TRandom.h"
-#include "TVector3.h"
+#include <TCanvas.h>
+#include <TClonesArray.h>
+#include <TFolder.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <THttpServer.h>
+#include <TMath.h>
+#include <TRandom.h>
+#include <TVector3.h>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -528,7 +529,7 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
             fh1_Strip[det]->Fill(strip + 1);
             energy[det][strip] = hit->GetEnergy() & 0xffff; // Take only lower 16 bits
             mult[det][strip]++;
-            if (!isnan(energy[det][strip]) && energy[det][strip] > highest_e[det])
+            if (!std::isnan(energy[det][strip]) && energy[det][strip] > highest_e[det])
             {
                 highest_e[det] = hit->GetEnergy();
                 highest_e_strip[det] = hit->GetStripID();
@@ -542,13 +543,13 @@ void R3BTttxOnlineSpectra::Exec(Option_t* option)
         {
             if (mult[i_det][i_strip] > 0)
                 fh2_MultVsStrip[i_det]->Fill(i_strip + 1, mult[i_det][i_strip]);
-            if (!isnan(time[i_det][i_strip]) && !isnan(time[i_det][fNbStrips + fNbTref + fNbTrig - 1]))
+            if (!std::isnan(time[i_det][i_strip]) && !std::isnan(time[i_det][fNbStrips + fNbTref + fNbTrig - 1]))
                 fh2_TimeVsStrip[i_det]->Fill(
                     i_strip + 1,
                     time[i_det][i_strip] - time[i_det][fNbStrips + fNbTref + fNbTrig - 1]); // mult=1 !
         }
     }
-    if (!isnan(highest_e[0]) && !isnan(highest_e[1]))
+    if (!std::isnan(highest_e[0]) && !std::isnan(highest_e[1]))
     {
         fh2_E2VsE1->Fill(highest_e[0], highest_e[1]);
         if (abs(highest_e[0] - highest_e[1]) < 1000.)
@@ -701,4 +702,4 @@ void R3BTttxOnlineSpectra::FinishTask()
     }
 }
 
-ClassImp(R3BTttxOnlineSpectra);
+ClassImp(R3BTttxOnlineSpectra)
