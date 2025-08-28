@@ -21,7 +21,7 @@ if(GTEST_FOUND)
         testNeulandMultiplicityCalorimetricPar.cxx)
     target_link_libraries(NeulandUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BNeulandDigitizing R3BNeulandReconstruction)
-    gtest_discover_tests(NeulandUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(NeulandUnitTests DISCOVERY_TIMEOUT "60")
 endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandSimulation.C)
@@ -30,18 +30,18 @@ add_test(NeulandSimulationMacro ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandSi
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandDigitizer.C)
 add_test(NeulandDigitizerMacro ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandDigitizer.sh)
 set_tests_properties(NeulandDigitizerMacro PROPERTIES DEPENDS NeulandSimulationMacro)
-set_tests_properties(NeulandDigitizerMacro PROPERTIES TIMEOUT "1000")
+set_tests_properties(NeulandDigitizerMacro PROPERTIES TIMEOUT "100")
 
 # generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandTrain.C)
 # add_test(NeulandTrain ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandTrain.sh)
 # set_tests_properties(NeulandTrain PROPERTIES DEPENDS NeulandDigitizer)
-# set_tests_properties(NeulandTrain PROPERTIES TIMEOUT "1000")
+# set_tests_properties(NeulandTrain PROPERTIES TIMEOUT "500")
 # set_tests_properties(NeulandTrain PROPERTIES PASS_REGULAR_EXPRESSION "Macro finished successfully.")
 
 # generate_root_test_script(${R3BROOT_SOURCE_DIR}/neuland/test/testNeulandReconstruction.C)
 # add_test(NeulandReconstruction ${R3BROOT_BINARY_DIR}/neuland/test/testNeulandReconstruction.sh)
 # set_tests_properties(NeulandReconstruction PROPERTIES DEPENDS NeulandTrain)
-# set_tests_properties(NeulandReconstruction PROPERTIES TIMEOUT "1000")
+# set_tests_properties(NeulandReconstruction PROPERTIES TIMEOUT "500")
 # set_tests_properties(NeulandReconstruction PROPERTIES PASS_REGULAR_EXPRESSION
 #                                                       "Macro finished successfully.")
 

@@ -17,5 +17,5 @@ if(GTEST_FOUND)
         testFrssciContainerPar.cxx)
     target_link_libraries(FrssciUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BFrsSci)
-    gtest_discover_tests(FrssciUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(FrssciUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)

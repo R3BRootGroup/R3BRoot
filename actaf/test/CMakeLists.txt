@@ -17,5 +17,5 @@ if(GTEST_FOUND)
         testActafContainerPar.cxx)
     target_link_libraries(ActafUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BActaf)
-    gtest_discover_tests(ActafUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(ActafUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)

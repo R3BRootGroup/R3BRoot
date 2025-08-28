@@ -17,11 +17,11 @@ if(GTEST_FOUND)
         testMwpcContainerPar.cxx)
     target_link_libraries(MwpcUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BMwpc)
-    gtest_discover_tests(MwpcUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(MwpcUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/test/testMwpcSimulation.C)
 add_test(NAME MwpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/mwpc/test/testMwpcSimulation.sh)
-set_tests_properties(MwpcSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(MwpcSimulation PROPERTIES TIMEOUT "100")
 set_tests_properties(MwpcSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

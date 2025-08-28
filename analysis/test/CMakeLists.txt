@@ -17,5 +17,5 @@ if(GTEST_FOUND)
         testAnaContainerPar.cxx)
     target_link_libraries(AnaUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BAnalysis)
-    gtest_discover_tests(AnaUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(AnaUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)

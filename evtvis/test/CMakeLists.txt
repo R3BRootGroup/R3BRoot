@@ -13,12 +13,13 @@
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/evtvis/test/testEventSimulation.C)
 add_test(NAME EventVisSimulation COMMAND ${R3BROOT_BINARY_DIR}/evtvis/test/testEventSimulation.sh)
-set_tests_properties(EventVisSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(EventVisSimulation PROPERTIES TIMEOUT "300")
 set_tests_properties(EventVisSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")
-                                                  
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/evtvis/test/testEventDisplay.C)
-add_test(NAME EventDisplay COMMAND ${R3BROOT_BINARY_DIR}/evtvis/test/testEventDisplay.sh)
-set_tests_properties(EventDisplay PROPERTIES TIMEOUT "2000")
-set_tests_properties(EventDisplay PROPERTIES PASS_REGULAR_EXPRESSION
-                                                  "Macro finished successfully.")
+
+if(GTEST_FOUND)
+  generate_root_test_script(${R3BROOT_SOURCE_DIR}/evtvis/test/testEventDisplay.C)
+  add_test(NAME EventDisplay COMMAND ${R3BROOT_BINARY_DIR}/evtvis/test/testEventDisplay.sh)
+  set_tests_properties(EventDisplay PROPERTIES DEPENDS EventVisSimulation)   
+  set_tests_properties(EventDisplay PROPERTIES TIMEOUT "300" PASS_REGULAR_EXPRESSION "Macro finished successfully") 
+endif()
