@@ -17,11 +17,11 @@ if(GTEST_FOUND)
         testCalifaContainerPar.cxx)
     target_link_libraries(CalifaUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BCalifa)
-    gtest_discover_tests(CalifaUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(CalifaUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/califa/test/testCalifaSimulation.C)
 add_test(NAME CalifaSimulation COMMAND ${R3BROOT_BINARY_DIR}/califa/test/testCalifaSimulation.sh)
-set_tests_properties(CalifaSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(CalifaSimulation PROPERTIES TIMEOUT "500")
 set_tests_properties(CalifaSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

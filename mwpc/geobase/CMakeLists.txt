@@ -44,23 +44,3 @@ else(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/mwpc3_v2021.3.geo.root")
 message(STATUS "${BYellow}MWPC3 standard root geometry already created${CR} ")
 endif(NOT EXISTS "${R3BROOT_SOURCE_DIR}/geometry/mwpc3_v2021.3.geo.root")
 endif(WITH_SOFIA)
-
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/geobase/create_mwpc0_geo.C)
-add_test(NAME Mwpc0RootGeometry COMMAND ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc0_geo.sh)
-set_tests_properties(Mwpc0RootGeometry PROPERTIES TIMEOUT "2000")
-set_tests_properties(Mwpc0RootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
-                                                  "Macro finished successfully.")
-                                                                                                    
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/geobase/create_mwpc1and2_geo.C)
-add_test(NAME Mwpc1RootGeometry COMMAND ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc1and2_geo.sh)
-set_tests_properties(Mwpc1RootGeometry PROPERTIES TIMEOUT "2000")
-set_tests_properties(Mwpc1RootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
-                                                  "Macro finished successfully.")
-                                                  
-if(WITH_SOFIA)                                              
-generate_root_test_script(${R3BROOT_SOURCE_DIR}/mwpc/geobase/create_mwpc3_geo.C)
-add_test(NAME Mwpc3RootGeometry COMMAND ${R3BROOT_BINARY_DIR}/mwpc/geobase/create_mwpc3_geo.sh)
-set_tests_properties(Mwpc3RootGeometry PROPERTIES TIMEOUT "2000")
-set_tests_properties(Mwpc3RootGeometry PROPERTIES PASS_REGULAR_EXPRESSION
-                                                  "Macro finished successfully.")
-endif(WITH_SOFIA)

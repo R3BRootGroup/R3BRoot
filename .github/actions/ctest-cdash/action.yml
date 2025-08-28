@@ -31,5 +31,6 @@ runs:
               -DTEST_MODEL=${TEST_MODEL}\
               -DTEST_NAME=${{ env.TEST_NAME }}\
               -DSITE_NAME="Github hosted (${{ github.repository }})"\
+              --force-new-ctest-process \
               -V -E "(run_gen_sim|run_digi|run_aladin_digi|califasim2|landreco|elsim)"
       shell: bash

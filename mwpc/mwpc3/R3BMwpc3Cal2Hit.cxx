@@ -14,14 +14,14 @@
 // ----------------------------------------------------------------------
 // -----                        R3BMwpc3Cal2Hit                     -----
 // -----             Created 14/10/19 by G. García Jiménez          -----
-// -----             by modifying J.L classes for MWPC0             -----
+// -----             by modifying J.L classes for MWPC3             -----
 // -----               s455 method 17/06/22 by Antia GG             -----
 // ----------------------------------------------------------------------
 
-#include "TClonesArray.h"
-#include "TF1.h"
-#include "TGraph.h"
-#include "TMath.h"
+#include <TClonesArray.h>
+#include <TF1.h>
+#include <TGraph.h>
+#include <TMath.h>
 
 // Fair headers
 #include "FairLogger.h"
@@ -65,12 +65,8 @@ R3BMwpc3Cal2Hit::R3BMwpc3Cal2Hit(const char* name, Int_t iVerbose)
 R3BMwpc3Cal2Hit::~R3BMwpc3Cal2Hit()
 {
     R3BLOG(debug1, "Destructor");
-    if (fMwpcCalDataCA)
-        delete fMwpcCalDataCA;
     if (fMwpcHitDataCA)
         delete fMwpcHitDataCA;
-    if (fTofWallHitDataCA)
-        delete fTofWallHitDataCA;
 }
 
 /* ---- Public method Init   ---- */
@@ -142,8 +138,9 @@ void R3BMwpc3Cal2Hit::S467()
     Reset();
 
     if (fTofWallMatching)
+    {
         ReconstructHitWithTofWallMatching();
-
+    }
     else
     {
         // Reading the Input -- Cal Data --
@@ -152,7 +149,6 @@ void R3BMwpc3Cal2Hit::S467()
             return;
 
         // Data from cal level
-        R3BMwpcCalData** calData = new R3BMwpcCalData*[nHits];
         Int_t planeId = 0;
         Int_t padId = 0;
         Int_t padmx = -1, padmy = -1;
@@ -173,10 +169,10 @@ void R3BMwpc3Cal2Hit::S467()
 
         for (Int_t i = 0; i < nHits; i++)
         {
-            calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
-            planeId = calData[i]->GetPlane();
-            padId = calData[i]->GetPad() - 1;
-            q = calData[i]->GetQ();
+            auto calData = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
+            planeId = calData->GetPlane();
+            padId = calData->GetPad() - 1;
+            q = calData->GetQ();
             if (planeId == 1)
             {
                 fx[padId] = q;
@@ -223,9 +219,6 @@ void R3BMwpc3Cal2Hit::S467()
 
             AddHitData(x, y);
         }
-
-        if (calData)
-            delete[] calData;
     }
     return;
 }
@@ -243,7 +236,6 @@ void R3BMwpc3Cal2Hit::S455()
     {
         // Reading the Input -- Cal Data --
         Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
-        R3BMwpcCalData** calData = new R3BMwpcCalData*[nHits];
 
         Int_t planeId = 0;
         Int_t padId = 0;
@@ -267,10 +259,10 @@ void R3BMwpc3Cal2Hit::S455()
             fy[i] = 0;
         for (Int_t i = 0; i < nHits; i++)
         {
-            calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
-            planeId = calData[i]->GetPlane();
-            padId = calData[i]->GetPad() - 1;
-            q = calData[i]->GetQ();
+            auto calData = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
+            planeId = calData->GetPlane();
+            padId = calData->GetPad() - 1;
+            q = calData->GetQ();
             // cout << "i = " << i << ", q = " << q << ", padId = " << padId << ", planeId = " << planeId << endl;
             pair<Double_t, Int_t> hit_pair = make_pair(q, padId);
             if (planeId == 1)
@@ -383,9 +375,6 @@ void R3BMwpc3Cal2Hit::S455()
             }
 
         } // Condition if (xexists == true && yexists == true)
-
-        if (calData)
-            delete[] calData;
     }
 
     return;
@@ -444,31 +433,27 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 {
     // Getting Position information from tof wall
     Int_t twHits = fTofWallHitDataCA->GetEntriesFast();
-    if (!twHits)
+    if (twHits == 0)
+    {
         return;
-    R3BSofTofWHitData** twHitData;
-    twHitData = new R3BSofTofWHitData*[twHits];
+    }
+
     vector<double> twX;
     vector<double> twY;
     twX.clear();
     twY.clear();
     for (Int_t i = 0; i < twHits; i++)
     {
-        twHitData[i] = (R3BSofTofWHitData*)(fTofWallHitDataCA->At(i));
-        twX.push_back(twHitData[i]->GetX());
-        twY.push_back(twHitData[i]->GetY());
+        auto twHitData = dynamic_cast<R3BSofTofWHitData*>(fTofWallHitDataCA->At(i));
+        twX.push_back(twHitData->GetX());
+        twY.push_back(twHitData->GetY());
     }
-
-    if (twHitData)
-        delete twHitData;
 
     // Getting Position information from mwpc3
     Int_t nHits = fMwpcCalDataCA->GetEntriesFast();
     if (nHits == 0)
         return;
     // Data from cal level
-    R3BMwpcCalData** calData;
-    calData = new R3BMwpcCalData*[nHits];
     Int_t planeId;
     Int_t padId;
     Int_t q;
@@ -485,10 +470,10 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 
     for (Int_t i = 0; i < nHits; i++)
     {
-        calData[i] = (R3BMwpcCalData*)(fMwpcCalDataCA->At(i));
-        planeId = calData[i]->GetPlane();
-        padId = calData[i]->GetPad() - 1;
-        q = calData[i]->GetQ();
+        auto calData = dynamic_cast<R3BMwpcCalData*>(fMwpcCalDataCA->At(i));
+        planeId = calData->GetPlane();
+        padId = calData->GetPad() - 1;
+        q = calData->GetQ();
         pair<Int_t, Int_t> hit_pair = make_pair(padId, q);
         if (planeId == 1)
         {
@@ -505,8 +490,6 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
     }
     if (fPairX.size() == 0 || fPairY.size() == 0)
     {
-        if (calData)
-            delete[] calData;
         return;
     }
 
@@ -528,8 +511,6 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 
     if (fClusterX.size() == 0 || fClusterY.size() == 0)
     {
-        if (calData)
-            delete[] calData;
         return;
     }
 
@@ -569,8 +550,6 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 
     if (Xpos.size() == 0 || Ypos.size() == 0)
     {
-        if (calData)
-            delete[] calData;
         return;
     }
 
@@ -578,8 +557,6 @@ void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
     {
         TofWallMatching(twX, twY, Xpos, Ypos);
     }
-    if (calData)
-        delete[] calData;
     return;
 }
 
@@ -700,4 +677,4 @@ R3BMwpcHitData* R3BMwpc3Cal2Hit::AddHitData(Double_t x, Double_t y)
     return new (clref[size]) R3BMwpcHitData(x, y);
 }
 
-ClassImp(R3BMwpc3Cal2Hit);
+ClassImp(R3BMwpc3Cal2Hit)

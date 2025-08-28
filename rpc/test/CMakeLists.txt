@@ -17,11 +17,11 @@ if(GTEST_FOUND)
         testRpcContainerPar.cxx)
     target_link_libraries(RpcUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BRpc)
-    gtest_discover_tests(RpcUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(RpcUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/rpc/test/testRpcSimulation.C)
 add_test(NAME RpcSimulation COMMAND ${R3BROOT_BINARY_DIR}/rpc/test/testRpcSimulation.sh)
-set_tests_properties(RpcSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(RpcSimulation PROPERTIES TIMEOUT "100")
 set_tests_properties(RpcSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

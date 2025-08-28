@@ -17,5 +17,5 @@ if(GTEST_FOUND)
         testTCalContainerPar.cxx)
     target_link_libraries(TCalUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BTCal)
-    gtest_discover_tests(TCalUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(TCalUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)

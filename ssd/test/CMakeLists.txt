@@ -17,11 +17,11 @@ if(GTEST_FOUND)
         testSsdContainerPar.cxx)
     target_link_libraries(SsdUnitTests PRIVATE GTest::gtest_main GTest::gmock_main
                                                    R3BSsd)
-    gtest_discover_tests(SsdUnitTests DISCOVERY_TIMEOUT 600)
+    gtest_discover_tests(SsdUnitTests DISCOVERY_TIMEOUT "50")
 endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/ssd/test/testAmsSimulation.C)
 add_test(NAME AmsSimulation COMMAND ${R3BROOT_BINARY_DIR}/ssd/test/testAmsSimulation.sh)
-set_tests_properties(AmsSimulation PROPERTIES TIMEOUT "2000")
+set_tests_properties(AmsSimulation PROPERTIES TIMEOUT "100")
 set_tests_properties(AmsSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

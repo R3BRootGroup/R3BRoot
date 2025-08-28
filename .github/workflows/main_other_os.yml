@@ -1,0 +1,173 @@
+# This is the main CI workflow for pull requests to the R3BRoot dev branch.
+
+# The workflow also submits the configure, build and test results to CDash
+# (cmake dashborad) with two different models: Experimental and Continuous for
+# the pull request and merge respectively. For the pull request (Experimental),
+# the project is built with the cache files from ccache while for the merge
+# (Continuous) it's built from scratch without using any cache files.
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+name: CI-CD-Other-OS
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow in case of a push or pull request events
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or
+# parallelly. As has been specified above, all the jobs below will be
+# triggered either by a pull request or a merge of a pull request.
+jobs:
+  # The job to clean the old caches before new caches are created when the PR is merged.
+  cache-cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+      - name: clean-cache
+        if: github.event_name == 'push'
+        uses: './.github/actions/cache-clean'
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # The job to run the main CI pipelines
+  build-test:
+    needs: cache-cleanup
+    runs-on: ubuntu-latest
+    # A strategy matrix gives different settings separately to different jobs
+    # which are run parallelly.
+    strategy:
+      # If fail-fast is true, all jobs running parallelly will be stopped if
+      # any of them fail. By setting it to false, all jobs will be run
+      # undisruptively.
+      fail-fast: false
+      # Definition of the strategy matrix. See
+      # https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/running-variations-of-jobs-in-a-workflow
+      matrix:
+        # Here are the groups of repositories that need to be downloaded inside
+        # r3broot. Each group is used by only one job.
+        repos: [ r3broot, glad-tpc, sofia-frs-asy ] # exclude r3broot-conan
+        os: [ ubuntu2404, ubuntu2504] # fedora42 is with C++23
+        cpp: [ 17 ]
+        fsv: [ jan24p5 ]
+        frv: [ v18.8.2 ]
+
+        # The list under "include" defines some properties for each group:
+        #
+        # repos: the name of the group. It must exist in matrix.repos as
+        # defined above.
+        #
+        # cache: the name of the cache file that will be created/used for the
+        # job. Each group can have their own cache file. But the total size of
+        # the cache files are limited to 10 GB per project. Therefore, the
+        # number of caches should be kept to a minimum. If there isn't too
+        # much difference between glad-tpc and the base r3broot, the cache file
+        # generated from r3broot build can be used.
+        #
+        # skip-save: whether to save the cache or not. Cache saving is disabled
+        # when true. This is neccessary when two parellel jobs share one cache
+        # name.
+        #
+        # url: the github repository urls that need to be downloaded during the
+        # run
+        include:
+          # The R3BFileSource repo is used for testing unpacking.
+          - url: https://github.com/R3BRootGroup/R3BFileSource.git
+          - cache: r3broot
+          # disable conan build by default
+          - preset: simple
+
+          # This job is only for testing R3BRoot without downloading any
+          # dependencies.
+          - repos: r3broot
+          # The job for testing with glad-tpc
+          - repos: glad-tpc
+            url: https://github.com/R3BRootGroup/glad-tpc.git
+            cache: glad-tpc
+            # skip-save: true
+          # The job for testing with sofia, frs and asyeos dependencies. All three
+          # repositories are downloaded and run together in the job.
+          - repos: sofia-frs-asy
+            # If more than one repos needs to be downloaded in a job. "url" needs
+            # to be a space separated list of urls using the operator ">-". Append
+            # more urls to this list if more repos need to be added.
+            # The R3BFileSource repo is used for testing unpacking.
+            url: >-
+              https://github.com/R3BRootGroup/sofia.git
+              https://github.com/R3BRootGroup/frs.git
+              https://github.com/R3BRootGroup/asyeos.git
+              https://github.com/R3BRootGroup/R3BFileSource.git
+            # Using own cache file
+            cache: other-repos
+
+          # build with conan package manager
+#          - repos: r3broot-conan
+#           preset: default
+
+    # Jobs are run inside a Docker container, which provides different compiled
+    # tool-kits for the building, such as clang-tidy. For more
+    # information, please visit the Docker repository at Dockerhub.
+    container: 
+      image: r3bdockers/${{ matrix.os }}_cpp${{ matrix.cpp }}_${{ matrix.fsv }}_${{ matrix.frv }}
+      env:
+        NUM_THREADS: 4
+
+    # Each job contains different steps that are executed sequentially. Each
+    # step could be multiple shell commands or a composite action either from
+    # another github repo or a self-defined one in .github/actions.
+    steps:
+      # Fetch updates from pull request branches using a public github action.
+      - uses: actions/checkout@v4
+        with:
+          # This allows all commits of all branches to be fetched.
+          fetch-depth: 0
+          
+      # Restore ccache
+      - name: Restore cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
+          restore-keys: |
+            ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}
+
+      # A self-defined composite action. It sets the required environment variables
+      # for FairSoft and FairRoot, and then compiles R3BRoot.
+      - name: configure-build
+        uses: './.github/actions/r3bbuild-steps-wfr'
+
+      # A self-defined composite action to perform the ctest and push the
+      # results to the cdash (cmake-dashborad). To fully show the errors and
+      # warnings during the configure and build processes, the two processes
+      # are rerun after 'make clean'.
+      - name: ctest-cdash
+        if: always()
+        uses: './.github/actions/ctest-cdash'
+        with:
+          repo: ${{ matrix.repos }}
+
+      # A composite action to save the ccaahe created from the merge events.
+      # Cache names (key) should be consistent with the names used in the
+      # cache restoring step.
+      - name: Save-cache
+        if: github.event_name == 'push' && matrix.skip-save != true
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
+
+      # Show the cache stats
+      - name: Show-ccache-stats
+        if: github.event_name == 'pull_request' && always()
+        run: ccache --show-stats

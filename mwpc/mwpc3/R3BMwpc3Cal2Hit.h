@@ -14,17 +14,16 @@
 //----------------------------------------------------------------------
 //-----                        R3BMwpc3Cal2Hit                     -----
 //-----             Created 14/10/19 by G. García Jiménez          -----
-//-----             by modifying J.L classes for MWPC0             -----
+//-----             by modifying J.L classes for MWPC3             -----
 //-----               s455 method 17/06/22 by Antia GG             -----
 //----------------------------------------------------------------------
 
-#ifndef R3BMWPC3CAL2HIT_H
-#define R3BMWPC3CAL2HIT_H 1
+#pragma once
 
 #include "FairTask.h"
 #include "R3BMwpcCalData.h"
 #include "R3BMwpcHitData.h"
-#include "R3BSofTofWHitData.h"
+#include "R3BSofTofWHitData.h" // NOLINT
 #include "TH1F.h"
 #include <TRandom.h>
 
@@ -121,7 +120,5 @@ class R3BMwpc3Cal2Hit : public FairTask
 
   public:
     // Class definition
-    ClassDef(R3BMwpc3Cal2Hit, 1)
+    ClassDef(R3BMwpc3Cal2Hit, 1); // NOLINT
 };
-
-#endif
