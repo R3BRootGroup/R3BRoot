@@ -1,46 +1,64 @@
-# $Id: g4config.in,v 1.4 2006/03/30 12:26:13 turany Exp $
+##############################################################################
+#   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2025 Members of R3B Collaboration                          #
+#                                                                            #
+#             This software is distributed under the terms of the            #
+#                 GNU General Public Licence (GPL) version 3,                #
+#                    copied verbatim in the file "LICENSE".                  #
+#                                                                            #
+# In applying this license GSI does not waive the privileges and immunities  #
+# granted to it by virtue of its status as an Intergovernmental Organization #
+# or submit itself to any jurisdiction.                                      #
+##############################################################################
 #
-# Geant4 configuration macro for Example02
-# (called from Root macro Config.C)
+#  Created by J.L. Rodriguez-Sanchez on 01/09/2025
+#  Geant4 configuration macro
+#  (called from Root macro R3BRoot/gconfig/g4Config.C)
 
-# specs
+# Exclude Geant4 event cout
+#/mcVerbose/eventAction 0
+
+# Exclude all the couts
+#/mcVerbose/all 0
+
+# More fine-grained mcVerbose control
+#/mcVerbose/runAction 0
+#/mcVerbose/trackingAction 0
+#/mcVerbose/trackManager 0
+#/mcVerbose/geometryManager 0
+#/mcVerbose/regionsManager 0
+#/mcVerbose/physicsList 0
+
+# Silence standard Geant4 verbose outputs
+#/event/verbose 0
+#/had/verbose 0
+#/em/verbose 0
+#/run/verbose 0
+/tracking/verbose 0
+#/stepping/verbose 0
+#/control/verbose 0
+
+# Store secondaries
+#/mcTracking/saveSecondaries DoNotSave
+#/mcTracking/saveSecondaries SaveInStep
+#/mcTracking/saveSecondariesInStep true
 
 #/process/eLoss/subsec  false
 #/process/eLoss/minsubsec 2 cm
-  
+#/process/had/verbose 0
+#/process/em/verbose 0
 
-# B field -> 0
-#/mcDet/fieldType None
-
-# don't store secondaries
-#/mcTracking/saveSecondaries true
-
-
+#/mcPhysics/g4ParticleHPVerbose 0
 #/mcPhysics/setSpecialCuts true
 #/mcPhysics/rangeCuts 0.1 mm
 #/mcPhysics/rangeCutForElectron 0.1 mm
 #/mcPhysics/printGeneralCuts true
-
+#/mcPhysics/rangeCutForGamma  1. mm
+#/mcPhysics/printGlobalCuts
 
 #/cuts/setLowEdge 100 eV
 #/cuts/setHighEdge 100 GeV
 
-
-#/mcPhysics/rangeCutForGamma  1. mm
-#/mcPhysics/printGlobalCuts
-
-
-#/mcVerbose/all 2
-#/mcVerbose/geometryManager 1
-#/mcVerbose/regionsManager 2
-#/mcVerbose/physicsList 2
-/tracking/verbose 0
-
 #/control/manual   
 #/control/createHTML  
 
-#/run/particle/dumpCutValues
-
-# Limit max number of Cerenkov photons per step
-# (Needed as Cerenkov process does not limit step itself)
-#
