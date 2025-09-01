@@ -29,17 +29,19 @@ constexpr int eChn = 16;
 constexpr int Bins = 2692;
 
 /**
- ** ext_h101_actaf.h was created by running
- ** $unpacker --ntuple=STRUCT_HH,RAW:ACTAF,id=h101_ACTAF,NOTRIGEVENTNO,ext_h101_actaf.h
+ ** ext_h101_actaf202X.h was created by running
+ ** $unpacker --ntuple=STRUCT_HH,RAW:ACTAF,id=h101_ACTAF202X,NOTRIGEVENTNO,ext_h101_actaf202X.h
  **/
 
 extern "C"
 {
 #include "ext_data_client.h"
-#include "ext_h101_actaf.h"
+#include "ext_h101_actaf2023.h"
+#include "ext_h101_actaf2025.h"
 }
 
-#define MAX_MODULES (sizeof data->ACTAF / sizeof data->ACTAF[0])
+#define MAX_MODULES2023 (sizeof data->ACTAF / sizeof data->ACTAF[0])
+#define MAX_MODULES2025 (sizeof data->ACTAF_ADC_MOD / sizeof data->ACTAF_ADC_MOD[0])
 
 int FindMaxPosition(const std::vector<UInt_t>& signal)
 {
@@ -112,11 +114,21 @@ int ComputeRiseTime(const std::vector<double>& signal, double maxValue)
     return t90 - t10; // Rise time in number of bins
 }
 
-R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF_onion* data, size_t offset)
+R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2023_onion* data, size_t offset)
     : R3BReader("R3BActafReader")
-    , fData(data)
+    , fData23(data)
     , fOffset(offset)
     , fArray(std::make_unique<TClonesArray>("R3BActafMappedData"))
+    , fVersion(UnpackerVersion::v2023)
+{
+}
+
+R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2025_onion* data, size_t offset)
+    : R3BReader("R3BActafReader")
+    , fData25(data)
+    , fOffset(offset)
+    , fArray(std::make_unique<TClonesArray>("R3BActafMappedData"))
+    , fVersion(UnpackerVersion::v2025)
 {
 }
 
@@ -125,7 +137,28 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
     R3BLOG(info, "");
     Int_t okey = 0;
     constexpr int esf = 1;
-    EXT_STR_h101_ACTAF_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_ACTAF, esf);
+
+    if (fVersion == UnpackerVersion::v2023)
+    {
+        EXT_STR_h101_ACTAF2023_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_ACTAF2023, esf);
+        memset(fData23, 0, sizeof *fData23);
+    }
+    else if (fVersion == UnpackerVersion::v2025)
+    {
+        EXT_STR_h101_ACTAF2025_ITEMS_INFO(okey, *a_struct_info, fOffset, EXT_STR_h101_ACTAF2025, esf);
+        memset(fData25, 0, sizeof *fData25);
+    }
+    else if (fVersion == UnpackerVersion::v2027)
+    {
+        R3BLOG(error, "UnpackerVersion 2027 not defined yet.");
+        return kFALSE;
+    }
+    else
+    {
+        R3BLOG(error, "UnpackerVersion not found.");
+        return kFALSE;
+    }
+
     if (!okey)
     {
         R3BLOG(error, "Failed to setup structure information");
@@ -135,7 +168,6 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
     // Register output array in tree
     FairRootManager::Instance()->Register("ActafMappedData", "Actaf mapped data", fArray.get(), !fOnline);
     Reset();
-    memset(fData, 0, sizeof *fData);
 
     return kTRUE;
 }
@@ -143,13 +175,27 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BActafReader::R3BRead()
 {
     R3BLOG(debug1, "Event data.");
+    fNEvent += 1;
+    if (fVersion == UnpackerVersion::v2023)
+    {
+        return R3BRead2023();
+    }
+    else if (fVersion == UnpackerVersion::v2025)
+    {
+        return R3BRead2025();
+    }
+    else
+    {
+        return kFALSE;
+    }
+}
 
-    auto* data = reinterpret_cast<EXT_STR_h101_ACTAF_onion*>(fData);
-
-    for (int mod = 0; mod < MAX_MODULES; ++mod)
+bool R3BActafReader::R3BRead2023()
+{
+    auto* data = reinterpret_cast<EXT_STR_h101_ACTAF2023_onion*>(fData23);
+    for (int mod = 0; mod < MAX_MODULES2023; ++mod)
     {
         std::vector<std::vector<UInt_t>> trace(eChn, std::vector<UInt_t>(Bins));
-
         for (int chn = 0; chn < data->ACTAF[mod].TRACERAW; ++chn)
         {
             int row = chn / Bins;
@@ -186,7 +232,60 @@ Bool_t R3BActafReader::R3BRead()
                                                                          maxAmplitude[chn] - baselineMean[chn]);
         }
     }
-    fNEvent += 1;
+    return kTRUE;
+}
+
+bool R3BActafReader::R3BRead2025()
+{
+    auto* data = reinterpret_cast<EXT_STR_h101_ACTAF2025_onion*>(fData25);
+    for (int mod = 0; mod < MAX_MODULES2025 - 1; ++mod)
+    {
+        std::vector<std::vector<UInt_t>> trace(eChn, std::vector<UInt_t>(Bins));
+        for (int chn = 0; chn < eChn; ++chn)
+        {
+            for (int size = 0; size < Bins; size++)
+            {
+                // std::cout<<data->ACTAF_ADC_MOD[mod].CH[chn].v[size]<<std::endl;
+                trace[chn][size] = data->ACTAF_ADC_MOD[mod].CH[chn].v[size];
+            }
+        }
+
+        std::vector<int> maxPos(eChn);
+        std::vector<double> baselineMean(eChn);
+        std::vector<double> integral(eChn);
+        std::vector<int> maxAmplitude(eChn);
+        std::vector<int> riseTime(eChn);
+
+        for (int chn = 0; chn < eChn; ++chn)
+        {
+            maxPos[chn] = FindMaxPosition(trace[chn]);
+            maxAmplitude[chn] = FindMaxAmplitude(trace[chn]);
+            baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
+            integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
+
+            // Subtract baseline from signal
+            std::vector<double> correctedtrace = SubtractBaseline(trace[chn], baselineMean[chn]);
+            riseTime[chn] = ComputeRiseTime(correctedtrace, maxAmplitude[chn] - baselineMean[chn]);
+        }
+
+        for (int chn = 0; chn < eChn; ++chn)
+        {
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mod * eChn + (chn + 1),
+                                                                         trace[chn],
+                                                                         integral[chn],
+                                                                         baselineMean[chn],
+                                                                         riseTime[chn],
+                                                                         maxPos[chn],
+                                                                         maxAmplitude[chn] - baselineMean[chn]);
+        }
+    }
+
+    if (data->AMBERTIMETAG > 0)
+    {
+        new ((*fArray)[fArray->GetEntriesFast()])
+            R3BActafMappedData((MAX_MODULES2025 - 1) * eChn + 1, std::vector<UInt_t>(), 0, 0, data->AMBERTIMETAG, 0, 0);
+    }
+
     return kTRUE;
 }
 

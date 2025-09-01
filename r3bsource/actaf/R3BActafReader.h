@@ -19,9 +19,14 @@
 
 class TClonesArray;
 
-struct EXT_STR_h101_ACTAF_t;
-typedef struct EXT_STR_h101_ACTAF_t EXT_STR_h101_ACTAF;
-typedef struct EXT_STR_h101_ACTAF_onion_t EXT_STR_h101_ACTAF_onion;
+struct EXT_STR_h101_ACTAF2023_t;
+typedef struct EXT_STR_h101_ACTAF2023_t EXT_STR_h101_ACTAF2023;
+typedef struct EXT_STR_h101_ACTAF2023_onion_t EXT_STR_h101_ACTAF2023_onion;
+
+struct EXT_STR_h101_ACTAF2025_t;
+typedef struct EXT_STR_h101_ACTAF2025_t EXT_STR_h101_ACTAF2025;
+typedef struct EXT_STR_h101_ACTAF2025_onion_t EXT_STR_h101_ACTAF2025_onion;
+
 class ext_data_struct_info;
 /**
  * A reader of ACTAF data with UCESB.
@@ -29,11 +34,13 @@ class ext_data_struct_info;
  * @author P. Rusell
  * @since Feb 17, 2025
  */
+
 class R3BActafReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BActafReader(EXT_STR_h101_ACTAF_onion*, size_t);
+    R3BActafReader(EXT_STR_h101_ACTAF2023_onion*, size_t);
+    R3BActafReader(EXT_STR_h101_ACTAF2025_onion*, size_t);
 
     // Destructor
     virtual ~R3BActafReader() = default;
@@ -48,19 +55,33 @@ class R3BActafReader : public R3BReader
     void Reset() override;
 
     // Accessor to select online mode
-    inline void SetOnline(Bool_t option) { fOnline = option; }
+    inline void SetOnline(bool option = true) { fOnline = option; }
 
   private:
+    enum class UnpackerVersion : int
+    {
+        v2023 = 2023,
+        v2025 = 2025,
+        v2027 = 2027
+    };
+    // Read data from AMBER-2023 setup
+    auto R3BRead2023() -> bool;
+    // Read data from AMBER-2025 setup
+    auto R3BRead2025() -> bool;
+
     // An event counter
     unsigned int fNEvent = 0;
     // Reader specific data structure from ucesb
-    EXT_STR_h101_ACTAF_onion* fData;
+    EXT_STR_h101_ACTAF2023_onion* fData23;
+    EXT_STR_h101_ACTAF2025_onion* fData25;
     // Data offset
     size_t fOffset;
     // Don't store data for online
-    Bool_t fOnline = kFALSE;
+    bool fOnline = false;
     // Output array
     std::unique_ptr<TClonesArray> fArray;
+    // Unpacker version
+    UnpackerVersion fVersion = UnpackerVersion::v2023;
 
   public:
     ClassDefOverride(R3BActafReader, 0);
