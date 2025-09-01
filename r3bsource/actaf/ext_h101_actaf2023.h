@@ -38,7 +38,7 @@ typedef int int32_t;
  * Plain structure (layout as ntuple/root file):
  */
 
-typedef struct EXT_STR_h101_ACTAF_t
+typedef struct EXT_STR_h101_ACTAF2023_t
 {
     /* RAW */
     uint32_t ACTAF1TSLO /* [0,20] */;
@@ -234,7 +234,7 @@ typedef struct EXT_STR_h101_ACTAF_t
     uint32_t ACTAF8TRACEMAW /* [0,20440] */;
     uint32_t ACTAF8TRACEMAWv[20440 EXT_STRUCT_CTRL(ACTAF8TRACEMAW)] /* [-1,-1] */;
 
-} EXT_STR_h101_ACTAF;
+} EXT_STR_h101_ACTAF2023;
 
 /********************************************************
  *
@@ -242,7 +242,7 @@ typedef struct EXT_STR_h101_ACTAF_t
  * recovered (recommended):
  */
 
-typedef struct EXT_STR_h101_ACTAF_onion_t
+typedef struct EXT_STR_h101_ACTAF2023_onion_t
 {
     /* RAW */
     struct
@@ -272,11 +272,11 @@ typedef struct EXT_STR_h101_ACTAF_onion_t
         uint32_t TRACEMAWv[20440 /* TRACEMAW */];
     } ACTAF[8];
 
-} EXT_STR_h101_ACTAF_onion;
+} EXT_STR_h101_ACTAF2023_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_ACTAF_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                              \
+#define EXT_STR_h101_ACTAF2023_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                          \
     do                                                                                                                 \
     {                                                                                                                  \
         ok = 1;                                                                                                        \

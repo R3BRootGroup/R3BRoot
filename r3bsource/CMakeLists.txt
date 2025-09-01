@@ -11,7 +11,7 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-# Create a library called "libR3Bsource" which includes the source files given
+# Create a library called "libR3BSource" which includes the source files given
 # in the array. The extension is already found. Any number of sources could be
 # listed here.
 
@@ -181,7 +181,9 @@ set(STRUCT_HEADERS
     pdc/ext_h101_pdc.h
     rpc/ext_h101_rpc.h
     sync_check/ext_h101_sync_check.h
-    actaf/ext_h101_actaf.h)
+    actaf/ext_h101_actaf2023.h
+    actaf/ext_h101_actaf2025.h
+    )
 
 set(HEADERS
     base/R3BUcesbSource.h
