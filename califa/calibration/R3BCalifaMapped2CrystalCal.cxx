@@ -100,13 +100,13 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     fCalTotParams = fTotCal_Par->GetCryCalParams(); // Array with the Tot Cal parameters
     assert(fCalTotParams->GetSize() >= fNumCrystals * fNumTotParams);
 
-    // handle old calibrations which mapped to barrel protons to crId+2432:
+    // handle old calibrations which mapped to barrel protons to crId+2544:
     // If you cal[id] is zero or nan (you wish),
-    // And cal[id+2432] is nonzero,
-    // Then make cal[id]=cal[id+2432] in case you are using the new unpacker
+    // And cal[id+2544] is nonzero,
+    // Then make cal[id]=cal[id+2544] in case you are using the new unpacker
     // (where barrel is always in [1, 1952]) with an old calibration
 
-    constexpr int offset = 2432;
+    constexpr int offset = 2544;
 
     auto& cal = *fCalParams;
     auto& tot = *fCalTotParams;
