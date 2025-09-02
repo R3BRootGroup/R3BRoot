@@ -167,7 +167,8 @@ set(STRUCT_HEADERS
     ams/ext_h101_ams.h
     foot/ext_h101_foot.h
     alpide/ext_h101_alpide.h
-    alpide/ext_h101_mosaic.h
+    alpide/ext_h101_mosaic202402.h
+    alpide/ext_h101_mosaic202506.h
     alpide/ext_h101_hmp.h
     music/ext_h101_music.h
     twim/ext_h101_twim.h

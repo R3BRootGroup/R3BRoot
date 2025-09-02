@@ -83,7 +83,6 @@
 #pragma link C++ class R3BMosaicReader+;
 #pragma link C++ class R3BActafReader+;
 
-
 #pragma link C++ class EXT_STR_h101_unpack_t;
 #pragma link C++ class EXT_STR_h101_whiterabbit_onion_t;
 #pragma link C++ class EXT_STR_h101_TPAT_t;
@@ -145,7 +144,8 @@
 #pragma link C++ class EXT_STR_h101_LOS_t;
 #pragma link C++ class EXT_STR_h101_RPC_t;
 #pragma link C++ class EXT_STR_h101_SYNC_CHECK_t;
-#pragma link C++ class EXT_STR_h101_MOSAIC_onion_t;
+#pragma link C++ class EXT_STR_h101_MOSAIC202402_onion_t;
+#pragma link C++ class EXT_STR_h101_MOSAIC202506_onion_t;
 #pragma link C++ class EXT_STR_h101_HMP_onion_t;
 #pragma link C++ class EXT_STR_h101_ACTAF2023_onion_t;
 #pragma link C++ class EXT_STR_h101_ACTAF2025_onion_t;

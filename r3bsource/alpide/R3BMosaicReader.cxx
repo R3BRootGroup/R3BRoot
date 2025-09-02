@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2024-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -29,15 +29,25 @@
 extern "C"
 {
 #include "ext_data_client.h"
-#include "ext_h101_mosaic.h"
+#include "ext_h101_mosaic202402.h"
+#include "ext_h101_mosaic202506.h"
 }
 
-R3BMosaicReader::R3BMosaicReader(EXT_STR_h101_MOSAIC_onion* data, size_t offset)
+R3BMosaicReader::R3BMosaicReader(EXT_STR_h101_MOSAIC202402_onion* data, size_t offset)
     : R3BReader("R3BMosaicReader")
-    , fData(data)
-    , fNbMosaic(sizeof(fData->MOSAIC) / sizeof(fData->MOSAIC[0]))
+    , fData2402(data)
+    , fNbMosaic(sizeof(fData2402->MOSAIC) / sizeof(fData2402->MOSAIC[0]))
     , fOffset(offset)
     , fArray(new TClonesArray("R3BAlpideMappedData"))
+{
+}
+
+R3BMosaicReader::R3BMosaicReader(EXT_STR_h101_MOSAIC202506_onion* data, size_t offset)
+    : R3BReader("R3BMosaicReader")
+    , fData2506(data)
+    , fOffset(offset)
+    , fArray(new TClonesArray("R3BAlpideMappedData"))
+    , fVersion(UnpackerMosaicVersion::v202506)
 {
 }
 
@@ -53,14 +63,23 @@ Bool_t R3BMosaicReader::Init(ext_data_struct_info* a_struct_info)
 {
     int okay = 0;
     R3BLOG(info, "");
-    EXT_STR_h101_MOSAIC_ITEMS_INFO(okay, *a_struct_info, fOffset, EXT_STR_h101_MOSAIC, 0);
+
+    if (fVersion == UnpackerMosaicVersion::v202402)
+    {
+        EXT_STR_h101_MOSAIC202402_ITEMS_INFO(okay, *a_struct_info, fOffset, EXT_STR_h101_MOSAIC202402, 0);
+        memset(fData2402, 0, sizeof(*fData2402));
+    }
+    else if (fVersion == UnpackerMosaicVersion::v202506)
+    {
+        EXT_STR_h101_MOSAIC202506_ITEMS_INFO(okay, *a_struct_info, fOffset, EXT_STR_h101_MOSAIC202506, 0);
+        memset(fData2506, 0, sizeof(*fData2506));
+    }
 
     R3BLOG_IF(fatal, !okay, "Failed to setup structure information.");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("AlpideMappedData", "ALPIDE_Map", fArray, !fOnline);
     Reset();
-    memset(fData, 0, sizeof(*fData));
 
     return kTRUE;
 }
@@ -69,22 +88,70 @@ Bool_t R3BMosaicReader::R3BRead()
 {
     R3BLOG(debug1, "Event data: " << fNEvent);
     fNEvent++;
+    if (fVersion == UnpackerMosaicVersion::v202402)
+    {
+        return R3BRead202402();
+    }
+    else if (fVersion == UnpackerMosaicVersion::v202506)
+    {
+        return R3BRead202506();
+    }
+    else
+    {
+        return kFALSE;
+    }
+}
 
+bool R3BMosaicReader::R3BRead202402()
+{
     for (int mosid = 0; mosid < fNbMosaic; mosid++)
     {
-        for (int hits = 0; hits < fData->MOSAIC[mosid].CHIP; hits++)
+        for (int hits = 0; hits < fData2402->MOSAIC[mosid].CHIP; hits++)
         {
-            int fChipId = fData->MOSAIC[mosid].CHIPv[hits];
+            int fChipId = fData2402->MOSAIC[mosid].CHIPv[hits];
 
             int fAlpideId = map_mosaics[mosid] * fNb_sensors_flex + fChipId + 1; // 1-base
             R3BLOG_IF(error, fAlpideId < 1, "Wrong fAlpideId: " << fAlpideId);
 
             fAlpideId = map_sensors[fAlpideId - 1]; // 1-base
 
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(
-                fAlpideId, 0, mosid + 1, fChipId, fData->MOSAIC[mosid].ROWv[hits], fData->MOSAIC[mosid].COLv[hits]);
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BAlpideMappedData(fAlpideId,
+                                                                          0,
+                                                                          mosid + 1,
+                                                                          fChipId,
+                                                                          fData2402->MOSAIC[mosid].ROWv[hits],
+                                                                          fData2402->MOSAIC[mosid].COLv[hits]);
         }
     }
+    return kTRUE;
+}
+
+bool R3BMosaicReader::R3BRead202506()
+{
+    // MOSAIC-3 corresponds to the second flex
+    for (int hits = 0; hits < fData2506->MOSAIC3CHIP; hits++)
+    {
+        int fChipId = fData2506->MOSAIC3CHIPv[hits];
+
+        int fAlpideId = fNb_sensors_flex + (fChipId + 1); // 1-base
+        R3BLOG_IF(error, fAlpideId < 1, "Wrong fAlpideId: " << fAlpideId);
+
+        new ((*fArray)[fArray->GetEntriesFast()])
+            R3BAlpideMappedData(fAlpideId, 0, 2, fChipId, fData2506->MOSAIC3ROWv[hits], fData2506->MOSAIC3COLv[hits]);
+    }
+
+    // MOSAIC-4 corresponds to the first flex
+    for (int hits = 0; hits < fData2506->MOSAIC4CHIP; hits++)
+    {
+        int fChipId = fData2506->MOSAIC4CHIPv[hits];
+
+        int fAlpideId = fChipId + 1; // 1-base
+        R3BLOG_IF(error, fAlpideId < 1, "Wrong fAlpideId: " << fAlpideId);
+
+        new ((*fArray)[fArray->GetEntriesFast()])
+            R3BAlpideMappedData(fAlpideId, 0, 1, fChipId, fData2506->MOSAIC4ROWv[hits], fData2506->MOSAIC4COLv[hits]);
+    }
+
     return kTRUE;
 }
 
