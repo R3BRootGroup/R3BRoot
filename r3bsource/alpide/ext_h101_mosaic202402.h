@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2024 Members of R3B Collaboration                          *
+ *   Copyright (C) 2023 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2023-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -38,7 +38,7 @@ typedef int int32_t;
  * Plain structure (layout as ntuple/root file):
  */
 
-typedef struct EXT_STR_h101_MOSAIC_t
+typedef struct EXT_STR_h101_MOSAIC202402_t
 {
     /* RAW */
     uint32_t MOSAIC1T_HI /* [-1,-1] */;
@@ -123,7 +123,7 @@ typedef struct EXT_STR_h101_MOSAIC_t
     uint32_t MOSAIC9COL /* [0,2000] */;
     uint32_t MOSAIC9COLv[2000 EXT_STRUCT_CTRL(MOSAIC9COL)] /* [0,65535] */;
 
-} EXT_STR_h101_MOSAIC;
+} EXT_STR_h101_MOSAIC202402;
 
 /********************************************************
  *
@@ -131,7 +131,7 @@ typedef struct EXT_STR_h101_MOSAIC_t
  * recovered (recommended):
  */
 
-typedef struct EXT_STR_h101_MOSAIC_onion_t
+typedef struct EXT_STR_h101_MOSAIC202402_onion_t
 {
     /* RAW */
     struct
@@ -147,11 +147,11 @@ typedef struct EXT_STR_h101_MOSAIC_onion_t
         uint32_t COLv[2000 /* COL */];
     } MOSAIC[9];
 
-} EXT_STR_h101_MOSAIC_onion;
+} EXT_STR_h101_MOSAIC202402_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_MOSAIC_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                         \
+#define EXT_STR_h101_MOSAIC202402_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                   \
     do                                                                                                             \
     {                                                                                                              \
         ok = 1;                                                                                                    \
@@ -302,5 +302,3 @@ typedef struct EXT_STR_h101_MOSAIC_onion_t
             ok, si, offset, struct_t, printerr, MOSAIC9COLv, UINT32, "MOSAIC9COLv", "MOSAIC9COL", 0 /*flags*/);    \
                                                                                                                    \
     } while (0);
-
-/*******************************************************/
