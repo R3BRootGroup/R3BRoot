@@ -138,7 +138,7 @@ void R3BCalifaMapped2CrystalCal::SetParameter()
     {
         auto a = cal.GetAt(2 * (id - 1) + 0);
         auto b = cal.GetAt(2 * (id - 1) + 1);
-        return (std::isnan(a) || a == 0.0) && (std::isnan(a) || a == 0.0);
+        return (std::isnan(a) || a == 0.0) && (std::isnan(b) || b == 0.0);
     };
 
     int replaced{};
