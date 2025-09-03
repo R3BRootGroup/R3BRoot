@@ -92,8 +92,8 @@ class R3BIncomingIDPar : public FairParGenericSet
     Float_t fx0_Aq, fy0_Aq, fang_Aq;
     Float_t fBeta_max, fBeta_min;
 
-    R3BTcutPar* fTcutparS2;
-    R3BTcutPar* fTcutparCave;
+    R3BTcutPar* fTcutparS2 = nullptr;
+    R3BTcutPar* fTcutparCave = nullptr;
 
     const R3BIncomingIDPar& operator=(const R3BIncomingIDPar&);
     R3BIncomingIDPar(const R3BIncomingIDPar&);
