@@ -26,9 +26,12 @@
 #include <exception>
 #include <ext_data_client.h>
 #include <fairlogger/Logger.h>
-#include <fmt/chrono.h> // NOLINT
 #include <fmt/core.h>
 #include <fmt/format.h>
+// NOLINTBEGIN
+#include <fmt/chrono.h> //IWYU pragma: keep
+#include <fmt/ranges.h> //IWYU pragma: keep
+// NOLINTEND
 #include <memory>
 #include <mutex>
 #include <string_view>

@@ -192,7 +192,6 @@ set(HEADERS
     base/R3BUnpackReader.h
     base/utils/R3BUcesbDecl.h
     base/utils/R3BUcesbMappingFlag.h
-    base/utils/R3BUcesbLauncher.h
     base/utils/R3BUcesbStructInfo.h
     wr/R3BWhiterabbitMasterReader.h
     califa/R3BWhiterabbitCalifaReader.h
