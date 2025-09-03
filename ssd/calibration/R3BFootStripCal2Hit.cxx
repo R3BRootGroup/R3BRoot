@@ -453,7 +453,7 @@ TVector3 R3BFootStripCal2Hit::ComputeHitPosition(int i, double pos)
 
     master.Transform(det2lab);
 
-    master += TVector3(fOffsetX[i], fOffsetY[i], fDistTarget[i]);
+    master += TVector3(fOffsetX[i], fOffsetY[i], fDistTarget[i] * 10);
 
     return master;
 }
@@ -482,7 +482,7 @@ void R3BFootStripCal2Hit::Exec(Option_t* /*option*/)
     {
         for (int j = 0; j < ClusterMult[i]; j++)
         {
-            double pos = 100. * ClusterPos[i][j] / fNumStrips - fMiddle;
+            double pos = fFootSize * ClusterPos[i][j] / fNumStrips - fMiddle;
             TVector3 master = ComputeHitPosition(i, pos);
 
             if (ClusterESum[i][j] > fThSum && ClusterMult[i] < fMaxNumClusters && ClusterNStrip[i][j] < fMaxNumStrips)

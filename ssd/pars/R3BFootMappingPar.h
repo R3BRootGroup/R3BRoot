@@ -77,12 +77,12 @@ class R3BFootMappingPar : public FairParGenericSet
   private:
     Int_t fGeo;                // Geometry of the foot detectors
     Int_t fNumDet;             // Number of foot detectors (from 1 to 10 for 2021 experiments)
-    TArrayF* fDistance2target; // Distance to target
+    TArrayF* fDistance2target; // Distance to target in cm
     TArrayF* fAngleTheta;      // Rotation angle around the Y direction (from Z to X in lab frame)
     TArrayF* fAnglePhi;        // Rotation angle around the Z direction (from X to Y in lab frame)
     TArrayF* fAnglePsi;        // Rotation angle around the X direction (from Y to Z in lab frame)
-    TArrayF* fOffsetX;         // Offset for x
-    TArrayF* fOffsetY;         // Offset for y
+    TArrayF* fOffsetX;         // Offset for x in mm
+    TArrayF* fOffsetY;         // Offset for y in mm
     Int_t fPolPar;             // Number of parameters for polynomial for Energy Vs Position Correction
     TArrayF* fEnevsPosCorr;    // Polynomial parameters for Energy Vs Position Correction
 
