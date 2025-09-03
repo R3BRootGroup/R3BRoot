@@ -80,7 +80,8 @@ class R3BFootStripCal2Hit : public FairTask
     void EtaCorrectionAndChargeCal();
     TVector3 ComputeHitPosition(int detId, double pos);
 
-    static constexpr double fMiddle = 50.;
+    static constexpr double fFootSize = 96.;
+    static constexpr double fMiddle = fFootSize / 2.;
     static constexpr int fNumAsic = 10;
     static constexpr int fNumStrips = 640;
     static constexpr double fEtaCenter = 0.5;
