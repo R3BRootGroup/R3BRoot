@@ -17,10 +17,12 @@
 #include "FairLogger.h"
 #include "FairParamList.h"
 
-#include "TArrayF.h"
-#include "TMath.h"
-#include "TString.h"
+#include <TArrayF.h>
+#include <TMath.h>
+#include <TString.h>
 
+#include <fmt/core.h>
+#include <iomanip>
 #include <iostream>
 
 // ---- Standard Constructor ---------------------------------------------------
@@ -197,18 +199,36 @@ void R3BIncomingIDPar::print() { printParams(); }
 void R3BIncomingIDPar::printParams()
 {
     R3BLOG(info, "Incoming ID parameters");
+    LOG(info) << fmt::format("{:<15} {:<15}", "Brho", "DispersionS2toCC");
+    LOG(info) << fmt::format("{:<15.4f} {:<15.4f}", fBrho0_S2toCC->GetAt(0), fDispersionS2->GetAt(0));
 
-    LOG(info) << "Brho: " << fBrho0_S2toCC->GetAt(0) << ", DispersionS2toCC: " << fDispersionS2->GetAt(0);
+    LOG(info) << fmt::format("{:<5} {:>12} {:>12} {:>12} {:>10} {:>10} {:>12} {:>12}",
+                             "Sci",
+                             "TofOffset",
+                             "PosS2Left",
+                             "PosS2Right",
+                             "Beta_min",
+                             "Beta_max",
+                             "Tof2InvV_p0",
+                             "Tof2InvV_p1");
 
-    for (size_t d = 0; d < fNumDet; d++)
+    for (size_t d = 0; d < fNumDet; ++d)
     {
-        LOG(info) << "Sci: " << d + 1 << ", TofOffset: " << fToFoffset->GetAt(d)
-                  << "\nPosS2Left: " << fPosS2Left->GetAt(d) << ", PosS2Right: " << fPosS2Right->GetAt(d)
-                  << "\nBeta range: " << fBeta_min << ", " << fBeta_max;
+        LOG(info) << fmt::format("{:<5} {:>12.4f} {:>12.4f} {:>12.4f} {:>10.4f} {:>10.4f} {:>12.4f} {:>12.4f}",
+                                 d + 1,
+                                 fToFoffset->GetAt(d),
+                                 fPosS2Left->GetAt(d),
+                                 fPosS2Right->GetAt(d),
+                                 fBeta_min,
+                                 fBeta_max,
+                                 fTof2InvV_p0->GetAt(d),
+                                 fTof2InvV_p1->GetAt(d));
     }
 
-    fTcutparS2->print();
-    fTcutparCave->print();
+    if (fTcutparS2 != nullptr)
+        fTcutparS2->print();
+    if (fTcutparCave != nullptr)
+        fTcutparCave->print();
 }
 
 ClassImp(R3BIncomingIDPar)
