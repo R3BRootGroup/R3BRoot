@@ -23,8 +23,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           sudo apt-get update
-          sudo apt-get install clang-format-15
-          ./util/clang-format-check.sh clang-format-15
+          sudo apt-get install clang-format-16
+          ./util/clang-format-check.sh clang-format-16
         shell: bash
         
   clang-tidy:
