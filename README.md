@@ -86,7 +86,7 @@ Please ask your questions, request features, and report issues by [creating a gi
 
 ## Code Formatting
 
-The R3BRoot project uses clang-format-15 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
+The R3BRoot project uses clang-format-16 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
 ~~~bash
 source util/clang-format-all.sh
 ~~~

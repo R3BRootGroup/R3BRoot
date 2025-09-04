@@ -85,10 +85,7 @@
         return kTRUE;                                                                                               \
     }                                                                                                               \
                                                                                                                     \
-    void R3B##ClassName##Reader::Reset()                                                                            \
-    {                                                                                                               \
-        fNEvent = 0;                                                                                                \
-    }                                                                                                               \
+    void R3B##ClassName##Reader::Reset() { fNEvent = 0; }                                                           \
                                                                                                                     \
     ClassImp(R3B##ClassName##Reader)
 
