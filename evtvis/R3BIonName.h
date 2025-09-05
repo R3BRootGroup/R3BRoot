@@ -27,7 +27,7 @@ class R3BIonName : public TNamed
     R3BIonName();
 
     /** Destructor **/
-    virtual ~R3BIonName();
+    virtual ~R3BIonName() = default;
 
     /** Accessors **/
     /**
@@ -35,8 +35,6 @@ class R3BIonName : public TNamed
      */
     Bool_t GetIonName(Int_t element, Char_t* name);
 
-  private:
-    /** Data members **/
-
+  public:
     ClassDef(R3BIonName, 1);
 };
