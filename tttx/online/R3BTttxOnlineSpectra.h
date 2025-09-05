@@ -35,7 +35,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads TTT10 data and plots online histograms
+ * This tasks reads TTT10 data and plots online histograms
  */
 class R3BTttxOnlineSpectra : public FairTask
 {
@@ -109,7 +109,7 @@ class R3BTttxOnlineSpectra : public FairTask
     TClonesArray* fCalItemsTttx;    /**< Array with cal items. */
     TClonesArray* fHitItemsTttx;    /**< Array with hit items. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
     Int_t fExpId;

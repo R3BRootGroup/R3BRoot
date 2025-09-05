@@ -64,7 +64,7 @@ void R3BTttxContFact::setAllContainers()
 FairParSet* R3BTttxContFact::createContainer(FairContainer* c)
 {
     // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
+    // of this container, the name is concatenated with the context.
 
     const std::string name(c->GetName());
     LOG(info) << "R3BTttxContFact: Create container name: " << name.c_str();
