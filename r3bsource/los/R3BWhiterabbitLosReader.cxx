@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum fur Schwerionenforschung GmbH    *
  *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -16,7 +16,7 @@
 #include "FairRootManager.h"
 #include "R3BEventHeader.h"
 #include "R3BWRData.h"
-#include "TClonesArray.h"
+#include <TClonesArray.h>
 
 extern "C"
 {

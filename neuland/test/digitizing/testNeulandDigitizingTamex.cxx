@@ -116,7 +116,7 @@ namespace
         ASSERT_EQ(GetSignals().size(), 2) << "should not be overlapped!";
     }
 
-    // TODO: this test is highly depenedent on how signals are piled up. Therefore, it's better to have different tests
+    // TODO: this test is highly dependent on how signals are piled up. Therefore, it's better to have different tests
     // for different pileup strategy.
     TEST_F(testNeulandTamexChannel, signal_multiPileup_check) // NOLINT
     {

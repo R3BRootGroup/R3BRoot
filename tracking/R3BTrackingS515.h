@@ -94,7 +94,7 @@ class R3BTrackingS515 : public FairTask
 
     void SetTofOffset(double offset) { tof_offset = offset; } // ns
 
-    // Transofrming input detector hit (point) into laboratory system
+    // Transforming input detector hit (point) into laboratory system
     void TransformPoint(TVector3& point, TVector3 rotation, TVector3 translation);
 
     // Setup incoming cuts on FRS data and Music data
@@ -207,13 +207,13 @@ class R3BTrackingS515 : public FairTask
     Bool_t DoAlignment;
     Double_t tof_offset; // ns
 
-    // frs eliptic cuts:
+    // frs elliptic cuts:
     Double_t FrsCutMeanZ;
     Double_t FrsCutMeanAoZ;
     Double_t FrsCutRadiusZ;
     Double_t FrsCutRadiusAoZ;
 
-    // frs eliptic cuts:
+    // frs elliptic cuts:
     Double_t FrsBrhoMin;
     Double_t FrsBrhoMax;
 

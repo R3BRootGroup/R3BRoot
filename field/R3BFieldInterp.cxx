@@ -221,7 +221,7 @@ double R3BFieldInterp::interp3(int ic[3], double dc[3] /*,int &outside*/)
     // Make field interpolation that also takes neighbouring cells into
     // account, for a smoother field map.  Within each cell, use a
     // weighted average of the linear inter(extra)polations of the
-    // points in this and neighbouring cells.  The weigths are
+    // points in this and neighbouring cells.  The weights are
     // quadratic, being at the boundary half, and going to zero at the
     // other boundary.  One-dimensionally:
     //

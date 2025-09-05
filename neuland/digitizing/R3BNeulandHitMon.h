@@ -20,7 +20,7 @@
  *
  *  Input:  Digis. Should work both on Digis from Monte Carlo simulations
  *          as well as experimental data on digi level.
- *  Output: Vairous diagrams, 3D scatterplot for each event if option 3DTRACK is given.
+ *  Output: Various diagrams, 3D scatterplot for each event if option 3DTRACK is given.
  */
 
 #include "FairTask.h"

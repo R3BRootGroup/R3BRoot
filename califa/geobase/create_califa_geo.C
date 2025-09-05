@@ -159,10 +159,26 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
     // General CALIFA alignment for both halves depending on the experiment
     std::vector<TVector3> DisplCalifa(2); // 0: Mes, 1: Wix
 
-    if (expId.compare(0, 4, "g249") == 0 || expId.compare(0, 4, "s494") == 0 || expId.compare(0, 4, "s444") == 0 ||
-        expId.compare(0, 4, "s467") == 0)
+    // A general new displacement introduced in the carbon fiber and crystals to account
+    // for the 4mm aluminum end plates of each half -> 4mm each half along X
+    DisplCalifa[0].SetX(0.4); // 0: Mes, 1: Wix
+    DisplCalifa[1].SetX(-0.4);
+    if (expId.compare(0, 4, "s494") == 0 || expId.compare(0, 4, "s444") == 0 || expId.compare(0, 4, "s467") == 0)
     {
         std::cout << "\033[31m No alignment data for this experiment yet \033[0m " << std::endl << std::endl;
+    }
+    else if (expId.compare(0, 4, "g249") == 0)
+    {
+        alignWixRotX->RotateX(0);
+        alignWixRotationX->RotateX(0);
+        alignWixRotY->RotateY(0);
+        alignWixRotationY->RotateY(0);
+        alignWixRotZ->RotateZ(-0.02 * 180 / TMath::Pi());
+        alignWixRotationZ->RotateZ(-0.02);
+        DisplCalifa[0].SetX(1.0); // 0: Mes, 1: Wix
+        DisplCalifa[0].SetZ(-2.7);
+        DisplCalifa[1].SetX(-1.0);
+        DisplCalifa[1].SetZ(-2.7);
     }
     else if (expId.compare(0, 4, "s522") == 0 || expId.compare(0, 4, "s509") == 0)
     {
@@ -172,19 +188,19 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
         alignWixRotationY->RotateY(0);
         alignWixRotZ->RotateZ(-0.003 * 180 / TMath::Pi());
         alignWixRotationZ->RotateZ(-0.003);
-        DisplCalifa[0].SetX(0.5);
+        DisplCalifa[0].SetX(0.9); // 0: Mes, 1: Wix
         DisplCalifa[0].SetZ(-2.7);
-        DisplCalifa[1].SetX(-0.5);
+        DisplCalifa[1].SetX(-0.9);
         DisplCalifa[1].SetZ(-1.7);
     }
     else if (expId.compare(0, 4, "s455") == 0 || expId.compare(0, 4, "s515") == 0)
     {
-        DisplCalifa[0].SetX(1.25);
-        DisplCalifa[1].SetX(-1.25);
+        DisplCalifa[0].SetX(1.65); // 0: Mes, 1: Wix
+        DisplCalifa[1].SetX(-1.65);
     }
     else if (expId.compare(0, 4, "s091") == 0 || expId.compare(0, 4, "s118") == 0)
     {
-        DisplCalifa[0].SetY(0.54);
+        DisplCalifa[0].SetY(0.54); // 0: Mes, 1: Wix
         DisplCalifa[0].SetZ(-3.14);
         DisplCalifa[1].SetY(0.54);
         DisplCalifa[1].SetZ(-2.23);
@@ -809,14 +825,14 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
         for (size_t j = 0; j < 32; j++)
         { // rotation around Z
             // ALIGNMENT DISPLACEMENT
-            auto disp_halfBarrel = (j < 16) ? DisplCalifa[0] : DisplCalifa[1];
+            auto disp_halfBarrel = (j < 16) ? DisplCalifa[0] : DisplCalifa[1]; // 0: Mes, 1: Wix
 
             if (i > 18 && j > 7)
                 continue;
 
             if (i > 18)
             {
-                disp_halfBarrel = (j < 4) ? DisplCalifa[0] : DisplCalifa[1];
+                disp_halfBarrel = (j < 4) ? DisplCalifa[0] : DisplCalifa[1]; // 0: Mes, 1: Wix
 
                 if (j < 4)
                 {
@@ -1481,11 +1497,22 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
 
             for (size_t j = 0; j < 8; j++)
             { // rotation around Z
-                auto disp_halfCEPA = (j < 4) ? DisplCalifa[0] : DisplCalifa[1];
-
-                rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation((rotOnZ_CEPA[j]) * (*rotAlv_CEPA[i]));
-                alv_cm_rot_CEPA[i] = (rotationOnZ_CEPA[j]) * alv_cm_CEPA[i];
-
+                // ALIGNMENT DISPLACEMENT
+                auto disp_halfCEPA = (j < 4) ? DisplCalifa[0] : DisplCalifa[1]; // 0: Mes, 1: Wix
+                if (j < 4)
+                {
+                    rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation((*alignMesRotX) * (*alignMesRotY) * (*alignMesRotZ) *
+                                                                   rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
+                    alv_cm_rot_CEPA[i] = (*alignMesRotationX) * (*alignMesRotationY) * (*alignMesRotationZ) *
+                                         rotationOnZ_CEPA[j] * alv_cm_CEPA[i];
+                }
+                else
+                {
+                    rotAlvFinal_CEPA[i * 8 + j] = new TGeoRotation((*alignWixRotX) * (*alignWixRotY) * (*alignWixRotZ) *
+                                                                   rotOnZ_CEPA[j] * (*rotAlv_CEPA[i]));
+                    alv_cm_rot_CEPA[i] = (*alignWixRotationX) * (*alignWixRotationY) * (*alignWixRotationZ) *
+                                         rotationOnZ_CEPA[j] * alv_cm_CEPA[i];
+                }
                 if (isCrystalInstalled(i + 24, j, installedCrystals.data())) // alveoli number stars in 24 for CEPA
                 {
                     pWorld->AddNode(Alv_vol_CEPA[i],
@@ -1591,13 +1618,15 @@ void CreateHoldingStructure(TGeoVolume* world,
         return new TGeoCombiTrans(trans); // still needs to be a pointer for ROOT
     };
 
-    const double offsetX = 0.5; // 0.5 cm
+    // 0.4 cm -> now all carbon fiber elements are separated 8 mm!
+    //+0.1 cm to account for the expected ideal separation
+    const double offsetX = 0.5;
     auto rot1 = new TGeoRotation();
     auto rot2 = new TGeoRotation();
     rot2->RotateZ(180);
 
-    auto trans1 = make_trans(0.05, 0.0, 0.0, rot1, disCalMes);
-    auto trans2 = make_trans(-0.05, 0.0, 0.0, rot2, disCalWix);
+    auto trans1 = make_trans(0.1, 0.0, 0.0, rot1, disCalMes);
+    auto trans2 = make_trans(-0.1, 0.0, 0.0, rot2, disCalWix);
 
     world->AddNode(CarbonFiberBack, 1, trans1);
     world->AddNode(CarbonFiberBack, 2, trans2);

@@ -46,7 +46,7 @@ void R3BNeulandParFact::setAllContainers()
     /** Creates the Container objects with all accepted contexts and adds them to
      *  the list of containers.*/
 
-    FairContainer* p1 = new FairContainer("NeulandHitPar", "NeuLAND Modul Parameters", "TestDefaultContext");
+    FairContainer* p1 = new FairContainer("NeulandHitPar", "NeuLAND Module Parameters", "TestDefaultContext");
     p1->addContext("TestNonDefaultContext");
     containers->Add(p1);
     FairContainer* p2 = new FairContainer("NeulandQCalPar", "NeuLAND Pedestal Parameters", "TestDefaultContext");
@@ -61,7 +61,7 @@ FairParSet* R3BNeulandParFact::createContainer(FairContainer* c)
 {
     /** Calls the constructor of the corresponding parameter container.
      * For an actual context, which is not an empty string and not the default context
-     * of this container, the name is concatinated with the context. */
+     * of this container, the name is concatenated with the context. */
 
     const char* name = c->GetName();
     LOG(info) << "R3BNeulandParFact::createContainer : " << name;

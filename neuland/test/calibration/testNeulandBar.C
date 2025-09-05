@@ -19,7 +19,7 @@ namespace Neuland
     constexpr auto CLight = 29.9792458;     // Speed of light [cm/ns]
     constexpr auto InvCLight = 1. / CLight; // Speed of light [cm/ns]>
 
-    // Electronics Constans
+    // Electronics Constants
 
     constexpr auto MaxCalTime = 5. * 2048;
 

@@ -66,7 +66,7 @@ R3BGladFieldMap::R3BGladFieldMap(const TString& mapName, const TString& fileType
     fPosY = 1.75;
     fPosZ = 163.4;
 
-    // Default translation vector of the local filed coordiantes
+    // Default translation vector of the local filed coordinates
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
 
     // Default Euler rotations of the local field (in degrees)
@@ -173,7 +173,7 @@ R3BGladFieldMap::~R3BGladFieldMap()
         delete fBz;
 }
 
-// -----------   Intialisation   ------------------------------------------
+// -----------   Initialisation   ------------------------------------------
 //
 void R3BGladFieldMap::Init()
 {
@@ -381,7 +381,7 @@ void R3BGladFieldMap::WriteAsciiFile(const TString& fileName)
     Int_t nTot = fNx * fNy * fNz;
     R3BLOG(info, fNx * fNy * fNz << " entries to write... " << setw(3) << 0 << " % ");
     Int_t index = 0;
-    div_t modul;
+    div_t module;
     Int_t iDiv = TMath::Nint(nTot / 100.);
     for (Int_t ix = 0; ix < fNx; ix++)
     {
@@ -390,8 +390,8 @@ void R3BGladFieldMap::WriteAsciiFile(const TString& fileName)
             for (Int_t iz = 0; iz < fNz; iz++)
             {
                 index = ix * fNy * fNz + iy * fNz + iz;
-                modul = div(index, iDiv);
-                if (modul.rem == 0)
+                module = div(index, iDiv);
+                if (module.rem == 0)
                 {
                     Double_t perc = TMath::Nint(100. * index / nTot);
                     cout << "\b\b\b\b\b\b" << setw(3) << perc << " % " << flush;
@@ -547,7 +547,7 @@ void R3BGladFieldMap::ReadAsciiFile(const TString& fileName)
     Int_t nTot = fNx * fNy * fNz;
     R3BLOG(info, nTot << " entries to read... " << setw(3) << 0 << " % ");
     Int_t index = 0;
-    div_t modul;
+    div_t module;
     Int_t iDiv = TMath::Nint(nTot / 100.);
     for (Int_t ix = 0; ix < fNx; ix++)
     {
@@ -560,8 +560,8 @@ void R3BGladFieldMap::ReadAsciiFile(const TString& fileName)
                     R3BLOG(error, "I/O Error at " << ix << " " << iy << " " << iz);
                 }
                 index = ix * fNy * fNz + iy * fNz + iz;
-                modul = div(index, iDiv);
-                if (modul.rem == 0)
+                module = div(index, iDiv);
+                if (module.rem == 0)
                 {
                     Double_t perc = TMath::Nint(100. * index / nTot);
                     cout << "\b\b\b\b\b\b" << setw(3) << perc << " % " << flush;

@@ -33,10 +33,10 @@ C3WTAR=$LUSTRE/r3b/$(whoami)/c3w.tar
 # which will be included in the tarball.
 # Please notice that on the worker node these environment
 # variables will point to locations which hold the same
-# content, but the pathes will be different.
+# content, but the paths will be different.
 # So always refer to them by getenv("MYVAR") (in C++)
 # or ${MYVAR} (in shell).
-# Do not include /lustre/ and /cvmfs/ pathes here.
+# Do not include /lustre/ and /cvmfs/ paths here.
 LOCATIONS=BUILD:VMCWORKDIR:UNPACK:PARS:HBOOK
 
 # Special handling of some cases:

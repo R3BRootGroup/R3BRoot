@@ -1,4 +1,4 @@
-# generate root dictioanry from cmake target
+# generate root dictionary from cmake target
 function(add_library_with_dictionary)
     set(options)
     set(oneValueArgs LIBNAME LINKDEF)
@@ -19,7 +19,7 @@ function(add_library_with_dictionary)
                              ${ARGS_LINKDEF})
 endfunction()
 
-# generate macros using availble variables. Please use create_library_with_dictionary instead.
+# generate macros using available variables. Please use create_library_with_dictionary instead.
 macro(ADD_LIB_WITH_DIC)
     add_library_with_dictionary(
         LIBNAME

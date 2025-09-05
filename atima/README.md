@@ -14,7 +14,7 @@ You can define Materials using `R3BAtimaTargetMaterial` and `R3BAtimaMaterialCom
 
 Since the computation takes a small amount of time, you can cache the result in a chosen range in order to increase the speed in frequent computations.
 
-The following lines will create a cache which can be read out whithin the chosen range. The results will be interpolated from the precalculated points.
+The following lines will create a cache which can be read out within the chosen range. The results will be interpolated from the precalculated points.
 
 ```c++
     // Energie from 100 AMeV to 200 AMeV with 10 steps

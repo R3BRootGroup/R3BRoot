@@ -132,7 +132,7 @@ namespace
         const auto& leftHits = GetChannels().left->hits_;
         const auto& rightHits = GetChannels().right->hits_;
         ASSERT_LT(leftHits[0].light, rightHits[0].light) << "left channel has larger light input with longer distance!";
-        ASSERT_GT(leftHits[0].time, rightHits[0].time) << "light hit left channel ealier with longer distance!";
+        ASSERT_GT(leftHits[0].time, rightHits[0].time) << "light hit left channel earlier with longer distance!";
     }
 
     TEST_F(testNeulandPaddle, check_coupling_counts) // NOLINT

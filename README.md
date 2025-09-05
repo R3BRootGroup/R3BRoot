@@ -88,7 +88,23 @@ Please ask your questions, request features, and report issues by [creating a gi
 
 The R3BRoot project uses clang-format-16 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
 ~~~bash
-source util/clang-format-all.sh
+bash util/clang-format-all.sh
+~~~
+
+## Spell Checking
+
+To avoid common typos in the codebase and documentation, we use [codespell](https://github.com/codespell-project/codespell).
+
+Check for spelling mistakes using the ignore list defined in `.codespell-ignorewords`:
+
+~~~bash
+codespell -I .codespell-ignorewords
+~~~
+
+If you want to automatically fix the detected typos:
+
+~~~bash
+codespell -w -I .codespell-ignorewords
 ~~~
 
 ## Tested systems

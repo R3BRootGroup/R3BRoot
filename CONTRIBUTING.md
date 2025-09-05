@@ -47,7 +47,7 @@ time.
 
 ### G.2 Adopted C++ Core Guidelines
 
-This shall be an evolving list of explicitely adopted C++ Core Guidelines:
+This shall be an evolving list of explicitly adopted C++ Core Guidelines:
 
 * [CPPCG::I.11: Never transfer ownership by a raw pointer (`T*`) or reference (`T&`)](https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i11-never-transfer-ownership-by-a-raw-pointer-t-or-reference-t)
    * If an owning raw pointer cannot be avoided for legacy reasons,

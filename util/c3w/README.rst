@@ -28,7 +28,7 @@ e.g. /lustre/r3b/pklenze/c3w.sh root -b -l -q -x /lustre/r3b/pklenze/script.C
 
 Note that your "macros" must
 a) be on /lustre/
-b) use getenv("SOMENAME") for all file pathes.
+b) use getenv("SOMENAME") for all file paths.
    (See /lustre/r3b/pklenze/califa_test.C for an example.)
 (To set the same environment variables locally so that you can still run your
 macros, you can source local_c3w.sh in your build instead of config.sh.)
@@ -48,14 +48,14 @@ the cmake controlled target all.
 After the compilation of all is completed, the locations listed in $LOCATIONS
 will get added to the tarball. Also, a wrapper script to unpack the tarball to
 /tmp/ will be created. Some trickery is required to run ROOT's C++ interpreter
-(which uses absolute pathes) and UCESB unpackers.
+(which uses absolute paths) and UCESB unpackers.
 
 It is assumed that the payload macro writes its main output (e.g. .root) to
 getenv(OUTPUT). During execution, that environment variable will point to a
 subdirectory labeled tmp.something in the OUTPUT the user set in c3w.conf.
 After the payload job is has been executed successfully, the contents of
 OUTPUT are moved to their designated location. This is done so that you do not
-accidentially use the output from currently running or crashed jobs.
+accidentally use the output from currently running or crashed jobs.
 
 Feel free to ask me if you have more questions -- Philipp (github pklenze)
 

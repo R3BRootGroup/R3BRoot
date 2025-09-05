@@ -65,7 +65,7 @@ void R3BLandDigiPar::Print(Option_t* option) const
     std::cout << "   Max Paddle   = " << nMaxPaddle << std::endl;
     std::cout << "   Max Plane   = " << nMaxPlane << std::endl;
     std::cout << "   Paddle Length   = " << paddleLength << std::endl;
-    std::cout << "   Paddle Heigth   = " << paddleHeight << std::endl;
+    std::cout << "   Paddle Height   = " << paddleHeight << std::endl;
     std::cout << "   Paddle Depth   = " << paddleDepth << std::endl;
     std::cout << "   Paddle Spacing = " << paddleSpacing << std::endl;
     std::cout << "   Paddle Wrapping = " << paddleWrapping << std::endl;

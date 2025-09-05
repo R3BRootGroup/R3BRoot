@@ -183,7 +183,7 @@ InitStatus R3BLandDigitizer::Init()
         }
     }
 
-    // If integration time has not been set otherwise, set it from beam energy - mimicks previous behavior
+    // If integration time has not been set otherwise, set it from beam energy - mimics previous behavior
     if (fTOFRange < 0.01)
     {
         fTOFRange = BuildTOFRangeFromBeamEnergy(fBeamEnergy);

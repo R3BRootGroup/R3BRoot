@@ -348,7 +348,7 @@ void R3BFragmentFitterChi2::Init(R3BTPropagator* prop, Bool_t energyLoss)
     fMinimum->SetPrintLevel(0);
     fMinimum->SetStrategy(0);
 
-    // create funciton wrapper for minmizer
+    // create function wrapper for minmizer
     // a IMultiGenFunction type
     ROOT::Math::Functor* f = new ROOT::Math::Functor(&Chi2Backward2D, 2);
 
@@ -367,7 +367,7 @@ Int_t R3BFragmentFitterChi2::FitTrack(R3BTrackingParticle* particle, R3BTracking
     minimum->SetTolerance(0.0001);
     minimum->SetPrintLevel(0);
 
-    // create funciton wrapper for minmizer
+    // create function wrapper for minmizer
     // a IMultiGenFunction type
     ROOT::Math::Functor f(&Chi2, 1);
     double variable[1] = { particle->GetMass() };
@@ -415,7 +415,7 @@ Int_t R3BFragmentFitterChi2::FitTrackBeta(R3BTrackingParticle* particle, R3BTrac
     minimum->SetTolerance(0.001);
     minimum->SetPrintLevel(0);
 
-    // create funciton wrapper for minmizer
+    // create function wrapper for minmizer
     // a IMultiGenFunction type
     ROOT::Math::Functor f(&Chi2Beta, 1);
     double variable[1] = { particle->GetStartBeta() };
@@ -965,7 +965,7 @@ void R3BFragmentTracker::FitFragment(R3BTrackingParticle* candidate)
     //
     // Ideally we would pre-calculated dm/dx which means:
     // how far moves the beam on the tof wall if the mass is changed?
-    // or viceversa: "how much do we need to change the mass if we are
+    // or vice-versa: "how much do we need to change the mass if we are
     // x centimeters off on the tof wall?".
     // One could also calculate dx/dbeta. Combination with dm/dx leads
     // to dm/dbeta.

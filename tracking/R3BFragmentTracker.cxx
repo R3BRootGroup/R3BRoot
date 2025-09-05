@@ -90,7 +90,7 @@ R3BFragmentTracker::~R3BFragmentTracker() {}
  * for ALL hit data. But not all detectors provide all variables.
  * We could inherit getters from a common base class and return NAN in the
  * overloaded members. Can fix this later. For now we can manually construct
- * a list of detectors with X,Y and additionaly fetch TOF and charge.
+ * a list of detectors with X,Y and additionally fetch TOF and charge.
  *
  * Btw: the old tracker required the user to provide the measured positions
  * for the track fitting. That was actually quite convenient. Can this

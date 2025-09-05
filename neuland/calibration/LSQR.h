@@ -141,7 +141,7 @@ typedef struct LSQR_DOUBLE_VECTOR
  *                         if 'A' is accurate to about 6 digits, set
  *                         rel_mat_err = 1.0e-6 .
  *
- *     rel_rhs_err  input  An extimate of the relative error in the data
+ *     rel_rhs_err  input  An estimate of the relative error in the data
  *                         defining the right hand side (rhs) vector 'b'.  For
  *                         example, if 'b' is accurate to about 6 digits, set
  *                         rel_rhs_err = 1.0e-6 .

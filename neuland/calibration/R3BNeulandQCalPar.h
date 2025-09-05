@@ -38,7 +38,7 @@ class R3BNeulandQCalPar : public FairParGenericSet
                       const char* context = "TestDefaultContext",
                       Bool_t own = kTRUE);
     /**
-     * Destructor. Cleares the memory used by the object.
+     * Destructor. Clears the memory used by the object.
      */
     virtual ~R3BNeulandQCalPar(void);
 

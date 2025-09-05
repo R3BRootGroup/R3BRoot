@@ -97,7 +97,7 @@ class R3BNeulandGainMatching : public FairTask
     }
 
     /**
-     * Method for setting needed statistics for data analyis.
+     * Method for setting needed statistics for data analysis.
      */
     inline void SetNeededStat(Int_t nevents) { fNEventsNeeded = nevents; }
 
