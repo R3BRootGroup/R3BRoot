@@ -18,7 +18,7 @@
 
 // Class to interpolate one variable in three dimensions Using linear
 // interpolation.  When given a point outside the valid map: produce
-// values as at the boundary at that point, i.e.  give a continous
+// values as at the boundary at that point, i.e.  give a continuous
 // value outside.  But not where and in what direction it went wrong.
 
 class R3BFieldInterp

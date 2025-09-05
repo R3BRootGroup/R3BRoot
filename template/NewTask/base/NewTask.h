@@ -51,7 +51,7 @@ namespace R3B
         // NOTE: all member variables should be default initialized right here
 
         // Store data for online
-        // Naming convenction of a boolean variable should be started with is_ or has_
+        // Naming convention of a boolean variable should be started with is_ or has_
         bool is_online_ = false;
 
         // -----------------Input data from previous already existing data level---------------

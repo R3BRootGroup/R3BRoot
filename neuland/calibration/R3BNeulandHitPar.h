@@ -38,7 +38,7 @@ class R3BNeulandHitPar : public FairParGenericSet
                      const char* context = "TestDefaultContext",
                      Bool_t own = kTRUE);
     /**
-     * Destructor. Cleares the memory used by the object.
+     * Destructor. Clears the memory used by the object.
      */
     virtual ~R3BNeulandHitPar(void);
 
@@ -74,7 +74,7 @@ class R3BNeulandHitPar : public FairParGenericSet
     void AddModulePar(R3BNeulandHitModulePar* tch) { fParams->Add(tch); }
 
     /**
-     * Method to retrieve the arrray with module containers.
+     * Method to retrieve the array with module containers.
      * @return an array with parameter containers of type R3BNeulandHitModulePar.
      */
     TObjArray* GetListOfModulePar() const { return fParams; }

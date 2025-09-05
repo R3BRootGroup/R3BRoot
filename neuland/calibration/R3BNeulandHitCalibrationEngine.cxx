@@ -28,7 +28,7 @@ namespace Neuland
 {
 
     // NaN2Value maps NaNs and Infs to a finite value.
-    // Usefull if you want to fill a possible nan variable into a histogram
+    // Useful if you want to fill a possible nan variable into a histogram
     inline double NaN2Value(const double val, const double valIfNaN = 0.)
     {
         return (std::isfinite(val) ? val : valIfNaN);

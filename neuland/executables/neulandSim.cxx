@@ -34,8 +34,8 @@ int main(int argc, const char** argv)
     auto runID = programOptions.Create_Option<int>("runID", "set runID", DEFAULT_RUNID);
     auto multi = programOptions.Create_Option<int>("multiplicity", "set particle multiplicity", 1);
     auto pEnergy = programOptions.Create_Option<double>("energy", "set energy value (GeV) of the particle", 1);
-    auto simuFileName =
-        programOptions.Create_Option<std::string>("simuFile", "set the base filename of simulation ouput", "simu.root");
+    auto simuFileName = programOptions.Create_Option<std::string>(
+        "simuFile", "set the base filename of simulation output", "simu.root");
     auto paraFileName =
         programOptions.Create_Option<std::string>("paraFile", "set the base filename of parameter sink", "para.root");
     auto logLevel = programOptions.Create_Option<std::string>("logLevel,v", "set log level of fairlog", "error");

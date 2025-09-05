@@ -812,7 +812,7 @@ void lsqr(lsqr_input* input,
 /*-------------------------------------------------------------------------*/
 /*                                                                         */
 /*  Define the function 'dvec_norm2()'.  This function takes a vector      */
-/*  arguement and computes the Euclidean or L2 norm of this vector.  Note  */
+/*  argument and computes the Euclidean or L2 norm of this vector.  Note  */
 /*  that this is a version of the BLAS function 'dnrm2()' rewritten to     */
 /*  use the current data structures.                                       */
 /*                                                                         */
@@ -853,7 +853,7 @@ void dvec_scale(double scal, dvec* vec)
 /*-------------------------------------------------------------------------*/
 /*                                                                         */
 /*  Define the function 'dvec_copy()'.  This function takes two vectors    */
-/*  as arguements and copies the contents of the first into the second.    */
+/*  as arguments and copies the contents of the first into the second.    */
 /*  Note  that this is a version of the BLAS function 'dcopy()' rewritten  */
 /*  to use the current data structures.                                    */
 /*                                                                         */

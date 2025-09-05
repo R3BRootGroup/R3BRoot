@@ -132,7 +132,7 @@ endmacro()
 macro(cdash_submit)
     ctest_submit(RETURN_VALUE _ctest_submit_ret_val BUILD_ID cdash_build_id RETRY_COUNT 3 RETRY_DELAY 2)
     if(_ctest_submit_ret_val)
-        message(WARNING " ctest_submit() failed. Continueing")
+        message(WARNING " ctest_submit() failed. Continuing")
     endif()
 
     if(cdash_build_id)

@@ -7,7 +7,7 @@
 #
 # Orientation of Strips: 0 - no strips, 1 - vertical strips, 2 - horizontal strips, 3 - strips in both directions
 #
-# Sign of Position: -1 or 1 to switch the orientation of the x and y axis if the position is determined via charge devision (SignOfPosition) or via the hit strip (Sign of Strip)
+# Sign of Position: -1 or 1 to switch the orientation of the x and y axis if the position is determined via charge division (SignOfPosition) or via the hit strip (Sign of Strip)
 #
 # Detector Length in cm
 #

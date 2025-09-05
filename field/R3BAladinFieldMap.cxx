@@ -99,7 +99,7 @@ R3BAladinFieldMap::~R3BAladinFieldMap()
     if (fBz)
         delete fBz;
 }
-// -----------   Intialisation   ------------------------------------------
+// -----------   Initialisation   ------------------------------------------
 void R3BAladinFieldMap::Init()
 {
 
@@ -484,7 +484,7 @@ void R3BAladinFieldMap::GetFieldValue(const Double_t point[3], Double_t* bField)
     // for each field map, there is one mar transformation to do
     // to get into each field map's coordinate system.
 
-    // We want the field to be continous also outside the field maps.
+    // We want the field to be continuous also outside the field maps.
     // So the maps will give their boundary values when we happen to
     // reach outside.  In Y and X directions (i.e. up and to the sides)
     // the means to give non-zero values.  In the Z direction, this

@@ -21,7 +21,7 @@ Example:
 ```
 
 ### Using a C++ executable
-Much more options are available when the task is used in a C++ executable. Such an example can be found in the source file [neulandAna.cxx](../executbales/neulandAna.cxx) implemented with some program options. To see what kind of options can be used with this executable, go to the folder `build/bin` and run the executable with:
+Much more options are available when the task is used in a C++ executable. Such an example can be found in the source file [neulandAna.cxx](../executables/neulandAna.cxx) implemented with some program options. To see what kind of options can be used with this executable, go to the folder `build/bin` and run the executable with:
 ```shell
 ./neulandAna -h
 ```

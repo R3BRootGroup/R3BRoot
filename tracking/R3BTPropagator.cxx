@@ -459,7 +459,7 @@ Double_t R3BTPropagator::Energy_loss_in_air(double beta, double step, double cha
     const double Tmax =
         (2 * me * pow(beta * gamma, 2)) /
         (1 + 2 * gamma * me / (mass * 1000.) +
-         pow(me / (mass * 1000.), 2)); // maximum transfered kinetic energy to a free electron in a single collision
+         pow(me / (mass * 1000.), 2)); // maximum transferred kinetic energy to a free electron in a single collision
 
     // Bethe Bloch formula
     const double delta = K * rho * (ZoAair)*pow(charge / beta, 2) * 0.5 *

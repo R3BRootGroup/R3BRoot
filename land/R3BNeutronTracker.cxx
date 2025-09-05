@@ -162,51 +162,51 @@ InitStatus R3BNeutronTracker::Init()
     hDeltaT->GetXaxis()->SetTitle("time (ns)");
     hDeltaT->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP1 = new TH1F("DeltaP1", "difference in reconstucted momenta for 1st neutron)", 1000, -150., 150.);
+    hDeltaP1 = new TH1F("DeltaP1", "difference in reconstructed momenta for 1st neutron)", 1000, -150., 150.);
     hDeltaP1->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP2 = new TH1F("DeltaP2", "difference in reconstucted momenta for 2nd neutron)", 1000, -150., 150.);
+    hDeltaP2 = new TH1F("DeltaP2", "difference in reconstructed momenta for 2nd neutron)", 1000, -150., 150.);
     hDeltaP2->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP2->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP3 = new TH1F("DeltaP3", "difference in reconstucted momenta for 3rd neutron)", 1000, -150., 150.);
+    hDeltaP3 = new TH1F("DeltaP3", "difference in reconstructed momenta for 3rd neutron)", 1000, -150., 150.);
     hDeltaP3->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP3->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP4 = new TH1F("DeltaP4", "difference in reconstucted momenta for 4th neutron)", 1000, -150., 150.);
+    hDeltaP4 = new TH1F("DeltaP4", "difference in reconstructed momenta for 4th neutron)", 1000, -150., 150.);
     hDeltaP4->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP4->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP5 = new TH1F("DeltaP5", "difference in reconstucted momenta for 5th neutron)", 1000, -150., 150.);
+    hDeltaP5 = new TH1F("DeltaP5", "difference in reconstructed momenta for 5th neutron)", 1000, -150., 150.);
     hDeltaP5->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP5->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP6 = new TH1F("DeltaP6", "difference in reconstucted momenta for 6th neutron)", 1000, -150., 150.);
+    hDeltaP6 = new TH1F("DeltaP6", "difference in reconstructed momenta for 6th neutron)", 1000, -150., 150.);
     hDeltaP6->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP6->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPx1 = new TH1F("DeltaPx1", "difference in reconstucted momenta px (ideal case)", 1000, -50., 50.);
+    hDeltaPx1 = new TH1F("DeltaPx1", "difference in reconstructed momenta px (ideal case)", 1000, -50., 50.);
     hDeltaPx1->GetXaxis()->SetTitle("Delta Px (MeV/c)");
     hDeltaPx1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPy1 = new TH1F("DeltaPy1", "difference in reconstucted momenta py (ideal case)", 1000, -50., 50.);
+    hDeltaPy1 = new TH1F("DeltaPy1", "difference in reconstructed momenta py (ideal case)", 1000, -50., 50.);
     hDeltaPy1->GetXaxis()->SetTitle("Delta Py (MeV/c)");
     hDeltaPy1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPz1 = new TH1F("DeltaPz1", "difference in reconstucted momenta pz (ideal case)", 1000, -150., 150.);
+    hDeltaPz1 = new TH1F("DeltaPz1", "difference in reconstructed momenta pz (ideal case)", 1000, -150., 150.);
     hDeltaPz1->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
     hDeltaPz1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPx2 = new TH1F("DeltaPx2", "difference in reconstucted momenta px (exp case)", 1000, -50., 50.);
+    hDeltaPx2 = new TH1F("DeltaPx2", "difference in reconstructed momenta px (exp case)", 1000, -50., 50.);
     hDeltaPx2->GetXaxis()->SetTitle("Delta Px (MeV/c)");
     hDeltaPx2->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPy2 = new TH1F("DeltaPy2", "difference in reconstucted momenta py (exp case)", 1000, -50., 50.);
+    hDeltaPy2 = new TH1F("DeltaPy2", "difference in reconstructed momenta py (exp case)", 1000, -50., 50.);
     hDeltaPy2->GetXaxis()->SetTitle("Delta Py (MeV/c)");
     hDeltaPy2->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPz2 = new TH1F("DeltaPz2", "difference in reconstucted momenta pz (exp case)", 1000, -150., 150.);
+    hDeltaPz2 = new TH1F("DeltaPz2", "difference in reconstructed momenta pz (exp case)", 1000, -150., 150.);
     hDeltaPz2->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
     hDeltaPz2->GetYaxis()->SetTitle("Counts");
 
@@ -532,7 +532,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
     // find clusters and mark the position of the cluster by
     // time of first hit, position of first hit, and total energy
     Double_t dio = 10.6; // 3 times half the diogonal of a paddle
-    Double_t distance, posx, posy, posz, post, delt, delx, dely, delz;
+    Double_t distance, posx, posy, posz, post, dealt, delx, dely, delz;
     //   Int_t hits=0;
     Int_t Nclusters = 0;
     //   cout<<"nentries: "<<nentries<<endl;
@@ -571,13 +571,13 @@ void R3BNeutronTracker::Exec(Option_t* opt)
             // find neighbor
             for (Int_t k = l; k < nentries; k++)
             {
-                delt = temp[k][3] - post;
+                dealt = temp[k][3] - post;
                 delx = temp[k][0] - posx;
                 dely = temp[k][1] - posy;
                 delz = temp[k][2] - posz;
 
-                if (TMath::Abs(delx) < 7.5 && TMath::Abs(dely) < 7.5 && TMath::Abs(delz) < 7.5 && delt >= 0.0 &&
-                    delt < 1.0)
+                if (TMath::Abs(delx) < 7.5 && TMath::Abs(dely) < 7.5 && TMath::Abs(delz) < 7.5 && dealt >= 0.0 &&
+                    dealt < 1.0)
                 {
                     // This is a neighbor
 
@@ -595,7 +595,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
                                 cout << "distance x " << delx << endl;
                                 cout << "distance y " << dely << endl;
                                 cout << "distance z " << delz << endl;
-                                cout << "delta t " << delt << endl;
+                                cout << "delta t " << dealt << endl;
                                 cout << "adding energy " << temp[k][4] << endl;
 
                                 cout << "Existing cluster  " << clusNo << endl;
@@ -1138,7 +1138,7 @@ void R3BNeutronTracker::Exec(Option_t* opt)
         {
             if (printing)
             {
-                cout << "Vor sortieren !!!!!!" << endl;
+                cout << "For sortieren !!!!!!" << endl;
                 cout << "cluster start: " << Cluster[i].xStart << "  " << Cluster[i].yStart << "  " << Cluster[i].zStart
                      << endl;
                 cout << "cluster end  : " << Cluster[i].xEnd << "  " << Cluster[i].yEnd << "  " << Cluster[i].zEnd

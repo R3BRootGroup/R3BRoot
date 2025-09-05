@@ -434,7 +434,7 @@ void R3BTrackingS515::Alignment()
         sprintf(hname, "par%d", i);
         hist[i] = new TH1F(hname, hname, 100, min_offset[i], max_offset[i]);
     }
-    std::cout << "\n\n-- Perfroming minimization for the detector alignment. Please wait... \n";
+    std::cout << "\n\n-- Performing minimization for the detector alignment. Please wait... \n";
 
     // Setting up Minimizer function parameters
     Double_t precision = 1e-10; // 0 - default precision will be automaticalle determined
@@ -465,7 +465,7 @@ void R3BTrackingS515::Alignment()
         minimizer->Minimize();
         xs = minimizer->X();
         // if(minimizer->Status() !=0) continue; //valid minimum
-        // Check if all paramters are "far" from limits
+        // Check if all parameters are "far" from limits
         for (i = 0; i < NVarsFunctor; i++)
         {
             if (fabs((xs[i] - min_offset[i]) / min_offset[i]) < 0.1 ||
@@ -494,7 +494,7 @@ void R3BTrackingS515::Alignment()
         std::cout << "\n-- Minimizer status: " << minimizer->Status() << std::endl;
         bs++;
     }
-    // Outputing final info and histograms
+    // Outputting final info and histograms
     if (minimizer->MinValue() < tolerance && f(xs) < tolerance)
         std::cout << "-- Minimizer "
                   << "   converged to the right minimum" << std::endl;

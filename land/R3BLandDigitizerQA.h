@@ -23,7 +23,7 @@ class TH2F;
 /**
  * \brief R3BLandDigitizerQA task.
  *
- * Task for filling controll histograms of R3BLandDigitizer
+ * Task for filling control histograms of R3BLandDigitizer
  * performance. Plots are stored in the output file.
  */
 

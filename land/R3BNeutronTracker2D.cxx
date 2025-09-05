@@ -132,7 +132,7 @@ void R3BNeutronTracker2D::ReadCalibrFile(char* name)
     // Open calibration file
     ifstream cFile;
     cFile.open(name);
-    // Check if opened succesfully
+    // Check if opened successfully
     if (!cFile.is_open())
     {
         LOG(fatal) << "ReadCalibrFile: Calibration file does not exist! Aborting...";
@@ -1332,51 +1332,51 @@ void R3BNeutronTracker2D::CreateHistograms()
     hDeltaT->GetXaxis()->SetTitle("time (ns)");
     hDeltaT->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP1 = new TH1F("DeltaP1", "difference in reconstucted momenta for 1st neutron)", 1000, -150., 150.);
+    hDeltaP1 = new TH1F("DeltaP1", "difference in reconstructed momenta for 1st neutron)", 1000, -150., 150.);
     hDeltaP1->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP2 = new TH1F("DeltaP2", "difference in reconstucted momenta for 2nd neutron)", 1000, -150., 150.);
+    hDeltaP2 = new TH1F("DeltaP2", "difference in reconstructed momenta for 2nd neutron)", 1000, -150., 150.);
     hDeltaP2->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP2->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP3 = new TH1F("DeltaP3", "difference in reconstucted momenta for 3rd neutron)", 1000, -150., 150.);
+    hDeltaP3 = new TH1F("DeltaP3", "difference in reconstructed momenta for 3rd neutron)", 1000, -150., 150.);
     hDeltaP3->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP3->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP4 = new TH1F("DeltaP4", "difference in reconstucted momenta for 4th neutron)", 1000, -150., 150.);
+    hDeltaP4 = new TH1F("DeltaP4", "difference in reconstructed momenta for 4th neutron)", 1000, -150., 150.);
     hDeltaP4->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP4->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP5 = new TH1F("DeltaP5", "difference in reconstucted momenta for 5th neutron)", 1000, -150., 150.);
+    hDeltaP5 = new TH1F("DeltaP5", "difference in reconstructed momenta for 5th neutron)", 1000, -150., 150.);
     hDeltaP5->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP5->GetYaxis()->SetTitle("Counts");
 
-    hDeltaP6 = new TH1F("DeltaP6", "difference in reconstucted momenta for 6th neutron)", 1000, -150., 150.);
+    hDeltaP6 = new TH1F("DeltaP6", "difference in reconstructed momenta for 6th neutron)", 1000, -150., 150.);
     hDeltaP6->GetXaxis()->SetTitle("Delta P (MeV/c)");
     hDeltaP6->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPx1 = new TH1F("DeltaPx1", "difference in reconstucted momenta px (ideal case)", 1000, -50., 50.);
+    hDeltaPx1 = new TH1F("DeltaPx1", "difference in reconstructed momenta px (ideal case)", 1000, -50., 50.);
     hDeltaPx1->GetXaxis()->SetTitle("Delta Px (MeV/c)");
     hDeltaPx1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPy1 = new TH1F("DeltaPy1", "difference in reconstucted momenta py (ideal case)", 1000, -50., 50.);
+    hDeltaPy1 = new TH1F("DeltaPy1", "difference in reconstructed momenta py (ideal case)", 1000, -50., 50.);
     hDeltaPy1->GetXaxis()->SetTitle("Delta Py (MeV/c)");
     hDeltaPy1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPz1 = new TH1F("DeltaPz1", "difference in reconstucted momenta pz (ideal case)", 1000, -150., 150.);
+    hDeltaPz1 = new TH1F("DeltaPz1", "difference in reconstructed momenta pz (ideal case)", 1000, -150., 150.);
     hDeltaPz1->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
     hDeltaPz1->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPx2 = new TH1F("DeltaPx2", "difference in reconstucted momenta px (exp case)", 1000, -50., 50.);
+    hDeltaPx2 = new TH1F("DeltaPx2", "difference in reconstructed momenta px (exp case)", 1000, -50., 50.);
     hDeltaPx2->GetXaxis()->SetTitle("Delta Px (MeV/c)");
     hDeltaPx2->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPy2 = new TH1F("DeltaPy2", "difference in reconstucted momenta py (exp case)", 1000, -50., 50.);
+    hDeltaPy2 = new TH1F("DeltaPy2", "difference in reconstructed momenta py (exp case)", 1000, -50., 50.);
     hDeltaPy2->GetXaxis()->SetTitle("Delta Py (MeV/c)");
     hDeltaPy2->GetYaxis()->SetTitle("Counts");
 
-    hDeltaPz2 = new TH1F("DeltaPz2", "difference in reconstucted momenta pz (exp case)", 1000, -150., 150.);
+    hDeltaPz2 = new TH1F("DeltaPz2", "difference in reconstructed momenta pz (exp case)", 1000, -150., 150.);
     hDeltaPz2->GetXaxis()->SetTitle("Delta Pz (MeV/c)");
     hDeltaPz2->GetYaxis()->SetTitle("Counts");
 

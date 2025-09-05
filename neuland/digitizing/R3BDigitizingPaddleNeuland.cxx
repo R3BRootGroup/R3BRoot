@@ -6,7 +6,7 @@ namespace R3B::Digitizing::Neuland
     static const uint8_t DEFAULT_ITERATION = 8U;
     static auto CheckMatchValidity(const std::vector<Paddle::ChannelSignalPair>& matchedPairs,
                                    const Channel::Signal& signal) -> bool;
-    // reversing attentuation factor:
+    // reversing attenuation factor:
     const double NeulandPaddle::ReverseAttenFac = std::exp(NeulandPaddle::gHalfLength * NeulandPaddle::gAttenuation);
 
     template <uint8_t iterations = DEFAULT_ITERATION>
@@ -123,7 +123,7 @@ namespace R3B::Digitizing::Neuland
         return channelPairs;
     }
 
-    // check if a signal is matched to two or more signals. If so, discard the lastest match.
+    // check if a signal is matched to two or more signals. If so, discard the latest match.
     static auto CheckMatchValidity(const std::vector<Paddle::ChannelSignalPair>& matchedPairs,
                                    const Channel::Signal& signal) -> bool
     {

@@ -35,7 +35,7 @@
 using std::cout;
 using std::endl;
 
-// Auxilliary function for sorting digis in time
+// Auxiliary function for sorting digis in time
 // to be used with std::sort
 bool SortDigiByTime(const R3BLandDigi* digi1, const R3BLandDigi* digi2);
 
@@ -137,7 +137,7 @@ void R3BNeuLandClusterFinder::Exec(Option_t* option)
 
     // find clusters and mark the position of the cluster by
     // time of first hit, position of first hit, and total energy
-    Double_t /*distance,*/ posx, posy, posz, post, delt, delx, dely, delz;
+    Double_t /*distance,*/ posx, posy, posz, post, dealt, delx, dely, delz;
     Int_t nClusters = 0;
     fhHits->Fill(nDigis);
 
@@ -179,18 +179,18 @@ void R3BNeuLandClusterFinder::Exec(Option_t* option)
                 delx = digi2->GetXX() - posx;
                 dely = digi2->GetYY() - posy;
                 delz = digi2->GetZZ() - posz;
-                delt = digi2->GetTdc() - post;
+                dealt = digi2->GetTdc() - post;
 
                 // Check if properly sorted
-                if (delt < 0.)
+                if (dealt < 0.)
                 {
                     // 2-nd digi has earlier time. Stop here.
                     LOG(fatal) << "Exec(): Sorting of digis failed.";
                 }
 
                 // Check if neighbour
-                if (TMath::Abs(delx) < 7.5 && TMath::Abs(dely) < 7.5 && TMath::Abs(delz) < 7.5 && delt >= 0.0 &&
-                    delt < 1.0)
+                if (TMath::Abs(delx) < 7.5 && TMath::Abs(dely) < 7.5 && TMath::Abs(delz) < 7.5 && dealt >= 0.0 &&
+                    dealt < 1.0)
                 {
                     // This is a neighbour
 
@@ -303,7 +303,7 @@ void R3BNeuLandClusterFinder::Reset()
 // -----------------------------------------------------------------------------
 bool SortDigiByTime(const R3BLandDigi* digi1, const R3BLandDigi* digi2)
 {
-    // Auxilliary function for sorting digis in time.
+    // Auxiliary function for sorting digis in time.
     // To be used with std::sort() from <algorithm>
 
     if (digi1->GetTdc() < digi2->GetTdc())

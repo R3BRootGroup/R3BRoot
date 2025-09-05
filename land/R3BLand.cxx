@@ -150,7 +150,7 @@ void R3BLand::Initialize()
     //<D.B> Check me
     // Initialise variables from Birk law
     Double_t dP = 1.032;
-    // Set constants for Birk's Law implentation
+    // Set constants for Birk's Law implementation
     fBirkC0 = 1.;
     fBirkC1 = 0.013 / dP;
     fBirkC2 = 9.6e-6 / (dP * dP);
@@ -166,7 +166,7 @@ Bool_t R3BLand::ProcessHits(FairVolume* vol)
 
     StepHistory(); // FIXME: StepHistory also responsible for filling LandFirstHits
 
-    // --- get Geometry hiearchical Information
+    // --- get Geometry hierarchical Information
     Int_t cp1 = -1;
     Int_t cp2 = -1;
     Int_t volId1 = -1;

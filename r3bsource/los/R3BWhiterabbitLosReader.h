@@ -1,5 +1,5 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2019 GSI Helmholtzzentrum fur Schwerionenforschung GmbH    *
  *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BWhiterabbitLosReader_H
-#define R3BWhiterabbitLosReader_H
+#pragma once
 
 #include "R3BReader.h"
 #include <Rtypes.h>
@@ -70,4 +69,3 @@ class R3BWhiterabbitLosReader : public R3BReader
   public:
     ClassDefOverride(R3BWhiterabbitLosReader, 0);
 };
-#endif // R3BWhiterabbitLosReader_H

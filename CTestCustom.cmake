@@ -26,7 +26,7 @@ set(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_WARNINGS "500" )
 set(CTEST_CUSTOM_MAXIMUM_NUMBER_OF_ERRORS   "50" )
 
 # -----------------------------------------------------------
-# -- Warning execptions
+# -- Warning exceptions
 # -----------------------------------------------------------
 
 set(CTEST_CUSTOM_WARNING_EXCEPTION
@@ -133,7 +133,7 @@ Set (CTEST_CUSTOM_COVERAGE_EXCLUDE
     )
 
 # -----------------------------------------------------------
-# -- Error execptions
+# -- Error exceptions
 # -- Get rid of boost warnings which are misinterpreted as errors
 # -----------------------------------------------------------
 

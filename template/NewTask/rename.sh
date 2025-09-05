@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# The rename script exchange all occurence of NewDetector or NEWDETECTOR
+# The rename script exchange all occurrence of NewDetector or NEWDETECTOR
 # by the name given by the first parameter. If the detector is for example
-# the Trd of the Cbm experiment a good name is CbmTrd. Normaly one should
+# the Trd of the Cbm experiment a good name is CbmTrd. Normally one should
 # use the naming convention of the experiment.
 # Also the filenames any many more things are changed automatically. In the
 # end there are only some small changes which have to be done by hand.

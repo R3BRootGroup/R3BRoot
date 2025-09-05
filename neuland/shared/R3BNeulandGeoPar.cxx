@@ -91,7 +91,7 @@ TVector3 R3BNeulandGeoPar::ConvertToLocalCoordinates(const TVector3& position, c
 
     // First, convert to Neuland-local coordinates (consisting of all paddles)
     fNeulandGeoNode->GetMatrix()->MasterToLocal(pos_in, pos_tmp);
-    // Second, convert to the repective paddle
+    // Second, convert to the respective paddle
     fPaddleGeoNodes.at(paddleID)->MasterToLocal(pos_tmp, pos_out);
 
     return TVector3(pos_out[0], pos_out[1], pos_out[2]);

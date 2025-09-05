@@ -62,7 +62,7 @@ namespace R3B::Digitizing::Neuland::Tamex
         : time_(pmtHit.time)
     {
         auto par = channel.GetParConstRef();
-        // apply saturation coefficent
+        // apply saturation coefficient
         qdc_ = pmtHit.light / (1. + par.fSaturationCoefficient * pmtHit.light);
     };
 

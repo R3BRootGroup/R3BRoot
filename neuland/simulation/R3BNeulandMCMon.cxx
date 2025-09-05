@@ -308,7 +308,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 fhPDG->Fill(mcTrack->GetPdgCode());
                 fhPrimaryDaughterIDs->Fill(point->GetTrackID());
 
-                // Buld Histograms for each particle PDG if it doesn't exist
+                // Build Histograms for each particle PDG if it doesn't exist
                 if (!fhmEPdg[mcTrack->GetPdgCode()])
                 {
                     TString name = TString("Light Yield of PID ") + TString::Itoa(mcTrack->GetPdgCode(), 10) +
