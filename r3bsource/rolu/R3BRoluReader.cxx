@@ -98,13 +98,13 @@ Bool_t R3BRoluReader::R3BRead()
     /*
      * For variable definition, see structure EXT_STR_h101_ROLU_onion_t
      * in ext_str_h101_rolu.h
-     * TTFL = Size of the array TFLv contaning fine leading times
+     * TTFL = Size of the array TFLv containing fine leading times
      * TTFLv = Array containing the actual data on the fine leading times
      * TTFLM = No of channels having fine leading time
      * TTFLMI = Array of TFLM size containing the channel numbers of each channel with data
      * TTFLME = Array of TFLM size containing the index of the first element of the next channel in data array TFLv
      *
-     * TTCL = Size of the array TCLv contaning coarse leading times
+     * TTCL = Size of the array TCLv containing coarse leading times
      * TTCLv = Array containing the actual data on the coarse leading times
      * TTCLM = No of channels having coarse leading time
      * TTCLMI = Array of TCLM size containing the channel numbers of each channel with data

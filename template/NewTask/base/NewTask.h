@@ -36,7 +36,7 @@ namespace R3B
         // Standard constructor
         explicit NewTask(const std::string& name, int iVerbose = 1);
 
-        // Other speical functions. Either define all these 5 functions or none of them (rule of 5).
+        // Other special functions. Either define all these 5 functions or none of them (rule of 5).
         // Defining none of them is preferred (rule of 0).
         // ~NewTask() override;
         // NewTask(const NewTask&) = delete;
@@ -48,7 +48,7 @@ namespace R3B
         void SetOnline(bool is_online) { is_online_ = is_online; }
 
       private:
-        // NOTE: all member variables should be default initiliazed right here
+        // NOTE: all member variables should be default initialized right here
 
         // Store data for online
         // Naming convenction of a boolean variable should be started with is_ or has_
@@ -67,7 +67,7 @@ namespace R3B
         R3BEventHeader* eventHeader_ = nullptr;
 
         // -----------------Output array to new data level-----------------
-        // Case 1: Ouput data container in std::vector (RECOMMENDED)
+        // Case 1: Output data container in std::vector (RECOMMENDED)
         R3B::OutputVectorConnector<DetectorHitData> output_data_vector_{ "DetectorHitData" };
         // or
         // OutputConnector<std::vector<R3BNeulandHit>> output_data_{ "DetectorHitData" };
@@ -80,7 +80,7 @@ namespace R3B
 
         // virtual functions should be private
 
-        // Initiliazation of task at the beginning of a run
+        // Initialization of task at the beginning of a run
         auto Init() -> InitStatus override;
 
         // Executed for each event

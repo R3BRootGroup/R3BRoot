@@ -115,7 +115,7 @@ void R3BGammaGenerator::GenerateGamma(double E, FairPrimaryGenerator* primGen)
     }
 
     double phi = 2. * TMath::Pi() * fRandom.Rndm();
-    // For a homogenous distribution over the sphere surface pick random cos(theta) instead of theta
+    // For a homogeneous distribution over the sphere surface pick random cos(theta) instead of theta
     double theta = TMath::ACos(2. * fRandom.Rndm() - 1.);
 
     TVector3 vMomentum;

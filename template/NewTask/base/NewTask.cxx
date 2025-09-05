@@ -86,14 +86,14 @@ namespace R3B
         // Case 1. Output std::vector
         output_data_vector_.init();
 
-        // Case 2. Ouput TClonesArray (NOT RECOMMENDED)
+        // Case 2. Output TClonesArray (NOT RECOMMENDED)
         ioman->Register("DetectorHitData", "Detector", output_data_TCA_, kTRUE);
 
         // Case 3. Output a TObject
         output_data_ = std::make_unique<DetectorData>().release();
         ioman->Register(output_data_->GetName(), "Detector", output_data_, kTRUE);
 
-        // Do whatever else is needed at the initilization stage
+        // Do whatever else is needed at the initialization stage
         // Create histograms to be filled
         // initialize variables
 

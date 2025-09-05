@@ -286,7 +286,7 @@ Bool_t R3BFileSource::Init()
     if (list)
     {
         TObjString* Obj = 0;
-        R3BLOG(debug, "Enteries in the list " << list->GetEntries());
+        R3BLOG(debug, "Entries in the list " << list->GetEntries());
         for (Int_t i = 0; i < list->GetEntries(); i++)
         {
             Obj = dynamic_cast<TObjString*>(list->At(i));
@@ -306,13 +306,13 @@ Bool_t R3BFileSource::Init()
 
     // Store the information about the unique runids in the input file
     // together with the filename and the number of events for each runid
-    // this information is needed later to check if inconsitencies exist
+    // this information is needed later to check if inconsistencies exist
     // between the main input chain and any of the friend chains.
 
     //  GetRunIdInfo(fInFile->GetName(), chainName);
 
     // Add all additional input files to the input chain and do a
-    // consitency check
+    // consistency check
     for (auto fileName : fInputChainList)
     {
         // Store global gFile pointer for safety reasons.
@@ -345,7 +345,7 @@ Bool_t R3BFileSource::Init()
         // Add the file to the input chain
         fInChain->Add(fileName);
 
-        // Close the temporarly file and restore the gFile pointer.
+        // Close the temporarily file and restore the gFile pointer.
         inputFile->Close();
         gFile = temp;
     }
@@ -523,7 +523,7 @@ void R3BFileSource::AddFriendsToChain()
     // The order in the input tree defined by the order in which the files have
     // been added. A file is defined by the runid.
 
-    // In the old way it was needed sometimes to add a freind file more
+    // In the old way it was needed sometimes to add a friend file more
     // than once. This is not needed any longer, so we remove deuplicates
     // from the list and display a warning.
     std::list<TString> friendList;
@@ -534,8 +534,8 @@ void R3BFileSource::AddFriendsToChain()
             friendList.push_back(fileName);
         }
     }
-    // TODO: print a warning if it was neccessary to remove a filname from the
-    // list. This can be chacked by comparing the size of both list
+    // TODO: print a warning if it was necessary to remove a filename from the
+    // list. This can be checked by comparing the size of both list
 
     TFile* temp = gFile;
 
@@ -647,7 +647,7 @@ void R3BFileSource::CheckFriendChains()
         events.push_back(bla[1]);
     }
 
-    // Now loop over all chains except the input chain and comapare the
+    // Now loop over all chains except the input chain and compare the
     // runids and event numbers.
     // If there is a mismatch stop the execution.
     Int_t errorFlag = 0;

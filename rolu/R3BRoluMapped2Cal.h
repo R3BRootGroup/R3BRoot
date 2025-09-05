@@ -125,7 +125,7 @@ class R3BRoluMapped2Cal : public FairTask
     R3BTCalPar* fTcalPar{};        /**< TCAL parameter container. */
     unsigned int fNofTcalPars = 0; /**< Number of modules in parameter file. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header{}; /**< Event header. */
     int fTrigger = 1;         /**< Trigger value. */
 

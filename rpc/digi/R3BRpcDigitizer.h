@@ -26,7 +26,7 @@ class TClonesArray;
 class R3BRpcDigitizer : public FairTask
 {
   public:
-    /** Standard contructor **/
+    /** Standard constructor **/
     R3BRpcDigitizer();
 
     /** Destructor **/

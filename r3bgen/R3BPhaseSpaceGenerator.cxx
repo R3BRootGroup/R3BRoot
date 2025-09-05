@@ -49,7 +49,7 @@ void R3BPhaseSpaceGenerator::EnableWrite(bool is_enabled)
 
     if (is_written_enabled_)
     {
-        R3BLOG(info, "Particle generator infomation is written!");
+        R3BLOG(info, "Particle generator information is written!");
         particle_output_.init();
     }
 }

@@ -83,7 +83,7 @@ Bool_t R3BFrsSciReader::R3BRead()
         uint32_t numberOfPMTsWithHits_TF = (uint32_t)data->FRSSCI[d].VTFM;
         if (numberOfPMTsWithHits_TF != numberOfPMTsWithHits_TC)
         {
-            LOG(error) << "R3BFrsSciReader::R3BRead() Error in unpacking, unconsistency between TF and TC for FrsSci !";
+            LOG(error) << "R3BFrsSciReader::R3BRead() Error in unpacking, inconsistency between TF and TC for FrsSci !";
         }
         else
         {
@@ -96,7 +96,7 @@ Bool_t R3BFrsSciReader::R3BRead()
                 if (pmtid_TF != pmtid_TC)
                 {
                     LOG(error)
-                        << "R3BFrsSciReader::R3BRead() Error in unpacking, unconsistency between the PMT id for TF "
+                        << "R3BFrsSciReader::R3BRead() Error in unpacking, inconsistency between the PMT id for TF "
                            "and TC for FrsSci !";
                 }
                 uint32_t nextChannelStart = (uint32_t)data->FRSSCI[d].VTFME[pmmult];

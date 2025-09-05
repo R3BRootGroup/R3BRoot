@@ -1,4 +1,4 @@
-/* Original code was writen in FORTRAN by Leonid Chulkov l.chulkov@gsi.de
+/* Original code was written in FORTRAN by Leonid Chulkov l.chulkov@gsi.de
  *
  * The program is simulating inverse kinematics of a quasi-elastic scattering
  * of a proton "i" (being at rest) on a cluster/nucleon "a" inside an incident
@@ -117,7 +117,7 @@ void run(TString fname)
         P1cm.SetY(-P2cm.Y());
         P1cm.SetZ(-P2cm.Z());
 
-        //------- Calculate realtive to the direction of the quasi-particle (cluster) --------
+        //------- Calculate relative to the direction of the quasi-particle (cluster) --------
         double beta_cm = -Pa.Mag() / (EaL + Mi);
         double gamma_cm = 1 / sqrt(1 - beta_cm * beta_cm);
 
@@ -192,8 +192,8 @@ void run(TString fname)
         Double_t P3F = sqrt(PA * PA + P1L.Mag2() - 2 * PA * P1L.Z());
         Double_t A = MA * MA - 2 * EA * sqrt(Mi * Mi + P1L.Mag2()) + 2 * PA * P1L.Z();
         Double_t B = A + 2 * Mi * Mi;
-        Double_t QUATER = B + sqrt(B * B + 4 * Mi * Mi * P3F * P3F - A * A);
-        Double_t ARAMISS = sqrt(QUATER) - MA;
+        Double_t QUARTER = B + sqrt(B * B + 4 * Mi * Mi * P3F * P3F - A * A);
+        Double_t ARAMISS = sqrt(QUARTER) - MA;
 
         sprintf(tooutfile,
                 "\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%0.5E\t%"

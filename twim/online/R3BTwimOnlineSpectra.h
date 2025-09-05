@@ -35,7 +35,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads TWIM data and plots online histograms
+ * This tasks reads TWIM data and plots online histograms
  */
 class R3BTwimOnlineSpectra : public FairTask
 {
@@ -110,7 +110,7 @@ class R3BTwimOnlineSpectra : public FairTask
     TClonesArray* fHitItemsMwpc3 = nullptr;   /**< Array with mw3-hit items. */
     TClonesArray* fHitItemsTofW = nullptr;    /**< Array with tofw-hit items. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     int fNEvents = 0;
     int fExpId = 0;
     int fNbSections = 1;

@@ -35,7 +35,7 @@ class R3BEventHeader;
 class R3BFootMappingPar;
 
 /**
- *  This taks reads hit data from foot and alpide detectors and plots
+ *  This tasks reads hit data from foot and alpide detectors and plots
  *  online histograms
  */
 class R3BFootVsAlpideOnlineSpectra : public FairTask
@@ -117,7 +117,7 @@ class R3BFootVsAlpideOnlineSpectra : public FairTask
 
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger = -1;    /**< Trigger value. */
     Int_t fNEvents;         /**< Event counter. */

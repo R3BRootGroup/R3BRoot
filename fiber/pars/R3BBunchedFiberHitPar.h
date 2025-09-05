@@ -52,7 +52,7 @@ class R3BBunchedFiberHitPar : public FairParGenericSet
                           const char* context = "TestDefaultContext",
                           Bool_t own = kTRUE);
     /**
-     * Destructor. Cleares the memory used by the object.
+     * Destructor. Clears the memory used by the object.
      */
     virtual ~R3BBunchedFiberHitPar(void);
 
@@ -107,7 +107,7 @@ class R3BBunchedFiberHitPar : public FairParGenericSet
     void AddModulePar(R3BBunchedFiberHitModulePar* tch);
 
     /**
-     * Method to retrieve the arrray with module containers.
+     * Method to retrieve the array with module containers.
      * @return an array with parameter containers of type R3BTCalModulePar.
      */
     TObjArray* GetListOfModulePar() { return fHitParams; }

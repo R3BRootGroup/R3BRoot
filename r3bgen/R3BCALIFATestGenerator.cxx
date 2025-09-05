@@ -93,7 +93,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 {
     // Generate one event: produce primary particles emitted from one vertex.
     // Primary particles are distributed uniformly along
-    // those kinematics variables which were limitted by setters.
+    // those kinematics variables which were limited by setters.
     // if SetCosTheta() function is used, the distribution will be uniform in
     // cos(theta)
 
@@ -173,7 +173,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
       if (fLorentzBoostIsSet && !doNotBoost){
 
         //Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-        //As each Lorentz transformation can be performed sequencially,
+        //As each Lorentz transformation can be performed sequentially,
         //we can separate the gamma factor corresponding to each direction
         Double32_t gammaMomentum=TMath::Sqrt(px*px+py*py+pz*pz);
         pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
@@ -182,7 +182,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         if (fPDGType == 22 && fLorentzBoostIsSet && !doNotBoost)
         { /// for gamma-rays
             // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-            // As each Lorentz transformation can be performed sequencially,
+            // As each Lorentz transformation can be performed sequentially,
             // we can separate the gamma factor corresponding to each direction
             Double32_t gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
             pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
@@ -190,7 +190,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         else if (fLorentzBoostIsSet && !doNotBoost)
         { /// for any massive particle
             // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-            // As each Lorentz transformation can be performed sequencially,
+            // As each Lorentz transformation can be performed sequentially,
             // we can separate the gamma factor corresponding to each direction
             Double32_t particleEnergy = TMath::Sqrt(px * px + py * py + pz * pz + fPDGMass * fPDGMass);
             pz = (pz + fBetaOfEmittingFragment * particleEnergy) / fGammaFactor;

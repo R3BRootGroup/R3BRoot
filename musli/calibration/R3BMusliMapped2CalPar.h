@@ -77,7 +77,7 @@ class R3BMusliMapped2CalPar : public FairTask
     Int_t fNumParamsPosFit;
     Int_t fLim_DTrawMin;
     Int_t fLim_DTrawMax;
-    TArrayF* EneCalParams; // for energy loss alignement
+    TArrayF* EneCalParams; // for energy loss alignment
     TArrayF* PosCalParams; // for position calibration (interpolation from Mw)
 
     TString fNameDetA;

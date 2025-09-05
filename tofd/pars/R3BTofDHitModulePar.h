@@ -52,7 +52,7 @@ class R3BTofDHitModulePar : public FairParGenericSet
     /**
      * A method to read parameters using RuntimeDB.
      * @param list a list of parameters.
-     * @return kTRUE if successfull, else kFALSE.
+     * @return kTRUE if successful, else kFALSE.
      */
     Bool_t getParams(FairParamList* list) override;
 

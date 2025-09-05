@@ -110,7 +110,7 @@ class R3BPdcMapped2Cal : public FairTask
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
     Int_t fnEvents;
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
 

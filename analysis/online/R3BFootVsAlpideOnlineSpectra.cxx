@@ -18,7 +18,7 @@
 // --------------------------------------------------------------
 
 /*
- *  This taks reads hit data from FOOT and ALPIDE detectors and plots
+ *  This tasks reads hit data from FOOT and ALPIDE detectors and plots
  *  online histograms
  */
 
@@ -262,7 +262,7 @@ void R3BFootVsAlpideOnlineSpectra::Exec(Option_t* option)
     // if ((fTrigger >= 0) && (header) && (header->GetTrigger() != 1))
     // return;
 
-    // Check for requested trigger (Todo: should be done globablly / somewhere else)
+    // Check for requested trigger (Todo: should be done globally / somewhere else)
     if ((fTrigger >= 0) && (header != nullptr) && (header->GetTrigger() != fTrigger))
         return;
 

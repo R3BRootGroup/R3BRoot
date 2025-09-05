@@ -58,7 +58,6 @@ void R3BMSOffsetFinder::SetParContainers()
 // -----   Public method Init   --------------------------------------------
 InitStatus R3BMSOffsetFinder::Init()
 {
-
     LOG(info) << "R3BMSOffsetFinder: Init";
 
     FairRootManager* rootManager = FairRootManager::Instance();
@@ -107,7 +106,6 @@ InitStatus R3BMSOffsetFinder::ReInit()
 // -----   Public method Exec   --------------------------------------------
 void R3BMSOffsetFinder::Exec(Option_t* /*opt*/)
 {
-
     const Int_t sampHits = fSamplerMapped->GetEntriesFast();
     const Int_t sampmsHits = fSamplerMSMapped->GetEntriesFast();
     if ((sampHits == 0) || (sampmsHits != 1))
@@ -141,7 +139,6 @@ void R3BMSOffsetFinder::FinishTask() { SearchMSOffset(); }
 
 void R3BMSOffsetFinder::SearchMSOffset()
 {
-
     LOG(info) << "R3BMSOffsetFinder: Search MS Offset";
     if (fh_Offset_Finder->GetEntries() >= fMinStatistics)
     {
@@ -149,7 +146,7 @@ void R3BMSOffsetFinder::SearchMSOffset()
         auto offset =
             (fh_Offset_Finder->GetBinCenter(MSpos)) -
             0.5; // The bin is unitary, so the Bin Center will always be X.5 (the center of a unitary bin). To fix that
-                 // the -0.5 is added to the equation. The time here is in clock cycles, so thi -0.5 corrects that.
+                 // the -0.5 is added to the equation. The time here is in clock cycles, so this -0.5 corrects that.
         fMSOffsetPar->SetMSOffset(offset);
     }
 

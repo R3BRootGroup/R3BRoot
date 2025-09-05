@@ -192,7 +192,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             P1cm.SetY(-P2cm.Y());
             P1cm.SetZ(-P2cm.Z());
 
-            //------- Calculate realtive to the direction of the quasi-particle (cluster) --------
+            //------- Calculate relative to the direction of the quasi-particle (cluster) --------
             double beta_cm = -Pa.Mag() / (EaL + Mi);
             double gamma_cm = 1 / sqrt(1 - beta_cm * beta_cm);
 
@@ -278,7 +278,7 @@ Bool_t R3Bp2pevtGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             P1cm.SetY(-P2cm.Y());
             P1cm.SetZ(-P2cm.Z());
 
-            //------- Calculate realtive to the direction of the CM motion ----------
+            //------- Calculate relative to the direction of the CM motion ----------
             double beta_cm = 0.00000 - LVstart.Beta();
             double gamma_cm = 1 / sqrt(1 - beta_cm * beta_cm);
 

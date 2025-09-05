@@ -1,7 +1,7 @@
 #################################################################
 # MAPPED parameter for Pspx
 # 3 physical detectors correspond to 6 R3BRoot detectors 
-# if signals are split into enery and position readout  
+# if signals are split into energy and position readout  
 #################################################################
 [R3BPspxMappedPar]
 //-------------------------------------------------------------

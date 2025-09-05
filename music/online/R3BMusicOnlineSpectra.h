@@ -17,8 +17,7 @@
 // -----           Fill MusIC online histograms           -----
 // ------------------------------------------------------------
 
-#ifndef R3BMusicOnlineSpectra_H
-#define R3BMusicOnlineSpectra_H
+#pragma once
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -37,7 +36,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads MusIC data and plots online histograms
+ * This tasks reads MusIC data and plots online histograms
  */
 class R3BMusicOnlineSpectra : public FairTask
 {
@@ -103,7 +102,7 @@ class R3BMusicOnlineSpectra : public FairTask
     TClonesArray* fCalItemsMus;    /**< Array with cal items. */
     TClonesArray* fHitItemsMus;    /**< Array with hit items. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
     Int_t fExpId;
@@ -144,5 +143,3 @@ class R3BMusicOnlineSpectra : public FairTask
   public:
     ClassDef(R3BMusicOnlineSpectra, 1)
 };
-
-#endif

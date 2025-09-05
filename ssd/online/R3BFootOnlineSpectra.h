@@ -40,7 +40,7 @@ class TH1F;
 class TH2F;
 
 /**
- * This taks reads FOOT data and plots online histograms
+ * This tasks reads FOOT data and plots online histograms
  */
 class R3BFootOnlineSpectra : public FairTask
 {
@@ -160,7 +160,7 @@ class R3BFootOnlineSpectra : public FairTask
     // Maximum size of the cluster (-1 for no maximum)
     double fMaxSize = -1;
 
-    // Number of posible combinations of correlations
+    // Number of possible combinations of correlations
     int dim = 6;
 
     // Variables measured by each foot (example of G-249 experiment)

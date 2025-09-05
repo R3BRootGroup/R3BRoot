@@ -100,7 +100,7 @@ class R3BMwpcCorrelationOnlineSpectra : public FairTask
     TClonesArray* fCalItemsMwpc2 = nullptr; /**< Array with cal items. */
     TClonesArray* fHitItemsMwpc2 = nullptr; /**< Array with hit items. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     int fNEvents = 0;
     TString fNameDet1, fNameDet2;
 

@@ -472,7 +472,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 if (top->GetBarId() == 48 && top->GetDetectorId() == 2 && IS_NAN(wedge_right_ns))
                 {
                     wedge_right_ns = top_ns;
-                    // cout << "wedge rigt: " << wedge_right_ns << endl;
+                    // cout << "wedge right: " << wedge_right_ns << endl;
                 }
                 ++top_i;
             }
@@ -589,7 +589,7 @@ void R3BTofDCal2Hit::Exec(Option_t* option)
                 }
                 else
                 {
-                    // we have paramters, but maybe not all
+                    // we have parameters, but maybe not all
                     R3BLOG(debug, "Hit par found, Plane: " << top->GetDetectorId() << ", Bar: " << top->GetBarId());
                     Offset1 = par->GetOffset1();
                     Offset2 = par->GetOffset2();

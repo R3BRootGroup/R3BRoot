@@ -106,7 +106,7 @@ class R3BTofiHisto2HitPar : public FairTask
     inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
-     * Method for selecting a certain paramter calculation.
+     * Method for selecting a certain parameter calculation.
      */
     inline void SetParameter(Int_t parameter) { fParameter = parameter; }
 

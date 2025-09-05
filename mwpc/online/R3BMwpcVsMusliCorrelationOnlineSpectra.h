@@ -90,7 +90,7 @@ class R3BMwpcVsMusliCorrelationOnlineSpectra : public FairTask
     TClonesArray* fMapItemsMusli = nullptr; /**< Array with Musli cal items. */
     TClonesArray* fCalItemsMusli = nullptr; /**< Array with Musli cal items. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     int fNEvents = 0;
     TString fNameDet;
 

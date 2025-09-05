@@ -84,7 +84,7 @@ void R3BMusliCal2Hit::SetParContainers()
     fHit_Par = dynamic_cast<R3BMusliHitPar*>(rtdb->getContainer("musliHitPar"));
     if (!fHit_Par)
     {
-        R3BLOG(error, "R3BMusliCal2Hit::SetParContainers() Couldn't get handle on musliHitPar container");
+        R3BLOG(error, "R3BMusliCal2Hit::SetParContainers() Could not get handle on musliHitPar container");
     }
     else
     {
@@ -93,7 +93,7 @@ void R3BMusliCal2Hit::SetParContainers()
 
     // Reading the TGeoPar from the FairRun
     fMusliGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("MusliGeoPar"));
-    R3BLOG_IF(error, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Couldn´t access to MusliGeoPar container.");
+    R3BLOG_IF(error, !fMusliGeo_Par, "R3BMusliCal2Hit::SetParContainers() Could not access to MusliGeoPar container.");
 }
 
 void R3BMusliCal2Hit::SetParameters()

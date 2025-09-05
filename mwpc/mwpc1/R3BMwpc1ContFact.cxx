@@ -33,9 +33,6 @@ R3BMwpc1ContFact::R3BMwpc1ContFact()
 
 void R3BMwpc1ContFact::setAllContainers()
 {
-    // Creates the Container objects with all accepted contexts and adds them to
-    // the list of containers for the Mwpc1 library.
-
     FairContainer* p1 = new FairContainer("mwpc1CalPar", "Mwpc1 Cal Parameters", "Mwpc1CalParContext");
     p1->addContext("Mwpc1CalParContext");
     containers->Add(p1);
@@ -47,10 +44,6 @@ void R3BMwpc1ContFact::setAllContainers()
 
 FairParSet* R3BMwpc1ContFact::createContainer(FairContainer* c)
 {
-    // Trals the constructor of the corresponding parameter container.
-    // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
-
     const std::string name(c->GetName());
     R3BLOG(info, "Create container name: " << name.c_str());
 

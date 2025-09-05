@@ -130,10 +130,10 @@ void create_target_area_2023_geo(const TString geoTag = "v2023.1")
     // Mylar windows for LH2 target
     Double_t thinMylar1 = 0.012 / 2.0;            // 120micra entrance window
     Double_t thinMylar2 = 0.018 / 2.0;            // 180micra exit window
-    Double_t LH2targetR = 1.5 - thinMylar2 * 2.0; // Radius of 1.5 cm - mylar cylindre
+    Double_t LH2targetR = 1.5 - thinMylar2 * 2.0; // Radius of 1.5 cm - mylar cylinder
     Double_t LH2targetL = 1.5;                    // Length 1.5cm
 
-    // Defintion of the Mother Volume
+    // Definition of the Mother Volume
     auto Part1 = new TGeoTube("Part1", 0., 27., 64. / 2.0);
     auto trans1 = new TGeoCombiTrans("trans1", 0., 0., -25.5 + offsetZ, fRefRot);
     trans1->RegisterYourself();

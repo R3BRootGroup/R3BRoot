@@ -428,7 +428,7 @@ Double_t R3BMwpc3Cal2Hit::FittedHyperbolicSecant(string XorY,
     return pos;
 }
 
-/* ---- Indentifying cluster and matching good hits using the tofwall information ---- */
+/* ---- Identifying cluster and matching good hits using the tofwall information ---- */
 void R3BMwpc3Cal2Hit::ReconstructHitWithTofWallMatching()
 {
     // Getting Position information from tof wall

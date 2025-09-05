@@ -59,7 +59,7 @@ class R3BFiberMAPMTHitModulePar : public FairParGenericSet
     /**
      * A method to read parameters using RuntimeDB.
      * @param list a list of parameters.
-     * @return kTRUE if successfull, else kFALSE.
+     * @return kTRUE if successful, else kFALSE.
      */
     Bool_t getParams(FairParamList* list);
 
@@ -70,7 +70,7 @@ class R3BFiberMAPMTHitModulePar : public FairParGenericSet
     void printParams();
 
     /**
-     * A method to draw vaues of parameters on the current Canvas.
+     * A method to draw values of parameters on the current Canvas.
      */
     void DrawParams();
 

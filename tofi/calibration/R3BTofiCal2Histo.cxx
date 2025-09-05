@@ -275,7 +275,7 @@ void R3BTofiCal2Histo::Exec(Option_t*)
             auto bot = bot_vec.at(bot_i);
             auto top_trig_i = g_tofi_trig_map[top->GetSideId() - 1][top->GetBarId() - 1];
             auto bot_trig_i = g_tofi_trig_map[bot->GetSideId() - 1][bot->GetBarId() - 1];
-            // cout << "Triger mapping: " << top_trig_i << "  "  << bot_trig_i << endl;
+            // cout << "Trigger mapping: " << top_trig_i << "  "  << bot_trig_i << endl;
             // cout << "Trigger num: " << trig_num << endl;
             Double_t top_trig_ns = 0, bot_trig_ns = 0;
             if (top_trig_i < trig_num && bot_trig_i < trig_num)
@@ -422,7 +422,7 @@ void R3BTofiCal2Histo::Exec(Option_t*)
                         continue;
                     }
 
-                    // calculate tdiff with offest
+                    // calculate tdiff with offset
                     auto tdiff = (bot_ns + para->GetOffset1()) - (top_ns + para->GetOffset2());
 
                     // walk corrections

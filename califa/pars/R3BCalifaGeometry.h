@@ -81,7 +81,7 @@ class R3BCalifaGeometry : public TObject
     int GetCrystalId(const std::string volumePath);
 
     /**
-     * Calculate the distance of a given straight track through the active detector volume (crystal(s)). Usefull for
+     * Calculate the distance of a given straight track through the active detector volume (crystal(s)). Useful for
      * iPhos.
      *
      * @param startVertex Start position of track (e.g. (0,0,0) for center of target)

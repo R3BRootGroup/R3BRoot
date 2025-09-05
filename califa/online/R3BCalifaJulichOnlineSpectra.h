@@ -38,7 +38,7 @@ class TH1F;
 class TH2F;
 
 /**
- * This taks reads CalifaJulich data and plots online histograms
+ * This tasks reads CalifaJulich data and plots online histograms
  */
 class R3BCalifaJulichOnlineSpectra : public FairTask
 {

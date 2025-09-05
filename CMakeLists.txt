@@ -38,7 +38,7 @@ option(BUILD_LAND_DIR "Build old land module" ON)
 if(NOT DEFINED ENV{SIMPATH})
     message(
         FATAL_ERROR
-            "You did not define the environment variable SIMPATH which is nedded to find the external packages. Please set this variable and execute cmake again."
+            "You did not define the environment variable SIMPATH which is needed to find the external packages. Please set this variable and execute cmake again."
     )
 endif(NOT DEFINED ENV{SIMPATH})
 
@@ -320,7 +320,7 @@ else()
     if(NOT APPLE)
         message(
             STATUS
-                "Set env WERROR to 1 to enable -Werror. If origin/dev compiles on your platform with that option, it is definitly a good idea to do that."
+                "Set env WERROR to 1 to enable -Werror. If origin/dev compiles on your platform with that option, it is definitely a good idea to do that."
         )
         set(CMAKE_CXX_FLAGS
             "${CMAKE_CXX_FLAGS} -Wall -Wformat-security -Wno-sign-compare -Wno-reorder -Wno-unused-variable -Wno-unused-but-set-variable"

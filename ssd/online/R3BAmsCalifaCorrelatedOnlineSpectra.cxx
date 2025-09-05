@@ -18,7 +18,7 @@
 // --------------------------------------------------------------
 
 /*
- *  This taks reads hit data from AMS and califa detectors and plots
+ *  This tasks reads hit data from AMS and califa detectors and plots
  *  online histograms
  */
 
@@ -265,8 +265,8 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     fh_Califa_coinc_petal2e->GetYaxis()->CenterTitle(true);
     fh_Califa_coinc_petal2e->Draw("COLZ");
 
-    TCanvas* cLos = new TCanvas("Los", "LOS", 10, 10, 750, 850);
-    cLos->Divide(1, 2);
+    TCanvas* canLos = new TCanvas("Los", "LOS", 10, 10, 750, 850);
+    canLos->Divide(1, 2);
     fh_los_pos_MCFD = new TH2F("los_pos_MCFD", "LOS MCFD Position emp. cal.", 1000, -10., 10., 1000, -10., 10.);
     fh_los_pos_MCFD->GetXaxis()->SetTitle("X position / cm");
     fh_los_pos_MCFD->GetYaxis()->SetTitle("Y position / cm");
@@ -274,10 +274,10 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     fh_los_pos_TAMEX->GetXaxis()->SetTitle("X position / cm");
     fh_los_pos_TAMEX->GetYaxis()->SetTitle("Y position / cm");
 
-    cLos->cd(1);
+    canLos->cd(1);
     gPad->SetLogz();
     fh_los_pos_MCFD->Draw("colz");
-    cLos->cd(2);
+    canLos->cd(2);
     gPad->SetLogz();
     fh_los_pos_TAMEX->Draw("colz");
 
@@ -291,7 +291,7 @@ InitStatus R3BAmsCalifaCorrelatedOnlineSpectra::Init()
     mainfolAmsCal->Add(cMap2);
     mainfolAmsCal->Add(cMap1e);
     mainfolAmsCal->Add(cMap2e);
-    mainfolAmsCal->Add(cLos);
+    mainfolAmsCal->Add(canLos);
     run->AddObject(mainfolAmsCal);
 
     // Register command to reset histograms

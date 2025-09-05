@@ -116,8 +116,8 @@ class R3BFootMapped2StripCal : public FairTask
     int MaxSigma = 6;
     int fNumParams = 2;
     int eventNumber = 0;
-    int fThresholdPed = 10; // threshold for the pedestal substraction
-    int fThresholdSig = 10; // threshold for fine sigma tunning
+    int fThresholdPed = 10; // threshold for the pedestal subtraction
+    int fThresholdSig = 10; // threshold for fine sigma tuning
     int fPedestalRefRate = 30000;
     int fSigmaRefRate = 30000;
     double fTimesSigma = 5.;

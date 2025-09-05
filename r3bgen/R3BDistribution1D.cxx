@@ -77,7 +77,7 @@ TGraph createLookupGraph(const TH1& distribution, const Double_t lower_bound, co
     if (distribution.GetBinContent(startbin) < 0 || distribution.GetBinContent(endbin) < 0)
         throw std::underflow_error("Found negative value inside data!");
 
-    // handle first bin --> might be "splitted"
+    // handle first bin --> might be "split"
     integral += (distribution.GetXaxis()->GetBinUpEdge(startbin) - lower_bound) /
                 distribution.GetXaxis()->GetBinWidth(startbin) * distribution.GetBinContent(startbin);
     integralGraph.SetPoint(integralGraph.GetN(), distribution.GetXaxis()->GetBinUpEdge(startbin), integral);
@@ -91,7 +91,7 @@ TGraph createLookupGraph(const TH1& distribution, const Double_t lower_bound, co
         integralGraph.SetPoint(integralGraph.GetN(), distribution.GetXaxis()->GetBinUpEdge(i), integral);
     }
 
-    // handle last bin --> might be "splitted"
+    // handle last bin --> might be "split"
     integral += (upper_bound - distribution.GetXaxis()->GetBinLowEdge(endbin)) /
                 distribution.GetXaxis()->GetBinWidth(endbin) * distribution.GetBinContent(endbin);
     integralGraph.SetPoint(integralGraph.GetN(), upper_bound, integral);

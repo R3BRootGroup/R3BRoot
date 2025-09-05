@@ -99,7 +99,7 @@ Bool_t R3BNeulandTamexReader::R3BRead()
             int start = 0;
             int stop = 0;
             int bar;
-            int cLE, fLE, cTE, fTE;
+            int cLE, file, cTE, fTE;
 
             // the counter for coarse time and fine time should be always the same:
             if (data->NN_P[plane].tcl_T[pm].BM != data->NN_P[plane].tfl_T[pm].BM ||
@@ -128,25 +128,25 @@ Bool_t R3BNeulandTamexReader::R3BRead()
                 for (int multi = start; multi < stop; multi++)
                 {
                     cLE = data->NN_P[plane].tcl_T[pm].Bv[multi];
-                    fLE = data->NN_P[plane].tfl_T[pm].Bv[multi];
+                    file = data->NN_P[plane].tfl_T[pm].Bv[multi];
                     cTE = data->NN_P[plane].tct_T[pm].Bv[multi];
                     fTE = data->NN_P[plane].tft_T[pm].Bv[multi];
 
-                    // fLogger->Info(MESSAGE_ORIGIN, " leading coarse time %d, fine time %d \n", cLE, fLE);
+                    // fLogger->Info(MESSAGE_ORIGIN, " leading coarse time %d, fine time %d \n", cLE, file);
                     // fLogger->Info(MESSAGE_ORIGIN, " trailing coarse time %d, fine time %d \n",cTE, fTE);
 
                     auto mapped = new ((*fArray)[fArray->GetEntriesFast()]) R3BPaddleTamexMappedData(plane + 1, bar);
                     if (0 == pm)
                     {
                         mapped->fCoarseTime1LE = cLE;
-                        mapped->fFineTime1LE = fLE;
+                        mapped->fFineTime1LE = file;
                         mapped->fCoarseTime1TE = cTE;
                         mapped->fFineTime1TE = fTE;
                     }
                     else
                     {
                         mapped->fCoarseTime2LE = cLE;
-                        mapped->fFineTime2LE = fLE;
+                        mapped->fFineTime2LE = file;
                         mapped->fCoarseTime2TE = cTE;
                         mapped->fFineTime2TE = fTE;
                     }

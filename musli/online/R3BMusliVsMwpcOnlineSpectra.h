@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMusliVsMwpcOnlineSpectra_H
-#define R3BMusliVsMwpcOnlineSpectra_H
+#pragma once
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -30,7 +29,7 @@ class R3BEventHeader;
 class R3BTGeoPar;
 
 /**
- * This taks reads MusIC data and plots online histograms
+ * This tasks reads MusIC data and plots online histograms
  */
 class R3BMusliVsMwpcOnlineSpectra : public FairTask
 {
@@ -103,7 +102,7 @@ class R3BMusliVsMwpcOnlineSpectra : public FairTask
     R3BTGeoPar* fMw1Geo_Par;
     R3BTGeoPar* fMw2Geo_Par;
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
     TString fNameDet1;
@@ -148,5 +147,3 @@ class R3BMusliVsMwpcOnlineSpectra : public FairTask
   public:
     ClassDef(R3BMusliVsMwpcOnlineSpectra, 1)
 };
-
-#endif

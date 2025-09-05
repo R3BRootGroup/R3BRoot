@@ -44,7 +44,7 @@ namespace R3B
         R3BLOG(debug2, fmt::format("Checking ucesb struct item {:?}.", item->_var_name));
         if (required_reader == nullptr || required_reader->AllowExtraCondition(map_flag, map_success_conditions_))
         {
-            // no reader requries this item or reader accepts extra flag
+            // no reader requires this item or reader accepts extra flag
             return true;
         }
 

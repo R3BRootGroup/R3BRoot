@@ -115,7 +115,7 @@ class R3BFiberTrackingOnlineSpectra : public FairTask
     }
 
     int linreg(int n, const double x[], const double y[], double* m, double* b, double* r)
-    {                       // Funktion for Linear regression
+    {                       // Function for Linear regression
         double sumx = 0.0;  /* sum of x     */
         double sumx2 = 0.0; /* sum of x**2  */
         double sumxy = 0.0; /* sum of x * y */
@@ -203,7 +203,7 @@ class R3BFiberTrackingOnlineSpectra : public FairTask
     R3BTGeoPar* fTargetGeoPar = nullptr;
     R3BTGeoPar* fMw1GeoPar = nullptr;
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
 
     int fTpat1 = -1;
     int fTpat2 = -1;

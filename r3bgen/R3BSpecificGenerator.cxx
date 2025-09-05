@@ -715,7 +715,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 Double_t energyCM = energyLAB;
 
                 // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-                // As each Lorentz transformation can be performed sequencially,
+                // As each Lorentz transformation can be performed sequentially,
                 // we can separate the gamma factor corresponding to each direction
                 momLAB = TVector3((momCM.X() + beta.X() * energyCM) / TMath::Sqrt(1 - beta.X() * beta.X()),
                                   (momCM.Y() + beta.Y() * energyCM) / TMath::Sqrt(1 - beta.Y() * beta.Y()),
@@ -1094,7 +1094,7 @@ Bool_t R3BSpecificGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             exit(0);
         }
 
-    } // ! Mutliplicity
+    } // ! Multiplicity
     return kTRUE;
 }
 

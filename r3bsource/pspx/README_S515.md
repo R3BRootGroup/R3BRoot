@@ -15,7 +15,7 @@ Later it was discovered that the reason for this was that PSP internal WhiteRabb
 were not properly read out from its buffer (because the buffer was not emptied properly).
 Nevertheless, a regularity was found in data in terms of shift between PSP data and other
 detector data (PSP data was correlated with MUSIC data to investigate this). The analysis was 
-done and shifts were found for each run (their occurence was marked in terms of WhiteRabbit Master 
+done and shifts were found for each run (their occurrence was marked in terms of WhiteRabbit Master 
 timestamps).
 
 ------------------------------------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 #include <unordered_map>
 #include <vector>
 
-// TODO: Use C++20 Concept to put more constains on the template parameters
+// TODO: Use C++20 Concept to put more constrains on the template parameters
 namespace R3B
 {
     template <typename InputType>
@@ -135,11 +135,11 @@ namespace R3B
         OutputConnector& operator=(const OutputConnector& other) = delete;
         OutputConnector& operator=(OutputConnector&&) = delete;
 
-        void init(bool persistance = true, const boost::source_location& loc = BOOST_CURRENT_LOCATION)
+        void init(bool persistence = true, const boost::source_location& loc = BOOST_CURRENT_LOCATION)
         {
             if (auto* ioman = FairRootManager::Instance(); ioman != nullptr)
             {
-                ioman->RegisterAny(branch_name_.c_str(), data_ptr_, persistance);
+                ioman->RegisterAny(branch_name_.c_str(), data_ptr_, persistence);
             }
             else
             {

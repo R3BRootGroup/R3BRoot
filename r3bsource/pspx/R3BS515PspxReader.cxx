@@ -131,7 +131,7 @@ Bool_t R3BS515PspxReader::WriteMappedData(EXT_STR_h101_PSP_onion* source)
         // loop over faces
         for (Int_t f = 0; f < 2; f++)
         {
-            std::vector<R3BPspxMappedData*> datas(LENGTH(source->PSPX[0].F[0].S[0].EI));
+            std::vector<R3BPspxMappedData*> data(LENGTH(source->PSPX[0].F[0].S[0].EI));
             // loop over strip sides
             for (Int_t s = 0; s < 2; s++)
             {
@@ -143,17 +143,17 @@ Bool_t R3BS515PspxReader::WriteMappedData(EXT_STR_h101_PSP_onion* source)
                     int32_t strip = dfs.EI[i]; // counting from 1 to max number of channels for an detector
                     int32_t energy = dfs.Ev[i];
                     if (energy < 0)
-                        energy = -1. * energy; // make sure energy values are positive. Necessary for compatibilty with
+                        energy = -1. * energy; // make sure energy values are positive. Necessary for compatibility with
                                                // GSI Febex firmware
 
-                    // if (!datas[strip-1]) datas[strip-1] = new
+                    // if (!data[strip-1]) data[strip-1] = new
                     // ((*fMappedItems[d])[fMappedItems[d]->GetEntriesFast()])
                     // R3BPspxMappedData(f+1,strip);
-                    if (!datas[strip - 1])
-                        datas[strip - 1] = new ((*fMappedItems[2 * d + f])[fMappedItems[2 * d + f]->GetEntriesFast()])
+                    if (!data[strip - 1])
+                        data[strip - 1] = new ((*fMappedItems[2 * d + f])[fMappedItems[2 * d + f]->GetEntriesFast()])
                             R3BPspxMappedData();
-                    // assert(-1 == datas[strip-1]->GetEnergy(s));
-                    datas[strip - 1]->SetValue(s, strip, energy);
+                    // assert(-1 == data[strip-1]->GetEnergy(s));
+                    data[strip - 1]->SetValue(s, strip, energy);
                 }
             }
         }

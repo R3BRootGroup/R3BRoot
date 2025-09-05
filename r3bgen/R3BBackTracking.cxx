@@ -76,7 +76,7 @@ void R3BBackTracking::ReadNewLine()
     Char_t* myChar = new Char_t[256];
 
     //  cout << inputFile << "" << *inputFile << endl;
-    // cout << "Estoy en el caracter del fichero: "<< (*inputFile).tellg() << endl;
+    // cout << "Estoy en el character del fichero: "<< (*inputFile).tellg() << endl;
     //(*inputFile).seekg((int)(12100000*0.00001));
     // cout << "y me muevo a: "<<(*inputFile).tellg() << endl;
 

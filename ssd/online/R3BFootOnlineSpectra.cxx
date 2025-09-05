@@ -812,7 +812,7 @@ void R3BFootOnlineSpectra::Exec(Option_t* option)
         }
     }
 
-    // Fill the mutiplicity of the cluster per event
+    // Fill the multiplicity of the cluster per event
     for (int i = 0; i < fNbDet; i++)
     {
         if (mult[i] == 0)

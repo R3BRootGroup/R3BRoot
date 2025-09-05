@@ -80,7 +80,7 @@ FairParSet* R3BTofiContFact::createContainer(FairContainer* c)
 {
     /** Tofils the constructor of the corresponding parameter container.
      * For an actual context, which is not an empty string and not the default context
-     * of this container, the name is concatinated with the context. */
+     * of this container, the name is concatenated with the context. */
 
     const char* name = c->GetName();
     cout << " -I container name " << name << endl;

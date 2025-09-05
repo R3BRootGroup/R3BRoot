@@ -32,7 +32,7 @@ class R3BTcutPar;
 class R3BCoarseTimeStitch;
 
 /**
- * This taks reads all detector data items for the analysis of incoming
+ * This tasks reads all detector data items for the analysis of incoming
  * projectiles from FRS.
  */
 class R3BAnalysisIncomingID : public FairTask

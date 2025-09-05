@@ -23,7 +23,7 @@ class R3BIncomingIDPar;
 class R3BFrsSciCalPar;
 
 /**
- * This taks reads SCI data and plots online histograms
+ * This tasks reads SCI data and plots online histograms
  */
 class R3BOnlineSpectraFrsSciVsLos : public FairTask
 {

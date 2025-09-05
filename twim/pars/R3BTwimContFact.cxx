@@ -21,17 +21,15 @@
 //  Factory for the parameter containers in libR3BTwim
 //
 
-#include "R3BTwimContFact.h"
-
-#include <FairLogger.h>
 #include <FairRuntimeDb.h>
+#include <TClass.h>
+#include <string>
 
 #include "R3BLogger.h"
 #include "R3BTGeoPar.h"
 #include "R3BTwimCalPar.h"
+#include "R3BTwimContFact.h"
 #include "R3BTwimHitPar.h"
-
-#include <TClass.h>
 
 static R3BTwimContFact gR3BTwimContFact;
 
@@ -46,40 +44,34 @@ R3BTwimContFact::R3BTwimContFact()
 
 void R3BTwimContFact::setAllContainers()
 {
-    // Creates the Container objects with all accepted contexts and adds them to
-    // the list of containers for the STS library.
-
-    FairContainer* p1 = new FairContainer("twimCalPar", "TWIM Cal Parameters", "TwimCalParContext");
+    auto* p1 = new FairContainer("twimCalPar", "TWIM Cal Parameters", "TwimCalParContext");
     p1->addContext("TwimCalParContext");
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("twimHitPar", "TWIM Hit Parameters", "TwimHitParContext");
+    auto* p2 = new FairContainer("twimHitPar", "TWIM Hit Parameters", "TwimHitParContext");
     p2->addContext("TwimHitParContext");
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("TwimGeoPar", "Twim-Music geometry parameters", "GeometryParameterContext");
+    auto* p3 = new FairContainer("TwimGeoPar", "Twim-Music geometry parameters", "GeometryParameterContext");
     p3->addContext("GeometryParameterContext");
     containers->Add(p3);
 }
 
 FairParSet* R3BTwimContFact::createContainer(FairContainer* c)
 {
-    // Trals the constructor of the corresponding parameter container.
-    // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
+    const std::string name(c->GetName());
+    R3BLOG(info, "Create container name: " << name.c_str());
 
-    const char* name = c->GetName();
-    R3BLOG(info, "Create container name: " << name);
-    FairParSet* p = 0;
-    if (strcmp(name, "twimCalPar") == 0)
+    FairParSet* p = nullptr;
+    if (name == "twimCalPar")
     {
         p = new R3BTwimCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "twimHitPar") == 0)
+    else if (name == "twimHitPar")
     {
         p = new R3BTwimHitPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
-    else if (strcmp(name, "TwimGeoPar") == 0)
+    else if (name == "TwimGeoPar")
     {
         p = new R3BTGeoPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }

@@ -17,8 +17,7 @@
 // -----              Modified Dec 2019 by M. Holl        -----
 // ------------------------------------------------------------
 
-#ifndef R3BPspxOnlineSpectra_H
-#define R3BPspxOnlineSpectra_H
+#pragma once
 
 #include "FairTask.h"
 #include <array>
@@ -37,7 +36,7 @@ class R3BEventHeader;
 #define PSPX 3
 
 /**
- * This taks reads all detector data items and plots histograms
+ * This tasks reads all detector data items and plots histograms
  * for online checks.
  */
 class R3BPspxOnlineSpectra : public FairTask
@@ -106,7 +105,7 @@ class R3BPspxOnlineSpectra : public FairTask
     std::vector<TClonesArray*> fCalItemsPspx;    /**< Array with Cal items for Pspx. */
     std::vector<TClonesArray*> fHitItemsPspx;    /**< Array with Hit items for Pspx. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fNEvents;         /**< Event counter. */
@@ -127,5 +126,3 @@ class R3BPspxOnlineSpectra : public FairTask
   public:
     ClassDef(R3BPspxOnlineSpectra, 2)
 };
-
-#endif

@@ -143,7 +143,7 @@ Bool_t R3BPtofReader::ReadLeadingEdges(EXT_STR_h101_PTOF_onion* data, int t)
 
 Bool_t R3BPtofReader::ReadTrailingEdges(EXT_STR_h101_PTOF_onion* data, int t)
 {
-    // # of channels with data. not necessarly number
+    // # of channels with data. not necessarily number
     // of hits! (b/c multi hit)
     uint32_t numChannels = data->PTOF_TFTM;
     LOG(debug) << "mult trailing " << numChannels << "---------------------------";
@@ -424,7 +424,7 @@ Bool_t R3BPtofReader::FindCoarseCounterReference(EXT_STR_h101_PTOF_onion* data)
     Int_t MinCoarse = 2048;
     Int_t MaxCoarse = 0;
 
-    // # of channels with data. not necessarly number
+    // # of channels with data. not necessarily number
     // of hits! (b/c multi hit)
     uint32_t numChannels = data->PTOF_TFLM;
 

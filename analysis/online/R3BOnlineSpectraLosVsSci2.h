@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BONLINESPECTRALOSVSSCI2
-#define R3BONLINESPECTRALOSVSSCI2
+#pragma once
 
 #include "FairTask.h"
 #include <array>
@@ -21,7 +20,6 @@
 #include <sstream>
 #include <vector>
 
-// #include "R3BFrsData.h"
 #include "TCanvas.h"
 #include "TClonesArray.h"
 #include "TH1.h"
@@ -34,12 +32,11 @@ class TH2F;
 class R3BEventHeader;
 
 /**
- * This taks reads all detector data items and plots histograms
+ * This tasks reads all detector data items and plots histograms
  * for online checks.
  */
 class R3BOnlineSpectraLosVsSci2 : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -271,13 +268,13 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
         Double_t tdiff = 0.;
         Double_t fNorm = 1.;
         Int_t iclear_count = 1;
-        UInt_t reset_time;         // time after which bmon spectra are reseted
+        UInt_t reset_time;         // time after which bmon spectra are reset
         Double_t read_time;        // step in which scalers are read, in sec
         Int_t fsens_SEE, fsens_IC; // SEETRAM and IC sensitivity, between -4 and -10
         Double_t calib_SEE = 1.;   // SEETRAM calibration factor
         Double_t see_offset = 7.1; // SEETRAM offset in kHz
     */
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
@@ -420,5 +417,3 @@ class R3BOnlineSpectraLosVsSci2 : public FairTask
   public:
     ClassDef(R3BOnlineSpectraLosVsSci2, 2)
 };
-
-#endif

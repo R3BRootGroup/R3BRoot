@@ -112,7 +112,7 @@ InitStatus R3BLosMapped2TCal::ReInit()
 
 void R3BLosMapped2TCal::Exec(Option_t*)
 {
-    // check for requested trigger (Todo: should be done globablly / somewhere else)
+    // check for requested trigger (Todo: should be done globally / somewhere else)
 
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;

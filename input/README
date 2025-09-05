@@ -18,7 +18,7 @@ the directory R3B contains the original field map
 (R3B.MAP.gz) with a simple X, Y, Z, Bx, By, Bz
 list, with 30mm step between field values in the three 
 dimensions. The field map is converted to a simple vector 
-of the values Bx, By and Bz using the perl scrip 
+of the values Bx, By and Bz using the perl script 
 converMapToCode2.pl 
 The outcome (R3B.dat) is included in the magnetic field 
 description within the code. 
@@ -35,7 +35,7 @@ the directory Aladin contains the original field map
 (measuredF-ala18.dat) with a simple X, Bx, Y, By, Z, Bz
 list, with 50mm step between field values in the three 
 dimensions. The field map is converted to a simple vector 
-of the values Bx, By and Bz using the perl scrip 
+of the values Bx, By and Bz using the perl script 
 converMapToCode.pl 
 The outcome (ALADIN.dat) is included in the magnetic field 
 description within the code. 

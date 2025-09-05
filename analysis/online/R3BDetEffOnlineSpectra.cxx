@@ -59,7 +59,7 @@ InitStatus R3BDetEffOnlineSpectra::Init()
     fHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
     R3BLOG_IF(fatal, fHeader == nullptr, "EventHeader. not found");
 
-    // get access to mappped data
+    // get access to mapped data
     for (const auto& clone_name : fNames)
     {
         auto temp = dynamic_cast<TClonesArray*>(mgr->GetObject(clone_name));

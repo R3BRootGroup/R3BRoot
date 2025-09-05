@@ -401,7 +401,7 @@ void R3BFootMapped2StripCal::Exec(Option_t* /*option*/)
         fCal_Par->setChanged(kTRUE);
     }
 
-    // Pedestal substraction
+    // Pedestal subtraction
     for (const auto& data : mappedDataNl)
     {
         detId = data->GetDetId() - 1;
