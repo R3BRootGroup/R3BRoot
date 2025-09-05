@@ -34,7 +34,7 @@
  * You may consider an instance of this class as an excited nucleus performing gamma decay.
  *
  * Use SetEnergyLevel(id, E) to define energy levels with arbitrary, integer IDs and energies in GeV.
- * Then, use SetBranchingRatio(idLevelFrom, idLevelTo, ratio) to define the transition propabilities between the levels.
+ * Then, use SetBranchingRatio(idLevelFrom, idLevelTo, ratio) to define the transition probabilities between the levels.
  * Finally, using SetInitalLevel() define the one and only initial energy level to start the cascade,
  * or SetInitialLevelDistribution() to define multiple possible initial states with a given distribution.
  */

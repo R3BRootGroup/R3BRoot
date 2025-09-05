@@ -102,7 +102,7 @@ InitStatus R3BFibervsTofDOnlineSpectra::Init()
     else
         R3BLOG(info, " EventHeader. found");
 
-    // uncomment lines below when ucesb avaliable
+    // uncomment lines below when ucesb available
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 

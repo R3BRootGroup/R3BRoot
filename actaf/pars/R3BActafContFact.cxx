@@ -18,6 +18,8 @@
 //-----------------------------------------------------------------
 
 #include <FairRuntimeDb.h>
+#include <TClass.h>
+#include <string>
 
 #include "R3BActafContFact.h"
 #include "R3BActafMappingPar.h"
@@ -51,7 +53,7 @@ void R3BActafContFact::setAllContainers()
 FairParSet* R3BActafContFact::createContainer(FairContainer* c)
 {
     // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
+    // of this container, the name is concatenated with the context.
     const std::string name(c->GetName());
     R3BLOG(info, "Create container name: " << name.c_str());
 

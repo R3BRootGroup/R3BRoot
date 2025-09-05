@@ -17,8 +17,7 @@
 // -----               Fill online histograms             -----
 // ------------------------------------------------------------
 
-#ifndef R3BONLINESPILLANALYSIS_H
-#define R3BONLINESPILLANALYSIS_H
+#pragma once
 
 #include "FairTask.h"
 
@@ -39,7 +38,7 @@ class R3BEventHeader;
 class TCanvas;
 
 /**
- * This taks reads all detector data items and plots histograms
+ * This tasks reads all detector data items and plots histograms
  * for online checks.
  */
 class R3BOnlineSpillAnalysis : public FairTask
@@ -119,7 +118,7 @@ class R3BOnlineSpillAnalysis : public FairTask
     void Update_Histo();
 
   private:
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
@@ -143,7 +142,7 @@ class R3BOnlineSpillAnalysis : public FairTask
     Double_t tdiff = 0.;
     Double_t fNorm = 1.;
     Int_t iclear_count = 1;
-    UInt_t reset_time;  // time after which bmon spectra are reseted
+    UInt_t reset_time;  // time after which bmon spectra are reset
     Double_t read_time; // step in which scalers are read, in sec
     Double_t fDAQ_dead_time;
 
@@ -236,5 +235,3 @@ class R3BOnlineSpillAnalysis : public FairTask
   public:
     ClassDef(R3BOnlineSpillAnalysis, 2)
 };
-
-#endif /* R3BONLINESPILLANALYSIS_H */

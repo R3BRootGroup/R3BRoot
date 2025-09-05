@@ -17,8 +17,7 @@
 // ----- Fill AMS and CALIFA correlations in online histograms --
 // --------------------------------------------------------------
 
-#ifndef R3BAmsCalifaCorrelatedOnlineSpectra_H
-#define R3BAmsCalifaCorrelatedOnlineSpectra_H
+#pragma once
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -34,7 +33,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- *  This taks reads hit data from AMS and califa detectors and plots
+ *  This tasks reads hit data from AMS and califa detectors and plots
  *  online histograms
  */
 class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask
@@ -103,7 +102,7 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask
 
     Double_t fClockFreq; /**< Clock cycle in [ns]. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fNEvents;         /**< Event counter. */
@@ -131,5 +130,3 @@ class R3BAmsCalifaCorrelatedOnlineSpectra : public FairTask
   public:
     ClassDef(R3BAmsCalifaCorrelatedOnlineSpectra, 1)
 };
-
-#endif

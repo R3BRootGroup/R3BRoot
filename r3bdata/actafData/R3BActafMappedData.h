@@ -30,7 +30,7 @@ class R3BActafMappedData : public TObject
      *@param energy    Energy for each pad
      *@param baseline  Baseline for each pad
      *@param riseTime  Rise time of the signal after baseline subtraction
-     *@param maxpos        Position of the maximum amplitud for the signal
+     *@param maxpos        Position of the maximum amplitude for the signal
      *@param maxamplitude  Max. amplitude after baseline subtraction
      **/
     explicit R3BActafMappedData(UInt_t pad,

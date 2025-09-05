@@ -262,7 +262,7 @@ void R3BOnlineSpectraPdc::Exec(Option_t* option)
             fhTrigger->Fill(header->GetTrigger());
         }
 
-        //   check for requested trigger (Todo: should be done globablly / somewhere else)
+        //   check for requested trigger (Todo: should be done globally / somewhere else)
         if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
             return;
 

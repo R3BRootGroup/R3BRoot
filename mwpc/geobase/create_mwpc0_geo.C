@@ -153,7 +153,7 @@ void create_mwpc0_geo(const TString geoTag = "v2021.3")
     TGeoRotation* rot_mwpc = new TGeoRotation("MWPCrot");
     rot_mwpc->RotateY(0.0);
 
-    // Defintion of the Mother Volume
+    // Definition of the Mother Volume
     TGeoShape* pCBWorld = new TGeoBBox("MWPC0_box", 40.0 / 2.0, 40.0 / 2.0, 7.0 / 2.0);
 
     TGeoVolume* pWorld = new TGeoVolume(WorldName, pCBWorld, pMedAr);

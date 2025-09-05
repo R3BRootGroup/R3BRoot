@@ -128,7 +128,7 @@ class R3BTofiMapped2Cal : public FairTask
     UInt_t fPaddlesPerPlane; /**< Number of paddles per plane. */
     Double_t fClockFreq;     /**< Clock cycle in [ns]. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
 

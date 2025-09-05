@@ -57,7 +57,7 @@ class R3BEventHeader : public FairEventHeader
 
     [[nodiscard]] inline double GetTnext() const { return fTnext; }
 
-    void Register(bool Persistance = true) override{};
+    void Register(bool Persistence = true) override{};
 
   private:
     int fExpId = 0;

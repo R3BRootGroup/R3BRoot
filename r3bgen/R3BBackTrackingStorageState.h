@@ -29,8 +29,7 @@
 // --------------------------------------------------------------
 /////////////////////////////////////////////////////////////////
 
-#ifndef R3BBackTrackingStorageState_h
-#define R3BBackTrackingStorageState_h 1
+#pragma once
 
 #include "TROOT.h" //for including Rtypes.h
 
@@ -39,8 +38,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
-// using namespace std;
 
 class R3BBackTrackingStorageState : public TObject
 {
@@ -55,7 +52,7 @@ class R3BBackTrackingStorageState : public TObject
     Double_t pfinal;  // calculated value for the momentum module
     Double_t piter;   // calculated value for the momentum module
     Int_t niter;      // iteration number
-    Int_t converg;    // 0 when it doesnt converge,1 when it does.
+    Int_t converg;    // 0 when it does not converge,1 when it does.
 
     Double_t x0tar; // coordinates measured in the target (real measurement)
     Double_t y0tar;
@@ -110,4 +107,3 @@ class R3BBackTrackingStorageState : public TObject
 
     ClassDef(R3BBackTrackingStorageState, 1) // ROOT CINT
 };
-#endif

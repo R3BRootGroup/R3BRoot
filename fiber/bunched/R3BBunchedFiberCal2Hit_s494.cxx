@@ -379,7 +379,7 @@ void R3BBunchedFiberCal2Hit_s494::Exec(Option_t* option)
                   if (side_i == 0)
                       channel.tot_list.push_front(ToT(lead, cur_cal, lead_ns, cur_cal_ns, tot_ns));
                 */
-                // In s494 all FibDet are readd out with MAPMT->CTDC and no TAMEX, thus nothing has to be inversed
+                // In s494 all FibDet are read out with MAPMT->CTDC and no TAMEX, thus nothing has to be inversed
                 channel.tot_list.push_back(ToT(lead, cur_cal, lead_ns, cur_cal_ns, tot_ns));
                 channel.lead_list.pop_front();
             }

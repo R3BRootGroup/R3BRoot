@@ -42,7 +42,7 @@ class TH2F;
 class R3BEventHeader;
 
 /**
- * This taks reads ROLU data items and plots histograms
+ * This tasks reads ROLU data items and plots histograms
  * for online checks.
  */
 class R3BRoluOnlineSpectra : public FairTask

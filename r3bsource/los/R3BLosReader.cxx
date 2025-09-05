@@ -129,27 +129,27 @@ Bool_t R3BLosReader::R3BRead()
      * For variable definition, see structure EXT_STR_h101_LOS_onion_t
      * in ext_str_h101_los_tamex.h
      *** VFTX DATA ***
-     * VTF = Size of the array TFv contaning fine VFTX times
+     * VTF = Size of the array TFv containing fine VFTX times
      * VTFv = Array containing the actual data on the fine  times
      * VTFM = No of channels having time
      * VTFMI = Array of TFM size containing the channel numbers of each channel with data
      * VTFME = Array of TFM size containing the index of the first element of the next channel in data array TFv;
      *         TFME[i]-FTME[i-1] = number of data for channel i;
      *
-     * VTC = Size of the array TCv contaning coarse VFTX times
+     * VTC = Size of the array TCv containing coarse VFTX times
      * VTCv = Array containing the actual data on the coarse times
      * VTCM = No of channels having coarse time
      * VTCMI = Array of TCM size containing the channel numbers of each channel with data
      * VTCME = Array of TCM size containing the index of the first element of the next channel in data array TCv
      *
      *** TAMEX DATA *** Added by Aleksandra, Oct. 2016
-     * TTFL = Size of the array TFLv contaning fine leading times
+     * TTFL = Size of the array TFLv containing fine leading times
      * TTFLv = Array containing the actual data on the fine leading times
      * TTFLM = No of channels having fine leading time
      * TTFLMI = Array of TFLM size containing the channel numbers of each channel with data
      * TTFLME = Array of TFLM size containing the index of the first element of the next channel in data array TFLv
      *
-     * TTCL = Size of the array TCLv contaning coarse leading times
+     * TTCL = Size of the array TCLv containing coarse leading times
      * TTCLv = Array containing the actual data on the coarse leading times
      * TTCLM = No of channels having coarse leading time
      * TTCLMI = Array of TCLM size containing the channel numbers of each channel with data

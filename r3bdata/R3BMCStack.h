@@ -24,7 +24,7 @@
  **
  ** This class handles the particle stack for the transport simulation.
  ** For the stack FILO functunality, it uses the STL stack. To store
- ** the tracks during transport, a TParticle arry is used.
+ ** the tracks during transport, a TParticle array is used.
  ** At the end of the event, tracks satisfying the filter criteria
  ** are copied to a R3BMCTrack array, which is stored in the output.
  **
@@ -38,8 +38,7 @@
  ** By default, the minimal number of points is 1 and the energy cut is 0.
  **/
 
-#ifndef R3BSTACK_H
-#define R3BSTACK_H
+#pragma once
 
 #include "FairGenericStack.h"
 #include "R3BDetectorList.h"
@@ -53,7 +52,6 @@
 
 class R3BStack : public FairGenericStack
 {
-
   public:
     /** Default constructor
      *param size  Estimated track number
@@ -217,7 +215,7 @@ class R3BStack : public FairGenericStack
      **/
     TClonesArray* fParticles; //!
 
-    /** Array of R3BMCTracks containg the tracks written to the output **/
+    /** Array of R3BMCTracks containing the tracks written to the output **/
     TClonesArray* fTracks;
 
     /** STL map from particle index to storage flag  **/
@@ -249,7 +247,6 @@ class R3BStack : public FairGenericStack
     /** Mark tracks for output using selection criteria  **/
     void SelectTracks();
 
-    ClassDef(R3BStack, 1)
+  public:
+    ClassDef(R3BStack, 1);
 };
-
-#endif

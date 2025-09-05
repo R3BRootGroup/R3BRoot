@@ -39,9 +39,6 @@ R3BFrsSciContFact::R3BFrsSciContFact()
 
 void R3BFrsSciContFact::setAllContainers()
 {
-    // Creates the Container objects with all accepted contexts and adds them to
-    // the list of containers for the STS library.
-
     auto p1 = new FairContainer(
         "FrsSciTcalPar", "FrsSci Tcal parameters for VFTX time calibration in ns", "FrsSciTcalParContext");
     p1->addContext("FrsSciTcalParContext");
@@ -56,10 +53,6 @@ void R3BFrsSciContFact::setAllContainers()
 
 FairParSet* R3BFrsSciContFact::createContainer(FairContainer* c)
 {
-    // Trals the constructor of the corresponding parameter container.
-    // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
-
     const std::string name(c->GetName());
     R3BLOG(info, "Create container name: " << name.c_str());
 

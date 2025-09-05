@@ -184,7 +184,7 @@ namespace R3B
             {
                 if (err)
                 {
-                    LOGP(error, "Error occured from ucesb server. Error message: {}", err.message());
+                    LOGP(error, "Error occurred from ucesb server. Error message: {}", err.message());
                 }
                 LOGP(info, "Ucesb server is closed successfully with the return value: {}", ret);
             });

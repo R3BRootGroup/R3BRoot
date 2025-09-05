@@ -17,7 +17,7 @@
 #include <TMath.h>
 #define IS_NAN(x) TMath::IsNaN(x)
 
-// Standard constructur
+// Standard constructor
 R3BCoarseTimeStitch::R3BCoarseTimeStitch()
     : fRange1(2048 * 1000. / 200.)           // ns
     , fRange2(2048 * 1000. / 200.)           // ns

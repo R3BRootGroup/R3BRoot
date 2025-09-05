@@ -444,7 +444,7 @@ void R3BMwpcOnlineSpectra::Reset_Histo()
 void R3BMwpcOnlineSpectra::Exec(Option_t* /*option*/)
 {
 
-    // Check for requested trigger (Todo: should be done globablly / somewhere else)
+    // Check for requested trigger (Todo: should be done globally / somewhere else)
     if ((fTrigger >= 0) && (header != nullptr) && (header->GetTrigger() != fTrigger))
         return;
 

@@ -38,7 +38,6 @@ set(INCLUDE_DIRECTORIES
     rpc
     sci2
     sci8
-    strack
     sync_check
     tofd
     tofi

@@ -133,7 +133,7 @@ class R3BCalifavsFootOnlineSpectra : public FairTask
     TClonesArray* fCalItemsFoot;
     TClonesArray* fHitItemsFoot;
 
-    // Check for trigger should be done globablly (somewhere else)
+    // Check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header.  */
     Int_t fNEvents;         /**< Event counter. */
     Int_t fTpat;

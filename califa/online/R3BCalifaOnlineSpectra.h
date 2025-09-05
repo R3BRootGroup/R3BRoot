@@ -47,7 +47,7 @@ class TH2F;
 class R3BEventHeader;
 
 /**
- * This taks reads CALIFA data and plots online histograms
+ * This tasks reads CALIFA data and plots online histograms
  */
 class R3BCalifaOnlineSpectra : public FairTask
 {
@@ -197,7 +197,7 @@ class R3BCalifaOnlineSpectra : public FairTask
     TClonesArray* fWRItemsCalifa = nullptr;  // Array with WR-Califa items
     TClonesArray* fWRItemsMaster = nullptr;  // Array with WR-Master items
 
-    // Check for trigger should be done globablly (somewhere else)
+    // Check for trigger should be done globally (somewhere else)
     R3BEventHeader* header = nullptr; // Event header
     unsigned long long fNEvents = 0;  // Event counter
     int fTrigger = -1;

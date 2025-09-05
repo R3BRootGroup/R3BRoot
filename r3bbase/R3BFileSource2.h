@@ -94,7 +94,7 @@ class R3BInputRootFiles
     std::vector<TFolder*> validMainFolders_;
     TChain* rootChain_ = nullptr;
 
-    void Intitialize(std::string_view filename, bool is_tree_file = false);
+    void Initialize(std::string_view filename, bool is_tree_file = false);
     auto ValidateFile(const std::string& filename, bool is_tree_file = false) -> bool;
     static auto ExtractMainFolder(TFile*) -> std::optional<TKey*>;
     auto ExtractRunId(TFile* rootFile) -> std::optional<uint>;

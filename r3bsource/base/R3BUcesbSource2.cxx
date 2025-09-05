@@ -118,7 +118,7 @@ namespace R3B
     void UcesbSource::setup_ucesb()
     {
         // TODO: convert to std::bitset
-        // could be initialzed in type UcesbMap. But C++ doesn't allow static cast of enum class pointer to its
+        // could be initialized in type UcesbMap. But C++ doesn't allow static cast of enum class pointer to its
         // underlying type
         auto is_struct_map_success = uint32_t{};
         LOGP(info, "Setting up ucesb client...");

@@ -16,7 +16,7 @@ In this case, the remote url is `https://github.com/YanzhaoW/R3BRoot.git`.
 
 ### Step 2: Add the remote
 
-First, go to your local repository and check all your existing avaliable remote urls:
+First, go to your local repository and check all your existing available remote urls:
 
 ```bash
 git remote -v
@@ -50,7 +50,7 @@ For example
 git remote add yanzhao https://github.com/YanzhaoW/R3BRoot.git
 ```
 
-You can use a different remote name for the new remote url. But please make sure it's different from all existing remote names. Once this is done, check the remotes again with `git remote -v` to make sure the new remote is added correclty.
+You can use a different remote name for the new remote url. But please make sure it's different from all existing remote names. Once this is done, check the remotes again with `git remote -v` to make sure the new remote is added correctly.
 
 ### Step 3: Update the dev branch
 
@@ -90,7 +90,7 @@ Here the `[remote name]` is the name you used/found in step 2 and `[branch name]
 After the update is fetched, check the new branch with:
 
 ```bash
-git checkout [banch name]
+git checkout [branch name]
 ```
 
 Here, again, `[branch name]` is the branch name you identified in step 1.

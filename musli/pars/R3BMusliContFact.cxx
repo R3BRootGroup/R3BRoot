@@ -43,20 +43,17 @@ R3BMusliContFact::R3BMusliContFact()
 
 void R3BMusliContFact::setAllContainers()
 {
-    // Creates the Container objects with all accepted contexts and adds them to
-    // the list of containers for the STS library.
-
-    FairContainer* p1 = new FairContainer("musliCalPar", "MUSLI Cal Parameters", "MusliCalParContext");
+    auto* p1 = new FairContainer("musliCalPar", "MUSLI Cal Parameters", "MusliCalParContext");
     p1->addContext("MusliCalParContext");
 
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("musliHitPar", "MUSLI Hit Parameters", "MusliHitParContext");
+    auto* p2 = new FairContainer("musliHitPar", "MUSLI Hit Parameters", "MusliHitParContext");
     p2->addContext("MusliHitParContext");
 
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("MusliGeoPar", "Musli geometry parameters", "GeometryParameterContext");
+    auto* p3 = new FairContainer("MusliGeoPar", "Musli geometry parameters", "GeometryParameterContext");
     p3->addContext("GeometryParameterContext");
 
     containers->Add(p3);
@@ -64,10 +61,6 @@ void R3BMusliContFact::setAllContainers()
 
 FairParSet* R3BMusliContFact::createContainer(FairContainer* c)
 {
-    // Trals the constructor of the corresponding parameter container.
-    // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
-
     const char* name = c->GetName();
     R3BLOG(info, name);
     FairParSet* p = 0;

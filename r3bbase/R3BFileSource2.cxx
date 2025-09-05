@@ -229,7 +229,7 @@ auto R3BInputRootFiles::AddFileName(std::string fileName, bool is_tree_file) -> 
     R3BLOG(info, msg);
     if (fileNames_.empty())
     {
-        Intitialize(fileName, is_tree_file);
+        Initialize(fileName, is_tree_file);
         register_branch_name();
     }
     if (!ValidateFile(fileName, is_tree_file))
@@ -336,7 +336,7 @@ auto R3BInputRootFiles::ExtractRunId(TFile* rootFile) -> std::optional<uint>
     return runID;
 }
 
-void R3BInputRootFiles::Intitialize(std::string_view filename, bool is_tree_file)
+void R3BInputRootFiles::Initialize(std::string_view filename, bool is_tree_file)
 {
     auto file = R3B::make_rootfile(filename.data());
 

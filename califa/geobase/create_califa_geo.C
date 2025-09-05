@@ -295,7 +295,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
     auto top = new TGeoVolumeAssembly("TOP");
     gGeoMan->SetTopVolume(top);
 
-    // Defintion of the Mother Volume  --------------------------------
+    // Definition of the Mother Volume  --------------------------------
     auto tgeotrans0 = new TGeoCombiTrans("tgeotrans0", 0., 0., 9., fRefRot);
     tgeotrans0->RegisterYourself();
     auto tgeotrans1 = new TGeoCombiTrans("tgeotrans1", 0, 0, 0., fRefRot);
@@ -396,7 +396,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
 
     // The center of the faces are first calculated. Then, the unit vectors defining the axis in each faces
     // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
-    // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
+    // volume in Arb8 style, we need the 8 corners in the local frustum coordinates. Then, we should express
     // the vertices in the coordinate system of the volume center of mass (cm)
     for (size_t i = 0; i < N_ALV_TYPES * 2 * 2; i++)
     { // for 23 geometries, 2 face centers, outer and inner (23*2*2)
@@ -880,8 +880,8 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
         // CALIFA CEPA USC VERSION (JAN 2024) PARAMETERS
         const size_t N_ALV_TYPES_CEPA = 3;             // alveolar structures
         const size_t N_CRY_TYPES_CEPA = 14;            // crystal elements
-        const double wrapping_thickness_CEPA = 0.0080; // (80 microns recomended by E. Casarejos)
-        const double cf_thickness_CEPA = 0.0300;       // carbon fiber (300 microns recomended by E. Casarejos)
+        const double wrapping_thickness_CEPA = 0.0080; // (80 microns recommended by E. Casarejos)
+        const double cf_thickness_CEPA = 0.0300;       // carbon fiber (300 microns recommended by E. Casarejos)
 
         // Target reference in mm. OFFSET INFO FROM UVIGO
         TVector3 target_ref_CEPA(0.0, 0.0, 24.9);
@@ -945,7 +945,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
 
         // The center of the crystal faces are first calculated. Then, the unit vectors defining the axis in each faces
         // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
-        // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
+        // volume in Arb8 style, we need the 8 corners in the local frustum coordinates. Then, we should express
         // the vertices in the coordinate system of the volume center of mass (cm)
         for (size_t i = 0; i < N_CRY_TYPES_CEPA * 2; i++)
         { // 14 types of crystals, 2 face centers (14*2)
@@ -1067,7 +1067,7 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
 
         // The center of the faces are first calculated. Then, the unit vectors defining the axis in each faces
         // Third, the rotation moving from the lab system to the unit vectors previously found. To define the
-        // volume in Arb8 style, we need the 8 corners in the local frustrum coordinates. Then, we should express
+        // volume in Arb8 style, we need the 8 corners in the local frustum coordinates. Then, we should express
         // the vertices in the coordinate system of the volume center of mass (cm)
         for (size_t i = 0; i < N_ALV_TYPES_CEPA * 2; i++)
         { // for 3 geometries, 2 face centers (3*2)

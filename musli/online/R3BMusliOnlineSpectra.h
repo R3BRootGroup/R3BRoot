@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMusliOnlineSpectra_H
-#define R3BMusliOnlineSpectra_H 1
+#pragma once
 
 #include "FairTask.h"
 #include "TCanvas.h"
@@ -29,11 +28,10 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads MusIC data and plots online histograms
+ * This tasks reads MusIC data and plots online histograms
  */
 class R3BMusliOnlineSpectra : public FairTask
 {
-
   public:
     /**
      * Default constructor.
@@ -93,7 +91,7 @@ class R3BMusliOnlineSpectra : public FairTask
     TClonesArray* fCalItemsMusli; /**< Array with cal items. */
     TClonesArray* fHitItemsMusli; /**< Array with hit items. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header.      */
     Int_t fNEvents;         /**< Event counter.     */
 
@@ -193,5 +191,3 @@ class R3BMusliOnlineSpectra : public FairTask
   public:
     ClassDef(R3BMusliOnlineSpectra, 1)
 };
-
-#endif /* R3BMusliOnlineSpectra_H */

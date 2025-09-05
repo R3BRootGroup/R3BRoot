@@ -159,7 +159,7 @@ InitStatus R3BOnlineSpillAnalysis::Init()
     fh_hans_sum_byMax = new TH1F("Spillquality_sum_byMax", "Spill quality HT", 600, -300., 300.);
     fh_MtA_sum = new TH1F("MaxToAverage_sum", "Maximum to average", 1000, 0., 100.);
 
-    fh_rate = new TH1F("rate", "accepted events relativ to poisson", 360, 0, 180);
+    fh_rate = new TH1F("rate", "accepted events relative to poisson", 360, 0, 180);
     fh_rate->GetXaxis()->SetTitle("spill number");
     fh_rate->GetYaxis()->SetTitle("Percent");
     fh_rate->GetXaxis()->SetTitle("spill number");
@@ -557,7 +557,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
                     Nps = 0;
                     Double_t Filler =
                         ((double)(i)) / 1000.; /// Not exactly sure why, but need to reduce i by 1, otherwise there
-                                               /// occurs a problem in the binning and some bins arent getting filled,
+                                               /// occurs a problem in the binning and some bins aren't getting filled,
                                                /// while the ones before are filled twice.
 
                     if (Filler < 0.)
@@ -663,7 +663,7 @@ void R3BOnlineSpillAnalysis::Exec(Option_t* option)
                 mean_count++;
             }
 
-            /// Substract the mean (here calculated via integral) from the spill to eliminate the lowest freq. (0th bin
+            /// Subtract the mean (here calculated via integral) from the spill to eliminate the lowest freq. (0th bin
             /// of FFT)
             for (int i = First_of_spill; i < Last_of_spill + 1; i++)
             {

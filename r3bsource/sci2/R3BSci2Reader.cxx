@@ -91,27 +91,27 @@ Bool_t R3BSci2Reader::R3BRead()
      * For variable definition, see structure EXT_STR_h101_SCI2_onion_t
      * in ext_str_h101_sci2_tamex.h
      *** VFTX DATA ***
-     * VTF = Size of the array TFv contaning fine VFTX times
+     * VTF = Size of the array TFv containing fine VFTX times
      * VTFv = Array containing the actual data on the fine  times
      * VTFM = No of channels having time
      * VTFMI = Array of TFM size containing the channel numbers of each channel with data
      * VTFME = Array of TFM size containing the index of the first element of the next channel in data array TFv;
      *         TFME[i]-FTME[i-1] = number of data for channel i;
      *
-     * VTC = Size of the array TCv contaning coarse VFTX times
+     * VTC = Size of the array TCv containing coarse VFTX times
      * VTCv = Array containing the actual data on the coarse times
      * VTCM = No of channels having coarse time
      * VTCMI = Array of TCM size containing the channel numbers of each channel with data
      * VTCME = Array of TCM size containing the index of the first element of the next channel in data array TCv
      *
      *** TAMEX DATA *** Added by Aleksandra, Oct. 2016
-     * TTFL = Size of the array TFLv contaning fine leading times
+     * TTFL = Size of the array TFLv containing fine leading times
      * TTFLv = Array containing the actual data on the fine leading times
      * TTFLM = No of channels having fine leading time
      * TTFLMI = Array of TFLM size containing the channel numbers of each channel with data
      * TTFLME = Array of TFLM size containing the index of the first element of the next channel in data array TFLv
      *
-     * TTCL = Size of the array TCLv contaning coarse leading times
+     * TTCL = Size of the array TCLv containing coarse leading times
      * TTCLv = Array containing the actual data on the coarse leading times
      * TTCLM = No of channels having coarse leading time
      * TTCLMI = Array of TCLM size containing the channel numbers of each channel with data
@@ -133,7 +133,7 @@ Bool_t R3BSci2Reader::R3BRead()
     //     // First, we prepare time arrays for VFTX
     //
     //     // VFTX first:
-    //     uint32_t numChannels = data->SCITWO_VTFM; // not necessarly number of hits! (b/c multi hit)
+    //     uint32_t numChannels = data->SCITWO_VTFM; // not necessarily number of hits! (b/c multi hit)
     //     // loop over channels
     //     uint32_t curChannelStart = 0; // index in v for first item of current channel
     //     Double_t mean_coarse_vftx = 0.;
@@ -141,7 +141,7 @@ Bool_t R3BSci2Reader::R3BRead()
     //     // First get the average coarse time to shift all coarse counters in the same cycle (by calculateing, in the
     //     // second step, deviations from the mean value. If the coarse time is smaller than mean value by more than
     //     200,
-    //     // then coarse counter was reseted, and thus, to its value 8192 (in case of VFTX) will be added.
+    //     // then coarse counter was reset, and thus, to its value 8192 (in case of VFTX) will be added.
     //     for (int i = 0; i < numChannels; i++)
     //     {
     //         uint32_t channel = data->SCITWO_VTFMI[i];          // = 1..8
@@ -232,7 +232,7 @@ Bool_t R3BSci2Reader::R3BRead()
     //
     //                 int coarse_leading = data->SCITWO_TTCLv[j];
     //                 if((mean_coarse_leading - float(coarse_leading)) > 200.) coarse_leading = coarse_leading + 2048;
-    //             // We now calculate again meanv alue of the "shifted" coarse leading times; this will be needed at
+    //             // We now calculate again meanv value of the "shifted" coarse leading times; this will be needed at
     //             the
     //        next step in order to
     //             // shift coarse trailing times in the same clock cycle as coarse leading
@@ -336,7 +336,7 @@ Bool_t R3BSci2Reader::R3BRead()
         uint32_t numberOfPMTsWithHits_TC = data->SCITWO_VTCM;
         if (numberOfPMTsWithHits_TF != numberOfPMTsWithHits_TC)
         {
-            LOG(error) << "R3BSofSciReader::R3BRead() Error in unpacking, unconsistency between TF and TC for SofSci !";
+            LOG(error) << "R3BSofSciReader::R3BRead() Error in unpacking, inconsistency between TF and TC for SofSci !";
         }
         else
         {
@@ -349,7 +349,7 @@ Bool_t R3BSci2Reader::R3BRead()
                 if (pmtid_TF != pmtid_TC)
                 {
                     LOG(error)
-                        << "R3BSofSciReader::R3BRead() Error in unpacking, unconsistency between the PMT id for TF "
+                        << "R3BSofSciReader::R3BRead() Error in unpacking, inconsistency between the PMT id for TF "
                            "and TC for SofSci !";
                 }
                 uint32_t nextChannelStart = data->SCITWO_VTFME[pmmult];

@@ -51,17 +51,17 @@ void R3BMusicContFact::setAllContainers()
     // Creates the Container objects with all accepted contexts and adds them to
     // the list of containers for the STS library.
 
-    FairContainer* p1 = new FairContainer("musicCalPar", "MUSIC Cal Parameters", "MusicCalParContext");
+    auto* p1 = new FairContainer("musicCalPar", "MUSIC Cal Parameters", "MusicCalParContext");
     p1->addContext("MusicCalParContext");
 
     containers->Add(p1);
 
-    FairContainer* p2 = new FairContainer("musicHitPar", "MUSIC Hit Parameters", "MusicHitParContext");
+    auto* p2 = new FairContainer("musicHitPar", "MUSIC Hit Parameters", "MusicHitParContext");
     p2->addContext("MusicHitParContext");
 
     containers->Add(p2);
 
-    FairContainer* p3 = new FairContainer("MusicGeoPar", "Music geometry parameters", "GeometryParameterContext");
+    auto* p3 = new FairContainer("MusicGeoPar", "Music geometry parameters", "GeometryParameterContext");
     p3->addContext("GeometryParameterContext");
 
     containers->Add(p3);
@@ -69,10 +69,6 @@ void R3BMusicContFact::setAllContainers()
 
 FairParSet* R3BMusicContFact::createContainer(FairContainer* c)
 {
-    // Trals the constructor of the corresponding parameter container.
-    // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
-
     const char* name = c->GetName();
     R3BLOG(info, "Create container name: " << name);
     FairParSet* p = 0;
@@ -91,4 +87,4 @@ FairParSet* R3BMusicContFact::createContainer(FairContainer* c)
     return p;
 }
 
-ClassImp(R3BMusicContFact);
+ClassImp(R3BMusicContFact)

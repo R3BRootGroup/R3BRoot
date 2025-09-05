@@ -41,7 +41,7 @@ R3BTofdHitData::R3BTofdHitData(Double_t t,
 
 UInt_t R3BTofdHitData::GetBarId() const { return fBarId; }
 
-Double_t R3BTofdHitData::GetTimeRaw() const { return fTimeRaw; } // returm bar time without trigger, needed for Rolu Tof
+Double_t R3BTofdHitData::GetTimeRaw() const { return fTimeRaw; } // return bar time without trigger, needed for Rolu Tof
 
 Double_t R3BTofdHitData::GetTof() const { return fTof; }
 

@@ -221,7 +221,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                                               static_cast<int>(200. * (fpos_range_max - fpos_range_min)),
                                               fpos_range_min,
                                               fpos_range_max);
-            fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] if mult1 at L and R. 50 ps per bin");
+            fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->SetTitle("Raw Position [ns] if mult1 at L and R. 50 ps per bin");
             fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
             fh1_Tcal1Hit_PosRaw[i]->GetXaxis()->CenterTitle(true);
             fh1_Tcal1Hit_PosRaw[i]->GetYaxis()->CenterTitle(true);
@@ -325,7 +325,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
                                              static_cast<int>(20. * (fpos_range_max - fpos_range_min)),
                                              fpos_range_min,
                                              fpos_range_max);
-            fh1_Cal_PosRaw[i]->GetXaxis()->SetTitle("Raw Positon [ns] in red CAL level, in blue TCAL-MULT1");
+            fh1_Cal_PosRaw[i]->GetXaxis()->SetTitle("Raw Position [ns] in red CAL level, in blue TCAL-MULT1");
             fh1_Cal_PosRaw[i]->GetYaxis()->SetTitle("number of counts with mult1");
             fh1_Cal_PosRaw[i]->GetXaxis()->CenterTitle(true);
             fh1_Cal_PosRaw[i]->GetYaxis()->CenterTitle(true);
@@ -341,7 +341,7 @@ InitStatus R3BOnlineSpectraFrsSci::Init()
             // === TH1F: calibrated Position in Ns at Cal level=== //
             sprintf(Name1, "FrsSci%i_PosCal", i + 1);
             fh1_Cal_PosCal[i] = new TH1D(Name1, Name1, 30000, -150, 150);
-            fh1_Cal_PosCal[i]->GetXaxis()->SetTitle("Calibrated Positon [mm]");
+            fh1_Cal_PosCal[i]->GetXaxis()->SetTitle("Calibrated Position [mm]");
             fh1_Cal_PosCal[i]->GetYaxis()->SetTitle("number of counts");
             fh1_Cal_PosCal[i]->GetXaxis()->CenterTitle(true);
             fh1_Cal_PosCal[i]->GetYaxis()->CenterTitle(true);

@@ -193,7 +193,7 @@ void R3BTofiHisto2HitPar::FinishTask()
 
     if (fParameter == 3)
     {
-        // calculation of position dependend charge
+        // calculation of position dependent charge
         if (fTofiSmiley)
         {
             LOG(warn) << "Calling function smiley";

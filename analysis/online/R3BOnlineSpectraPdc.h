@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BONLINESPECTRAPDC
-#define R3BONLINESPECTRAPDC
+#pragma once
 
 #include "FairTask.h"
 #include <array>
@@ -32,7 +31,7 @@ class R3BEventHeader;
 
 #define N_PLANE_MAX_PDC 4
 /**
- * This taks reads all detector data items and plots histograms
+ * This tasks reads all detector data items and plots histograms
  * for online checks.
  */
 class R3BOnlineSpectraPdc : public FairTask
@@ -97,7 +96,7 @@ class R3BOnlineSpectraPdc : public FairTask
     TClonesArray* fCalItems;    /**< Array with Cal items - input data. */
     TClonesArray* fHitItems;    /**< Array with Cal items - input data. */
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fTpat;
@@ -118,5 +117,3 @@ class R3BOnlineSpectraPdc : public FairTask
   public:
     ClassDef(R3BOnlineSpectraPdc, 2)
 };
-
-#endif

@@ -76,7 +76,7 @@ namespace R3B
         template <typename Predicate>
         auto FindReaderIf(Predicate pred) -> R3BReader*;
 
-        // deprecate the old API because of bad memory managerment
+        // deprecate the old API because of bad memory management
         [[deprecated("Please use smart pointer method to add a reader")]] auto* AddReader(R3BReader* a_reader)
         {
             return AddReader(std::unique_ptr<R3BReader>(a_reader));

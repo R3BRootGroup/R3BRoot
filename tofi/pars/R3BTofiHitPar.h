@@ -54,7 +54,7 @@ class R3BTofiHitPar : public FairParGenericSet
                   const char* context = "TestDefaultContext",
                   Bool_t own = kTRUE);
     /**
-     * Destructor. Cleares the memory used by the object.
+     * Destructor. Clears the memory used by the object.
      */
     virtual ~R3BTofiHitPar(void);
 
@@ -109,7 +109,7 @@ class R3BTofiHitPar : public FairParGenericSet
     void AddModulePar(R3BTofiHitModulePar* tch);
 
     /**
-     * Method to retrieve the arrray with module containers.
+     * Method to retrieve the array with module containers.
      * @return an array with parameter containers of type R3BTCalModulePar.
      */
     TObjArray* GetListOfModulePar() { return fHitParams; }

@@ -18,13 +18,13 @@
 //-----------------------------------------------------------------
 
 #include <FairRuntimeDb.h>
+#include <TClass.h>
+#include <string>
 
 #include "R3BAlpideContFact.h"
 #include "R3BAlpideMappingPar.h"
 #include "R3BLogger.h"
 #include "R3BTGeoPar.h"
-
-#include <TClass.h>
 
 static R3BAlpideContFact gR3BAlpideContFact;
 
@@ -54,7 +54,7 @@ void R3BAlpideContFact::setAllContainers()
 FairParSet* R3BAlpideContFact::createContainer(FairContainer* c)
 {
     // For an actual context, which is not an empty string and not the default context
-    // of this container, the name is concatinated with the context.
+    // of this container, the name is concatenated with the context.
     const std::string name(c->GetName());
     R3BLOG(info, "Create container name: " << name.c_str());
 

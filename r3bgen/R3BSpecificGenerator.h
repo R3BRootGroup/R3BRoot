@@ -30,8 +30,7 @@
 // --------------------------------------------------------------
 /////////////////////////////////////////////////////////////////
 
-#ifndef R3BSpecificGenerator_H
-#define R3BSpecificGenerator_H 1
+#pragma once
 
 #include "TString.h"
 #include "TVector3.h"
@@ -135,7 +134,7 @@ class R3BSpecificGenerator : public FairGenerator
         kinEnergyPrim = val;
     }
 
-    void SetTargetType(TString ans) { targetType = ans; }
+    void SetTargetType(TString val) { targetType = val; }
     void SetReactionFlag(TString val) { reactionFlag = val; }
     void SetGammasFlag(TString val) { gammasFlag = val; }
     void SetDecaySchemeFlag(TString val) { decaySchemeFlag = val; }
@@ -216,5 +215,3 @@ class R3BSpecificGenerator : public FairGenerator
 
     ClassDef(R3BSpecificGenerator, 1);
 };
-
-#endif

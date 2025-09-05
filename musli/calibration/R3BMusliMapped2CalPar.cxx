@@ -80,17 +80,17 @@ void R3BMusliMapped2CalPar::SetParContainers()
 
     fMusliGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer("MusliGeoPar"));
     R3BLOG_IF(
-        error, !fMusliGeo_Par, "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to MusliGeoPar container.");
+        error, !fMusliGeo_Par, "R3BMusliMapped2CalPar::SetParContainers() Could not access to MusliGeoPar container.");
 
     fMwAGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDetA + "GeoPar"));
     R3BLOG_IF(error,
               !fMwAGeo_Par,
-              "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetA + "GeoPar container.");
+              "R3BMusliMapped2CalPar::SetParContainers() Could not access to " + fNameDetA + "GeoPar container.");
 
     fMwBGeo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDetB + "GeoPar"));
     R3BLOG_IF(error,
               !fMwBGeo_Par,
-              "R3BMusliMapped2CalPar::SetParContainers() Couldn´t access to " + fNameDetB + "GeoPar container.");
+              "R3BMusliMapped2CalPar::SetParContainers() Could not access to " + fNameDetB + "GeoPar container.");
 }
 
 // -----   Public method Init   --------------------------------------------

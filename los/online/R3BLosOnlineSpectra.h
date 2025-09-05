@@ -42,7 +42,7 @@ constexpr size_t mult_hit = 32;
 constexpr uint8_t nb_pmts = 8;
 
 /**
- * This taks reads LOS data items and plots histograms
+ * This tasks reads LOS data items and plots histograms
  * for online checks.
  */
 class R3BLosOnlineSpectra : public FairTask
@@ -207,7 +207,7 @@ class R3BLosOnlineSpectra : public FairTask
 
     const char* fDetectorNames[DET_MAX + 1] = { "Los", NULL };
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header = nullptr;
     int fTrigger = -1;
     int fTpat = -1;

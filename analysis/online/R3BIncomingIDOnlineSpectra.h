@@ -142,7 +142,7 @@ class R3BIncomingIDOnlineSpectra : public FairTask
     R3BTGeoPar* fMw0GeoPar;
     R3BTGeoPar* fMw1GeoPar;
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* fHeader; /**< Event header.      */
     Int_t fNEvents;          /**< Event counter.     */
     Int_t fTpat;

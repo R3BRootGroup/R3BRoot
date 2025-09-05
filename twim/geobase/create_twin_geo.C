@@ -127,7 +127,7 @@ void create_twin_geo(const TString geoTag = "v2021.3")
     TGeoRotation* rotg = new TGeoRotation();
     TGeoCombiTrans* pMatrix0 = new TGeoCombiTrans("", dx, dy, dz, rotg);
 
-    // Defintion of the Mother Volume
+    // Definition of the Mother Volume
     TGeoShape* pbox1 = new TGeoBBox("twimbox1", 12. / 2.0, 23. / 2.0, 22.1);
     TGeoCombiTrans* t_box1 = new TGeoCombiTrans("t_box1", 6., 0., 0., fRefRot);
     t_box1->RegisterYourself();

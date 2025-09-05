@@ -98,7 +98,7 @@ InitStatus R3BFiberMAPMTOnlineSpectra::Init()
     R3BLOG_IF(warn, header == nullptr, "EventHeader. not found");
     R3BLOG_IF(info, header, " EventHeader. found");
 
-    // uncomment lines below when ucesb avaliable
+    // uncomment lines below when ucesb available
     FairRunOnline* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
 

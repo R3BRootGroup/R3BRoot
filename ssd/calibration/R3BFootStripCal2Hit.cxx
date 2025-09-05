@@ -140,7 +140,7 @@ void R3BFootStripCal2Hit::SetParameter()
 
     // Now we iterate over the multiplicity of each asic. If the asic is from
     // a dead foot (i.e, mult == 0, we continue). Otherwise, we start filling
-    // with the pol coeficients of each charge state (eta band) in each asic.
+    // with the pol coefficients of each charge state (eta band) in each asic.
     int nParsEta = 0;
     int nParsCal = 0;
 
@@ -418,7 +418,7 @@ void R3BFootStripCal2Hit::EtaCorrectionAndChargeCal()
 
             // *********** Charge calibration *********** //
 
-            // Get the coeficients for this asic
+            // Get the coefficients for this asic
             auto name = Form("fitFunc_foot_%i_asic_%i", i, asicId);
             auto polType = Form("pol%i", fNumParsCal - 1);
             auto fitFunc = std::make_unique<TF1>(name, polType);

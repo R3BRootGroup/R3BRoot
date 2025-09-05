@@ -34,7 +34,7 @@ struct R3BPhaseSpaceGenParticleInfo
     R3BPhaseSpaceGenParticleInfo() = default;
     int pdg_code = 0;
     double mass = 0.;                   // GeV
-    double kinetic_energy = 0.;         // GeV. Defintion: E-m
+    double kinetic_energy = 0.;         // GeV. Definition: E-m
     ROOT::Math::PxPyPzMVector momentum; // GeV
     ROOT::Math::XYZTVector position;    // cm
 
@@ -52,7 +52,7 @@ class R3BPhaseSpaceGenerator : public FairGenerator, public R3BParticleSelector
     void EnableWhitelist(bool is_enabled = true) { is_whitelist_enabled_ = is_enabled; }
     void EnableWrite(bool is_enabled = true);
 
-    // realtive energy distribution in keV
+    // relative energy distribution in keV
     void SetErelDistribution(const R3BDistribution<1>& ErelDistribution) { fErel_keV = ErelDistribution; }
 
     // Getters:

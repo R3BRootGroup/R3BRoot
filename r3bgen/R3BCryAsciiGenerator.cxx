@@ -14,7 +14,7 @@
 // ------------------------------------------------------------------------
 //                 R3BCryAsciiGenerator source file                   -----
 // ------------------------------------------------------------------------
-// ----------  Use this generator with an appropiate ascii file  ----------
+// ----------  Use this generator with an appropriate ascii file  ----------
 // ----------     generated with CRY with the "pdg" option       ----------
 // ------------------------------------------------------------------------
 
@@ -71,13 +71,13 @@ bool R3BCryAsciiGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     Double_t cosA = 0.; // direction cosines
     Double_t cosB = 0.;
     Double_t cosC = 0.;
-    Double_t vx = 0.; // vertex componets
+    Double_t vx = 0.; // vertex components
     Double_t vy = 0.;
     Double_t vz = 0.;
 
-    // Intermediate varibles
+    // Intermediate variables
     Double_t p = 0.;  // total momentum
-    Double_t px = 0.; // momentum componets
+    Double_t px = 0.; // momentum components
     Double_t py = 0.;
     Double_t pz = 0.;
     Double_t mass = 0.; // particle mass read in GeV

@@ -35,7 +35,7 @@ class R3BEventHeader;
 class R3BAmsMappingPar;
 
 /**
- * This taks reads AMS data and plots online histograms
+ * This tasks reads AMS data and plots online histograms
  */
 class R3BAmsOnlineSpectra : public FairTask
 {
@@ -106,7 +106,7 @@ class R3BAmsOnlineSpectra : public FairTask
 
     R3BAmsMappingPar* fMap_Par; /**< Container with mapping parameters. >*/
 
-    // check for trigger should be done globablly (somewhere else)
+    // check for trigger should be done globally (somewhere else)
     R3BEventHeader* header; /**< Event header. */
     Int_t fTrigger;         /**< Trigger value. */
     Int_t fNEvents;         /**< Event counter. */

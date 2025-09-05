@@ -22,7 +22,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads SCI data and plots online histograms
+ * This tasks reads SCI data and plots online histograms
  */
 class R3BOnlineSpectraFrsSci : public FairTask
 {

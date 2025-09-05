@@ -32,7 +32,7 @@ constexpr int barrelCrystals = 1952;
 class R3BCalifaDigitizer : public FairTask
 {
   public:
-    /** Standard contructor **/
+    /** Standard constructor **/
     R3BCalifaDigitizer();
 
     ~R3BCalifaDigitizer();

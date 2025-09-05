@@ -98,12 +98,12 @@ void R3BMusliVsMwpcOnlineSpectra::SetParContainers()
     fMw1Geo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDet1 + "GeoPar"));
     R3BLOG_IF(error,
               !fMw1Geo_Par,
-              "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Couldn´t access to " + fNameDet1 + "GeoPar container.");
+              "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Could not access to " + fNameDet1 + "GeoPar container.");
 
     fMw2Geo_Par = dynamic_cast<R3BTGeoPar*>(rtdb->getContainer(fNameDet2 + "GeoPar"));
     R3BLOG_IF(error,
               !fMw2Geo_Par,
-              "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Couldn´t access to " + fNameDet2 + "GeoPar container.");
+              "R3BMusliVsMwpcOnlineSpectra::SetParContainers() Could not access to " + fNameDet2 + "GeoPar container.");
 }
 
 InitStatus R3BMusliVsMwpcOnlineSpectra::Init()

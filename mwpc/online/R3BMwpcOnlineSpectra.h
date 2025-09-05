@@ -34,7 +34,7 @@ class TClonesArray;
 class R3BEventHeader;
 
 /**
- * This taks reads MWPC data and plots online histograms
+ * This tasks reads MWPC data and plots online histograms
  */
 class R3BMwpcOnlineSpectra : public FairTask
 {
