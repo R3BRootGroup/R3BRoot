@@ -36,6 +36,12 @@ class R3BAlpideHitData : public TObject
      **/
     explicit R3BAlpideHitData(uint16_t sensorId,
                               uint16_t clustersize,
+                              uint16_t genus,
+                              double elong,
+                              TVector3 majorUnit,
+                              double holePerimeter,
+                              double totalPerimeter,
+                              std::vector<double> hu,
                               double posx,
                               double posy,
                               double posz = std::nan(""),
@@ -48,6 +54,12 @@ class R3BAlpideHitData : public TObject
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const uint16_t GetSensorId() const { return fSensorId; }
     [[nodiscard]] inline const uint16_t GetClusterSize() const { return fClustersize; }
+    [[nodiscard]] inline const uint16_t GetGenus() const { return fGenus; }
+    [[nodiscard]] inline const uint16_t GetElong() const { return fElong; }
+    [[nodiscard]] inline const TVector3 GetMajorUnit() const { return fMajorUnit; }
+    [[nodiscard]] inline const double GetHolePerimeter() const { return fHolePerimeter; }
+    [[nodiscard]] inline const double GetTotalPerimeter() const { return fTotalPerimeter; }
+    [[nodiscard]] inline const std::vector<double> GetHu() const { return fHu; }
     [[nodiscard]] inline const double GetX() const { return fX; }
     [[nodiscard]] inline const double GetY() const { return fY; }
     [[nodiscard]] inline const double GetZ() const { return fZ; }
@@ -64,6 +76,12 @@ class R3BAlpideHitData : public TObject
   protected:
     uint16_t fSensorId = 0;
     uint16_t fClustersize = 0;
+    uint16_t fGenus = 0;
+    double fElong = 0;
+    TVector3 fMajorUnit;
+    double fHolePerimeter;
+    double fTotalPerimeter;
+    std::vector<double> fHu;
     double fX = std::nan("");
     double fY = std::nan("");
     double fZ = std::nan("");

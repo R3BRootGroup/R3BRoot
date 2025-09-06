@@ -60,9 +60,16 @@ class R3BAlpideCal2Hit : public FairTask
     // Method to setup online mode
     inline void SetOnline(bool option = true) { fOnline = option; }
 
+    void SetAlgorithm(const std::string& algo) { fAlgorithm = algo; }
+
   private:
     void SetParameter();
     void FindClusters();
+
+    void FindClustersDefault();   // Called as default
+    void FindClustersFloodFill(); // New trial method
+
+    std::string fAlgorithm = "Default"; // Set Default as Default
 
     const double fPixelSize_ls = 0.0292968; // long side
     const double fPixelSize_ss = 0.02695;   // short side
@@ -88,6 +95,12 @@ class R3BAlpideCal2Hit : public FairTask
     // Private method AddHitData
     R3BAlpideHitData* AddHitData(uint16_t senId,
                                  uint16_t clustersize,
+                                 uint16_t genus,
+                                 double elong,
+                                 TVector3 majorUnit,
+                                 double holePerimeter,
+                                 double totalPerimeter,
+                                 std::vector<double> hu,
                                  double xpos,
                                  double ypos,
                                  double zpos,
