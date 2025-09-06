@@ -311,25 +311,10 @@ void create_califa_geo_selector(const std::string expNumber = "nominal",
     auto top = new TGeoVolumeAssembly("TOP");
     gGeoMan->SetTopVolume(top);
 
-    // Definition of the Mother Volume  --------------------------------
-    auto tgeotrans0 = new TGeoCombiTrans("tgeotrans0", 0., 0., 9., fRefRot);
-    tgeotrans0->RegisterYourself();
     auto tgeotrans1 = new TGeoCombiTrans("tgeotrans1", 0, 0, 0., fRefRot);
     tgeotrans1->RegisterYourself();
 
-    auto mother_outer = new TGeoTube("mother_outer", 0., 81., (58. + 73.5) / 2.);
-    auto inner_hole = new TGeoTube("inner_hole", 0., 29., 130. / 2.);
-    auto mother_endcap = new TGeoSphere("mother_endcap", 38., 73.5, 7., 90., 0., 360.);
-
-    auto mother_endcap2 = new TGeoPgon("mother_endcap2", 0, 360, 16, 2);
-    mother_endcap2->DefineSection(0, 54., 40., 80.);
-    mother_endcap2->DefineSection(1, 85., 12., 34.);
-
-    auto califa_mother = new TGeoCompositeShape(
-        "califa_mother",
-        "mother_outer:tgeotrans0 - inner_hole:tgeotrans0 + mother_endcap:tgeotrans1 + mother_endcap2:tgeotrans1");
-
-    auto pWorld = new TGeoVolume("CalifaWorld", califa_mother, pAirMedium);
+    auto pWorld = new TGeoVolumeAssembly("CalifaWorld");
     top->AddNode(pWorld, 0, tgeotrans1);
 
     // FINAL CALIFA CARREL + iPHOS VERSION (SINCE NOV 2019)
@@ -1598,7 +1583,7 @@ void CreateHoldingStructure(TGeoVolume* world,
     const int numZPlanes = 2;
 
     auto carbonfiber = new TGeoPgon("CarbonFiberCone", -90., 180., 8, numZPlanes);
-    carbonfiber->DefineSection(0, -50.44, 58.36 - 0.6, 58.4 - 0.6);
+    carbonfiber->DefineSection(0, -50.44, 58.36 - 0.6 - 0.29, 58.4 - 0.6 - 0.29);
     carbonfiber->DefineSection(1, -48.54, 42.0, 42.04);
 
     auto CarbonFiberBack = new TGeoVolume("CarbonFiberBack", carbonfiber, med1);
@@ -1625,8 +1610,8 @@ void CreateHoldingStructure(TGeoVolume* world,
     auto rot2 = new TGeoRotation();
     rot2->RotateZ(180);
 
-    auto trans1 = make_trans(0.1, 0.0, 0.0, rot1, disCalMes);
-    auto trans2 = make_trans(-0.1, 0.0, 0.0, rot2, disCalWix);
+    auto trans1 = make_trans(0.4, 0.0, 0.0, rot1, disCalMes);
+    auto trans2 = make_trans(-0.4, 0.0, 0.0, rot2, disCalWix);
 
     world->AddNode(CarbonFiberBack, 1, trans1);
     world->AddNode(CarbonFiberBack, 2, trans2);
@@ -1714,9 +1699,9 @@ void CreateHoldingStructure(TGeoVolume* world,
     // auto volbox2 = new TGeoVolume("volbox2", box_mother2, med2);
     // volbox2->SetLineColor(3);
 
-    auto box_tape = new TGeoBBox("box_tape", 17. / 2., 0.15, 16.3 / 2.);
-    // auto volbox_tape = new TGeoVolume("volbox_tape", box_tape, med2);
-    // volbox_tape->SetLineColor(19);
+    auto box_cover_barrel = new TGeoBBox("box_cover_barrel", 17. / 2., 0.15, 16.3 / 2.);
+    // auto volbox_cover_barrel = new TGeoVolume("volbox_cover_barrel", box_cover_barrel, med2);
+    // volbox_cover_barrel->SetLineColor(19);
 
     TGeoCompositeShape* GeoCompObj;
     std::vector<double> disz = { -31.1, -6.2, 18., 31.1 + 10.4, 65. };
@@ -1775,10 +1760,10 @@ void CreateHoldingStructure(TGeoVolume* world,
             vmatrix22->RegisterYourself();
 
             // auto trs = make_trans(xi-offsetX, yi, disz[j], rot22, disCalMes);
-            // world->AddNode(volbox_tape, i+1, trs);
+            // world->AddNode(volbox_cover_barrel, i+1, trs);
 
-            auto tape = new TGeoUnion(GeoCompObj, box_tape, 0, vmatrix22);
-            TString name = TString::Format("tape_%zu", i + 8 * j);
+            auto tape = new TGeoUnion(GeoCompObj, box_cover_barrel, 0, vmatrix22);
+            TString name = TString::Format("box_cover_%zu", i + 8 * j);
             GeoCompObj = new TGeoCompositeShape(name.Data(), tape);
         }
 
