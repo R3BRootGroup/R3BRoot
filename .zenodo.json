@@ -274,6 +274,11 @@
         },
         {
             "type": "Other",
+            "name": "Bilela, Petra",
+            "affiliation": "Faculty of Science in Split, 21000 Split, Croatia"
+        },
+        {
+            "type": "Other",
             "name": "Boretzky, Konstanze",
             "affiliation": "GSI Helmholtzzentrum für Schwerionenforschung, 64291 Darmstadt, Germany"
         },
@@ -312,16 +317,23 @@
         },
         {
             "type": "Other",
-            "name": "Heiss, Benjamin"
+            "name": "Heiss, Benjamin",
+            "affiliation": "GSI Helmholtzzentrum für Schwerionenforschung, 64291 Darmstadt, Germany"
         },
         {
             "type": "Other",
-            "name": "Inglessi, Alexander"
+            "name": "Inglessi, Alexander",
+            "affiliation": "GSI Helmholtzzentrum für Schwerionenforschung, 64291 Darmstadt, Germany"
         },
         {
             "type": "Other",
             "name": "Jelavic-Malenica, Deša",
             "affiliation": "RBI Zagreb, HR10000 Zagreb, Croatia"
+        },
+        {
+            "type": "Other",
+            "name": "Jena, Mrunmoy",
+            "affiliation": "Technische Universität München, 85748 Garching, Germany"
         },
         {
             "type": "Other",
@@ -366,12 +378,19 @@
         },
         {
             "type": "Other",
+            "name": "Risitano, Fabio",
+            "orcid": "0000-0003-0460-5245",
+            "affiliation": "INFN Laboratori Nazionali del Sud, 95123 Catania, Italy"
+        },
+        {
+            "type": "Other",
             "name": "Qi, Christine",
             "affiliation": "Massachusetts Institute of Technology, MA 02139 Cambridge, USA"
         },
         {
             "type": "Other",
-            "name": "Rybalchenko, Alexey"
+            "name": "Rybalchenko, Alexey",
+            "affiliation": "GSI Helmholtzzentrum für Schwerionenforschung, 64291 Darmstadt, Germany"
         },
         {
             "type": "Other",
@@ -404,7 +423,8 @@
         },
         {
             "type": "Other",
-            "name": "Wongel, Alicia"
+            "name": "Wongel, Alicia",
+            "affiliation": "GSI Helmholtzzentrum für Schwerionenforschung, 64291 Darmstadt, Germany"
         },
         {
             "type": "Other",
