@@ -5,12 +5,12 @@
   "codeRepository": "https://github.com/R3BRootGroup/R3BRoot",
   "contIntegration": "https://github.com/R3BRootGroup/R3BRoot/actions",
   "name": "R3BRoot",
-  "softwareVersion": "24.0.0",
+  "softwareVersion": "25.0.3",
   "description": "Software for simulations and data analysis of Reactions with Relativistic Radioactive Beams (R3B) experiments at GSI/FAIR",
   "dateCreated": "2009-04-14",
   "datePublished": "2009-08-01",
-  "dateModified": "2024-12-06",
-  "downloadUrl": "https://github.com/R3BRootGroup/R3BRoot/archive/refs/tags/dec24.tar.gz",
+  "dateModified": "2025-09-07",
+  "downloadUrl": "https://github.com/R3BRootGroup/R3BRoot/archive/refs/tags/sep25.tar.gz",
   "issueTracker": "https://github.com/R3BRootGroup/R3BRoot/issues",
   "readme": "https://github.com/R3BRootGroup/R3BRoot/blob/dev/README.md",
   "relatedLink": "https://www.gsi.de/work/forschung/nustarenna/nustarenna_divisions/kernreaktionen/activities/r3b",
@@ -312,6 +312,11 @@
     },
     {
       "@type": "Person",
+      "givenName": "Petra",
+      "familyName": "Bilela"
+    },
+    {
+      "@type": "Person",
       "givenName": "Konstanze",
       "familyName": "Boretzky",
       "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
@@ -341,7 +346,8 @@
     {
       "@type": "Person",
       "givenName": "Elisabet",
-      "familyName": "Galiana"
+      "familyName": "Galiana",
+      "affiliation": "IGFAE, University of Santiago de Compostela, 15782 Santiago de Compostela, Spain"
     },
     {
       "@type": "Person",
@@ -352,12 +358,14 @@
     {
       "@type": "Person",
       "givenName": "Benjamin",
-      "familyName": "Heiss"
+      "familyName": "Heiss",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
       "givenName": "Alexander",
-      "familyName": "Inglessi"
+      "familyName": "Inglessi",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -366,8 +374,15 @@
     },
     {
       "@type": "Person",
+      "givenName": "Mrunmoy",
+      "familyName": "Jena",
+      "affiliation": "Technische Universit\u00e4t M\u00fcnchen, 85748 Garching, Germany"
+    },
+    {
+      "@type": "Person",
       "givenName": "Tobias",
-      "familyName": "Jenegger"
+      "familyName": "Jenegger",
+      "affiliation": "Technische Universit\u00e4t M\u00fcnchen, 85748 Garching, Germany"
     },
     {
       "@type": "Person",
@@ -383,7 +398,8 @@
     {
       "@type": "Person",
       "givenName": "Enis",
-      "familyName": "Lorenz"
+      "familyName": "Lorenz",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -399,7 +415,8 @@
     {
       "@type": "Person",
       "givenName": "Ralf",
-      "familyName": "Plag"
+      "familyName": "Plag",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -408,18 +425,27 @@
     },
     {
       "@type": "Person",
-      "givenName": "Alexey",
-      "familyName": "Rybalchenko"
+      "givenName": "Fabio",
+      "familyName": "Risitano",
+      "affiliation": "INFN Laboratori Nazionali del Sud, 95123 Catania, Italy"
     },
     {
       "@type": "Person",
       "givenName": "Dominic",
-      "familyName": "Rossi"
+      "familyName": "Rossi",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Alexey",
+      "familyName": "Rybalchenko",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
       "givenName": "Deniz",
-      "familyName": "Savran"
+      "familyName": "Savran",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
@@ -444,12 +470,14 @@
     {
       "@type": "Person",
       "givenName": "Alicia",
-      "familyName": "Wongel"
+      "familyName": "Wongel",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     },
     {
       "@type": "Person",
       "givenName": "Lorenzo",
-      "familyName": "Zanetti"
+      "familyName": "Zanetti",
+      "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
     }
   ]
 }
