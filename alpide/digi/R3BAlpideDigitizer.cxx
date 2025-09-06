@@ -209,7 +209,9 @@ R3BAlpideHitData* R3BAlpideDigitizer::AddHitData(UInt_t sid, uint16_t clustersiz
     // It fills the R3BAlpideHitData
     TClonesArray& clref = *fAlpideHits;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BAlpideHitData(sid, clustersize, x, y, z);
+    TVector3 nullMajor;
+    std::vector<double> nullHu;
+    return new (clref[size]) R3BAlpideHitData(sid, clustersize, 0, 0, nullMajor, 0, 0, nullHu, x, y, z);
 }
 
 ClassImp(R3BAlpideDigitizer)
