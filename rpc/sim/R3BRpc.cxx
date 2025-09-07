@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum fur Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,9 +20,9 @@
 #include "R3BRpc.h"
 #include "R3BRpcPoint.h"
 
-#include "TClonesArray.h"
-#include "TGeoManager.h"
-#include "TVirtualMC.h"
+#include <TClonesArray.h>
+#include <TGeoManager.h>
+#include <TVirtualMC.h>
 
 R3BRpc::R3BRpc()
     : R3BRpc("")
@@ -102,7 +102,7 @@ Bool_t R3BRpc::ProcessHits(FairVolume* vol)
                  gMC->CurrentEvent());
 
         // Increment number of RpcPoints for this track
-        R3BStack* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
+        auto* stack = dynamic_cast<R3BStack*>(gMC->GetStack());
         stack->AddPoint(kRPC);
         ResetParameters();
     }
@@ -191,4 +191,4 @@ Bool_t R3BRpc::CheckIfSensitive(std::string name)
     return kFALSE;
 }
 
-ClassImp(R3BRpc);
+ClassImp(R3BRpc)
