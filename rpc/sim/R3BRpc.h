@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum fur Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BRPC_H
-#define R3BRPC_H 1
+#pragma once
 
 #include "R3BDetector.h"
-#include "Rtypes.h"
-#include "TLorentzVector.h"
+#include <Rtypes.h>
+#include <TLorentzVector.h>
 
 class TClonesArray;
 class R3BRpcPoint;
@@ -142,5 +141,3 @@ inline void R3BRpc::ResetParameters()
     fTime = fLength = fELoss = 0;
     fPosIndex = 0;
 };
-
-#endif /* R3BRPC_H */
