@@ -17,6 +17,7 @@
 #include "R3BAlpideMappedData.h"
 #include "R3BLogger.h"
 #include "R3BMosaicReader.h"
+#include "R3BWRData.h"
 
 #include <TClonesArray.h>
 #include <ext_data_struct_info.hh>
@@ -47,6 +48,7 @@ R3BMosaicReader::R3BMosaicReader(EXT_STR_h101_MOSAIC202506_onion* data, size_t o
     , fData2506(data)
     , fOffset(offset)
     , fArray(new TClonesArray("R3BAlpideMappedData"))
+    , fArray_TS(new TClonesArray("R3BWRData"))
     , fVersion(UnpackerMosaicVersion::v202506)
 {
 }
@@ -56,6 +58,10 @@ R3BMosaicReader::~R3BMosaicReader()
     if (fArray)
     {
         delete fArray;
+    }
+    if (fArray_TS)
+    {
+        delete fArray_TS;
     }
 }
 
@@ -79,6 +85,7 @@ Bool_t R3BMosaicReader::Init(ext_data_struct_info* a_struct_info)
 
     // Register output array in tree
     FairRootManager::Instance()->Register("AlpideMappedData", "ALPIDE_Map", fArray, !fOnline);
+    FairRootManager::Instance()->Register("WRAlpideData", "WRAlpide", fArray_TS, true);
     Reset();
 
     return kTRUE;
@@ -152,6 +159,12 @@ bool R3BMosaicReader::R3BRead202506()
             R3BAlpideMappedData(fAlpideId, 0, 1, fChipId, fData2506->MOSAIC4ROWv[hits], fData2506->MOSAIC4COLv[hits]);
     }
 
+    // reading timestamps
+    uint64_t timestamp_m3 = ((uint64_t)fData2506->MOSAIC3T_HI << 32) | (fData2506->MOSAIC3T_LO);
+    uint64_t timestamp_m4 = ((uint64_t)fData2506->MOSAIC4T_HI << 32) | (fData2506->MOSAIC4T_LO);
+    new ((*fArray_TS)[fArray_TS->GetEntriesFast()]) R3BWRData(timestamp_m3, 3);
+    new ((*fArray_TS)[fArray_TS->GetEntriesFast()]) R3BWRData(timestamp_m4, 4);
+
     return kTRUE;
 }
 
@@ -161,6 +174,11 @@ void R3BMosaicReader::Reset()
     if (fArray)
     {
         fArray->Clear();
+    }
+    // Reset the output array
+    if (fArray_TS)
+    {
+        fArray_TS->Clear();
     }
 }
 
