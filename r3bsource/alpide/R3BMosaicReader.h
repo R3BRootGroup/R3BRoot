@@ -90,6 +90,7 @@ class R3BMosaicReader : public R3BReader
     uint16_t fNb_sensors_flex = 6;
     // Output array
     TClonesArray* fArray = nullptr;
+    TClonesArray* fArray_TS = nullptr; // timestamps
     // Unpacker version
     UnpackerMosaicVersion fVersion = UnpackerMosaicVersion::v202402;
 
