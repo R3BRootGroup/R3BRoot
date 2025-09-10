@@ -116,7 +116,8 @@
 #pragma link C++ class EXT_STR_h101_TOFI_onion_t;
 #pragma link C++ class EXT_STR_h101_PTOF_onion_t;
 #pragma link C++ class EXT_STR_h101_PSP_onion_t;
-#pragma link C++ class EXT_STR_h101_CALIFA_onion_t;
+#pragma link C++ class EXT_STR_h101_CALIFA202402_onion_t;
+#pragma link C++ class EXT_STR_h101_CALIFA202506_onion_t;
 #pragma link C++ class EXT_STR_h101_WRNEULAND_onion_t;
 #pragma link C++ class EXT_STR_h101_raw_nnp_tacquila_onion_t;
 #pragma link C++ class EXT_STR_h101_raw_nnp_tamex_onion_t;

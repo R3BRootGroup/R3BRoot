@@ -160,7 +160,8 @@ set(STRUCT_HEADERS
     tofi/ext_h101_tofi.h
     tofd/ext_h101_ptof.h
     pspx/ext_h101_psp.h
-    califa/ext_h101_califa.h
+    califa/ext_h101_califa202402.h
+    califa/ext_h101_califa202506.h
     neuland/ext_h101_raw_nnp_tacquila.h
     neuland/ext_h101_raw_nnp_tamex.h
     ams/ext_h101_ams.h
