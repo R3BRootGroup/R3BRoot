@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2025 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -38,9 +38,12 @@ typedef int int32_t;
  * Plain structure (layout as ntuple/root file):
  */
 
-typedef struct EXT_STR_h101_CALIFA_t
+typedef struct EXT_STR_h101_CALIFA202506_t
 {
     /* RAW */
+    uint32_t CALIFA_TRGENE /* [0,8] */;
+    uint32_t CALIFA_TRGENEI[8 EXT_STRUCT_CTRL(CALIFA_TRGENE)] /* [1,4] */;
+    uint32_t CALIFA_TRGENEv[8 EXT_STRUCT_CTRL(CALIFA_TRGENE)] /* [0,65535] */;
     uint32_t CALIFA_ENE /* [0,5088] */;
     uint32_t CALIFA_ENEI[5088 EXT_STRUCT_CTRL(CALIFA_ENE)] /* [1,5088] */;
     uint32_t CALIFA_ENEv[5088 EXT_STRUCT_CTRL(CALIFA_ENE)] /* [0,65535] */;
@@ -84,7 +87,7 @@ typedef struct EXT_STR_h101_CALIFA_t
     uint32_t CALIFA_DISCARDI[5088 EXT_STRUCT_CTRL(CALIFA_DISCARD)] /* [1,5088] */;
     uint32_t CALIFA_DISCARDv[5088 EXT_STRUCT_CTRL(CALIFA_DISCARD)] /* [0,65535] */;
 
-} EXT_STR_h101_CALIFA;
+} EXT_STR_h101_CALIFA202506;
 
 /********************************************************
  *
@@ -92,9 +95,12 @@ typedef struct EXT_STR_h101_CALIFA_t
  * recovered (recommended):
  */
 
-typedef struct EXT_STR_h101_CALIFA_onion_t
+typedef struct EXT_STR_h101_CALIFA202506_onion_t
 {
     /* RAW */
+    uint32_t CALIFA_TRGENE;
+    uint32_t CALIFA_TRGENEI[8 /* CALIFA_TRGENE */];
+    uint32_t CALIFA_TRGENEv[8 /* CALIFA_TRGENE */];
     uint32_t CALIFA_ENE;
     uint32_t CALIFA_ENEI[5088 /* CALIFA_ENE */];
     uint32_t CALIFA_ENEv[5088 /* CALIFA_ENE */];
@@ -132,15 +138,37 @@ typedef struct EXT_STR_h101_CALIFA_onion_t
     uint32_t CALIFA_DISCARDI[5088 /* CALIFA_DISCARD */];
     uint32_t CALIFA_DISCARDv[5088 /* CALIFA_DISCARD */];
 
-} EXT_STR_h101_CALIFA_onion;
+} EXT_STR_h101_CALIFA202506_onion;
 
 /*******************************************************/
 
-#define EXT_STR_h101_CALIFA_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                             \
+#define EXT_STR_h101_CALIFA202506_ITEMS_INFO(ok, si, offset, struct_t, printerr)                                       \
     do                                                                                                                 \
     {                                                                                                                  \
         ok = 1;                                                                                                        \
         /* RAW */                                                                                                      \
+        EXT_STR_ITEM_INFO2_LIM(                                                                                        \
+            ok, si, offset, struct_t, printerr, CALIFA_TRGENE, UINT32, "CALIFA_TRGENE", 4, 0 /*flags*/);               \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               CALIFA_TRGENEI,                                                                         \
+                               UINT32,                                                                                 \
+                               "CALIFA_TRGENEI",                                                                       \
+                               "CALIFA_TRGENE",                                                                        \
+                               0 /*flags*/);                                                                           \
+        EXT_STR_ITEM_INFO2_ZZP(ok,                                                                                     \
+                               si,                                                                                     \
+                               offset,                                                                                 \
+                               struct_t,                                                                               \
+                               printerr,                                                                               \
+                               CALIFA_TRGENEv,                                                                         \
+                               UINT32,                                                                                 \
+                               "CALIFA_TRGENEv",                                                                       \
+                               "CALIFA_TRGENE",                                                                        \
+                               0 /*flags*/);                                                                           \
         EXT_STR_ITEM_INFO2_LIM(                                                                                        \
             ok, si, offset, struct_t, printerr, CALIFA_ENE, UINT32, "CALIFA_ENE", 5088, 0 /*flags*/);                  \
         EXT_STR_ITEM_INFO2_ZZP(                                                                                        \

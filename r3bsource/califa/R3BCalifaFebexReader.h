@@ -15,11 +15,18 @@
 
 #include "R3BReader.h"
 #include <Rtypes.h>
+#include <variant>
 
 class TClonesArray;
 
-struct EXT_STR_h101_CALIFA_t;
-typedef struct EXT_STR_h101_CALIFA_t EXT_STR_h101_CALIFA;
+struct EXT_STR_h101_CALIFA202402_t;
+typedef struct EXT_STR_h101_CALIFA202402_t EXT_STR_h101_CALIFA202402;
+typedef struct EXT_STR_h101_CALIFA202402_onion_t EXT_STR_h101_CALIFA202402_onion;
+
+struct EXT_STR_h101_CALIFA202506_t;
+typedef struct EXT_STR_h101_CALIFA202506_t EXT_STR_h101_CALIFA202506;
+typedef struct EXT_STR_h101_CALIFA202506_onion_t EXT_STR_h101_CALIFA202506_onion;
+
 class ext_data_struct_info;
 /**
  * A reader of CALIFA FEBEX data with UCESB.
@@ -37,7 +44,8 @@ class R3BCalifaFebexReader : public R3BReader
      * second parameter seems to be the offset of EXT_STR_h101_califa
      * in the overall event structure.
      */
-    R3BCalifaFebexReader(EXT_STR_h101_CALIFA*, size_t);
+    R3BCalifaFebexReader(EXT_STR_h101_CALIFA202402_onion*, size_t);
+    R3BCalifaFebexReader(EXT_STR_h101_CALIFA202506_onion*, size_t);
 
     // Destructor
     virtual ~R3BCalifaFebexReader();
@@ -58,7 +66,8 @@ class R3BCalifaFebexReader : public R3BReader
     // An event counter
     unsigned int fNEvent;
     // Reader specific data structure from ucesb
-    EXT_STR_h101_CALIFA* fData;
+    EXT_STR_h101_CALIFA202402_onion* fData24 = nullptr;
+    EXT_STR_h101_CALIFA202506_onion* fData25 = nullptr;
     // Data offset
     size_t fOffset;
     // Don't store data for online
@@ -66,6 +75,8 @@ class R3BCalifaFebexReader : public R3BReader
     // Output array
     TClonesArray* fArray;
     TClonesArray* fArraytrig;
+
+    std::variant<EXT_STR_h101_CALIFA202402_onion*, EXT_STR_h101_CALIFA202506_onion*> fData;
 
   public:
     ClassDefOverride(R3BCalifaFebexReader, 0);
