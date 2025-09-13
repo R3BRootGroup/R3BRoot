@@ -19,6 +19,7 @@
 class TClonesArray;
 class R3BActafPoint;
 class FairVolume;
+class R3BActafGeometry;
 
 class R3BActaf : public R3BDetector
 {
@@ -80,6 +81,8 @@ class R3BActaf : public R3BDetector
      **/
     void Reset() override;
 
+    inline void SelectGeometryVersion(int version) { fGeometryVersion = version; }
+
     Bool_t CheckIfSensitive(std::string name) override;
     void Initialize() override;
 
@@ -98,6 +101,8 @@ class R3BActaf : public R3BDetector
     Double32_t fLength;             //!  length
     Double32_t fELoss;              //!  energy loss
     TClonesArray* fActafCollection; //!  The hit collection
+
+    int fGeometryVersion = 2025;
 
     /** Private method AddHit
      **

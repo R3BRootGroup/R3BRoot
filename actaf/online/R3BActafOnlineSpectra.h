@@ -27,7 +27,7 @@ class TClonesArray;
 class TH1F;
 class TH2F;
 class R3BEventHeader;
-// class R3BActafMappingPar;
+class R3BActafMappingPar;
 
 class R3BActafOnlineSpectra : public FairTask
 {
@@ -103,9 +103,9 @@ class R3BActafOnlineSpectra : public FairTask
     TClonesArray* fCalItems = nullptr;
     TClonesArray* fHitItems = nullptr;
 
-    R3BEventHeader* header = nullptr; /**< Event header. */
-    // R3BActafMappingPar* fMap_Par = nullptr; /**< Parameter container. >*/
-    int fTrigger = -1; /**< Trigger value. */
+    R3BEventHeader* header = nullptr;       /** Event header */
+    R3BActafMappingPar* fMap_Par = nullptr; /** Parameter container */
+    int fTrigger = -1;                      /** Trigger value */
     int fTpat1 = 0, fTpat2 = 0;
     unsigned long fNEvents = 0;
     const int fChn = 16;
@@ -123,5 +123,5 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_Risetime_map;
 
   public:
-    ClassDefOverride(R3BActafOnlineSpectra, 1)
+    ClassDefOverride(R3BActafOnlineSpectra, 1);
 };

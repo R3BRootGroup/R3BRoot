@@ -82,22 +82,21 @@ void R3BActafMappingPar::putParams(FairParamList* list)
     list->add("NbFADCModulesPar", fNbFADCModules);
     R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
 
-    auto* In_use = new TArrayI(fNbPads);
-    auto* Module = new TArrayI(fNbPads);
-    auto* Channel = new TArrayI(fNbPads);
-    auto* Pads = new TArrayI(fNbPads);
-
+    TArrayI In_use(fNbPads);
+    TArrayI Module(fNbPads);
+    TArrayI Channel(fNbPads);
+    TArrayI Pads(fNbPads);
     for (Int_t idx = 0; idx < fNbPads; idx++)
     {
-        In_use->AddAt(fIn_use[idx], idx);
-        Module->AddAt(fModule[idx], idx);
-        Channel->AddAt(fChannel[idx], idx);
-        Pads->AddAt(fPad[idx], idx);
+        In_use[idx] = fIn_use[idx];
+        Module[idx] = fModule[idx];
+        Channel[idx] = fChannel[idx];
+        Pads[idx] = fPad[idx];
     }
-    list->add("InUsePar", *In_use);
-    list->add("ModulePar", *Module);
-    list->add("ChannelPar", *Channel);
-    list->add("PadPar", *Pads);
+    list->add("InUsePar", In_use);
+    list->add("ModulePar", Module);
+    list->add("ChannelPar", Channel);
+    list->add("PadPar", Pads);
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -138,6 +137,38 @@ Bool_t R3BActafMappingPar::getParams(FairParamList* list)
     else
     {
         R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
+    }
+
+    TArrayI In_use(fNbPads);
+    TArrayI Module(fNbPads);
+    TArrayI Channel(fNbPads);
+    TArrayI Pads(fNbPads);
+
+    // Map names to arrays for cleaner loop
+    struct ArrayPair
+    {
+        const char* name;
+        TArrayI& array;
+        std::vector<Int_t>& target;
+    };
+
+    ArrayPair arrays[] = { { "InUsePar", In_use, fIn_use },
+                           { "ModulePar", Module, fModule },
+                           { "ChannelPar", Channel, fChannel },
+                           { "PadPar", Pads, fPad } };
+
+    // Fill and copy only if successful
+    for (auto& pair : arrays)
+    {
+        if (!list->fill(pair.name, &pair.array))
+        {
+            LOG(warn) << "---Could not initialize " << pair.name;
+            continue;
+        }
+        for (Int_t idx = 0; idx < fNbPads; ++idx)
+        {
+            pair.target[idx] = pair.array[idx];
+        }
     }
 
     return kTRUE;

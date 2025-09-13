@@ -295,4 +295,5 @@ add_library_with_dictionary(
     ${DIRS}
     DEPENDENCIES
     R3BData
+    R3BActaf
     Ucesb)
