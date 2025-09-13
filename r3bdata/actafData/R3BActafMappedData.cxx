@@ -20,7 +20,8 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
                                        double baseline,
                                        int risetime,
                                        int maxpos,
-                                       double maxamplitude)
+                                       double maxamplitude,
+                                       double leadingedge10)
     : fPad(pad)
     , fTrace(trace)
     , fE(energy)
@@ -28,6 +29,7 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
     , fRisetime(risetime)
     , fMaxpos(maxpos)
     , fMaxamplitude(maxamplitude)
+    , fLeadingEdge10(leadingedge10)
 {
 }
 
@@ -42,15 +44,16 @@ std::string R3BActafMappedData::toString() const
     }
     trace_str += "]";
 
-    return fmt::format(
-        "Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, Max-position: {}, Max-amplitude: {}",
-        GetPad(),
-        trace_str,
-        GetE(),
-        GetBaseline(),
-        GetRisetime(),
-        GetMaxpos(),
-        GetMaxampl());
+    return fmt::format("Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, Max-position: {}, Max-amplitude: "
+                       "{}, Leading-Time: {}",
+                       GetPad(),
+                       trace_str,
+                       GetE(),
+                       GetBaseline(),
+                       GetRisetime(),
+                       GetMaxpos(),
+                       GetMaxampl(),
+                       GetLeadingEdgeTime());
 }
 
 void R3BActafMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }

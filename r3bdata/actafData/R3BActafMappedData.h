@@ -11,6 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
+// -----------------------------------------------------------------
+// -----            R3BActafMappedData source file             -----
+// -----      Created 14/02/25 by J.L. Rodriguez-Sanchez       -----
+// -----------------------------------------------------------------
+
 #pragma once
 
 #include <TObject.h>
@@ -39,7 +44,8 @@ class R3BActafMappedData : public TObject
                                 double baseline = 0.,
                                 int risetime = 0,
                                 int maxpos = 0,
-                                double maxamplitude = 0.);
+                                double maxamplitude = 0.,
+                                double leadingedge10 = 0.);
 
     // Destructor
     virtual ~R3BActafMappedData() = default;
@@ -52,6 +58,7 @@ class R3BActafMappedData : public TObject
     [[nodiscard]] inline const int& GetRisetime() const { return fRisetime; }
     [[nodiscard]] inline const int& GetMaxpos() const { return fMaxpos; }
     [[nodiscard]] inline const double& GetMaxampl() const { return fMaxamplitude; }
+    [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge10; }
 
     // Support for printing
     [[nodiscard]] std::string toString() const;
@@ -63,9 +70,10 @@ class R3BActafMappedData : public TObject
     int fRisetime = 0, fMaxpos = 0;
     double fMaxamplitude = 0.;
     std::vector<UInt_t> fTrace; // Trace signal for each channel
+    double fLeadingEdge10 = 0;
 
   public:
-    ClassDefOverride(R3BActafMappedData, 2)
+    ClassDefOverride(R3BActafMappedData, 3);
 };
 
 // Operator overloading for printing R3BActafMappedData

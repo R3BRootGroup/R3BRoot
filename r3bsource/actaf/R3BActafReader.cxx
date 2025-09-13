@@ -13,8 +13,10 @@
 
 #include <FairLogger.h>
 #include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 
 #include "R3BActafMappedData.h"
+#include "R3BActafMappingPar.h"
 #include "R3BActafReader.h"
 #include "R3BLogger.h"
 
@@ -132,6 +134,15 @@ R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2025_onion* data, size_t offset
 {
 }
 
+void R3BActafReader::SetParContainers()
+{
+    auto* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
+
+    fMapping_Par = dynamic_cast<R3BActafMappingPar*>(rtdb->getContainer("actafMappingPar"));
+    R3BLOG_IF(fatal, !fMapping_Par, "Could not get handle on actafMappingPar container");
+}
+
 Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
 {
     R3BLOG(info, "");
@@ -169,6 +180,14 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
     FairRootManager::Instance()->Register("ActafMappedData", "Actaf mapped data", fArray.get(), !fOnline);
     Reset();
 
+    // fMapping_Par->print();
+    mapping = std::vector<std::vector<int>>(fMapping_Par->GetNbFADCModules(), std::vector<int>(eChn, 0));
+    for (auto index = 0; index < fMapping_Par->GetNbPads(); ++index)
+    {
+        auto mod = fMapping_Par->GetFADCModule(index) - 1;
+        auto chn = fMapping_Par->GetFADCChannel(index) - 1;
+        mapping[mod][chn] = index + 1;
+    }
     return kTRUE;
 }
 
@@ -223,7 +242,7 @@ bool R3BActafReader::R3BRead2023()
 
         for (int chn = 0; chn < data->ACTAF[mod].CH; ++chn)
         {
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mod * eChn + (chn + 1),
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mapping[mod][chn],
                                                                          trace[chn],
                                                                          integral[chn],
                                                                          baselineMean[chn],
@@ -270,7 +289,7 @@ bool R3BActafReader::R3BRead2025()
 
         for (int chn = 0; chn < eChn; ++chn)
         {
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mod * eChn + (chn + 1),
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mapping[mod][chn],
                                                                          trace[chn],
                                                                          integral[chn],
                                                                          baselineMean[chn],

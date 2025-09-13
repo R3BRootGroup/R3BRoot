@@ -15,10 +15,12 @@
 #include <FairVolume.h>
 
 #include <TClonesArray.h>
+#include <TGeoManager.h>
 #include <TVirtualMC.h>
 #include <stdlib.h>
 
 #include "R3BActaf.h"
+#include "R3BActafGeometry.h"
 #include "R3BActafPoint.h"
 #include "R3BLogger.h"
 #include "R3BMCStack.h"
@@ -54,20 +56,19 @@ void R3BActaf::Initialize()
     FairDetector::Initialize();
 
     R3BLOG(info, " ");
-    // LOG(debug) << "R3BActaf: Vol. (McId) " << gMC->VolId("PSP1Log");
+    TGeoVolume* vol = static_cast<TGeoVolume*>(gGeoManager->GetVolume("ActafWorld"));
+    vol->SetVisibility(kFALSE);
+
+    if (!R3BActafGeometry::Instance()->Init(fGeometryVersion))
+    {
+        R3BLOG(error, "Actaf geometry not found");
+    }
+    return;
 }
 
 // -----   Public method ProcessHits  --------------------------------------
 Bool_t R3BActaf::ProcessHits(FairVolume* vol)
 {
-    // 2 Simple Det PLane
-    // get Info from DCH planes
-    Int_t copyNo = -1;
-    Int_t planeNr = -1;
-    // Get the Geo info from MC Point
-    TVirtualMC::GetMC()->CurrentVolID(copyNo);
-    TVirtualMC::GetMC()->CurrentVolOffID(1, planeNr);
-
     if (TVirtualMC::GetMC()->IsTrackEntering())
     {
         fELoss = 0.;
@@ -85,7 +86,6 @@ Bool_t R3BActaf::ProcessHits(FairVolume* vol)
         TVirtualMC::GetMC()->IsTrackDisappeared())
     {
         fTrackID = gMC->GetStack()->GetCurrentTrackNumber();
-        fVolumeID = vol->getMCid();
         gMC->TrackPosition(fPosOut);
         gMC->TrackMomentum(fMomOut);
         if (fELoss == 0.)
@@ -99,9 +99,15 @@ Bool_t R3BActaf::ProcessHits(FairVolume* vol)
         fTime = (fTime_out + fTime_in) / 2.;
         fLength = (fLength_out + fLength_in) / 2.;
 
+        int ringId = R3BActafGeometry::Instance()->GetRingId(TVirtualMC::GetMC()->CurrentVolPath());
+        int padId = R3BActafGeometry::Instance()->GetPadId(TVirtualMC::GetMC()->CurrentVolPath());
+
+        R3BLOG(debug,
+               TVirtualMC::GetMC()->CurrentVolPath() << " " << ringId << " " << padId << " fVolumeID:" << fVolumeID);
+
         AddHit(fTrackID,
-               fVolumeID,
-               planeNr,
+               padId,
+               ringId,
                TVector3(fPosIn.X(), fPosIn.Y(), fPosIn.Z()),
                TVector3(fPosOut.X(), fPosOut.Y(), fPosOut.Z()),
                TVector3(fMomIn.Px(), fMomIn.Py(), fMomIn.Pz()),
@@ -178,7 +184,8 @@ R3BActafPoint* R3BActaf::AddHit(Int_t trackID,
 
 Bool_t R3BActaf::CheckIfSensitive(std::string name)
 {
-    if (TString(name).Contains("Actar_chamber_inner"))
+    // std::cout << "Name: " << name << std::endl;
+    if (TString(name).Contains("Pad"))
     {
         return kTRUE;
     }

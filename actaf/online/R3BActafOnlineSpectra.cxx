@@ -37,7 +37,7 @@
 // #include "R3BActafCalData.h"
 // #include "R3BActafHitData.h"
 #include "R3BActafMappedData.h"
-// #include "R3BActafMappingPar.h"
+#include "R3BActafMappingPar.h"
 #include "R3BActafOnlineSpectra.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
@@ -61,8 +61,8 @@ void R3BActafOnlineSpectra::SetParContainers()
     FairRuntimeDb* rtdb = FairRuntimeDb::instance();
     R3BLOG_IF(fatal, rtdb == nullptr, "FairRuntimeDb not found");
 
-    // fMap_Par = dynamic_cast<R3BActafMappingPar*>(rtdb->getContainer("ActafMappingPar"));
-    // R3BLOG_IF(fatal, fMap_Par == nullptr, "Container ActafMappingPar not found");
+    fMap_Par = dynamic_cast<R3BActafMappingPar*>(rtdb->getContainer("actafMappingPar"));
+    R3BLOG_IF(fatal, fMap_Par == nullptr, "Container ActafMappingPar not found");
 }
 
 void R3BActafOnlineSpectra::SetParameter()
@@ -286,6 +286,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             if (!hit)
                 continue;
             auto pad = hit->GetPad() - 1;
+            if (pad >= fMap_Par->GetNbPads())
+                continue;
 
             if (hit->GetE() > 0)
             {

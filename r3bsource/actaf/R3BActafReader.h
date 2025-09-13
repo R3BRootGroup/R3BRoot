@@ -28,6 +28,7 @@ typedef struct EXT_STR_h101_ACTAF2025_t EXT_STR_h101_ACTAF2025;
 typedef struct EXT_STR_h101_ACTAF2025_onion_t EXT_STR_h101_ACTAF2025_onion;
 
 class ext_data_struct_info;
+class R3BActafMappingPar;
 /**
  * A reader of ACTAF data with UCESB.
  * Receives mapped raw data and converts it to R3BRoot objects.
@@ -47,6 +48,9 @@ class R3BActafReader : public R3BReader
 
     // Setup structure information
     auto Init(ext_data_struct_info* /*unused*/) -> Bool_t override;
+
+    // Set containers
+    void SetParContainers() override;
 
     // Read data from full event structure
     auto R3BRead() -> Bool_t override;
@@ -82,6 +86,8 @@ class R3BActafReader : public R3BReader
     std::unique_ptr<TClonesArray> fArray;
     // Unpacker version
     UnpackerVersion fVersion = UnpackerVersion::v2023;
+    R3BActafMappingPar* fMapping_Par = nullptr;
+    std::vector<std::vector<int>> mapping;
 
   public:
     ClassDefOverride(R3BActafReader, 0);

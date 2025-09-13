@@ -21,6 +21,7 @@
 #include <FairParGenericSet.h>
 
 #include <Rtypes.h>
+#include <stdexcept>
 #include <stdint.h>
 #include <vector>
 
@@ -57,21 +58,92 @@ class R3BActafMappingPar : public FairParGenericSet
     void printParams() override;
 
     /** Accessor functions **/
-    Int_t GetNbPads() const { return fNbPads; }
-    Int_t GetGeoVersion() const { return fGeoVersion; }
-    Int_t GetNbFADCModules() const { return fNbFADCModules; }
-    Int_t GetNbFADCChannels() const { return fNbFADCChannels; }
-    Int_t GetInUse(UInt_t index) const { return fIn_use[index]; }
-    Int_t GetFADCModule(UInt_t index) const { return fModule[index]; }
-    Int_t GetFADCChannel(UInt_t index) const { return fChannel[index]; }
-    Int_t GetPad(UInt_t index) const { return fPad[index]; }
+    [[nodiscard]] Int_t GetNbPads() const { return fNbPads; }
+    [[nodiscard]] Int_t GetGeoVersion() const { return fGeoVersion; }
+    [[nodiscard]] Int_t GetNbFADCModules() const { return fNbFADCModules; }
+    [[nodiscard]] Int_t GetNbFADCChannels() const { return fNbFADCChannels; }
 
+    [[nodiscard]] Int_t GetInUse(Int_t index) const
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fIn_use.size()))
+        {
+            throw std::out_of_range("GetInUse: index out of range");
+        }
+        return fIn_use[index];
+    }
+
+    [[nodiscard]] Int_t GetFADCModule(Int_t index) const
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fModule.size()))
+        {
+            throw std::out_of_range("GetFADCModule: index out of range");
+        }
+        return fModule[index];
+    }
+
+    [[nodiscard]] Int_t GetFADCChannel(Int_t index) const
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fChannel.size()))
+        {
+            throw std::out_of_range("GetFADCChannel: index out of range");
+        }
+        return fChannel[index];
+    }
+
+    [[nodiscard]] Int_t GetPad(Int_t index) const
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fPad.size()))
+        {
+            throw std::out_of_range("GetPad: index out of range");
+        }
+        return fPad[index];
+    }
+
+    /** Accessor functions by pad (pad = index + 1) **/
+    [[nodiscard]] Int_t GetInUseByPad(UInt_t pad) const { return GetInUse(pad - 1); }
+    [[nodiscard]] Int_t GetFADCModuleByPad(UInt_t pad) const { return GetFADCModule(pad - 1); }
+    [[nodiscard]] Int_t GetFADCChannelByPad(UInt_t pad) const { return GetFADCChannel(pad - 1); }
+    [[nodiscard]] Int_t GetPadByPad(UInt_t pad) const { return GetPad(pad - 1); }
+
+    /** Setter functions **/
     void SetNbPads(Int_t pads);
     void SetGeoVersion(Int_t v) { fGeoVersion = v; }
-    void SetInUse(UInt_t index, Int_t val) { fIn_use[index] = val; }
-    void SetFADCModule(UInt_t index, Int_t val) { fModule[index] = val; }
-    void SetFADCChannel(UInt_t index, Int_t val) { fChannel[index] = val; }
-    void SetPad(UInt_t index, Int_t val) { fPad[index] = val; }
+
+    void SetInUse(Int_t index, Int_t val)
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fIn_use.size()))
+        {
+            throw std::out_of_range("SetInUse: index out of range");
+        }
+        fIn_use[index] = val;
+    }
+
+    void SetFADCModule(Int_t index, Int_t val)
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fModule.size()))
+        {
+            throw std::out_of_range("SetFADCModule: index out of range");
+        }
+        fModule[index] = val;
+    }
+
+    void SetFADCChannel(Int_t index, Int_t val)
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fChannel.size()))
+        {
+            throw std::out_of_range("SetFADCChannel: index out of range");
+        }
+        fChannel[index] = val;
+    }
+
+    void SetPad(Int_t index, Int_t val)
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fPad.size()))
+        {
+            throw std::out_of_range("SetPad: index out of range");
+        }
+        fPad[index] = val;
+    }
 
   private:
     Int_t fNbPads = 128;
