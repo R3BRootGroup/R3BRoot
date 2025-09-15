@@ -51,7 +51,7 @@ class R3BActafCalData : public TObject
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const UInt_t& GetPad() const { return fPad; }
     [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
-    [[nodiscard]] inline const double& GetEMaxAmpl() const { return fEnergy; }
+    [[nodiscard]] inline const double& GetEMaxAmpl() const { return fEMaxAmpl; }
     [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge; }
     [[nodiscard]] inline const double& GetZpos() const { return fZPos; }
     [[nodiscard]] inline const double& GetSynTime() const { return fSynTime; }

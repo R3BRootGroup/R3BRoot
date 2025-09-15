@@ -23,9 +23,11 @@
 // FAIR headers
 #include <FairLogger.h>
 #include <FairRootManager.h>
+#include <FairRuntimeDb.h>
 
 // ACTAF headers
 #include "R3BActafCalData.h"
+#include "R3BActafCalPar.h"
 #include "R3BActafMapped2Cal.h"
 #include "R3BActafMappedData.h"
 #include "R3BLogger.h"
@@ -40,6 +42,8 @@ R3BActafMapped2Cal::R3BActafMapped2Cal()
 R3BActafMapped2Cal::R3BActafMapped2Cal(const TString& name, Int_t iVerbose)
     : FairTask(name, iVerbose)
 {
+    fEGain.resize(fPad);
+    fEThr.resize(fPad);
 }
 
 // Virtual R3BActafMapped2Cal::Destructor
@@ -47,8 +51,43 @@ R3BActafMapped2Cal::~R3BActafMapped2Cal()
 {
     R3BLOG(debug1, "");
     if (fActafCalData)
-    {
         delete fActafCalData;
+
+    if (fCal_Par)
+        delete fCal_Par;
+}
+
+void R3BActafMapped2Cal::SetParContainers()
+{
+    // Parameter Container
+    // Reading actafCalPar from FairRuntimeDb
+
+    FairRuntimeDb* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(error, !rtdb, "FairRuntimeDb not found");
+
+    fCal_Par = dynamic_cast<R3BActafCalPar*>(rtdb->getContainer("actafCalPar"));
+    if (!fCal_Par)
+    {
+        R3BLOG(error, "actafCalPar container not found");
+    }
+    else
+    {
+        R3BLOG(info, "actafCalPar found");
+    }
+}
+
+void R3BActafMapped2Cal::SetParameter()
+{
+    if (fCal_Par == nullptr)
+    {
+        R3BLOG(error, "actaf CalPar not found");
+        return;
+    }
+
+    for (int i = 0; i < fPad; i++)
+    {
+        fEGain[i] = fCal_Par->GetGainVal(i);
+        fEThr[i] = fCal_Par->GetThresholdVal(i);
     }
 }
 
@@ -76,6 +115,8 @@ InitStatus R3BActafMapped2Cal::Init()
     mgr->Register("ActafCalData", "ACTAF_Cal", fActafCalData, !fOnline);
     Reset();
 
+    SetParameter();
+
     return kSUCCESS;
 }
 
@@ -83,6 +124,7 @@ InitStatus R3BActafMapped2Cal::Init()
 InitStatus R3BActafMapped2Cal::ReInit()
 {
     SetParContainers();
+    SetParameter();
     return kSUCCESS;
 }
 
@@ -114,16 +156,14 @@ void R3BActafMapped2Cal::Exec(Option_t*)
         auto pad = mappedData->GetPad();
         if (pad == 129)
             continue; // syn-time
-        auto energy = mappedData->GetE() * fEGain;
-        auto energyMaxAmpl = mappedData->GetMaxampl() * fEGain;
+        auto energy = mappedData->GetE() * fEGain[pad - 1];
+        auto energyMaxAmpl = mappedData->GetMaxampl() * fEGain[pad - 1];
         auto drift = mappedData->GetLeadingEdgeTime() * fConversionCh2ns; // in ns
         auto zpos = drift * fVelocity;                                    // in cm
         auto syntime = drift - synTagTime;                                // in ns
-        // std::cout << pad <<" " <<std::endl;
-        // if (fMap_Par->GetInUse(pad) == 1)
-        //{
-        AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime);
-        //}
+
+        if (energy >= fEThr[pad - 1])
+            AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime);
     }
     return;
 }

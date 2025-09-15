@@ -116,6 +116,29 @@ int ComputeRiseTime(const std::vector<double>& signal, double maxValue)
     return t90 - t10; // Rise time in number of bins
 }
 
+inline double ComputeLeadingEdge10(const std::vector<double>& x, int maxIdx, double frac)
+{
+    if (x.empty() || maxIdx <= 0 || maxIdx >= (int)x.size())
+        return -1.0;
+
+    const double xmax = *std::max_element(x.begin(), x.begin() + maxIdx + 1);
+    const double thr = frac * xmax;
+
+    for (int i = 1; i <= maxIdx; ++i)
+    {
+        if (x[i - 1] < thr && x[i] >= thr)
+        {
+            const double y0 = x[i - 1], y1 = x[i];
+            const double dy = y1 - y0;
+            if (dy <= 0)
+                return (double)i;
+            const double alpha = (thr - y0) / dy;
+            return (double)(i - 1) + alpha;
+        }
+    }
+    return -1.0;
+}
+
 R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2023_onion* data, size_t offset)
     : R3BReader("R3BActafReader")
     , fData23(data)
@@ -227,6 +250,7 @@ bool R3BActafReader::R3BRead2023()
         std::vector<double> integral(eChn);
         std::vector<int> maxAmplitude(eChn);
         std::vector<int> riseTime(eChn);
+        std::vector<double> leadingEdge10(eChn);
 
         for (int chn = 0; chn < eChn; ++chn)
         {
@@ -238,6 +262,7 @@ bool R3BActafReader::R3BRead2023()
             // Subtract baseline from signal
             std::vector<double> correctedtrace = SubtractBaseline(trace[chn], baselineMean[chn]);
             riseTime[chn] = ComputeRiseTime(correctedtrace, maxAmplitude[chn] - baselineMean[chn]);
+            leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0.1);
         }
 
         for (int chn = 0; chn < data->ACTAF[mod].CH; ++chn)
@@ -248,7 +273,8 @@ bool R3BActafReader::R3BRead2023()
                                                                          baselineMean[chn],
                                                                          riseTime[chn],
                                                                          maxPos[chn],
-                                                                         maxAmplitude[chn] - baselineMean[chn]);
+                                                                         maxAmplitude[chn] - baselineMean[chn],
+                                                                         leadingEdge10[chn]);
         }
     }
     return kTRUE;
@@ -274,6 +300,7 @@ bool R3BActafReader::R3BRead2025()
         std::vector<double> integral(eChn);
         std::vector<int> maxAmplitude(eChn);
         std::vector<int> riseTime(eChn);
+        std::vector<double> leadingEdge10(eChn);
 
         for (int chn = 0; chn < eChn; ++chn)
         {
@@ -285,6 +312,7 @@ bool R3BActafReader::R3BRead2025()
             // Subtract baseline from signal
             std::vector<double> correctedtrace = SubtractBaseline(trace[chn], baselineMean[chn]);
             riseTime[chn] = ComputeRiseTime(correctedtrace, maxAmplitude[chn] - baselineMean[chn]);
+            leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0.1);
         }
 
         for (int chn = 0; chn < eChn; ++chn)
@@ -295,7 +323,8 @@ bool R3BActafReader::R3BRead2025()
                                                                          baselineMean[chn],
                                                                          riseTime[chn],
                                                                          maxPos[chn],
-                                                                         maxAmplitude[chn] - baselineMean[chn]);
+                                                                         maxAmplitude[chn] - baselineMean[chn],
+                                                                         leadingEdge10[chn]);
         }
     }
 

@@ -28,6 +28,48 @@ class TH1F;
 class TH2F;
 class R3BEventHeader;
 class R3BActafMappingPar;
+class R3BActafGeometry;
+
+namespace r3b::util
+{
+    template <class T>
+    inline void ClearIfNotNull(T* ptr) noexcept
+    {
+        if (ptr)
+            ptr->Clear();
+    }
+
+    /*
+    inline TH1F* MakeH1F(TString name,
+                         TString title,
+                         int nbx,
+                         double xlow,
+                         double xup,
+                         TString xtitle,
+                         TString ytitle,
+                         TCanvas* where,
+                         TString drawopt = "")
+    {
+        auto* h = R3B::root_owned<TH1F>(name, title, nbx, xlow, xup);
+
+        h->SetTitle(title);
+        h->CenterTitle(true);
+
+        h->GetXaxis()->SetTitle(xtitle);
+        h->GetXaxis()->CenterTitle(true);
+
+        h->GetYaxis()->SetTitle(ytitle);
+        h->GetYaxis()->SetTitleOffset(1.1);
+        h->GetYaxis()->CenterTitle(true);
+
+        if (where)
+        {
+            where->cd();
+            h->Draw(drawopt);
+        }
+    }
+    */
+} // namespace r3b::util
 
 class R3BActafOnlineSpectra : public FairTask
 {
@@ -96,8 +138,42 @@ class R3BActafOnlineSpectra : public FairTask
         fTpat2 = tpat2;
     }
 
+    // Setters for the histogram setting
+    inline void setHistPars(int nBins, int minBin, int maxBin, int& nBinsRef, int& minRef, int& maxRef)
+    {
+        nBinsRef = nBins;
+        minRef = minBin;
+        maxRef = maxBin;
+    }
+
+    inline void SetGeoVersion(int geo) { fGeoversion = geo; }
+
+    inline void SetEcalHistPars(int n, int minB, int maxB)
+    {
+        setHistPars(n, minB, maxB, nBinsEcal, nEcalMin, nEcalMax);
+    }
+    inline void SetZcalHistPars(int n, int minB, int maxB)
+    {
+        setHistPars(n, minB, maxB, nBinsZcal, nZcalMin, nZcalMax);
+    }
+    inline void SetTLeadingHistPars(int n, int minB, int maxB)
+    {
+        setHistPars(n, minB, maxB, nBinstLeading, ntLeadingMin, ntLeadingMax);
+    }
+    inline void SetMaxAmpHistPars(int n, int minB, int maxB)
+    {
+        setHistPars(n, minB, maxB, nBinsMaxAmp, nMaxAmpMin, nMaxAmpMax);
+    }
+    inline void SetTSyncHistPars(int n, int minB, int maxB)
+    {
+        setHistPars(n, minB, maxB, nBinsTSync, nTSyncMin, nTSyncMax);
+    }
+
   private:
     void SetParameter();
+
+    int fGeoversion = 2025;
+    R3BActafGeometry* fActafGeo;
 
     TClonesArray* fMappedItems = nullptr;
     TClonesArray* fCalItems = nullptr;
@@ -108,19 +184,57 @@ class R3BActafOnlineSpectra : public FairTask
     int fTrigger = -1;                      /** Trigger value */
     int fTpat1 = 0, fTpat2 = 0;
     unsigned long fNEvents = 0;
-    const int fChn = 16;
-    const int fFadcs = 8;
-    const int fPads = fChn * fFadcs;
+    static constexpr int fChn = 16;
+    static constexpr int fFadcs = 8;
+    static constexpr int fPads = fChn * fFadcs;
     bool fDisplaytraces = true;
 
     std::vector<TH2F*> fh2_RawTraces;
     std::vector<TH1F*> fh1_RawE;
     std::vector<TH1F*> fh1_Baseline;
 
-    TH2F* fh2_ERaw_map;
-    TH2F* fh2_Baseline_map;
-    TH2F* fh2_MaxPos_map;
-    TH2F* fh2_Risetime_map;
+    // Map histograms
+    TH2F* fh2_ERaw_map = nullptr;
+    TH2F* fh2_Baseline_map = nullptr;
+    TH2F* fh2_MaxPos_map = nullptr;
+    TH2F* fh2_Risetime_map = nullptr;
+    TH2F* fh2_ModVsCh_map = nullptr;
+
+    // Cal histograms
+    TH2F* fh2_Ecal_cal = nullptr;
+    TH2F* fh2_zPos_cal = nullptr;
+    TH2F* fh2_tLeading_cal = nullptr;
+    TH2F* fh2_maxAmp_cal = nullptr;
+    TH2F* fh2_tSync_cal = nullptr;
+
+    int nBinsEcal = 100;
+    int nEcalMin = 0;
+    int nEcalMax = 500000;
+
+    int nBinsZcal = 100;
+    int nZcalMin = 0;
+    int nZcalMax = 1000;
+
+    int nBinstLeading = 100;
+    int ntLeadingMin = 0;
+    int ntLeadingMax = 5000;
+
+    int nBinsMaxAmp = 100;
+    int nMaxAmpMin = 0;
+    int nMaxAmpMax = 1500;
+
+    int nBinsTSync = 100;
+    int nTSyncMin = 0;
+    int nTSyncMax = 5000;
+
+    // Hit histograms
+    std::vector<TH1F*> fh1_RingCounts;
+    std::vector<TH2F*> fh2_XYPos;
+    std::vector<TH2F*> fh2_XYPosRand;
+    std::vector<TH1F*> fh1_PhiCounts;
+
+    TH1F* fh1_CountsPerSide = nullptr;
+    TH2F* fh2_Phi1VsPhi2 = nullptr;
 
   public:
     ClassDefOverride(R3BActafOnlineSpectra, 1);

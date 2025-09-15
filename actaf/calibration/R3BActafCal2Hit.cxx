@@ -110,7 +110,7 @@ void R3BActafCal2Hit::Exec(Option_t*)
         auto ring = fActafGeo->GetRingId(pad);
         auto zpos = calData->GetZpos();
         auto energy = calData->GetEnergy();
-        TVector3 track = fActafGeo->GetPosition(pad);
+        TVector3 track = fActafGeo->GetPosition(pad, false);
         AddHitData(pad, (pad < 65 ? 1 : 2), ring, track.X(), track.Y(), zpos, energy, track);
     }
     return;
