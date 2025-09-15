@@ -21,6 +21,7 @@
 #include <TClass.h>
 #include <string>
 
+#include "R3BActafCalPar.h"
 #include "R3BActafContFact.h"
 #include "R3BActafMappingPar.h"
 #include "R3BLogger.h"
@@ -48,6 +49,9 @@ void R3BActafContFact::setAllContainers()
     auto* p2 = new FairContainer("actafMappingPar", "ACTAF Mapping Parameters", "ActafMappingParContext");
     p2->addContext("ActafMappingParContext");
     containers->Add(p2);
+    auto* p3 = new FairContainer("actafCalPar", "ACTAF Cal Parameters", "ActafCalParContext");
+    p3->addContext("ActafCalParContext");
+    containers->Add(p3);
 }
 
 FairParSet* R3BActafContFact::createContainer(FairContainer* c)
@@ -65,6 +69,10 @@ FairParSet* R3BActafContFact::createContainer(FairContainer* c)
     else if (name == "actafMappingPar")
     {
         p = new R3BActafMappingPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
+    }
+    else if (name == "actafCalPar")
+    {
+        p = new R3BActafCalPar(c->getConcatName().Data(), c->GetTitle(), c->getContext());
     }
     return p;
 }

@@ -24,7 +24,10 @@
 
 #include <Rtypes.h>
 
+#include <vector>
+
 class TClonesArray;
+class R3BActafCalPar;
 
 class R3BActafMapped2Cal : public FairTask
 {
@@ -50,6 +53,8 @@ class R3BActafMapped2Cal : public FairTask
     /** Method ReInit **/
     InitStatus ReInit() override;
 
+    void SetParContainers() override;
+
     // Method to setup online mode
     inline void SetOnline(bool option = true) { fOnline = option; }
 
@@ -60,13 +65,20 @@ class R3BActafMapped2Cal : public FairTask
     inline void SetVelocity(double opt) { fVelocity = opt; }
 
   private:
+    void SetParameter();
+
+    static constexpr int fPad = 128;
+
     bool fOnline = false;            // Don't store data for online
-    double fEGain = 1.;              // units?
     double fConversionCh2ns = 51.44; // in ns/bin
     double fVelocity = 0.02888;      // in cm/ns
 
     TClonesArray* fActafMappedData = nullptr; // Array with Actaf Mapped input data
     TClonesArray* fActafCalData = nullptr;    // Array with Actaf Cal output data
+
+    R3BActafCalPar* fCal_Par = nullptr; // Parameter container
+    std::vector<double> fEGain;
+    std::vector<double> fEThr;
 
     // Private method AddCalData
     R3BActafCalData* AddCalData(UInt_t padId, double energy, double maxampl, double drift, double zpos, double syntime);

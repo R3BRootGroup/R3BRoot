@@ -63,7 +63,7 @@ class R3BActafGeometry : public TObject
      * On error, the x,y and z component of the TVector3 are set to NAN.
      * @param iD crystal ID (depending on geometry version)
      */
-    const TVector3& GetPosition(int iD);
+    const TVector3& GetPosition(int iD, bool rand = false);
 
     /**
      * Gets ring ID for given volume path.

@@ -14,8 +14,10 @@
 #include <TFile.h>
 #include <TGeoManager.h>
 #include <TGeoNavigator.h>
+#include <TGeoTube.h>
 #include <TGeoVolume.h>
 #include <TMath.h>
+#include <TRandom.h>
 #include <TRotation.h>
 #include <TString.h>
 #include <TSystem.h>
@@ -115,16 +117,30 @@ std::string R3BActafGeometry::GetPadVolumePath(const int iD)
     return oss.str();
 }
 
-const TVector3& R3BActafGeometry::GetPosition(int iD)
+const TVector3& R3BActafGeometry::GetPosition(int iD, bool rand)
 {
+
+    // If rand == true, a random point in the face of the pad
+    // will be return instead of the cetral value. NB, since
+    // for circular sections the area scales with r^2 while points
+    // get away of the center with r, to have a uniform sampling
+    // of the pad we need to use sqrt(Uniform(rmin**2, rmax**2)).
+
     static std::map<int, TVector3> cache;
     Double_t local[3] = { 0, 0, 0 };
     Double_t master[3];
     const static TVector3 invalid(NAN, NAN, NAN);
-    if (cache.count(iD))
+
+    /* To be fixed
+    if (!rand)
     {
-        return cache[iD];
+        auto it = cache.find(iD);
+        if (it != cache.end())
+        {
+            return it->second;
+        }
     }
+    */
 
     if (iD >= 1 && iD <= fNbPads)
     {
@@ -138,6 +154,41 @@ const TVector3& R3BActafGeometry::GetPosition(int iD)
             R3BLOG(error, "Invalid pad path: " << nameVolume);
             return invalid;
         }
+
+        TGeoNode* node = gGeoManager->GetCurrentNode();
+        TGeoVolume* vol = node ? node->GetVolume() : nullptr;
+        TGeoShape* shp = vol ? vol->GetShape() : nullptr;
+
+        if (auto* seg = dynamic_cast<TGeoTubeSeg*>(shp))
+        {
+            double rmid = 0.5 * (seg->GetRmin() + seg->GetRmax());
+            const double phi1 = seg->GetPhi1() * TMath::DegToRad();
+            const double phi2 = seg->GetPhi2() * TMath::DegToRad();
+            double phim = (phi1 + phi2) / 2.;
+
+            if (rand)
+            {
+                phim = gRandom->Uniform(phi1, phi2);
+                rmid = TMath::Sqrt(gRandom->Uniform(std::pow(seg->GetRmin(), 2), std::pow(seg->GetRmax(), 2)));
+            }
+
+            local[0] = rmid * TMath::Cos(phim);
+            local[1] = rmid * TMath::Sin(phim);
+            local[2] = 0.0;
+        }
+        else if (auto* tub = dynamic_cast<TGeoTube*>(shp))
+        {
+            if (rand)
+            {
+                double r = TMath::Sqrt(gRandom->Uniform(0, std::pow(tub->GetRmax(), 2)));
+                double phi = gRandom->Uniform(0, 2 * TMath::Pi());
+
+                local[0] = r * TMath::Cos(phi);
+                local[1] = r * TMath::Sin(phi);
+                local[2] = 0;
+            }
+        }
+
         gGeoManager->LocalToMaster(local, master);
     }
     else if (iD == 129)
