@@ -25,7 +25,8 @@ set(SRCS
     R3BTrackingParticle.cxx
     R3BTrackingSetup.cxx
     R3BMDFWrapper.cxx
-    R3BTrackingS515.cxx)
+    R3BTrackingS515.cxx
+    R3BTrackingG249.cxx)
 
 set(HEADERS
     R3BTPropagator.h
@@ -37,7 +38,8 @@ set(HEADERS
     R3BTrackingParticle.h
     R3BTrackingSetup.h
     R3BMDFWrapper.h
-    R3BTrackingS515.h)
+    R3BTrackingS515.h
+    R3BTrackingG249.h)
 
 add_library_with_dictionary(
     LIBNAME
