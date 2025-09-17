@@ -72,6 +72,9 @@ class R3BFootStripCal2Hit : public FairTask
     // Method for setting the maximum number of strips for each cluster
     inline void SetMaxNumStrips(int max) { fMaxNumStrips = max; }
 
+    // Method to disable transformation of hits to lab coordinates (default: true)
+    inline void SetTransform2Lab(bool flag) { fTransform2Lab = flag; }
+
   private:
     void SetParameter();
     void FillCalData(int nHits);
@@ -79,6 +82,8 @@ class R3BFootStripCal2Hit : public FairTask
     void ComputeClusterParams();
     void EtaCorrectionAndChargeCal();
     TVector3 ComputeHitPosition(int detId, double pos);
+
+    bool fTransform2Lab = true;
 
     static constexpr double fFootSize = 96.;
     static constexpr double fMiddle = fFootSize / 2.;

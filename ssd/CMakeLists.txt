@@ -38,9 +38,10 @@ set(SRCS
     online/R3BAmsCalifaCorrelatedOnlineSpectra.cxx
     pars/R3BFootMappingPar.cxx
     pars/R3BFootCalPar.cxx
-	pars/R3BFootHitPar.cxx
+    pars/R3BFootHitPar.cxx
     calibration/R3BFootMapped2StripCal.cxx
-    calibration/R3BFootStripCal2Hit.cxx)
+    calibration/R3BFootStripCal2Hit.cxx
+    calibration/R3BFootHit2Track.cxx)
 
 set(HEADERS
     sim/R3BTra.h
@@ -69,9 +70,10 @@ set(HEADERS
     online/R3BFootOnlineSpectra.h
     pars/R3BFootMappingPar.h
     pars/R3BFootCalPar.h
-	pars/R3BFootHitPar.h
+    pars/R3BFootHitPar.h
     calibration/R3BFootMapped2StripCal.h
-    calibration/R3BFootStripCal2Hit.h)
+    calibration/R3BFootStripCal2Hit.h
+    calibration/R3BFootHit2Track.h)
 
 add_library_with_dictionary(
     LIBNAME

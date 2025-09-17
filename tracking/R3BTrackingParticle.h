@@ -37,6 +37,12 @@ class R3BTrackingParticle : public TObject
                         Double_t beta,
                         Double_t mass);
 
+    // Copy constructor, needed for TClonesArray
+    R3BTrackingParticle(const R3BTrackingParticle& other);
+
+    // Assignment operator
+    R3BTrackingParticle& operator=(const R3BTrackingParticle& other);
+
     virtual ~R3BTrackingParticle();
 
     Double_t GetCharge() const { return fCharge; }

@@ -49,6 +49,7 @@
 #pragma link C++ class R3BFootHitPar+;
 #pragma link C++ class R3BFootMapped2StripCal+;
 #pragma link C++ class R3BFootStripCal2Hit+;
+#pragma link C++ class R3BFootHit2Track+;
 #pragma link C++ class R3BFootOnlineSpectra+;
 
 #endif
