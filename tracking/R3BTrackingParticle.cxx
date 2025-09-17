@@ -51,6 +51,46 @@ R3BTrackingParticle::R3BTrackingParticle(Double_t charge,
 {
 }
 
+// Copy constructor
+R3BTrackingParticle::R3BTrackingParticle(const R3BTrackingParticle& other)
+    : TObject(other) // copy base class
+    , fHits(other.fHits)
+    , fCharge(other.fCharge)
+    , fStartPosition(other.fStartPosition)
+    , fStartMomentum(other.fStartMomentum)
+    , fStartBeta(other.fStartBeta)
+    , fMass(other.fMass)
+    , fPosition(other.fPosition)
+    , fMomentum(other.fMomentum)
+    , fBeta(other.fBeta)
+    , fLength(other.fLength)
+    , fChi2(other.fChi2)
+{
+}
+
+// assignment operator
+R3BTrackingParticle& R3BTrackingParticle::operator=(const R3BTrackingParticle& other)
+{
+    if (this == &other)
+        return *this;
+
+    TObject::operator=(other);
+
+    fHits = other.fHits;
+    fCharge = other.fCharge;
+    fStartPosition = other.fStartPosition;
+    fStartMomentum = other.fStartMomentum;
+    fStartBeta = other.fStartBeta;
+    fMass = other.fMass;
+    fPosition = other.fPosition;
+    fMomentum = other.fMomentum;
+    fBeta = other.fBeta;
+    fLength = other.fLength;
+    fChi2 = other.fChi2;
+
+    return *this;
+}
+
 void R3BTrackingParticle::SetStartBeta(const Double_t& startBeta) { fStartBeta = startBeta; }
 
 void R3BTrackingParticle::SetBeta(const Double_t& beta) { fBeta = beta; }

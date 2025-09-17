@@ -445,15 +445,17 @@ void R3BFootStripCal2Hit::EtaCorrectionAndChargeCal()
 TVector3 R3BFootStripCal2Hit::ComputeHitPosition(int i, double pos)
 {
     TVector3 master(pos, 0., 0.);
+    if (fTransform2Lab == true)
+    {
+        TRotation det2lab;
+        det2lab.RotateZ(fAnglePhi[i] * TMath::DegToRad());
+        det2lab.RotateY(fAngleTheta[i] * TMath::DegToRad());
+        det2lab.RotateX(fAnglePsi[i] * TMath::DegToRad());
 
-    TRotation det2lab;
-    det2lab.RotateZ(fAnglePhi[i] * TMath::DegToRad());
-    det2lab.RotateY(fAngleTheta[i] * TMath::DegToRad());
-    det2lab.RotateX(fAnglePsi[i] * TMath::DegToRad());
+        master.Transform(det2lab);
 
-    master.Transform(det2lab);
-
-    master += TVector3(fOffsetX[i], fOffsetY[i], fDistTarget[i] * 10);
+        master += TVector3(fOffsetX[i], fOffsetY[i], fDistTarget[i] * 10);
+    }
 
     return master;
 }
