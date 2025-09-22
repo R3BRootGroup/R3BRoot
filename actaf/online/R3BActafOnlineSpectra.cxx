@@ -344,7 +344,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
 
         cXY->cd(i + 1);
-        fh2_XYPos[i] = R3B::root_owned<TH2F>(Form("fh2_XY_side%d", i + 1), tit, 100, -50, 50, 100, -50, 50);
+        fh2_XYPos[i] = R3B::root_owned<TH2F>(Form("fh2_XY_side%d", i + 1), tit, 100, -40, 40, 100, -40, 40);
         fh2_XYPos[i]->GetXaxis()->SetTitle("X [cm]");
         fh2_XYPos[i]->GetYaxis()->SetTitle("Y [cm]");
         fh2_XYPos[i]->GetYaxis()->SetTitleOffset(1.1);
@@ -366,7 +366,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
 
         cXYRand->cd(i + 1);
-        fh2_XYPosRand[i] = R3B::root_owned<TH2F>(Form("fh2_XYRand_side%d", i + 1), tit, 200, -50, 50, 200, -50, 50);
+        fh2_XYPosRand[i] = R3B::root_owned<TH2F>(Form("fh2_XYRand_side%d", i + 1), tit, 400, -40, 40, 400, -40, 40);
         fh2_XYPosRand[i]->GetXaxis()->SetTitle("X [cm]");
         fh2_XYPosRand[i]->GetYaxis()->SetTitle("Y [cm]");
         fh2_XYPosRand[i]->GetYaxis()->SetTitleOffset(1.1);
