@@ -317,9 +317,12 @@ InitStatus R3BActafOnlineSpectra::Init()
     // Counts vs ring per side
     for (auto i = 0; i < fh1_RingCounts.size(); i++)
     {
+
+        TString tit;
+        i == 0 ? tit = "Counts per ring (upstream side)" : tit = "Counts per ring (downstream side)";
+
         cCounts->cd(i + 2);
-        fh1_RingCounts[i] = R3B::root_owned<TH1F>(
-            Form("fh1_RingCounts_side%d", i + 1), Form("Counts per Ring (side %d)", i + 1), 8, 0.5, 8.5);
+        fh1_RingCounts[i] = R3B::root_owned<TH1F>(Form("fh1_RingCounts_side%d", i + 1), tit, 8, 0.5, 8.5);
         fh1_RingCounts[i]->GetXaxis()->SetTitle("Ring");
         fh1_RingCounts[i]->GetYaxis()->SetTitle("Counts");
         fh1_RingCounts[i]->GetYaxis()->SetTitleOffset(1.1);
@@ -337,9 +340,11 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (auto i = 0; i < fh2_XYPos.size(); i++)
     {
+        TString tit;
+        i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
+
         cXY->cd(i + 1);
-        fh2_XYPos[i] = R3B::root_owned<TH2F>(
-            Form("fh2_XY_side%d", i + 1), Form("XY pos (side %d)", i + 1), 100, -50, 50, 100, -50, 50);
+        fh2_XYPos[i] = R3B::root_owned<TH2F>(Form("fh2_XY_side%d", i + 1), tit, 100, -50, 50, 100, -50, 50);
         fh2_XYPos[i]->GetXaxis()->SetTitle("X [cm]");
         fh2_XYPos[i]->GetYaxis()->SetTitle("Y [cm]");
         fh2_XYPos[i]->GetYaxis()->SetTitleOffset(1.1);
@@ -356,9 +361,12 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (auto i = 0; i < fh2_XYPosRand.size(); i++)
     {
+
+        TString tit;
+        i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
+
         cXYRand->cd(i + 1);
-        fh2_XYPosRand[i] = R3B::root_owned<TH2F>(
-            Form("fh2_XYRand_side%d", i + 1), Form("XY random pos (side %d)", i + 1), 200, -50, 50, 200, -50, 50);
+        fh2_XYPosRand[i] = R3B::root_owned<TH2F>(Form("fh2_XYRand_side%d", i + 1), tit, 200, -50, 50, 200, -50, 50);
         fh2_XYPosRand[i]->GetXaxis()->SetTitle("X [cm]");
         fh2_XYPosRand[i]->GetYaxis()->SetTitle("Y [cm]");
         fh2_XYPosRand[i]->GetYaxis()->SetTitleOffset(1.1);
@@ -376,9 +384,11 @@ InitStatus R3BActafOnlineSpectra::Init()
     // phi counts for side up and down
     for (auto i = 0; i < fh1_PhiCounts.size(); i++)
     {
+
+        TString tit;
+        i == 0 ? tit = "Phi (upstream)" : tit = "Phi (downstream)";
         cPhi->cd(i + 1);
-        fh1_PhiCounts[i] =
-            R3B::root_owned<TH1F>(Form("fh1_phi_side%d", i + 1), Form("Phi (side %d)", i + 1), 100, 0, 360);
+        fh1_PhiCounts[i] = R3B::root_owned<TH1F>(Form("fh1_phi_side%d", i + 1), tit, 100, -180, 180);
         fh1_PhiCounts[i]->GetXaxis()->SetTitle("Phi [deg]");
         fh1_PhiCounts[i]->GetYaxis()->SetTitle("counts");
         fh1_PhiCounts[i]->GetYaxis()->SetTitleOffset(1.1);
@@ -389,9 +399,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     }
 
     cPhi->cd(3);
-    fh2_Phi1VsPhi2 = R3B::root_owned<TH2F>("fh2_Phi1VsPhi2", "Phi side 1 vs Phi side 2", 100, 0, 360, 50, 0, 360);
-    fh2_Phi1VsPhi2->GetXaxis()->SetTitle("Phi_{side 1} [deg]");
-    fh2_Phi1VsPhi2->GetYaxis()->SetTitle("Phi_{side 2} [deg]");
+    fh2_Phi1VsPhi2 = R3B::root_owned<TH2F>("fh2_Phi1VsPhi2", "Phi upstream vs Phi downstream", 100, 0, 360, 50, 0, 360);
+    fh2_Phi1VsPhi2->GetXaxis()->SetTitle("Phi_{upstream} [deg]");
+    fh2_Phi1VsPhi2->GetYaxis()->SetTitle("Phi_{downstream} [deg]");
     fh2_Phi1VsPhi2->GetYaxis()->SetTitleOffset(1.1);
     fh2_Phi1VsPhi2->GetXaxis()->CenterTitle(true);
     fh2_Phi1VsPhi2->GetYaxis()->CenterTitle(true);
