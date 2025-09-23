@@ -283,7 +283,7 @@ bool R3BActafReader::R3BRead2023()
 bool R3BActafReader::R3BRead2025()
 {
     auto* data = reinterpret_cast<EXT_STR_h101_ACTAF2025_onion*>(fData25);
-    for (int mod = 0; mod < MAX_MODULES2025 - 1; ++mod)
+    for (int mod = 0; mod < MAX_MODULES2025; ++mod)
     {
         std::vector<std::vector<UInt_t>> trace(eChn, std::vector<UInt_t>(Bins));
         for (int chn = 0; chn < eChn; ++chn)
@@ -315,9 +315,9 @@ bool R3BActafReader::R3BRead2025()
             leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0.1);
         }
 
-        for (int chn = 0; chn < eChn; ++chn)
+        for (int chn = 0; chn < (mod < 8 ? eChn : 1); ++chn)
         {
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mapping[mod][chn],
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData((mod < 8 ? mapping[mod][chn] : 129),
                                                                          trace[chn],
                                                                          integral[chn],
                                                                          baselineMean[chn],
@@ -328,11 +328,12 @@ bool R3BActafReader::R3BRead2025()
         }
     }
 
+    /*
     if (data->AMBERTIMETAG > 0)
     {
         new ((*fArray)[fArray->GetEntriesFast()])
             R3BActafMappedData((MAX_MODULES2025 - 1) * eChn + 1, std::vector<UInt_t>(), 0, 0, data->AMBERTIMETAG, 0, 0);
-    }
+    }*/
 
     return kTRUE;
 }
