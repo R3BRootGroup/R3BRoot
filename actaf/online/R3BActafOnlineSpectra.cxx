@@ -228,7 +228,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     // FADC Channel [1 - 16] vs Module [1 - 9] (8 modules + 1 for AMBER signal)
     auto* cModVsCh = new TCanvas("ModVsCh_map", "FADC Module vs Channel", 10, 10, 500, 500);
-    fh2_ModVsCh_map = R3B::root_owned<TH2F>("fh2_ModVsCh_map", "Channel vs Mod", 9, 0, 9.5, 16, 0.5, 16.5);
+    fh2_ModVsCh_map = R3B::root_owned<TH2F>("fh2_ModVsCh_map", "Channel vs Mod", 9, 0.5, 9.5, 16, 0.5, 16.5);
     fh2_ModVsCh_map->GetXaxis()->SetTitle("FADC Module");
     fh2_ModVsCh_map->GetYaxis()->SetTitle("FADC Channel");
     fh2_ModVsCh_map->GetYaxis()->SetTitleOffset(1.1);
@@ -300,7 +300,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     // ********* HIT HISTOGRAMS ********* //
 
     // Canvas with counts: 3 hist
-    auto* cCounts = new TCanvas("cCounts", "Hit level info", 10, 10, 500, 500);
+    auto* cCounts = new TCanvas("Counts_per_ring", "Hit level info", 10, 10, 500, 500);
     cCounts->Divide(3, 1);
 
     // Counts vs side (up - down)
@@ -335,7 +335,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     hitfol->Add(cCounts);
 
     // Canvas with XY positions (one per ring)
-    auto* cXY = new TCanvas("cXY", "XY positions", 10, 10, 500, 500);
+    auto* cXY = new TCanvas("X_Y", "XY positions", 10, 10, 500, 500);
     cXY->Divide(2, 1);
 
     for (auto i = 0; i < fh2_XYPos.size(); i++)
@@ -356,7 +356,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     hitfol->Add(cXY);
 
     // Canvas with XY positions randomly sampling the pad (one per ring)
-    auto* cXYRand = new TCanvas("cXYRand", "XY positions (sampling the whole pad)", 10, 10, 500, 500);
+    auto* cXYRand = new TCanvas("X_Y_Rand", "XY positions (sampling the whole pad)", 10, 10, 500, 500);
     cXYRand->Divide(2, 1);
 
     for (auto i = 0; i < fh2_XYPosRand.size(); i++)
@@ -377,7 +377,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     hitfol->Add(cXYRand);
 
     // Canvas with phi angle -> 3 histograms
-    auto* cPhi = new TCanvas("cPhi", "Phi angles", 10, 10, 500, 500);
+    auto* cPhi = new TCanvas("Phi_correlations", "Phi angles", 10, 10, 500, 500);
     cPhi->Divide(1, 3);
 
     // phi counts for side up and down
@@ -514,25 +514,17 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 continue;
             auto pad = hit->GetPad() - 1;
 
-            // Allow 128 pad + 1 for Amber
-            // if (pad > fMap_Par->GetNbPads())
-            //    continue;
+            // Allow 128 pad for Amber
+            if (pad > fMap_Par->GetNbPads())
+                continue;
 
-            double moduleNb;
-            double channelNb;
-
-            if (pad + 1 == 129)
-            {
-                moduleNb = 9;
-                channelNb = 1;
-            }
-            else
-            {
-                channelNb = fMap_Par->GetFADCChannelByPad(pad + 1);
-                moduleNb = fMap_Par->GetFADCModuleByPad(pad + 1);
-            }
+            const int moduleNb = pad >= fMap_Par->GetNbPads() ? 9 : fMap_Par->GetFADCChannelByPad(pad + 1);
+            const int channelNb = pad >= fMap_Par->GetNbPads() ? 1 : fMap_Par->GetFADCModuleByPad(pad + 1);
 
             fh2_ModVsCh_map->Fill(moduleNb, channelNb);
+
+            if (pad >= fMap_Par->GetNbPads())
+                continue;
 
             if (hit->GetE() > 0)
             {
