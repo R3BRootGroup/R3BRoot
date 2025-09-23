@@ -361,7 +361,6 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (auto i = 0; i < fh2_XYPosRand.size(); i++)
     {
-
         TString tit;
         i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
 
@@ -516,8 +515,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto pad = hit->GetPad() - 1;
 
             // Allow 128 pad + 1 for Amber
-            if (pad >= fMap_Par->GetNbPads() + 1)
-                continue;
+            // if (pad > fMap_Par->GetNbPads())
+            //    continue;
 
             double moduleNb;
             double channelNb;
@@ -635,6 +634,7 @@ void R3BActafOnlineSpectra::FinishEvent()
     R3BLOG(debug, "Cleaning data structures");
     r3b::util::ClearIfNotNull(fMappedItems);
     r3b::util::ClearIfNotNull(fCalItems);
+    r3b::util::ClearIfNotNull(fHitItems);
 }
 
 void R3BActafOnlineSpectra::FinishTask()
