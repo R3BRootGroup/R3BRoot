@@ -518,8 +518,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             if (pad > fMap_Par->GetNbPads())
                 continue;
 
-            const int moduleNb = pad >= fMap_Par->GetNbPads() ? 9 : fMap_Par->GetFADCChannelByPad(pad + 1);
-            const int channelNb = pad >= fMap_Par->GetNbPads() ? 1 : fMap_Par->GetFADCModuleByPad(pad + 1);
+            const int moduleNb = pad >= fMap_Par->GetNbPads() ? 9 : fMap_Par->GetFADCModuleByPad(pad + 1);
+            const int channelNb = pad >= fMap_Par->GetNbPads() ? 1 : fMap_Par->GetFADCChannelByPad(pad + 1);
 
             fh2_ModVsCh_map->Fill(moduleNb, channelNb);
 
