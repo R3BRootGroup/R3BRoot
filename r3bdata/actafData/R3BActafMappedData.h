@@ -14,19 +14,23 @@
 // -----------------------------------------------------------------
 // -----            R3BActafMappedData source file             -----
 // -----      Created 14/02/25 by J.L. Rodriguez-Sanchez       -----
+// -----      Modified by Pablo González Rusell (24/09/2025)   -----
 // -----------------------------------------------------------------
 
 #pragma once
 
 #include <TObject.h>
+#include <array>
 #include <cstdint>
 #include <iostream>
 #include <string>
 
+constexpr int ACTAF_ECHN = 16;
+constexpr int ACTAF_BINS = 2692;
+
 class R3BActafMappedData : public TObject
 {
   public:
-    // Default Constructor
     R3BActafMappedData() = default;
 
     /** Standard Constructor
@@ -38,8 +42,9 @@ class R3BActafMappedData : public TObject
      *@param maxpos        Position of the maximum amplitude for the signal
      *@param maxamplitude  Max. amplitude after baseline subtraction
      **/
+
     explicit R3BActafMappedData(UInt_t pad,
-                                std::vector<UInt_t> trace,
+                                const std::array<UInt_t, ACTAF_BINS>& trace,
                                 double energy = 0.,
                                 double baseline = 0.,
                                 int risetime = 0,
@@ -47,12 +52,10 @@ class R3BActafMappedData : public TObject
                                 double maxamplitude = 0.,
                                 double leadingedge10 = 0.);
 
-    // Destructor
     virtual ~R3BActafMappedData() = default;
 
-    // Accessors with [[nodiscard]]
     [[nodiscard]] inline const UInt_t& GetPad() const { return fPad; }
-    [[nodiscard]] inline const std::vector<UInt_t>& GetTrace() const { return fTrace; }
+    [[nodiscard]] inline const std::array<UInt_t, ACTAF_BINS>& GetTrace() const { return fTrace; }
     [[nodiscard]] inline const double& GetE() const { return fE; }
     [[nodiscard]] inline const double& GetBaseline() const { return fBaseline; }
     [[nodiscard]] inline const int& GetRisetime() const { return fRisetime; }
@@ -60,21 +63,19 @@ class R3BActafMappedData : public TObject
     [[nodiscard]] inline const double& GetMaxampl() const { return fMaxamplitude; }
     [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge10; }
 
-    // Support for printing
     [[nodiscard]] std::string toString() const;
     void Print(const Option_t*) const override;
 
   protected:
-    UInt_t fPad = 0;                // Pad number
+    UInt_t fPad = 0;
     double fE = 0., fBaseline = 0.; // Energy and baseline
     int fRisetime = 0, fMaxpos = 0;
     double fMaxamplitude = 0.;
-    std::vector<UInt_t> fTrace; // Trace signal for each channel
+    std::array<UInt_t, ACTAF_BINS> fTrace{};
     double fLeadingEdge10 = 0;
 
   public:
-    ClassDefOverride(R3BActafMappedData, 3);
+    ClassDefOverride(R3BActafMappedData, 4);
 };
 
-// Operator overloading for printing R3BActafMappedData
 std::ostream& operator<<(std::ostream& os, const R3BActafMappedData& data);

@@ -22,13 +22,12 @@
 
 #include <TClonesArray.h>
 #include <algorithm>
+#include <array>
 #include <ext_data_struct_info.hh>
 #include <iostream>
 #include <numeric>
+#include <utility>
 #include <vector>
-
-constexpr int eChn = 16;
-constexpr int Bins = 2692;
 
 /**
  ** ext_h101_actaf202X.h was created by running
@@ -45,80 +44,74 @@ extern "C"
 #define MAX_MODULES2023 (sizeof data->ACTAF / sizeof data->ACTAF[0])
 #define MAX_MODULES2025 (sizeof data->ACTAF_ADC_MOD / sizeof data->ACTAF_ADC_MOD[0])
 
-int FindMaxPosition(const std::vector<UInt_t>& signal)
+template <class Cont>
+int FindMaxPosition(const Cont& signal)
 {
     return std::distance(signal.begin(), std::max_element(signal.begin(), signal.end()));
 }
 
-double ComputeBaselineMean(const std::vector<UInt_t>& signal, int numBins)
+template <class Cont>
+int FindMaxAmplitude(const Cont& signal)
+{
+    return *std::max_element(signal.begin(), signal.end());
+}
+
+template <class Cont>
+double ComputeBaselineMean(const Cont& signal, int numBins)
 {
     numBins = std::min(static_cast<int>(numBins * 0.8), static_cast<int>(signal.size()));
     if (numBins <= 0)
-        return 0.0; // Avoid division by zero
-
+        return 0.0;
     return std::accumulate(signal.begin(), signal.begin() + numBins, 0.0) / numBins;
 }
 
-double IntegratePulse(const std::vector<UInt_t>& signal, int maxIdx, double baseline)
+template <class Cont>
+double IntegratePulse(const Cont& signal, int maxIdx, double baseline)
 {
     int left = maxIdx, right = maxIdx;
-    int size = signal.size();
+    const int size = static_cast<int>(signal.size());
 
-    // Expand left until the signal falls back to the baseline
     while (left > 0 && signal[left] > baseline)
         --left;
 
-    // Expand right until the signal falls back to the baseline
     while (right < size - 1 && signal[right] > baseline)
         ++right;
 
-    // Compute the integral by summing the values within the range
     return std::accumulate(signal.begin() + left, signal.begin() + right, 0.0) - (right - left) * baseline;
 }
 
-// Function to compute the maximum amplitude of a signal
-int FindMaxAmplitude(const std::vector<UInt_t>& signal) { return *std::max_element(signal.begin(), signal.end()); }
-
-// Function to subtract the baseline from the signal
-std::vector<double> SubtractBaseline(const std::vector<UInt_t>& signal, double baseline)
+inline void SubtractBaseline(const std::array<UInt_t, ACTAF_BINS>& signal,
+                             double baseline,
+                             std::array<double, ACTAF_BINS>& out)
 {
-    std::vector<double> correctedSignal(signal.size());
     for (size_t i = 0; i < signal.size(); ++i)
-        correctedSignal[i] = signal[i] - baseline;
-
-    return correctedSignal;
+        out[i] = signal[i] - baseline;
 }
 
-// Function to compute the risetime (time from 10% to 90% of max amplitude)
-int ComputeRiseTime(const std::vector<double>& signal, double maxValue)
+inline int ComputeRiseTime(const std::array<double, ACTAF_BINS>& signal, double maxValue)
 {
-    double threshold10 = 0.1 * maxValue; // 10% of peak amplitude
-    double threshold90 = 0.9 * maxValue; // 90% of peak amplitude
+    const double threshold10 = 0.1 * maxValue;
+    const double threshold90 = 0.9 * maxValue;
 
     int t10 = -1, t90 = -1;
-
-    // Scan the signal to find the first occurrence of 10% and 90% of the max amplitude
     for (size_t i = 0; i < signal.size(); ++i)
     {
         if (signal[i] >= threshold10 && t10 == -1)
-            t10 = i;
+            t10 = static_cast<int>(i);
         if (signal[i] >= threshold90)
         {
-            t90 = i;
-            break; // Stop as soon as we find t90
+            t90 = static_cast<int>(i);
+            break;
         }
     }
-
-    // Ensure both t10 and t90 were found
     if (t10 == -1 || t90 == -1)
-        return -1; // Return -1 if risetime cannot be computed
-
-    return t90 - t10; // Rise time in number of bins
+        return -1;
+    return t90 - t10;
 }
 
-inline double ComputeLeadingEdge10(const std::vector<double>& x, int maxIdx, double frac)
+inline double ComputeLeadingEdge10(const std::array<double, ACTAF_BINS>& x, int maxIdx, double frac)
 {
-    if (x.empty() || maxIdx <= 0 || maxIdx >= (int)x.size())
+    if (x.empty() || maxIdx <= 0 || maxIdx >= static_cast<int>(x.size()))
         return -1.0;
 
     const double xmax = *std::max_element(x.begin(), x.begin() + maxIdx + 1);
@@ -131,13 +124,15 @@ inline double ComputeLeadingEdge10(const std::vector<double>& x, int maxIdx, dou
             const double y0 = x[i - 1], y1 = x[i];
             const double dy = y1 - y0;
             if (dy <= 0)
-                return (double)i;
+                return static_cast<double>(i);
             const double alpha = (thr - y0) / dy;
-            return (double)(i - 1) + alpha;
+            return static_cast<double>(i - 1) + alpha;
         }
     }
     return -1.0;
 }
+
+// ------------------------------ Reader impl ----------------------------------
 
 R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2023_onion* data, size_t offset)
     : R3BReader("R3BActafReader")
@@ -199,12 +194,10 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
         return kFALSE;
     }
 
-    // Register output array in tree
     FairRootManager::Instance()->Register("ActafMappedData", "Actaf mapped data", fArray.get(), !fOnline);
     Reset();
 
-    // fMapping_Par->print();
-    mapping = std::vector<std::vector<int>>(fMapping_Par->GetNbFADCModules(), std::vector<int>(eChn, 0));
+    mapping = std::vector<std::vector<int>>(fMapping_Par->GetNbFADCModules(), std::vector<int>(ACTAF_ECHN, 0));
     for (auto index = 0; index < fMapping_Par->GetNbPads(); ++index)
     {
         auto mod = fMapping_Par->GetFADCModule(index) - 1;
@@ -217,6 +210,7 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
 Bool_t R3BActafReader::R3BRead()
 {
     R3BLOG(debug1, "Event data.");
+
     fNEvent += 1;
     if (fVersion == UnpackerVersion::v2023)
     {
@@ -235,37 +229,43 @@ Bool_t R3BActafReader::R3BRead()
 bool R3BActafReader::R3BRead2023()
 {
     auto* data = reinterpret_cast<EXT_STR_h101_ACTAF2023_onion*>(fData23);
+
     for (int mod = 0; mod < MAX_MODULES2023; ++mod)
     {
-        std::vector<std::vector<UInt_t>> trace(eChn, std::vector<UInt_t>(Bins));
-        for (int chn = 0; chn < data->ACTAF[mod].TRACERAW; ++chn)
+        std::array<std::array<UInt_t, ACTAF_BINS>, ACTAF_ECHN> trace{};
+
+        for (int flat = 0; flat < data->ACTAF[mod].TRACERAW; ++flat)
         {
-            int row = chn / Bins;
-            int col = chn % Bins;
-            trace[row][col] = data->ACTAF[mod].TRACERAWv[chn];
+            const int row = flat / ACTAF_BINS;
+            const int col = flat % ACTAF_BINS;
+            if (row >= ACTAF_ECHN || col >= ACTAF_BINS)
+                continue;
+            trace[row][col] = data->ACTAF[mod].TRACERAWv[flat];
         }
 
-        std::vector<int> maxPos(eChn);
-        std::vector<double> baselineMean(eChn);
-        std::vector<double> integral(eChn);
-        std::vector<int> maxAmplitude(eChn);
-        std::vector<int> riseTime(eChn);
-        std::vector<double> leadingEdge10(eChn);
+        std::array<int, ACTAF_ECHN> maxPos{};
+        std::array<double, ACTAF_ECHN> baselineMean{};
+        std::array<double, ACTAF_ECHN> integral{};
+        std::array<int, ACTAF_ECHN> maxAmplitude{};
+        std::array<int, ACTAF_ECHN> riseTime{};
+        std::array<double, ACTAF_ECHN> leadingEdge10{};
 
-        for (int chn = 0; chn < eChn; ++chn)
+        std::array<double, ACTAF_BINS> correctedtrace{};
+
+        for (int chn = 0; chn < ACTAF_ECHN; ++chn)
         {
             maxPos[chn] = FindMaxPosition(trace[chn]);
             maxAmplitude[chn] = FindMaxAmplitude(trace[chn]);
             baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
             integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
 
-            // Subtract baseline from signal
-            std::vector<double> correctedtrace = SubtractBaseline(trace[chn], baselineMean[chn]);
+            SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
             riseTime[chn] = ComputeRiseTime(correctedtrace, maxAmplitude[chn] - baselineMean[chn]);
             leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0.1);
         }
 
-        for (int chn = 0; chn < data->ACTAF[mod].CH; ++chn)
+        const int nChToWrite = data->ACTAF[mod].CH;
+        for (int chn = 0; chn < nChToWrite && chn < ACTAF_ECHN; ++chn)
         {
             new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(mapping[mod][chn],
                                                                          trace[chn],
@@ -283,41 +283,44 @@ bool R3BActafReader::R3BRead2023()
 bool R3BActafReader::R3BRead2025()
 {
     auto* data = reinterpret_cast<EXT_STR_h101_ACTAF2025_onion*>(fData25);
+
     for (int mod = 0; mod < MAX_MODULES2025; ++mod)
     {
-        std::vector<std::vector<UInt_t>> trace(eChn, std::vector<UInt_t>(Bins));
-        for (int chn = 0; chn < eChn; ++chn)
+        std::array<std::array<UInt_t, ACTAF_BINS>, ACTAF_ECHN> trace{};
+
+        for (int chn = 0; chn < ACTAF_ECHN; ++chn)
         {
-            for (int size = 0; size < Bins; size++)
+            for (int i = 0; i < ACTAF_BINS; ++i)
             {
-                // std::cout<<data->ACTAF_ADC_MOD[mod].CH[chn].v[size]<<std::endl;
-                trace[chn][size] = data->ACTAF_ADC_MOD[mod].CH[chn].v[size];
+                trace[chn][i] = data->ACTAF_ADC_MOD[mod].CH[chn].v[i];
             }
         }
 
-        std::vector<int> maxPos(eChn);
-        std::vector<double> baselineMean(eChn);
-        std::vector<double> integral(eChn);
-        std::vector<int> maxAmplitude(eChn);
-        std::vector<int> riseTime(eChn);
-        std::vector<double> leadingEdge10(eChn);
+        std::array<int, ACTAF_ECHN> maxPos{};
+        std::array<double, ACTAF_ECHN> baselineMean{};
+        std::array<double, ACTAF_ECHN> integral{};
+        std::array<int, ACTAF_ECHN> maxAmplitude{};
+        std::array<int, ACTAF_ECHN> riseTime{};
+        std::array<double, ACTAF_ECHN> leadingEdge10{};
+        std::array<double, ACTAF_BINS> correctedtrace{};
 
-        for (int chn = 0; chn < eChn; ++chn)
+        for (int chn = 0; chn < ACTAF_ECHN; ++chn)
         {
             maxPos[chn] = FindMaxPosition(trace[chn]);
             maxAmplitude[chn] = FindMaxAmplitude(trace[chn]);
             baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
             integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
 
-            // Subtract baseline from signal
-            std::vector<double> correctedtrace = SubtractBaseline(trace[chn], baselineMean[chn]);
+            SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
             riseTime[chn] = ComputeRiseTime(correctedtrace, maxAmplitude[chn] - baselineMean[chn]);
             leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0.1);
         }
 
-        for (int chn = 0; chn < (mod < 8 ? eChn : 1); ++chn)
+        const int nChToWrite = (mod < 8 ? ACTAF_ECHN : 1);
+        for (int chn = 0; chn < nChToWrite; ++chn)
         {
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData((mod < 8 ? mapping[mod][chn] : 129),
+            const UInt_t pad = (mod < 8 ? mapping[mod][chn] : 129);
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BActafMappedData(pad,
                                                                          trace[chn],
                                                                          integral[chn],
                                                                          baselineMean[chn],
@@ -332,16 +335,14 @@ bool R3BActafReader::R3BRead2025()
     if (data->AMBERTIMETAG > 0)
     {
         new ((*fArray)[fArray->GetEntriesFast()])
-            R3BActafMappedData((MAX_MODULES2025 - 1) * eChn + 1, std::vector<UInt_t>(), 0, 0, data->AMBERTIMETAG, 0, 0);
-    }*/
+            R3BActafMappedData((MAX_MODULES2025 - 1) * ACTAF_ECHN + 1, std::array<UInt_t, ACTAF_BINS>{}, 0, 0,
+    data->AMBERTIMETAG, 0, 0);
+    }
+    */
 
     return kTRUE;
 }
 
-void R3BActafReader::Reset()
-{
-    // Reset the output array
-    fArray->Clear();
-}
+void R3BActafReader::Reset() { fArray->Clear(); }
 
 ClassImp(R3BActafReader)
