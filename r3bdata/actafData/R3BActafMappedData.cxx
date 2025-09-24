@@ -15,7 +15,7 @@
 #include <fmt/core.h>
 
 R3BActafMappedData::R3BActafMappedData(UInt_t pad,
-                                       std::vector<UInt_t> trace,
+                                       const std::array<UInt_t, ACTAF_BINS>& trace,
                                        double energy,
                                        double baseline,
                                        int risetime,
@@ -23,12 +23,12 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
                                        double maxamplitude,
                                        double leadingedge10)
     : fPad(pad)
-    , fTrace(trace)
     , fE(energy)
     , fBaseline(baseline)
     , fRisetime(risetime)
     , fMaxpos(maxpos)
     , fMaxamplitude(maxamplitude)
+    , fTrace(trace)
     , fLeadingEdge10(leadingedge10)
 {
 }
@@ -39,13 +39,13 @@ std::string R3BActafMappedData::toString() const
     for (size_t i = 0; i < fTrace.size(); ++i)
     {
         trace_str += std::to_string(fTrace[i]);
-        if (i < fTrace.size())
+        if (i + 1 < fTrace.size())
             trace_str += ", ";
     }
     trace_str += "]";
 
-    return fmt::format("Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, Max-position: {}, Max-amplitude: "
-                       "{}, Leading-Time: {}",
+    return fmt::format("Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, "
+                       "Max-position: {}, Max-amplitude: {}, Leading-Time: {}",
                        GetPad(),
                        trace_str,
                        GetE(),
