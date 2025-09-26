@@ -17,8 +17,12 @@
 #define R3BCalifaCrystalCal2TotCalPar_H 1
 
 #include <FairTask.h>
-#include <TGraph.h>
-#include <TH1F.h>
+#include <TCanvas.h>
+#include <TF1.h>
+#include <TGraphErrors.h>
+#include <TH2D.h>
+#include <utility> // for std::pair
+#include <vector>
 
 class TClonesArray;
 class R3BCalifaMappingPar;
@@ -38,25 +42,18 @@ class R3BCalifaCrystalCal2TotCalPar : public FairTask
     /** Destructor **/
     virtual ~R3BCalifaCrystalCal2TotCalPar();
 
-    /** Virtual method Init **/
     virtual InitStatus Init();
 
-    /** Virtual method Exec **/
     virtual void Exec(Option_t* opt);
 
-    /** Virtual method FinishEvent **/
     virtual void FinishEvent();
 
-    /** Virtual method FinishTask **/
     virtual void FinishTask();
 
-    /** Virtual method Reset **/
     virtual void Reset();
 
-    /** Virtual method ReInit **/
     virtual InitStatus ReInit();
 
-    /** Virtual method SetParContainers **/
     virtual void SetParContainers();
 
     virtual void Search_TotParams();
@@ -65,39 +62,61 @@ class R3BCalifaCrystalCal2TotCalPar : public FairTask
     const Int_t GetNumCrystals() { return fNumCrystals; }
     const Double_t GetThreshold() { return fThreshold; }
     const Int_t GetNumParameterFit() { return fNumParam; }
-    const Int_t GetMinStadistics() { return fMinStadistics; }
+    const Int_t GetMinStatistics() { return fMinStatistics; }
 
     void SetNumCrystals(Int_t numberCry) { fNumCrystals = numberCry; }
     void SetThreshold(Double_t threshold) { fThreshold = threshold; }
     void SetNumParameterFit(Int_t numberParFit) { fNumParam = numberParFit; }
-    void SetMinStadistics(Int_t minstad) { fMinStadistics = minstad; }
+    void SetMinStatistics(Int_t minstat) { fMinStatistics = minstat; }
     void SetDebugMode(Bool_t debug) { fDebugMode = debug; }
-    void SetRange(Double_t H_left, Double_t H_right)
+    void SetRange(Double_t H_left, Double_t H_right, Double_t H_left_proton, Double_t H_right_proton)
     {
         fLeft = H_left;
         fRight = H_right;
+        fLeftProton = H_left_proton;
+        fRightProton = H_right_proton;
     }
+    void SetInitFitParams(Double_t a0, Double_t a1, Double_t a0p, Double_t a1p)
+    {
+        fa0 = a0;
+        fa1 = a1;
+        fa0proton = a0p;
+        fa1proton = a1p;
+    }
+    std::pair<std::pair<Double_t, Double_t>, std::pair<Double_t, Double_t>> ProjectAndFit(TH2* h2,
+                                                                                          Int_t binx_low,
+                                                                                          Int_t binx_high,
+                                                                                          Double_t& prev_band1,
+                                                                                          Double_t& prev_band2);
 
   private:
     void SetParameter();
     Bool_t fDebugMode;
     Int_t fNumCrystals;
     Int_t fNumParam;
-    Int_t fMinStadistics;
-    Int_t* idx;
+    Int_t fMinStatistics;
 
     Double_t fThreshold;
-    Double_t fLeft;
-    Double_t fRight;
+    Double_t fLeft;        // lower limit of calibrated energy [keV] to be used for ToT fits (gamma range)
+    Double_t fRight;       // upper limit of calibrated energy [keV] to be used for ToT fits (gamma range)
+    Double_t fLeftProton;  // lower limit of calibrated energy [keV] to be used for ToT fits (proton range)
+    Double_t fRightProton; // upper limit of calibrated energy [keV] to be used for ToT fits (proton range)
+    Double_t fa0, fa1, fa0proton, fa1proton; // Initial parameters for the ToT fit functions
 
-    R3BCalifaMappingPar* fMap_Par;   /**< Parameter container with mapping. >*/
-    R3BCalifaTotCalPar* fTotCal_Par; /**< Container for Tot-Cal parameters. >*/
-    TClonesArray* fCrystalCalDataCA; /**< Array with CALIFA energy calibrated - input data. >*/
+    R3BCalifaMappingPar* fMap_Par;   // Parameter container with mapping
+    R3BCalifaTotCalPar* fTotCal_Par; // Container for Tot-Cal parameters
+    TClonesArray* fCrystalCalDataCA; // Array with calibrated energy
+    TClonesArray* fMappedDataCA;     // Array with uncalibrated ToT
 
-    TGraph** energy_vs_tot_crystal;
+    std::vector<TH2D*> tot_vs_energy_hist;
+    std::vector<TCanvas*> totCanvases;
+    std::vector<TGraphErrors*> fGraphs1;
+    std::vector<TGraphErrors*> fGraphs2;
+    std::vector<TF1*> fFits1;
+    std::vector<TF1*> fFits2;
 
   public:
-    ClassDef(R3BCalifaCrystalCal2TotCalPar, 1);
+    ClassDef(R3BCalifaCrystalCal2TotCalPar, 2);
 };
 
 #endif
