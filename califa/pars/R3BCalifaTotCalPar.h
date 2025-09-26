@@ -50,14 +50,15 @@ class R3BCalifaTotCalPar : public FairParGenericSet
     /** Accessor functions **/
     [[nodiscard]] inline const int GetNumCrystals() const { return fNumCrystals; }
     [[nodiscard]] inline const int GetNumParametersFit() const { return fNumParamsFit; }
-    TArrayF* GetCryCalParams() { return fCryCalParams; }
+    [[nodiscard]] inline TArrayF* GetCryCalParams() { return fCryCalParams; }
 
     inline void SetNumCrystals(int numberCry) { fNumCrystals = numberCry; }
     inline void SetNumParametersFit(int numberParams) { fNumParamsFit = numberParams; }
     inline void SetCryCalParams(Float_t cc, int cry)
     {
-        assert(std::clamp(cry, 1, fNumCrystals) == cry && "Number of crystal out of range");
-        fCryCalParams->AddAt(cc, cry);
+        assert(std::clamp(cry, 1, fNumCrystals * fNumParamsFit) == cry &&
+               "Number of crystal ToT parameters out of range");
+        fCryCalParams->AddAt(cc, cry - 1);
     }
 
     /** Create more Methods if you need them! **/

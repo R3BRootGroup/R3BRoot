@@ -50,7 +50,6 @@ class R3BCalifaCrystalCalData : public TObject
 
     // Accessors with [[nodiscard]]
     [[nodiscard]] inline const uint16_t& GetCrystalId() const { return fCrystalId; }
-    //[[nodiscard]] inline double GetEnergy() const { return fEnergy ? fEnergy : 10*TMath::Exp(fToT_Energy/950); }
     [[nodiscard]] inline double GetEnergy() const
     {
         if (!std::isnan(fEnergy))
@@ -68,6 +67,10 @@ class R3BCalifaCrystalCalData : public TObject
     [[nodiscard]] inline const double& GetNs() const { return fNs; }
     [[nodiscard]] inline const ULong64_t& GetTime() const { return fTime; }
     [[nodiscard]] inline const double& GetToTEnergy() const { return fToT_Energy; }
+    [[nodiscard]] inline const double GetCalEnergy() const
+    {
+        return fEnergy;
+    } /*Warning: will give NaN beyond saturation ! Use only for ToT correlation plots*/
 
     // Modifiers
     inline void SetCrystalId(uint16_t cryid) { fCrystalId = cryid; }

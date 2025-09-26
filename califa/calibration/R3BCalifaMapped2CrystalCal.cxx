@@ -255,13 +255,19 @@ void R3BCalifaMapped2CrystalCal::Exec(Option_t* /*option*/)
                 cal[idx] = NAN;
 
         double TotCal = Tot;
+        double a0, a1;
         if (fCalTotParams)
         {
-            double a0 = params_tot.at(fNumTotParams * (crystalId - 1));
-            double a1 = params_tot.at(fNumTotParams * (crystalId - 1) + 1);
+            a0 = params_tot.at(fNumTotParams * (crystalId - 1));
+            a1 = params_tot.at(fNumTotParams * (crystalId - 1) + 1);
             // TotCal = a0 * TMath::Exp(Tot / a1);
-            TotCal = (Tot == 0) ? 0 : a0 * TMath::Exp(Tot / a1);
         }
+        else
+        {
+            a0 = 6500;
+            a1 = 1000; // default ToT parameters, sufficient for a coarse extrapolation
+        }
+        TotCal = (Tot == 0) ? 0 : a0 * TMath::Exp(Tot / a1);
         AddCalData(crystalId, cal[en], cal[Nf], cal[Ns], wrts, TotCal);
     }
     return;
