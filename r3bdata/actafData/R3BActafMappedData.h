@@ -34,48 +34,59 @@ class R3BActafMappedData : public TObject
     R3BActafMappedData() = default;
 
     /** Standard Constructor
-     *@param pad       Pad number
-     *@param trace     Trace signal for each pad
-     *@param energy    Energy for each pad
-     *@param baseline  Baseline for each pad
-     *@param riseTime  Rise time of the signal after baseline subtraction
+     *@param pad           Pad number
+     *@param trace         Trace signal for each pad
+     *@param energy        Energy for each pad
+     *@param baseline      Baseline for each pad
+     *@param riseTime      Rise time of the signal after baseline subtraction
      *@param maxpos        Position of the maximum amplitude for the signal
      *@param maxamplitude  Max. amplitude after baseline subtraction
+     *@param leadingedge10 Time to the beginning of the pulse
+     *@param rms           RMS of the baseline
+     *@param rmsFilt       RMS of the baseline after filtering
+     *@param baselineFilt  Baseline for each pad after filtering
      **/
 
     explicit R3BActafMappedData(UInt_t pad,
-                                const std::array<UInt_t, ACTAF_BINS>& trace,
+                                const std::array<double, ACTAF_BINS>& trace,
                                 double energy = 0.,
                                 double baseline = 0.,
-                                int risetime = 0,
+                                double risetime = 0.,
                                 int maxpos = 0,
                                 double maxamplitude = 0.,
-                                double leadingedge10 = 0.);
+                                double leadingedge10 = 0.,
+                                double rms = 0.,
+                                double rmsFilt = 0.,
+                                double baselineFilt = 0);
 
     virtual ~R3BActafMappedData() = default;
 
     [[nodiscard]] inline const UInt_t& GetPad() const { return fPad; }
-    [[nodiscard]] inline const std::array<UInt_t, ACTAF_BINS>& GetTrace() const { return fTrace; }
+    [[nodiscard]] inline const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
     [[nodiscard]] inline const double& GetE() const { return fE; }
     [[nodiscard]] inline const double& GetBaseline() const { return fBaseline; }
-    [[nodiscard]] inline const int& GetRisetime() const { return fRisetime; }
+    [[nodiscard]] inline const double& GetRisetime() const { return fRisetime; }
     [[nodiscard]] inline const int& GetMaxpos() const { return fMaxpos; }
     [[nodiscard]] inline const double& GetMaxampl() const { return fMaxamplitude; }
     [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge10; }
+    [[nodiscard]] inline const double GetRms() const { return fRms; }
+    [[nodiscard]] inline const double GetRmsFilt() const { return fRmsFilt; }
+    [[nodiscard]] inline const double GetBaselineFilt() const { return fBaselineFilt; }
 
     [[nodiscard]] std::string toString() const;
     void Print(const Option_t*) const override;
 
   protected:
     UInt_t fPad = 0;
-    double fE = 0., fBaseline = 0.; // Energy and baseline
-    int fRisetime = 0, fMaxpos = 0;
+    double fE = 0., fBaseline = 0., fRisetime = 0.; // Energy, baseline, risetime
+    int fMaxpos = 0;
     double fMaxamplitude = 0.;
-    std::array<UInt_t, ACTAF_BINS> fTrace{};
+    std::array<double, ACTAF_BINS> fTrace{};
     double fLeadingEdge10 = 0;
+    double fRms = 0, fRmsFilt = 0, fBaselineFilt = 0;
 
   public:
-    ClassDefOverride(R3BActafMappedData, 4);
+    ClassDefOverride(R3BActafMappedData, 5);
 };
 
 std::ostream& operator<<(std::ostream& os, const R3BActafMappedData& data);

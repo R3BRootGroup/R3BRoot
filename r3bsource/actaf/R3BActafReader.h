@@ -55,6 +55,8 @@ class R3BActafReader : public R3BReader
 
     inline void SetOnline(bool option = true) { fOnline = option; }
 
+    inline void SetFilter(bool opt = true) { fApplyFilter = opt; }
+
   private:
     enum class UnpackerVersion : int
     {
@@ -90,7 +92,10 @@ class R3BActafReader : public R3BReader
     // Mapping parameters
     R3BActafMappingPar* fMapping_Par = nullptr;
     std::vector<std::vector<int>> mapping;
+    std::vector<double> fSgCoeffs;
+    double fNbSgCoeffs;
+    bool fApplyFilter = true;
 
   public:
-    ClassDefOverride(R3BActafReader, 0);
+    ClassDefOverride(R3BActafReader, 1);
 };

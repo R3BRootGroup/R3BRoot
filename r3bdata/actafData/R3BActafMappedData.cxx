@@ -15,13 +15,16 @@
 #include <fmt/core.h>
 
 R3BActafMappedData::R3BActafMappedData(UInt_t pad,
-                                       const std::array<UInt_t, ACTAF_BINS>& trace,
+                                       const std::array<double, ACTAF_BINS>& trace,
                                        double energy,
                                        double baseline,
-                                       int risetime,
+                                       double risetime,
                                        int maxpos,
                                        double maxamplitude,
-                                       double leadingedge10)
+                                       double leadingedge10,
+                                       double rms,
+                                       double rmsFilt,
+                                       double baselineFilt)
     : fPad(pad)
     , fE(energy)
     , fBaseline(baseline)
@@ -30,6 +33,9 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
     , fMaxamplitude(maxamplitude)
     , fTrace(trace)
     , fLeadingEdge10(leadingedge10)
+    , fRms(rms)
+    , fRmsFilt(rmsFilt)
+    , fBaselineFilt(baselineFilt)
 {
 }
 
@@ -44,16 +50,20 @@ std::string R3BActafMappedData::toString() const
     }
     trace_str += "]";
 
-    return fmt::format("Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, "
-                       "Max-position: {}, Max-amplitude: {}, Leading-Time: {}",
-                       GetPad(),
-                       trace_str,
-                       GetE(),
-                       GetBaseline(),
-                       GetRisetime(),
-                       GetMaxpos(),
-                       GetMaxampl(),
-                       GetLeadingEdgeTime());
+    return fmt::format(
+        "Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, "
+        "Max-position: {}, Max-amplitude: {}, Leading-Time: {}, Rms: {}, Rms Filtered: {}, Baseline Filtered {}",
+        GetPad(),
+        trace_str,
+        GetE(),
+        GetBaseline(),
+        GetRisetime(),
+        GetMaxpos(),
+        GetMaxampl(),
+        GetLeadingEdgeTime(),
+        GetRms(),
+        GetRmsFilt(),
+        GetBaselineFilt());
 }
 
 void R3BActafMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }

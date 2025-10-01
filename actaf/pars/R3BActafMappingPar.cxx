@@ -17,7 +17,9 @@
 // --------------------------------------------------------------
 
 #include <FairParamList.h>
+#include <TArrayD.h>
 #include <TArrayI.h>
+#include <algorithm>
 
 #include "R3BActafMappingPar.h"
 #include "R3BLogger.h"
@@ -30,6 +32,7 @@ R3BActafMappingPar::R3BActafMappingPar(const char* name, const char* title, cons
     fModule.resize(fNbPads);
     fChannel.resize(fNbPads);
     fPad.resize(fNbPads);
+    fSGCoeffs.resize(fNbSGcoefs);
     for (Int_t idx = 0; idx < fNbPads; idx++)
     {
         fIn_use[idx] = 1;
@@ -56,6 +59,8 @@ void R3BActafMappingPar::SetNbPads(Int_t pads)
     fPad.resize(pads);
 }
 
+void R3BActafMappingPar::SetNbSGCoeffs(Int_t num) { fSGCoeffs.resize(num); }
+
 // ----  Method clear ----------------------------------------------------------
 void R3BActafMappingPar::clear()
 {
@@ -76,8 +81,14 @@ void R3BActafMappingPar::putParams(FairParamList* list)
     list->add("GeoVersionPar", fGeoVersion);
     R3BLOG(info, "Geometry version: " << fGeoVersion);
 
+    list->add("NbBinsSamplePar", fNbBinsSample);
+    R3BLOG(info, "Nb of bins of the sample: " << fNbBinsSample);
+
     list->add("NbPadsPar", fNbPads);
     R3BLOG(info, "Nb of pads: " << fNbPads);
+
+    list->add("NbSGPar", fNbSGcoefs);
+    R3BLOG(info, "Nb of pads: " << fNbSGcoefs);
 
     list->add("NbFADCModulesPar", fNbFADCModules);
     R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
@@ -93,10 +104,32 @@ void R3BActafMappingPar::putParams(FairParamList* list)
         Channel[idx] = fChannel[idx];
         Pads[idx] = fPad[idx];
     }
+
+    TArrayD SGCoeffs(fNbSGcoefs);
+    for (int idx = 0; idx < fNbSGcoefs; idx++)
+    {
+        SGCoeffs[idx] = fSGCoeffs[idx];
+    }
+
     list->add("InUsePar", In_use);
     list->add("ModulePar", Module);
     list->add("ChannelPar", Channel);
     list->add("PadPar", Pads);
+    list->add("SGCoeffs", SGCoeffs);
+}
+
+// Template to simplify the parameter getting
+template <class TArrayT, class VecT>
+void FillAndCopy(FairParamList* list, const char* name, TArrayT& arr, VecT& vec)
+{
+    if (!list->fill(name, &arr))
+    {
+        R3BLOG(warn, "---Could not initialize " << name);
+        return;
+    }
+    const Int_t n = arr.GetSize();
+    vec.resize(n);
+    std::copy_n(arr.GetArray(), n, vec.begin());
 }
 
 // ----  Method getParams ------------------------------------------------------
@@ -129,6 +162,16 @@ Bool_t R3BActafMappingPar::getParams(FairParamList* list)
         R3BLOG(info, "Nb of pads: " << fNbPads);
     }
 
+    if (!list->fill("NbBinsSamplePar", &fNbBinsSample))
+    {
+        R3BLOG(error, "Could not initialize NbBinsSamplePar");
+        return kFALSE;
+    }
+    else
+    {
+        R3BLOG(info, "Nb of bins of the sample: " << fNbBinsSample);
+    }
+
     if (!list->fill("NbFADCModulesPar", &fNbFADCModules))
     {
         R3BLOG(error, "Could not initialize NbFADCModulesPar");
@@ -139,37 +182,31 @@ Bool_t R3BActafMappingPar::getParams(FairParamList* list)
         R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
     }
 
+    if (!list->fill("NbSGcoefs", &fNbSGcoefs))
+    {
+        R3BLOG(error, "Could not initialize SGCoeffs");
+        return kFALSE;
+    }
+    else
+    {
+        R3BLOG(info, "Nb of sg coeffs: " << fNbSGcoefs);
+    }
+
+    // Map names to arrays for cleaner loop
     TArrayI In_use(fNbPads);
     TArrayI Module(fNbPads);
     TArrayI Channel(fNbPads);
     TArrayI Pads(fNbPads);
+    TArrayD SGCoeffs(fNbSGcoefs);
 
-    // Map names to arrays for cleaner loop
-    struct ArrayPair
-    {
-        const char* name;
-        TArrayI& array;
-        std::vector<Int_t>& target;
-    };
+    // Ints
+    FillAndCopy(list, "InUsePar", In_use, fIn_use);
+    FillAndCopy(list, "ModulePar", Module, fModule);
+    FillAndCopy(list, "ChannelPar", Channel, fChannel);
+    FillAndCopy(list, "PadPar", Pads, fPad);
 
-    ArrayPair arrays[] = { { "InUsePar", In_use, fIn_use },
-                           { "ModulePar", Module, fModule },
-                           { "ChannelPar", Channel, fChannel },
-                           { "PadPar", Pads, fPad } };
-
-    // Fill and copy only if successful
-    for (auto& pair : arrays)
-    {
-        if (!list->fill(pair.name, &pair.array))
-        {
-            LOG(warn) << "---Could not initialize " << pair.name;
-            continue;
-        }
-        for (Int_t idx = 0; idx < fNbPads; ++idx)
-        {
-            pair.target[idx] = pair.array[idx];
-        }
-    }
+    // Doubles
+    FillAndCopy(list, "SGCoeffs", SGCoeffs, fSGCoeffs);
 
     return kTRUE;
 }
@@ -182,7 +219,9 @@ void R3BActafMappingPar::printParams()
 {
     R3BLOG(info, "GeoVersion: " << fGeoVersion);
     R3BLOG(info, "Nb of Pads: " << fNbPads);
+    R3BLOG(info, "Nb of Bins of the Sample: " << fNbBinsSample);
     R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
+    R3BLOG(info, "Nb of SG Coeffs: " << fNbSGcoefs);
     for (Int_t idx = 0; idx < fNbPads; idx++)
     {
         R3BLOG(info, "Pad: " << idx + 1 << ", module: " << fModule[idx] << ", channel: " << fChannel[idx]);
