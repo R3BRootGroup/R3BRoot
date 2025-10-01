@@ -169,6 +169,8 @@ class R3BActafOnlineSpectra : public FairTask
         setHistPars(n, minB, maxB, nBinsTSync, nTSyncMin, nTSyncMax);
     }
 
+    inline void SetNBinsSample(int n) { nBinsSample = n; }
+
   private:
     void SetParameter();
 
@@ -199,6 +201,12 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_MaxPos_map = nullptr;
     TH2F* fh2_Risetime_map = nullptr;
     TH2F* fh2_ModVsCh_map = nullptr;
+    TH1F* fh1_sigmaInit = nullptr;
+    TH1F* fh1_sigmaFilt = nullptr;
+    TH2F* fh2_sigmaInitVsPad = nullptr;
+    TH2F* fh2_sigmaFiltVsPad = nullptr;
+    TH2F* fh2_meanInitVsPad = nullptr;
+    TH2F* fh2_meanFiltVsPad = nullptr;
 
     // Cal histograms
     TH2F* fh2_Ecal_cal = nullptr;
@@ -226,6 +234,8 @@ class R3BActafOnlineSpectra : public FairTask
     int nBinsTSync = 100;
     int nTSyncMin = 0;
     int nTSyncMax = 5000;
+
+    int nBinsSample = 2692;
 
     // Hit histograms
     std::vector<TH1F*> fh1_RingCounts;
