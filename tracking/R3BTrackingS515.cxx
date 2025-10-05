@@ -232,7 +232,7 @@ void R3BTrackingS515::Exec(Option_t* option)
     for (auto i = 0; i < tofd_DataItems->GetEntriesFast(); ++i)
     {
         tofd_hit = dynamic_cast<R3BTofdHitData*>(tofd_DataItems->At(i));
-        if (tofd_hit->GetDetId() == 1) // only hits from first plane
+        if (tofd_hit->GetPlaneId() == 1) // only hits from first plane
             is_good_tofd = true;
     }
     if (!is_good_tofd)

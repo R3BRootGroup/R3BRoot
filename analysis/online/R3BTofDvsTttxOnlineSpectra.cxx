@@ -140,7 +140,7 @@ void R3BTofDvsTttxOnlineSpectra::Exec(Option_t* /*option*/)
     for (int ihit = 0; ihit < nHitsTofd; ihit++)
     {
         auto hit = dynamic_cast<R3BTofdHitData*>(fHitItemsTofd->At(ihit));
-        auto plane = hit->GetDetId();
+        auto plane = hit->GetPlaneId();
         if (plane != fPlaneTofd)
             continue;
         // Looking for the max. charge

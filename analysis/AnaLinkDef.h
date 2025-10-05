@@ -20,6 +20,7 @@
 #pragma link off all functions;
 
 #pragma link C++ class R3BAnalysisIncomingID+;
+#pragma link C++ class R3BEventFilter+;
 #pragma link C++ class R3BIncomingBeta+;
 #pragma link C++ class R3BIncomingIDPar+;
 #pragma link C++ class R3BAnalysisContFact+;

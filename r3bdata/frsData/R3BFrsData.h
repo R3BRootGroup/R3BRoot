@@ -16,13 +16,12 @@
 // -----     Created 30/04/2021 by J.L. Rodriguez            -----
 // ---------------------------------------------------------------
 
-#ifndef R3BFrsData_H
-#define R3BFrsData_H
+#pragma once
+
 #include "TObject.h"
 
 class R3BFrsData : public TObject
 {
-
   public:
     // Default Constructor
     R3BFrsData();
@@ -78,5 +77,3 @@ class R3BFrsData : public TObject
   public:
     ClassDef(R3BFrsData, 1)
 };
-
-#endif

@@ -1272,7 +1272,7 @@ void R3BFiberTrackingOnlineSpectra::Exec(Option_t* option)
                                 if (!hitToFD)
                                     continue;
                                 // Looking for the maximum
-                                Int_t iPlane = hitToFD->GetDetId() - 1;
+                                Int_t iPlane = hitToFD->GetPlaneId() - 1;
                                 if (iPlane > 1)
                                     continue;
                                 if (iPlane == 0)
@@ -1344,13 +1344,16 @@ void R3BFiberTrackingOnlineSpectra::Exec(Option_t* option)
                             }
 
 #if 0
-                        int ck=0;
-                        for(int j=0;j<SetPlane;j++){
-                            if(bar[j] != -100) xmean += xpos2[j];
-                            else continue;
-                            ck++;
-                        }
-                        xmean = xmean/(double)ck;
+                            int ck = 0;
+                            for (int j = 0; j < SetPlane; j++)
+                            {
+                                if (bar[j] != -100)
+                                    xmean += xpos2[j];
+                                else
+                                    continue;
+                                ck++;
+                            }
+                            xmean = xmean / (double)ck;
 #else
                             xmean = xpos2[0];
 #endif
@@ -1600,7 +1603,7 @@ void R3BFiberTrackingOnlineSpectra::Exec(Option_t* option)
 
                         fh_X_fib_vs_tofd_no_cut->Fill(xmean, intercept + slope * 1138.5);
                         fh_X_fib_vs_tofd_ang_no_cut->Fill(xmean,
-                                                          xposback - (angX)*602.95 / 100. + (angX)*1138.5 / 100.);
+                                                          xposback - angX * 602.95 / 100. + angX * 1138.5 / 100.);
 
                         if (q > qmin && q < qmax /*q>5.6 && q<6.5*/)
                         {
@@ -1653,7 +1656,7 @@ void R3BFiberTrackingOnlineSpectra::Exec(Option_t* option)
                         if (!(q > qmin && q < qmax /*q>5.6 && q<6.5*/) /*r*r < 0.9*/)
                             return;
                         fh_X_fib_vs_tofd->Fill(xmean, intercept + slope * 1138.5);
-                        fh_X_fib_vs_tofd_ang->Fill(xmean, xposback - (angX)*602.95 / 100. + (angX)*1138.5 / 100.);
+                        fh_X_fib_vs_tofd_ang->Fill(xmean, xposback - angX * 602.95 / 100. + angX * 1138.5 / 100.);
 
                         if ((v2(1) > -0.2 && v2(1) < 0.2) || 1)
                         {
@@ -1673,7 +1676,7 @@ void R3BFiberTrackingOnlineSpectra::Exec(Option_t* option)
                                     // fh2_fibtracking_planeXZ->Fill(zrand, xpos32 - angX * 434.1 /1000. + angX
                                     // * zrand /1000.); fh2_fibtracking_planeXZ->Fill(zrand, b + m * zrand);
                                     fh2_fibtracking_planeXZ_nocuts->Fill(
-                                        zrand, xposback - (angX)*602.95 / 100. + (angX)*zrand / 100.);
+                                        zrand, xposback - angX * 602.95 / 100. + angX * zrand / 100.);
                                     fh2_fibtracking_planeXZ->Fill(zrand, intercept + slope * zrand);
                                 }
                             }
