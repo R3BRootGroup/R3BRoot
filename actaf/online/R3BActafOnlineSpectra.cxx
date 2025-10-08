@@ -195,6 +195,7 @@ InitStatus R3BActafOnlineSpectra::Init()
             std::string titleHist = "Raw trace: Pad " + std::to_string(index + 1);
 
             int FADCnum = fMap_Par->GetFADCModuleByPad(index + 1);
+            int FADCchn = fMap_Par->GetFADCChannelByPad(index + 1);
 
             // Only plot the pads that belong to the FADC
             if (FADCnum != adc + 1)
@@ -214,7 +215,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh2_RawTraces[index]->Draw("colz");
 
             std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
-            std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1);
+            std::string titleHistE =
+                "ERaw: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
             fh1_RawE[index] = R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 100, 0, 300000);
             fh1_RawE[index]->GetXaxis()->SetTitle("E [Chn]");
             fh1_RawE[index]->GetYaxis()->SetTitle("Counts");
@@ -226,7 +228,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh1_RawE[index]->Draw();
 
             std::string nameHistB = "fh1_Pad_" + std::to_string(index) + "_Baseline";
-            std::string titleHistB = "Baseline: Pad " + std::to_string(index + 1);
+            std::string titleHistB =
+                "Baseline: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
             fh1_Baseline[index] = R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 10000);
             fh1_Baseline[index]->GetXaxis()->SetTitle("Baseline [Chn]");
             fh1_Baseline[index]->GetYaxis()->SetTitle("Counts");
