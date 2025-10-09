@@ -79,7 +79,7 @@ Bool_t R3BWhiterabbitActafReader::R3BRead()
 {
     for (size_t d = 0; d < NB_ACTAF_DETS; d++)
     {
-        if (fData->TIMESTAMP_ACTAF[d].ID && fData->TIMESTAMP_ACTAF[d].ID == fWhiterabbitId[d])
+        if (fData->TIMESTAMP_ACTAF[d].ID)
         {
             /*std::ostringstream msg;
            msg << "Event " << fEventHeader->GetEventno()
