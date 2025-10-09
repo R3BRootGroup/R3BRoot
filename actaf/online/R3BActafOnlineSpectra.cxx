@@ -683,7 +683,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
-    int timetag = 0;
+    uint64_t timetag = 0;
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
@@ -841,6 +841,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto id = hit->GetId() > 0 ? hit->GetId() - 1 : 0;
             
             fh1_Sync[id]->Fill(hit->GetTimeStamp()-pre_timestamp[id] - 2 * (timetag-pre_timetag));
+            
+            std::cout<< hit->GetTimeStamp()-pre_timestamp[id]<<" "<< timetag-pre_timetag<<std::endl;
             pre_timestamp[id] = hit->GetTimeStamp();
         }
         pre_timetag = timetag;
