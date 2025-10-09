@@ -61,6 +61,7 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh2_XYPosRand.resize(2);
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
+    fh2_CorrectedTraces.resize(fPads);
     fh1_RawE.resize(fPads);
     fh1_Baseline.resize(fPads);
 }
@@ -178,6 +179,10 @@ InitStatus R3BActafOnlineSpectra::Init()
         auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
         cMap->Divide(4, 4);
 
+        std::string nameCanvasC = "FADC_" + std::to_string(adc + 1) + "_corrected_traces_map";
+        auto* cMapC = new TCanvas(nameCanvasC.c_str(), "mapped info", 10, 10, 500, 500);
+        cMapC->Divide(4, 4);
+
         std::string nameCanvasE = "FADC_" + std::to_string(adc + 1) + "_ERaw";
         auto* cMapE = new TCanvas(nameCanvasE.c_str(), "ERaw info", 10, 10, 500, 500);
         cMapE->Divide(4, 4);
@@ -203,8 +208,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             else
                 chn++;
 
-            fh2_RawTraces[index] =
-                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), 1346, 1, nBinsSample, 500, -100, 2000);
+            fh2_RawTraces[index] = R3B::root_owned<TH2F>(
+                nameHist.c_str(), titleHist.c_str(), nBinsSample / 2, 1, nBinsSample, 2000, 0, 20000);
 
             fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_RawTraces[index]->GetYaxis()->SetTitle("A");
@@ -213,6 +218,25 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh2_RawTraces[index]->GetYaxis()->CenterTitle(true);
             cMap->cd(chn);
             fh2_RawTraces[index]->Draw("colz");
+
+            std::string nameHistC = "fh2_Pad_" + std::to_string(index) + "corrected_trace";
+
+            fh2_CorrectedTraces[index] = R3B::root_owned<TH2F>(nameHistC.c_str(),
+                                                               titleHist.c_str(),
+                                                               nBinsSample / 2,
+                                                               1,
+                                                               nBinsSample,
+                                                               nBinsTrace,
+                                                               nTraceMin,
+                                                               nTraceMax);
+
+            fh2_CorrectedTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
+            fh2_CorrectedTraces[index]->GetYaxis()->SetTitle("A");
+            fh2_CorrectedTraces[index]->GetYaxis()->SetTitleOffset(1.1);
+            fh2_CorrectedTraces[index]->GetXaxis()->CenterTitle(true);
+            fh2_CorrectedTraces[index]->GetYaxis()->CenterTitle(true);
+            cMapC->cd(chn);
+            fh2_CorrectedTraces[index]->Draw("colz");
 
             std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
             std::string titleHistE =
@@ -243,6 +267,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         if (fDisplaytraces)
         {
             mapfol->Add(cMap);
+            mapfol->Add(cMapC);
         }
 
         mapfol->Add(cMapE);
@@ -332,11 +357,23 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     mapfol->Add(cmean);
 
+    auto* cdetmask = new TCanvas("Det_mask", "Detector mask", 10, 10, 500, 500);
+    fh1_DetMask = R3B::root_owned<TH1F>("fh1_detmask", "Detector mask", 512, -0.5, 511.5);
+    fh1_DetMask->GetXaxis()->SetTitle("Detector mask");
+    fh1_DetMask->GetYaxis()->SetTitle("Counts");
+    fh1_DetMask->GetYaxis()->SetTitleOffset(1.1);
+    fh1_DetMask->GetXaxis()->CenterTitle(true);
+    fh1_DetMask->GetYaxis()->CenterTitle(true);
+    fh1_DetMask->SetFillColor(31);
+    fh1_DetMask->Draw();
+
+    mapfol->Add(cdetmask);
+
     mainfol->Add(mapfol);
 
     // ********* CAL HISTOGRAMS ********* //
 
-    auto* cCal = new TCanvas("cCal", "cal info", 10, 10, 500, 500);
+    auto* cCal = new TCanvas("Cal_data", "cal info", 10, 10, 500, 500);
     cCal->Divide(2, 3);
 
     cCal->cd(1);
@@ -390,7 +427,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_tSync_cal->Draw("colz");
 
     calfol->Add(cCal);
-    mainfol->Add(calfol);
+
+    if (fCalItems != nullptr)
+        mainfol->Add(calfol);
 
     // ********* HIT HISTOGRAMS ********* //
 
@@ -502,7 +541,8 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_Phi1VsPhi2->Draw("colz");
     hitfol->Add(cPhi);
 
-    mainfol->Add(hitfol);
+    if (fHitItems != nullptr)
+        mainfol->Add(hitfol);
 
     run->AddObject(mainfol);
 
@@ -537,10 +577,16 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh2_sigmaFiltVsPad->Reset();
         fh2_meanInitVsPad->Reset();
         fh2_meanFiltVsPad->Reset();
+        fh1_DetMask->Reset();
         for (const auto& hist : fh2_RawTraces)
         {
             hist->Reset();
         }
+        for (const auto& hist : fh2_CorrectedTraces)
+        {
+            hist->Reset();
+        }
+
         for (const auto& hist : fh1_RawE)
         {
             hist->Reset();
@@ -615,7 +661,10 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 continue;
             auto pad = hit->GetPad() - 1;
 
-            // Allow 128 pad for Amber
+            if (pad == 129)
+                fh1_DetMask->Fill(hit->GetDetMask());
+
+            // Allow 128 pads for AMBER and R3B
             if (pad > fMap_Par->GetNbPads())
                 continue;
 
@@ -658,10 +707,12 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                     if (value == 0)
                         continue;
 
-                    if (value < -hit->GetBaseline())
-                        continue;
+                    // if (value < -hit->GetBaseline())
+                    //     continue;
 
-                    fh2_RawTraces[pad]->Fill(index++, value);
+                    fh2_CorrectedTraces[pad]->Fill(index++, value);
+
+                    fh2_RawTraces[pad]->Fill(index++, value + hit->GetBaseline());
                 }
             }
         }
@@ -762,7 +813,12 @@ void R3BActafOnlineSpectra::FinishTask()
         fh2_sigmaFiltVsPad->Write();
         fh2_meanInitVsPad->Write();
         fh2_meanFiltVsPad->Write();
+        fh1_DetMask->Write();
         for (const auto& hist : fh2_RawTraces)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh2_CorrectedTraces)
         {
             hist->Write();
         }

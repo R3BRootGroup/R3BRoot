@@ -154,7 +154,7 @@ void R3BActafMapped2Cal::Exec(Option_t*)
     {
         auto mappedData = dynamic_cast<R3BActafMappedData const*>(fActafMappedData->At(index));
         auto pad = mappedData->GetPad();
-        if (pad == 129)
+        if (pad >= 129)
             continue; // syn-time
         auto energy = mappedData->GetE() * fEGain[pad - 1];
         auto energyMaxAmpl = mappedData->GetMaxampl() * fEGain[pad - 1];

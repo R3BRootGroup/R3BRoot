@@ -53,31 +53,25 @@ R3BWhiterabbitActafReader::~R3BWhiterabbitActafReader()
 
 Bool_t R3BWhiterabbitActafReader::Init(ext_data_struct_info* a_struct_info)
 {
-    Int_t ok;
+    Int_t okay;
     R3BLOG(info, "");
-    EXT_STR_h101_WRACTAF_ITEMS_INFO(ok, *a_struct_info, fOffset, EXT_STR_h101_WRACTAF, 0);
+    EXT_STR_h101_WRACTAF_ITEMS_INFO(okay, *a_struct_info, fOffset, EXT_STR_h101_WRACTAF, 0);
 
-    if (!ok)
+    if (!okay)
     {
         R3BLOG(error, "Failed to setup structure information");
         return kFALSE;
     }
 
     // Look for the R3BEventHeader
-    FairRootManager* frm = FairRootManager::Instance();
+    auto* frm = FairRootManager::Instance();
     fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
-    if (!fEventHeader)
-    {
-        R3BLOG(warn, "EventHeader. not found");
-        fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("R3BEventHeader"));
-    }
-    else
-    {
-        R3BLOG(info, "R3BEventHeader found");
-    }
+    if (fEventHeader)
+        R3BLOG(info, "EventHeader. found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRActafData", "WRActaf", fArray, !fOnline);
+    memset(fData, 0, sizeof *fData);
     Reset();
 
     return kTRUE;
@@ -85,31 +79,25 @@ Bool_t R3BWhiterabbitActafReader::Init(ext_data_struct_info* a_struct_info)
 
 Bool_t R3BWhiterabbitActafReader::R3BRead()
 {
-    for (uint32_t d = 0; d < NB_ACTAF_DETS; d++)
+    for (size_t d = 0; d < NB_ACTAF_DETS; d++)
     {
-        if (fData->TIMESTAMP_ACTAF[d].ID && fData->TIMESTAMP_ACTAF[d].ID != fWhiterabbitId[d])
+        if (fData->TIMESTAMP_ACTAF[d].ID && fData->TIMESTAMP_ACTAF[d].ID == fWhiterabbitId[d])
         {
-            char strMessage[1000];
-            snprintf(strMessage,
-                     sizeof strMessage,
-                     "Event %lu: Whiterabbit ID mismatch for det=%u: expected 0x%x, got 0x%x.\n",
-                     fEventHeader->GetEventno(),
-                     d,
-                     fWhiterabbitId[d],
-                     fData->TIMESTAMP_ACTAF[d].ID);
-            LOG(error) << strMessage;
-        }
-        if (fEventHeader != nullptr)
-        {
+            /*std::ostringstream msg;
+           msg << "Event " << fEventHeader->GetEventno()
+               << ": Whiterabbit ID mismatch for det=" << d + 1
+               << ": expected 0x" << fWhiterabbitId[d]
+               << ", got 0x" << fData->TIMESTAMP_ACTAF[d].ID;
+           LOG(info) << msg.str();
+               }*/
             uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[3] << 48) |
                                  ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[2] << 32) |
                                  ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[1] << 16) |
                                  (uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[0];
-            fNEvent = fEventHeader->GetEventno();
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp, d + 1);
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp, fWhiterabbitId[d]);
         }
     }
-
+    fNEvent++;
     return kTRUE;
 }
 
@@ -117,11 +105,10 @@ void R3BWhiterabbitActafReader::Reset()
 {
     // Reset the output array
     fArray->Clear();
-    fNEvent = 0;
-    for (uint32_t d = 0; d < NB_ACTAF_DETS; d++)
+    for (size_t d = 0; d < NB_ACTAF_DETS; d++)
     {
         fData->TIMESTAMP_ACTAF[d].ID = 0;
     }
 }
 
-ClassImp(R3BWhiterabbitActafReader);
+ClassImp(R3BWhiterabbitActafReader)
