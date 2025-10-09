@@ -418,15 +418,11 @@ bool R3BActafReader::R3BRead2025()
         }
     }
 
-    /*
-    if (data->AMBERTIMETAG > 0)
-    {
+    if (data->DETECTORMASK > 0)
+    { // Extra pad 130 for AMBER specific IDs
         new ((*fArray)[fArray->GetEntriesFast()])
-            R3BActafMappedData((MAX_MODULES2025 - 1) * ACTAF_ECHN + 1, std::array<UInt_t, ACTAF_BINS>{}, 0, 0,
-    data->AMBERTIMETAG, 0, 0);
+            R3BActafMappedData(130, data->DETECTORMASK, data->AMBERTIMETAG, data->AMBERSPILLNB);
     }
-    */
-
     return kTRUE;
 }
 

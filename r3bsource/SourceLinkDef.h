@@ -34,6 +34,7 @@
 #pragma link C++ class R3BWhiterabbitLosReader+;
 #pragma link C++ class R3BWhiterabbitPspReader+;
 #pragma link C++ class R3BWhiterabbitMusicReader+;
+#pragma link C++ class R3BWhiterabbitActafReader+;
 #pragma link C++ class R3BTrloiiTpatReader+;
 #pragma link C++ class R3BTrloiiSampReader+;
 #pragma link C++ class R3BTrloiiScalerReader+;
@@ -150,5 +151,6 @@
 #pragma link C++ class EXT_STR_h101_HMP_onion_t;
 #pragma link C++ class EXT_STR_h101_ACTAF2023_onion_t;
 #pragma link C++ class EXT_STR_h101_ACTAF2025_onion_t;
+#pragma link C++ class EXT_STR_h101_WRACTAF_onion_t;
 
 #endif

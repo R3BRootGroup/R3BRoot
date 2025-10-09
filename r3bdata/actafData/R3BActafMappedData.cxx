@@ -39,6 +39,14 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
 {
 }
 
+R3BActafMappedData::R3BActafMappedData(UInt_t pad, int det_mask, int timetag, int spill_nb)
+    : fPad(pad)
+    , fDetMask(det_mask)
+    , fTimeTag(timetag)
+    , fSpillNb(spill_nb)
+{
+}
+
 std::string R3BActafMappedData::toString() const
 {
     std::string trace_str = "[";

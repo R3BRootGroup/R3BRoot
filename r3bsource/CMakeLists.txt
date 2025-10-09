@@ -61,6 +61,7 @@ set(SRCS
     wr/R3BWhiterabbitS8Reader.cxx
     los/R3BWhiterabbitLosReader.cxx
     wr/R3BWhiterabbitPspReader.cxx
+    actaf/R3BWhiterabbitActafReader.cxx
     music/R3BWhiterabbitMusicReader.cxx
     trloii/R3BTrloiiTpatReader.cxx
     trloii/R3BTrloiiSampReader.cxx
@@ -184,6 +185,7 @@ set(STRUCT_HEADERS
     sync_check/ext_h101_sync_check.h
     actaf/ext_h101_actaf2023.h
     actaf/ext_h101_actaf2025.h
+    actaf/ext_h101_wractaf.h
     )
 
 set(HEADERS
@@ -204,6 +206,7 @@ set(HEADERS
     los/R3BWhiterabbitLosReader.h
     wr/R3BWhiterabbitPspReader.h
     music/R3BWhiterabbitMusicReader.h
+    actaf/R3BWhiterabbitActafReader.h
     trloii/R3BTrloiiTpatReader.h
     trloii/R3BTrloiiSampReader.h
     trloii/R3BTrloiiScalerReader.h

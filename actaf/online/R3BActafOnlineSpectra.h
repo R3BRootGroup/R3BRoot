@@ -21,6 +21,7 @@
 
 #include <FairTask.h>
 #include <TCanvas.h>
+#include <TGraph.h>
 #include <vector>
 
 class TClonesArray;
@@ -152,6 +153,12 @@ class R3BActafOnlineSpectra : public FairTask
     {
         setHistPars(n, minB, maxB, nBinsEcal, nEcalMin, nEcalMax);
     }
+
+    inline void SetTraceHistPars(int minB, int maxB)
+    {
+        setHistPars(std::abs(maxB - minB) / 4, minB, maxB, nBinsTrace, nTraceMin, nTraceMax);
+    }
+
     inline void SetZcalHistPars(int n, int minB, int maxB)
     {
         setHistPars(n, minB, maxB, nBinsZcal, nZcalMin, nZcalMax);
@@ -171,6 +178,8 @@ class R3BActafOnlineSpectra : public FairTask
 
     inline void SetNBinsSample(int n) { nBinsSample = n; }
 
+    inline void SetMaxTimeForRate(int max) { max_second_for_rate = max; }
+
   private:
     void SetParameter();
 
@@ -180,6 +189,7 @@ class R3BActafOnlineSpectra : public FairTask
     TClonesArray* fMappedItems = nullptr;
     TClonesArray* fCalItems = nullptr;
     TClonesArray* fHitItems = nullptr;
+    TClonesArray* fWrItems = nullptr;
 
     R3BEventHeader* header = nullptr;       /** Event header */
     R3BActafMappingPar* fMap_Par = nullptr; /** Parameter container */
@@ -192,6 +202,7 @@ class R3BActafOnlineSpectra : public FairTask
     bool fDisplaytraces = true;
 
     std::vector<TH2F*> fh2_RawTraces;
+    std::vector<TH2F*> fh2_CorrectedTraces;
     std::vector<TH1F*> fh1_RawE;
     std::vector<TH1F*> fh1_Baseline;
 
@@ -219,6 +230,10 @@ class R3BActafOnlineSpectra : public FairTask
     int nEcalMin = 0;
     int nEcalMax = 500000;
 
+    int nBinsTrace = 500;
+    int nTraceMin = -100;
+    int nTraceMax = 2000;
+
     int nBinsZcal = 100;
     int nZcalMin = 0;
     int nZcalMax = 1000;
@@ -237,14 +252,31 @@ class R3BActafOnlineSpectra : public FairTask
 
     int nBinsSample = 2692;
 
+    size_t nbWrs = 9;
+
+    uint64_t pre_timetag = 0;
+    uint64_t first_timestamp = 0;
+    uint64_t overall_rate = 0;
+    uint64_t fsec_rate = 0; // upstream section rates
+    uint64_t ssec_rate = 0; // downstream section rates
+    int last_second = 0;
+    int max_second_for_rate = 600;
+
+    std::vector<uint64_t> pre_timestamp{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
     // Hit histograms
     std::vector<TH1F*> fh1_RingCounts;
     std::vector<TH2F*> fh2_XYPos;
     std::vector<TH2F*> fh2_XYPosRand;
     std::vector<TH1F*> fh1_PhiCounts;
+    std::vector<TH1F*> fh1_Sync;
+    std::vector<TH1F*> fh1_WrSync;
+    std::vector<TGraph*> fgraph_rates;
 
     TH1F* fh1_CountsPerSide = nullptr;
+    TH1F* fh1_DetMask = nullptr;
     TH2F* fh2_Phi1VsPhi2 = nullptr;
+    TH2F* fh2_timetag_signal = nullptr;
 
   public:
     ClassDefOverride(R3BActafOnlineSpectra, 1);

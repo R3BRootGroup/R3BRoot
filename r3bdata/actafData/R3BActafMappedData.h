@@ -26,7 +26,7 @@
 #include <string>
 
 constexpr int ACTAF_ECHN = 16;
-constexpr int ACTAF_BINS = 2692;
+constexpr int ACTAF_BINS = 2500;
 
 class R3BActafMappedData : public TObject
 {
@@ -59,19 +59,29 @@ class R3BActafMappedData : public TObject
                                 double rmsFilt = 0.,
                                 double baselineFilt = 0);
 
+    /** Constructor for AMBER data
+     *@param pad           Pad number
+     *@param det_mask      Detector mask
+     *@param timetag       AMBER timestamp
+     *@param spill_nb      Spill on/off
+     **/
+    explicit R3BActafMappedData(UInt_t pad, int det_mask, int timetag, int spill_nb);
+
     virtual ~R3BActafMappedData() = default;
 
-    [[nodiscard]] inline const UInt_t& GetPad() const { return fPad; }
+    [[nodiscard]] inline UInt_t GetPad() const { return fPad; }
     [[nodiscard]] inline const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
-    [[nodiscard]] inline const double& GetE() const { return fE; }
-    [[nodiscard]] inline const double& GetBaseline() const { return fBaseline; }
-    [[nodiscard]] inline const double& GetRisetime() const { return fRisetime; }
-    [[nodiscard]] inline const int& GetMaxpos() const { return fMaxpos; }
-    [[nodiscard]] inline const double& GetMaxampl() const { return fMaxamplitude; }
-    [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge10; }
-    [[nodiscard]] inline const double GetRms() const { return fRms; }
-    [[nodiscard]] inline const double GetRmsFilt() const { return fRmsFilt; }
-    [[nodiscard]] inline const double GetBaselineFilt() const { return fBaselineFilt; }
+    [[nodiscard]] inline double GetE() const { return fE; }
+    [[nodiscard]] inline double GetBaseline() const { return fBaseline; }
+    [[nodiscard]] inline double GetRisetime() const { return fRisetime; }
+    [[nodiscard]] inline int GetMaxpos() const { return fMaxpos; }
+    [[nodiscard]] inline double GetMaxampl() const { return fMaxamplitude; }
+    [[nodiscard]] inline double GetLeadingEdgeTime() const { return fLeadingEdge10; }
+    [[nodiscard]] inline double GetRms() const { return fRms; }
+    [[nodiscard]] inline double GetRmsFilt() const { return fRmsFilt; }
+    [[nodiscard]] inline double GetBaselineFilt() const { return fBaselineFilt; }
+    [[nodiscard]] inline int GetTimeTag() const { return fTimeTag; }
+    [[nodiscard]] inline int GetDetMask() const { return fDetMask; }
 
     [[nodiscard]] std::string toString() const;
     void Print(const Option_t*) const override;
@@ -84,9 +94,10 @@ class R3BActafMappedData : public TObject
     std::array<double, ACTAF_BINS> fTrace{};
     double fLeadingEdge10 = 0;
     double fRms = 0, fRmsFilt = 0, fBaselineFilt = 0;
+    int fDetMask = 0, fTimeTag = 0, fSpillNb = 0;
 
   public:
-    ClassDefOverride(R3BActafMappedData, 5);
+    ClassDefOverride(R3BActafMappedData, 6);
 };
 
 std::ostream& operator<<(std::ostream& os, const R3BActafMappedData& data);
