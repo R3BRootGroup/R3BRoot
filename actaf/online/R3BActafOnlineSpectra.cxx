@@ -27,6 +27,7 @@
 #include <TH2F.h>
 #include <THttpServer.h>
 #include <TMath.h>
+#include <TStyle.h>
 
 // FAIR headers
 #include <FairLogger.h>
@@ -551,6 +552,8 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     auto* cSync = new TCanvas("Sync", "", 10, 10, 500, 500);
     cSync->Divide(3, 3);
+    
+    gStyle->SetOptStat("uo");
 
     for (auto i = 0; i < nbWrs; i++)
     {
