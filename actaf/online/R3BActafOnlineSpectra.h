@@ -249,7 +249,7 @@ class R3BActafOnlineSpectra : public FairTask
 
     int nBinsSample = 2692;
 
-    constexpr size_t nbWrs = 9;
+    size_t nbWrs = 9;
 
     // Hit histograms
     std::vector<TH1F*> fh1_RingCounts;
