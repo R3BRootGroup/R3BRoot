@@ -25,7 +25,7 @@ class R3BWRData : public TObject
 {
   public:
     // Default Constructor
-    R3BWRData();
+    R3BWRData() = default;
 
     /** Standard Constructor
      *@param timestamp
@@ -37,11 +37,11 @@ class R3BWRData : public TObject
     virtual ~R3BWRData() = default;
 
     // Getters
-    inline const uint64_t& GetTimeStamp() const { return fTimeStamp; }
-    inline const UInt_t& GetId() const { return fId; }
+    inline uint64_t GetTimeStamp() const { return fTimeStamp; }
+    inline UInt_t GetId() const { return fId; }
 
   protected:
-    UInt_t fId = 0;
+    UInt_t fId = 1;
     uint64_t fTimeStamp = 0; // Timestamp
 
   public:

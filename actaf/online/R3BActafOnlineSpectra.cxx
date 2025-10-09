@@ -26,7 +26,10 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <THttpServer.h>
+#include <TLegend.h>
+#include <TLegendEntry.h>
 #include <TMath.h>
+#include <TStyle.h>
 
 // FAIR headers
 #include <FairLogger.h>
@@ -44,6 +47,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BShared.h"
+#include "R3BWRData.h"
 
 // R3BActafOnlineSpectra::Default Constructor --------------------------
 R3BActafOnlineSpectra::R3BActafOnlineSpectra()
@@ -61,6 +65,7 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh2_XYPosRand.resize(2);
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
+    fh2_CorrectedTraces.resize(fPads);
     fh1_RawE.resize(fPads);
     fh1_Baseline.resize(fPads);
 }
@@ -108,6 +113,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("ActafHitData"));
     R3BLOG_IF(warn, fHitItems == nullptr, "ActafHitData not found");
 
+    fWrItems = dynamic_cast<TClonesArray*>(mgr->GetObject("WRActafData"));
+    R3BLOG_IF(warn, fWrItems == nullptr, "WRActafData not found");
+
     fActafGeo = R3BActafGeometry::Instance();
     R3BLOG_IF(warn, !fActafGeo->Init(fGeoversion), "Actaf geometry " << fGeoversion << " not found");
 
@@ -117,8 +125,10 @@ InitStatus R3BActafOnlineSpectra::Init()
     auto* mapfol = new TFolder("Map", "Map Actaf info");
     // Folder for cal data
     auto* calfol = new TFolder("Cal", "Cal Actaf info");
-    // Folder for cal data
+    // Folder for hit data
     auto* hitfol = new TFolder("Hit", "Hit Actaf info");
+    // Folder for sync data
+    auto* syncfol = new TFolder("Sync", "Sync Actaf info");
 
     //
     // Create histograms
@@ -178,6 +188,10 @@ InitStatus R3BActafOnlineSpectra::Init()
         auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
         cMap->Divide(4, 4);
 
+        std::string nameCanvasC = "FADC_" + std::to_string(adc + 1) + "_corrected_traces_map";
+        auto* cMapC = new TCanvas(nameCanvasC.c_str(), "mapped info", 10, 10, 500, 500);
+        cMapC->Divide(4, 4);
+
         std::string nameCanvasE = "FADC_" + std::to_string(adc + 1) + "_ERaw";
         auto* cMapE = new TCanvas(nameCanvasE.c_str(), "ERaw info", 10, 10, 500, 500);
         cMapE->Divide(4, 4);
@@ -190,12 +204,12 @@ InitStatus R3BActafOnlineSpectra::Init()
 
         for (int index = 0; index < fPads; ++index)
         {
-            // auto index = adc * fChn + chn;
-            std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
-            std::string titleHist = "Raw trace: Pad " + std::to_string(index + 1);
-
             int FADCnum = fMap_Par->GetFADCModuleByPad(index + 1);
             int FADCchn = fMap_Par->GetFADCChannelByPad(index + 1);
+
+            std::string titleHist =
+                "Raw trace: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
+            std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
 
             // Only plot the pads that belong to the FADC
             if (FADCnum != adc + 1)
@@ -203,8 +217,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             else
                 chn++;
 
-            fh2_RawTraces[index] =
-                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), 1346, 1, nBinsSample, 500, -100, 2000);
+            fh2_RawTraces[index] = R3B::root_owned<TH2F>(
+                nameHist.c_str(), titleHist.c_str(), nBinsSample / 2, 1, nBinsSample, 2000, 0, 20000);
 
             fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_RawTraces[index]->GetYaxis()->SetTitle("A");
@@ -213,6 +227,25 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh2_RawTraces[index]->GetYaxis()->CenterTitle(true);
             cMap->cd(chn);
             fh2_RawTraces[index]->Draw("colz");
+
+            std::string nameHistC = "fh2_Pad_" + std::to_string(index) + "corrected_trace";
+
+            fh2_CorrectedTraces[index] = R3B::root_owned<TH2F>(nameHistC.c_str(),
+                                                               titleHist.c_str(),
+                                                               nBinsSample / 2,
+                                                               1,
+                                                               nBinsSample,
+                                                               nBinsTrace,
+                                                               nTraceMin,
+                                                               nTraceMax);
+
+            fh2_CorrectedTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
+            fh2_CorrectedTraces[index]->GetYaxis()->SetTitle("A");
+            fh2_CorrectedTraces[index]->GetYaxis()->SetTitleOffset(1.1);
+            fh2_CorrectedTraces[index]->GetXaxis()->CenterTitle(true);
+            fh2_CorrectedTraces[index]->GetYaxis()->CenterTitle(true);
+            cMapC->cd(chn);
+            fh2_CorrectedTraces[index]->Draw("colz");
 
             std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
             std::string titleHistE =
@@ -243,6 +276,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         if (fDisplaytraces)
         {
             mapfol->Add(cMap);
+            mapfol->Add(cMapC);
         }
 
         mapfol->Add(cMapE);
@@ -332,11 +366,35 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     mapfol->Add(cmean);
 
+    auto* cdetmask = new TCanvas("Det_mask", "Detector mask", 10, 10, 500, 500);
+    fh1_DetMask = R3B::root_owned<TH1F>("fh1_detmask", "Detector mask", 513, -0.5, 512.5);
+    fh1_DetMask->GetXaxis()->SetTitle("Detector mask");
+    fh1_DetMask->GetYaxis()->SetTitle("Counts");
+    fh1_DetMask->GetYaxis()->SetTitleOffset(1.1);
+    fh1_DetMask->GetXaxis()->CenterTitle(true);
+    fh1_DetMask->GetYaxis()->CenterTitle(true);
+    fh1_DetMask->SetFillColor(2);
+    fh1_DetMask->Draw();
+
+    mapfol->Add(cdetmask);
+
+    auto* ctimetag = new TCanvas("TimeTag_signal", "TimeTag Signal", 10, 10, 500, 500);
+    fh2_timetag_signal = R3B::root_owned<TH2F>(
+        "fh2_timetag_signal", "TimeTag Signal", nBinsSample / 2, 1, nBinsSample, nBinsTrace, nTraceMin, 11000);
+    fh2_timetag_signal->GetXaxis()->SetTitle("Time [Chn]");
+    fh2_timetag_signal->GetYaxis()->SetTitle("A");
+    fh2_timetag_signal->GetYaxis()->SetTitleOffset(1.1);
+    fh2_timetag_signal->GetXaxis()->CenterTitle(true);
+    fh2_timetag_signal->GetYaxis()->CenterTitle(true);
+    fh2_timetag_signal->Draw("colz");
+
+    mapfol->Add(ctimetag);
+
     mainfol->Add(mapfol);
 
     // ********* CAL HISTOGRAMS ********* //
 
-    auto* cCal = new TCanvas("cCal", "cal info", 10, 10, 500, 500);
+    auto* cCal = new TCanvas("Cal_data", "cal info", 10, 10, 500, 500);
     cCal->Divide(2, 3);
 
     cCal->cd(1);
@@ -390,7 +448,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_tSync_cal->Draw("colz");
 
     calfol->Add(cCal);
-    mainfol->Add(calfol);
+
+    if (fCalItems != nullptr)
+        mainfol->Add(calfol);
 
     // ********* HIT HISTOGRAMS ********* //
 
@@ -478,7 +538,6 @@ InitStatus R3BActafOnlineSpectra::Init()
     // phi counts for side up and down
     for (auto i = 0; i < fh1_PhiCounts.size(); i++)
     {
-
         TString tit;
         i == 0 ? tit = "Phi (upstream)" : tit = "Phi (downstream)";
         cPhi->cd(i + 1);
@@ -502,7 +561,104 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_Phi1VsPhi2->Draw("colz");
     hitfol->Add(cPhi);
 
-    mainfol->Add(hitfol);
+    if (fHitItems != nullptr)
+        mainfol->Add(hitfol);
+
+    auto* cSync = new TCanvas("Sync", "", 10, 10, 500, 500);
+    cSync->Divide(3, 3);
+
+    for (auto i = 0; i < nbWrs; i++)
+    {
+        fh1_Sync.push_back(
+            R3B::root_owned<TH1F>(Form("fh1_wr%d_timetag", i + 1), Form("WR%d - TimeTag", i + 1), 400, -2000, 2000));
+        fh1_Sync[i]->GetXaxis()->SetTitle(Form("WR%d - TimeTag [ns]", i + 1));
+        fh1_Sync[i]->GetYaxis()->SetTitle("Counts");
+        fh1_Sync[i]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Sync[i]->GetXaxis()->CenterTitle(true);
+        fh1_Sync[i]->GetYaxis()->CenterTitle(true);
+        fh1_Sync[i]->SetFillColor(31);
+        cSync->cd(i + 1);
+        fh1_Sync[i]->Draw();
+        gStyle->SetOptStat(111111);
+        cSync->Update();
+    }
+    syncfol->Add(cSync);
+
+    auto* cWrSync = new TCanvas("WrSync", "", 10, 10, 500, 500);
+    cWrSync->Divide(3, 3);
+
+    for (auto i = 0; i < nbWrs - 1; i++)
+    {
+        fh1_WrSync.push_back(R3B::root_owned<TH1F>(Form("fh1_wr%d", i + 1), Form("WR%d - WR1", i + 2), 2000, -50, 50));
+        fh1_WrSync[i]->GetXaxis()->SetTitle(Form("WR%d - WR1 [ns]", i + 2));
+        fh1_WrSync[i]->GetYaxis()->SetTitle("Counts");
+        fh1_WrSync[i]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_WrSync[i]->GetXaxis()->CenterTitle(true);
+        fh1_WrSync[i]->GetYaxis()->CenterTitle(true);
+        fh1_WrSync[i]->SetFillColor(31);
+        cWrSync->cd(i + 1);
+        fh1_WrSync[i]->Draw();
+        gStyle->SetOptStat(111111);
+        cWrSync->Update();
+    }
+    syncfol->Add(cWrSync);
+
+    auto* cRates = new TCanvas("Rates", "", 10, 10, 500, 500);
+
+    std::vector<std::string> titles = { "Overall rate [Hz]", "Upstream rate [Hz]", "Downstream rate [Hz]" };
+
+    auto fh1_rates = R3B::root_owned<TH1F>("fh1_rates", "Rates [Hz]", max_second_for_rate, 0, max_second_for_rate);
+    fh1_rates->GetXaxis()->SetTitle("Time [s]");
+    fh1_rates->GetYaxis()->SetTitle("Rate [Hz]");
+    fh1_rates->GetYaxis()->SetTitleOffset(1.1);
+    fh1_rates->GetXaxis()->CenterTitle(true);
+    fh1_rates->GetYaxis()->CenterTitle(true);
+    fh1_rates->SetMinimum(0);
+    fh1_rates->SetMaximum(500);
+    fh1_rates->SetDirectory(0);
+    fh1_rates->SetStats(0);
+    // fh1_rates->Draw("");
+
+    for (int i = 0; i < 3; i++)
+    {
+        auto gr = new TGraph();
+        gr->SetName(Form("gr%d", i));
+        gr->SetTitle(titles[i].c_str());
+        gr->SetMarkerStyle(24);
+        gr->SetMarkerColor(i + 1);
+        gr->SetMarkerSize(2);
+        fgraph_rates.push_back(gr);
+        if (i == 0)
+        {
+            fgraph_rates[i]->SetHistogram(fh1_rates);
+            fgraph_rates[i]->Draw("ap");
+        }
+        else
+            fgraph_rates[i]->Draw("samep");
+    }
+
+    auto* leg = new TLegend(0.58, 0.7, 0.84, 0.88, NULL, "brNDC");
+    leg->SetBorderSize(0);
+    leg->SetTextFont(62);
+    leg->SetTextSize(0.04);
+    leg->SetLineColor(1);
+    leg->SetLineStyle(1);
+    leg->SetLineWidth(1);
+    leg->SetFillStyle(0);
+    auto* entry = leg->AddEntry("gr0", "", "p");
+    entry->SetTextFont(62);
+    entry = leg->AddEntry("gr1", "", "p");
+    entry->SetTextFont(62);
+    entry = leg->AddEntry("gr2", "", "p");
+    entry->SetTextFont(62);
+    leg->Draw();
+
+    syncfol->Add(cRates);
+
+    if (fWrItems != nullptr)
+    {
+        mainfol->Add(syncfol);
+    }
 
     run->AddObject(mainfol);
 
@@ -537,10 +693,17 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh2_sigmaFiltVsPad->Reset();
         fh2_meanInitVsPad->Reset();
         fh2_meanFiltVsPad->Reset();
+        fh1_DetMask->Reset();
+        fh2_timetag_signal->Reset();
         for (const auto& hist : fh2_RawTraces)
         {
             hist->Reset();
         }
+        for (const auto& hist : fh2_CorrectedTraces)
+        {
+            hist->Reset();
+        }
+
         for (const auto& hist : fh1_RawE)
         {
             hist->Reset();
@@ -548,6 +711,19 @@ void R3BActafOnlineSpectra::Reset_Histo()
         for (const auto& hist : fh1_Baseline)
         {
             hist->Reset();
+        }
+        for (const auto& hist : fh1_Sync)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_WrSync)
+        {
+            hist->Reset();
+        }
+        for (auto* gr : fgraph_rates)
+        {
+            if (gr)
+                gr->Set(0); // Clear
         }
     }
 
@@ -575,7 +751,6 @@ void R3BActafOnlineSpectra::Reset_Histo()
             h->Reset();
 
         fh1_CountsPerSide->Reset();
-
         fh2_Phi1VsPhi2->Reset();
     }
 
@@ -604,6 +779,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
+    uint64_t timetag = 0;
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
@@ -615,7 +791,29 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 continue;
             auto pad = hit->GetPad() - 1;
 
-            // Allow 128 pad for Amber
+            if (pad == 129)
+            {
+                fh1_DetMask->Fill(hit->GetDetMask());
+            }
+
+            if (pad == 128)
+            {
+                timetag = hit->GetMaxpos();
+
+                if (fDisplaytraces)
+                {
+                    auto vec = hit->GetTrace(); // std::vector
+                    std::size_t index = 0;
+                    for (const auto& value : vec)
+                    {
+                        if (value == 0)
+                            continue;
+                        fh2_timetag_signal->Fill(index++, value + hit->GetBaseline());
+                    }
+                }
+            }
+
+            // Allow 128 pads for AMBER and R3B
             if (pad > fMap_Par->GetNbPads())
                 continue;
 
@@ -658,14 +856,19 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                     if (value == 0)
                         continue;
 
-                    if (value < -hit->GetBaseline())
-                        continue;
+                    // if (value < -hit->GetBaseline())
+                    //     continue;
 
-                    fh2_RawTraces[pad]->Fill(index++, value);
+                    fh2_CorrectedTraces[pad]->Fill(index++, value);
+
+                    fh2_RawTraces[pad]->Fill(index++, value + hit->GetBaseline());
                 }
             }
         }
     }
+
+    // For overall rates
+    overall_rate += fCalItems->GetEntriesFast();
 
     // Fill cal data
     if (fCalItems && fCalItems->GetEntriesFast() > 0)
@@ -678,6 +881,14 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 continue;
 
             int pad = hit->GetPad();
+            if (pad < 65)
+            {
+                fsec_rate++;
+            }
+            else if (pad > 64 && pad < 129)
+            {
+                ssec_rate++;
+            }
 
             if (pad > fPads)
                 continue;
@@ -735,6 +946,62 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
+    // R3BLOG(info,"wr: "<<fWrItems->GetEntriesFast());
+
+    if (fWrItems && fWrItems->GetEntriesFast() > 0)
+    {
+
+        if (timetag < pre_timetag)
+        {
+            pre_timetag = timetag;
+        }
+
+        auto nHits = fWrItems->GetEntriesFast();
+        std::vector<uint64_t> timestamps{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        for (int ihit = 0; ihit < nHits; ihit++)
+        {
+            auto* hit = dynamic_cast<R3BWRData*>(fWrItems->At(ihit));
+            if (!hit)
+                continue;
+
+            auto id = hit->GetId() > 0 ? hit->GetId() - 1 : 0;
+
+            timestamps[id] = hit->GetTimeStamp();
+
+            fh1_Sync[id]->Fill(hit->GetTimeStamp() - pre_timestamp[id] - 2 * (timetag - pre_timetag));
+
+            // std::cout<< hit->GetTimeStamp()-pre_timestamp[id]<<" "<< timetag-pre_timetag<<std::endl;
+            pre_timestamp[id] = hit->GetTimeStamp();
+        }
+        pre_timetag = timetag;
+
+        // std::cout<< timestamps[0] << " " << timestamps[1] << " " << timestamps[2] << std::endl;
+
+        if (first_timestamp == 0 || first_timestamp > timestamps[0])
+            first_timestamp = timestamps[0];
+
+        auto time_s = (timestamps[0] - first_timestamp) * 1e-9;
+        int sec = static_cast<int>(time_s);
+
+        // std::cout<< time_s <<" "<<overall_rate<<" "<< fsec_rate<<" "<<ssec_rate<<std::endl;
+
+        if (sec > last_second)
+        {
+            fgraph_rates[0]->SetPoint(fgraph_rates[0]->GetN(), sec, overall_rate);
+            fgraph_rates[1]->SetPoint(fgraph_rates[1]->GetN(), sec, fsec_rate);
+            fgraph_rates[2]->SetPoint(fgraph_rates[2]->GetN(), sec, ssec_rate);
+            last_second = sec;
+            overall_rate = 0;
+            fsec_rate = 0;
+            ssec_rate = 0;
+        }
+
+        for (size_t index = 1; index < timestamps.size(); ++index)
+        {
+            fh1_WrSync[index - 1]->Fill(timestamps[index] - timestamps[0]);
+        }
+    }
+
     fNEvents++;
     return;
 }
@@ -745,6 +1012,7 @@ void R3BActafOnlineSpectra::FinishEvent()
     r3b::util::ClearIfNotNull(fMappedItems);
     r3b::util::ClearIfNotNull(fCalItems);
     r3b::util::ClearIfNotNull(fHitItems);
+    r3b::util::ClearIfNotNull(fWrItems);
 }
 
 void R3BActafOnlineSpectra::FinishTask()
@@ -762,7 +1030,13 @@ void R3BActafOnlineSpectra::FinishTask()
         fh2_sigmaFiltVsPad->Write();
         fh2_meanInitVsPad->Write();
         fh2_meanFiltVsPad->Write();
+        fh1_DetMask->Write();
+        fh2_timetag_signal->Write();
         for (const auto& hist : fh2_RawTraces)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh2_CorrectedTraces)
         {
             hist->Write();
         }
@@ -773,6 +1047,19 @@ void R3BActafOnlineSpectra::FinishTask()
         for (const auto& hist : fh1_Baseline)
         {
             hist->Write();
+        }
+        for (const auto& hist : fh1_Sync)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh1_WrSync)
+        {
+            hist->Write();
+        }
+        for (auto* gr : fgraph_rates)
+        {
+            if (gr)
+                gr->Write();
         }
     }
 

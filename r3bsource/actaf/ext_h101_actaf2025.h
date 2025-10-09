@@ -763,6 +763,7 @@ typedef struct EXT_STR_h101_ACTAF2025_t
     uint32_t ACTAF_USERCNT_MOD9CH16 /* [-1,-1] */;
     uint32_t DETECTORMASK /* [-1,-1] */;
     uint32_t AMBERTIMETAG /* [-1,-1] */;
+    uint32_t AMBERSPILLNB /* [-1,-1] */;
 
 } EXT_STR_h101_ACTAF2025;
 
@@ -797,6 +798,7 @@ typedef struct EXT_STR_h101_ACTAF2025_onion_t
     } ACTAF_USERCNT_MOD[9];
     uint32_t DETECTORMASK;
     uint32_t AMBERTIMETAG;
+    uint32_t AMBERSPILLNB;
 
 } EXT_STR_h101_ACTAF2025_onion;
 
@@ -3842,5 +3844,6 @@ typedef struct EXT_STR_h101_ACTAF2025_onion_t
                            0 /*flags*/);                                                                              \
         EXT_STR_ITEM_INFO2(ok, si, offset, struct_t, printerr, DETECTORMASK, UINT32, "DETECTORMASK", 0 /*flags*/);    \
         EXT_STR_ITEM_INFO2(ok, si, offset, struct_t, printerr, AMBERTIMETAG, UINT32, "AMBERTIMETAG", 0 /*flags*/);    \
+        EXT_STR_ITEM_INFO2(ok, si, offset, struct_t, printerr, AMBERSPILLNB, UINT32, "AMBERSPILLNB", 0 /*flags*/);    \
                                                                                                                       \
     } while (0);
