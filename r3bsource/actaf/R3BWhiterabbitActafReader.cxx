@@ -33,10 +33,8 @@ R3BWhiterabbitActafReader::R3BWhiterabbitActafReader(EXT_STR_h101_WRACTAF_onion*
                                                      size_t offset,
                                                      std::vector<UInt_t> whiterabbit_id)
     : R3BReader("R3BWhiterabbitActafReader")
-    , fNEvent(0)
     , fData(data)
     , fOffset(offset)
-    , fOnline(kFALSE)
     , fWhiterabbitId(whiterabbit_id)
     , fEventHeader(nullptr)
     , fArray(new TClonesArray("R3BWRData"))

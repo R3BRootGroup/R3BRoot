@@ -51,11 +51,11 @@ class R3BWhiterabbitActafReader : public R3BReader
     virtual void Reset() override;
 
     // Accessor to select online mode
-    void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(bool opt = true) { fOnline = opt; }
 
   private:
     // An event counter
-    UInt_t fNEvent;
+    UInt_t fNEvent = 0;
     // Reader specific data structure from ucesb
     EXT_STR_h101_WRACTAF_onion* fData;
     // Offset of detector specific data in full data structure
@@ -63,11 +63,11 @@ class R3BWhiterabbitActafReader : public R3BReader
     // The whiterabbit subsystem ID
     std::vector<UInt_t> fWhiterabbitId;
     // Don't store data for online
-    Bool_t fOnline;
-    // Output array
-    TClonesArray* fArray;
+    bool fOnline = false;
     // A pointer to the R3BEventHeader structure
-    R3BEventHeader* fEventHeader;
+    R3BEventHeader* fEventHeader = nullptr;
+    // Output array
+    TClonesArray* fArray = nullptr;
 
   public:
     ClassDefOverride(R3BWhiterabbitActafReader, 0);
