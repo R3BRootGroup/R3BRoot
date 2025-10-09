@@ -827,7 +827,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
-    R3BLOG(info,"wr: "<<fWrItems->GetEntriesFast());
+    // R3BLOG(info,"wr: "<<fWrItems->GetEntriesFast());
 
     if (fWrItems && fWrItems->GetEntriesFast() > 0 && timetag > 0)
     {
