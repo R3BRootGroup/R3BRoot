@@ -552,7 +552,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     auto* cSync = new TCanvas("Sync", "", 10, 10, 500, 500);
     cSync->Divide(3, 3);
-    
+
     gStyle->SetOptStat("uo");
 
     for (auto i = 0; i < nbWrs; i++)
@@ -698,7 +698,11 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             if (pad == 129)
             {
                 fh1_DetMask->Fill(hit->GetDetMask());
-                timetag = hit->GetTimeTag();
+            }
+
+            if (pad == 128)
+            {
+                timetag = hit->GetMaxpos();
             }
 
             // Allow 128 pads for AMBER and R3B
