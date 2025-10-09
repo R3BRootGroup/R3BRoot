@@ -839,8 +839,11 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 continue;
 
             auto id = hit->GetId() > 0 ? hit->GetId() - 1 : 0;
-            fh1_Sync[id]->Fill(hit->GetTimeStamp() - 2 * timetag);
+            
+            fh1_Sync[id]->Fill(hit->GetTimeStamp()-pre_timestamp[id] - 2 * (timetag-pre_timetag));
+            pre_timestamp[id] = hit->GetTimeStamp();
         }
+        pre_timetag = timetag;
     }
 
     fNEvents++;

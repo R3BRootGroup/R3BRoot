@@ -250,6 +250,9 @@ class R3BActafOnlineSpectra : public FairTask
     int nBinsSample = 2692;
 
     size_t nbWrs = 9;
+    
+    uint64_t pre_timetag=0;
+    std::vector<uint64_t> pre_timestamp{0,0,0,0,0,0,0,0,0};
 
     // Hit histograms
     std::vector<TH1F*> fh1_RingCounts;

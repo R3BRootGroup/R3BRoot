@@ -79,7 +79,7 @@ Bool_t R3BWhiterabbitActafReader::R3BRead()
 {
     for (size_t d = 0; d < NB_ACTAF_DETS; d++)
     {
-        if (fData->TIMESTAMP_ACTAF[d].ID)
+        if (fData->TIMESTAMP_ACTAF[d].ID>0)
         {
             /*std::ostringstream msg;
            msg << "Event " << fEventHeader->GetEventno()
@@ -88,12 +88,6 @@ Bool_t R3BWhiterabbitActafReader::R3BRead()
                << ", got 0x" << fData->TIMESTAMP_ACTAF[d].ID;
            LOG(info) << msg.str();
                }*/
-               
-           std::ostringstream msg;
-           msg << "Det=" << d + 1 << ": expected 0x" << fWhiterabbitId[d]
-               << ", got 0x" << fData->TIMESTAMP_ACTAF[d].ID;
-           LOG(info) << msg.str();
-               
             uint64_t timestamp = ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[3] << 48) |
                                  ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[2] << 32) |
                                  ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[1] << 16) |
