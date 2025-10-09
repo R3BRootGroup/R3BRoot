@@ -554,7 +554,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (auto i = 0; i < nbWrs; i++)
     {
-        fh1_Sync->push_back(
+        fh1_Sync.push_back(
             R3B::root_owned<TH1F>(Form("fh1_wr%d", i + 1), Form("WR%d - TimeTag", i + 1), 400, -2000, 2000));
         fh1_Sync[i]->GetXaxis()->SetTitle(Form("WR%d - TimeTag [ns]", i + 1));
         fh1_Sync[i]->GetYaxis()->SetTitle("Counts");
