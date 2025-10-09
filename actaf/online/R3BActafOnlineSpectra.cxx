@@ -190,12 +190,12 @@ InitStatus R3BActafOnlineSpectra::Init()
 
         for (int index = 0; index < fPads; ++index)
         {
-            // auto index = adc * fChn + chn;
-            std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
-            std::string titleHist = "Raw trace: Pad " + std::to_string(index + 1);
-
             int FADCnum = fMap_Par->GetFADCModuleByPad(index + 1);
             int FADCchn = fMap_Par->GetFADCChannelByPad(index + 1);
+
+            std::string titleHist =
+                "Raw trace: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
+            std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
 
             // Only plot the pads that belong to the FADC
             if (FADCnum != adc + 1)
