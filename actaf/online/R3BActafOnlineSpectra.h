@@ -186,6 +186,7 @@ class R3BActafOnlineSpectra : public FairTask
     TClonesArray* fMappedItems = nullptr;
     TClonesArray* fCalItems = nullptr;
     TClonesArray* fHitItems = nullptr;
+    TClonesArray* fWrItems = nullptr;
 
     R3BEventHeader* header = nullptr;       /** Event header */
     R3BActafMappingPar* fMap_Par = nullptr; /** Parameter container */
@@ -248,11 +249,14 @@ class R3BActafOnlineSpectra : public FairTask
 
     int nBinsSample = 2692;
 
+    constexpr size_t nbWrs = 9;
+
     // Hit histograms
     std::vector<TH1F*> fh1_RingCounts;
     std::vector<TH2F*> fh2_XYPos;
     std::vector<TH2F*> fh2_XYPosRand;
     std::vector<TH1F*> fh1_PhiCounts;
+    std::vector<TH1F*> fh1_Sync;
 
     TH1F* fh1_CountsPerSide = nullptr;
     TH1F* fh1_DetMask = nullptr;

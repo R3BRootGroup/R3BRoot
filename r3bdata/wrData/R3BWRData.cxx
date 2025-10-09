@@ -18,18 +18,10 @@
 
 #include "R3BWRData.h"
 
-R3BWRData::R3BWRData()
-    : fTimeStamp(0)
-    , fId(1)
-{
-}
-
-//------------------------------
-
 R3BWRData::R3BWRData(uint64_t timestamp, UInt_t id)
     : fTimeStamp(timestamp)
     , fId(id)
 {
 }
 
-ClassImp(R3BWRData);
+ClassImp(R3BWRData)

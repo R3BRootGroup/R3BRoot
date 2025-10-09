@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2025 Members of R3B Collaboration                          *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -94,7 +94,7 @@ Bool_t R3BWhiterabbitActafReader::R3BRead()
                                  ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[2] << 32) |
                                  ((uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[1] << 16) |
                                  (uint64_t)fData->TIMESTAMP_ACTAF[d].WR_T[0];
-            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp, fWhiterabbitId[d]);
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp, d + 1);
         }
     }
     fNEvent++;

@@ -44,6 +44,7 @@
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
 #include "R3BShared.h"
+#include "R3BWRData.h"
 
 // R3BActafOnlineSpectra::Default Constructor --------------------------
 R3BActafOnlineSpectra::R3BActafOnlineSpectra()
@@ -109,6 +110,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("ActafHitData"));
     R3BLOG_IF(warn, fHitItems == nullptr, "ActafHitData not found");
 
+    fWrItems = dynamic_cast<TClonesArray*>(mgr->GetObject("WRActafData"));
+    R3BLOG_IF(warn, fWrItems == nullptr, "WRActafData not found");
+
     fActafGeo = R3BActafGeometry::Instance();
     R3BLOG_IF(warn, !fActafGeo->Init(fGeoversion), "Actaf geometry " << fGeoversion << " not found");
 
@@ -118,8 +122,10 @@ InitStatus R3BActafOnlineSpectra::Init()
     auto* mapfol = new TFolder("Map", "Map Actaf info");
     // Folder for cal data
     auto* calfol = new TFolder("Cal", "Cal Actaf info");
-    // Folder for cal data
+    // Folder for hit data
     auto* hitfol = new TFolder("Hit", "Hit Actaf info");
+    // Folder for sync data
+    auto* syncfol = new TFolder("Sync", "Sync Actaf info");
 
     //
     // Create histograms
@@ -517,7 +523,6 @@ InitStatus R3BActafOnlineSpectra::Init()
     // phi counts for side up and down
     for (auto i = 0; i < fh1_PhiCounts.size(); i++)
     {
-
         TString tit;
         i == 0 ? tit = "Phi (upstream)" : tit = "Phi (downstream)";
         cPhi->cd(i + 1);
@@ -543,6 +548,27 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     if (fHitItems != nullptr)
         mainfol->Add(hitfol);
+
+    auto* cSync = new TCanvas("Sync", "", 10, 10, 500, 500);
+    cSync->Divide(3, 3);
+
+    for (auto i = 0; i < nbWrs; i++)
+    {
+        fh1_Sync->push_back(
+            R3B::root_owned<TH1F>(Form("fh1_wr%d", i + 1), Form("WR%d - TimeTag", i + 1), 400, -2000, 2000));
+        fh1_Sync[i]->GetXaxis()->SetTitle(Form("WR%d - TimeTag [ns]", i + 1));
+        fh1_Sync[i]->GetYaxis()->SetTitle("Counts");
+        fh1_Sync[i]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Sync[i]->GetXaxis()->CenterTitle(true);
+        fh1_Sync[i]->GetYaxis()->CenterTitle(true);
+        fh1_Sync[i]->SetFillColor(31);
+        cSync->cd(i + 1);
+        fh1_Sync[i]->Draw();
+    }
+    syncfol->Add(cSync);
+
+    if (fWrItems != nullptr)
+        mainfol->Add(syncfol);
 
     run->AddObject(mainfol);
 
@@ -592,6 +618,10 @@ void R3BActafOnlineSpectra::Reset_Histo()
             hist->Reset();
         }
         for (const auto& hist : fh1_Baseline)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_Sync)
         {
             hist->Reset();
         }
@@ -650,6 +680,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
+    int timetag = 0;
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
@@ -662,7 +693,10 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto pad = hit->GetPad() - 1;
 
             if (pad == 129)
+            {
                 fh1_DetMask->Fill(hit->GetDetMask());
+                timetag = hit->GetTimeTag();
+            }
 
             // Allow 128 pads for AMBER and R3B
             if (pad > fMap_Par->GetNbPads())
@@ -786,6 +820,20 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
+    if (fWrItems && fWrItems->GetEntriesFast() > 0 && timetag > 0)
+    {
+        auto nHits = fWrItems->GetEntriesFast();
+        for (int ihit = 0; ihit < nHits; ihit++)
+        {
+            auto* hit = dynamic_cast<R3BWRData*>(fWrItems->At(ihit));
+            if (!hit)
+                continue;
+
+            auto id = hit->GetId() > 0 ? hit->GetId() - 1 : 0;
+            fh1_Sync[id]->Fill(hit->GetTimeStamp() - 2 * timetag);
+        }
+    }
+
     fNEvents++;
     return;
 }
@@ -796,6 +844,7 @@ void R3BActafOnlineSpectra::FinishEvent()
     r3b::util::ClearIfNotNull(fMappedItems);
     r3b::util::ClearIfNotNull(fCalItems);
     r3b::util::ClearIfNotNull(fHitItems);
+    r3b::util::ClearIfNotNull(fWrItems);
 }
 
 void R3BActafOnlineSpectra::FinishTask()
@@ -827,6 +876,10 @@ void R3BActafOnlineSpectra::FinishTask()
             hist->Write();
         }
         for (const auto& hist : fh1_Baseline)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh1_Sync)
         {
             hist->Write();
         }
