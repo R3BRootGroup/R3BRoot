@@ -831,6 +831,13 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
     if (fWrItems && fWrItems->GetEntriesFast() > 0 && timetag > 0)
     {
+    
+      if(timetag < pre_timetag)
+{
+pre_timetag = timetag;
+}
+
+    
         auto nHits = fWrItems->GetEntriesFast();
         for (int ihit = 0; ihit < nHits; ihit++)
         {
