@@ -374,6 +374,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh1_DetMask->GetXaxis()->CenterTitle(true);
     fh1_DetMask->GetYaxis()->CenterTitle(true);
     fh1_DetMask->SetFillColor(2);
+    gPad->SetLogy();
     fh1_DetMask->Draw();
 
     mapfol->Add(cdetmask);
@@ -570,7 +571,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     for (auto i = 0; i < nbWrs; i++)
     {
         fh1_Sync.push_back(
-            R3B::root_owned<TH1F>(Form("fh1_wr%d_timetag", i + 1), Form("WR%d - TimeTag", i + 1), 400, -2000, 2000));
+            R3B::root_owned<TH1F>(Form("fh1_wr%d_timetag", i + 1), Form("WR%d - TimeTag", i + 1), 2000, -50, 50));
         fh1_Sync[i]->GetXaxis()->SetTitle(Form("WR%d - TimeTag [ns]", i + 1));
         fh1_Sync[i]->GetYaxis()->SetTitle("Counts");
         fh1_Sync[i]->GetYaxis()->SetTitleOffset(1.1);
@@ -578,6 +579,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         fh1_Sync[i]->GetYaxis()->CenterTitle(true);
         fh1_Sync[i]->SetFillColor(31);
         cSync->cd(i + 1);
+        gPad->SetLogy();
         fh1_Sync[i]->Draw();
         gStyle->SetOptStat(111111);
         cSync->Update();
@@ -597,13 +599,14 @@ InitStatus R3BActafOnlineSpectra::Init()
         fh1_WrSync[i]->GetYaxis()->CenterTitle(true);
         fh1_WrSync[i]->SetFillColor(31);
         cWrSync->cd(i + 1);
+        gPad->SetLogy();
         fh1_WrSync[i]->Draw();
         gStyle->SetOptStat(111111);
         cWrSync->Update();
     }
     syncfol->Add(cWrSync);
 
-    auto* cRates = new TCanvas("Rates", "", 10, 10, 500, 500);
+    cRates = new TCanvas("Rates", "", 10, 10, 500, 500);
 
     std::vector<std::string> titles = { "Overall rate [Hz]", "Upstream rate [Hz]", "Downstream rate [Hz]" };
 
@@ -614,10 +617,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh1_rates->GetXaxis()->CenterTitle(true);
     fh1_rates->GetYaxis()->CenterTitle(true);
     fh1_rates->SetMinimum(0);
-    fh1_rates->SetMaximum(500);
+    fh1_rates->SetMaximum(max_rate);
     fh1_rates->SetDirectory(0);
     fh1_rates->SetStats(0);
-    // fh1_rates->Draw("");
 
     for (int i = 0; i < 3; i++)
     {
@@ -794,12 +796,12 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             if (pad == 129)
             {
                 fh1_DetMask->Fill(hit->GetDetMask());
+                timetag = hit->GetTimeTag();
             }
 
             if (pad == 128)
             {
-                timetag = hit->GetMaxpos();
-
+                // timetag = hit->GetMaxpos();
                 if (fDisplaytraces)
                 {
                     auto vec = hit->GetTrace(); // std::vector
@@ -970,7 +972,12 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
             fh1_Sync[id]->Fill(hit->GetTimeStamp() - pre_timestamp[id] - 2 * (timetag - pre_timetag));
 
-            // std::cout<< hit->GetTimeStamp()-pre_timestamp[id]<<" "<< timetag-pre_timetag<<std::endl;
+            // std::cout<<"1: "<< hit->GetTimeStamp()-pre_timestamp[id]<<" "<< timetag-pre_timetag<<std::endl;
+
+            // std::cout<< hit->GetTimeStamp()<<" "<< timetag<<std::endl;
+
+            // std::cout<< hit->GetTimeStamp() - pre_timestamp[id] - 2 * (timetag - pre_timetag) <<std::endl;
+
             pre_timestamp[id] = hit->GetTimeStamp();
         }
         pre_timetag = timetag;
@@ -980,7 +987,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         if (first_timestamp == 0 || first_timestamp > timestamps[0])
             first_timestamp = timestamps[0];
 
-        auto time_s = (timestamps[0] - first_timestamp) * 1e-9;
+        auto time_s = (timestamps[0] - first_timestamp) * 1e-9; // in seconds
         int sec = static_cast<int>(time_s);
 
         // std::cout<< time_s <<" "<<overall_rate<<" "<< fsec_rate<<" "<<ssec_rate<<std::endl;
@@ -991,6 +998,24 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             fgraph_rates[1]->SetPoint(fgraph_rates[1]->GetN(), sec, fsec_rate);
             fgraph_rates[2]->SetPoint(fgraph_rates[2]->GetN(), sec, ssec_rate);
             last_second = sec;
+
+            if (overall_rate > max_rate)
+            {
+                max_rate = overall_rate + 100;
+                cRates->cd();
+
+                std::cout << "Update max rate: " << max_rate << std::endl << std::endl;
+
+                TH1* hframe = fgraph_rates[0]->GetHistogram();
+                if (hframe)
+                {
+                    hframe->SetMaximum(max_rate);
+                    hframe->SetMinimum(0);
+                }
+                cRates->Modified();
+                cRates->Update();
+            }
+
             overall_rate = 0;
             fsec_rate = 0;
             ssec_rate = 0;

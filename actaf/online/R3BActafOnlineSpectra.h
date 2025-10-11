@@ -261,6 +261,7 @@ class R3BActafOnlineSpectra : public FairTask
     uint64_t ssec_rate = 0; // downstream section rates
     int last_second = 0;
     int max_second_for_rate = 600;
+    int max_rate = 1000;
 
     std::vector<uint64_t> pre_timestamp{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -277,6 +278,7 @@ class R3BActafOnlineSpectra : public FairTask
     TH1F* fh1_DetMask = nullptr;
     TH2F* fh2_Phi1VsPhi2 = nullptr;
     TH2F* fh2_timetag_signal = nullptr;
+    TCanvas* cRates = nullptr;
 
   public:
     ClassDefOverride(R3BActafOnlineSpectra, 1);
