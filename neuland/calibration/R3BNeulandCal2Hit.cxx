@@ -173,7 +173,7 @@ void R3BNeulandCal2Hit::Exec(Option_t*)
 
         std::array<Double_t, 2> tdc;
 
-        if (std::isnan(cal[0]->GetTriggerTime()) || std::isnan(cal[0]->GetTriggerTime()))
+        if (std::isnan(cal[0]->GetTriggerTime()) || std::isnan(cal[1]->GetTriggerTime()))
         {
             tdc = { cal[0]->GetTime() + parameter.GetTimeOffset(1), cal[1]->GetTime() + parameter.GetTimeOffset(2) };
         }
