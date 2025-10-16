@@ -261,6 +261,14 @@ void R3BOptimizeMagfieldS494::Finish()
         ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(0.9987568);
     */
 
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionX(0.4942526);
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionY(-1.022616);
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionZ(174.5851);
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleX(0.04190000);
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleY(-14.18602);
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionAngleZ(-0.1464000);
+    ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->SetTrackerCorrectionScale(1.000450);
+
     string line;
     // ifstream myfile("/u/mheil/R3BRoot/macros/r3b/tracking/s494/exp_field_map_2022_2023_2000A_0deg_labsyst.dat");
     // ifstream myfile("/u/mheil/R3BRoot/macros/r3b/tracking/s494/exp_field_map_2023_2000A_0deg_labsyst.dat");
@@ -284,7 +292,7 @@ void R3BOptimizeMagfieldS494::Finish()
     // ofstream myfile1("/u/mheil/R3BRoot/macros/r3b/tracking/s494/exp_field_map_longarm_out.dat");
     // ofstream myfile1("/u/mheil/R3BRoot/macros/r3b/tracking/s494/exp_field_map_longarm_out_test.dat");
     ofstream myfile1("/u/kelic/glad/field_measurements_2023/GLAD_field_measurements_202307/20220613A01/compare/"
-                     "exp_field_map_2022_2023_2000A_0deg_labsyst_optim_tmp.dat");
+                     "exp_field_map_2022_2023_2000A_0deg_labsyst_optimized.dat");
 
     getline(myfile, line);
     myfile1 << line << endl;
@@ -346,7 +354,9 @@ void R3BOptimizeMagfieldS494::Finish()
 
     //						 x    y   z       thetax thetay thetaz
     // Start values with Michael's measurements for anglesand Daniel's for turning point:
-    Double_t variable_default[7] = { 0., 0., 174.25, 0.0419, -14., -0.1464, 1. };
+    // Double_t variable_default[7] = { 0., 0., 174.25, 0.0419, -14., -0.1464, 1. };
+    // optimzed values, 2024
+    Double_t variable_default[7] = { 0.4942526, -1.022616, 174.5851, 0.0419, -14.18602, -0.1464, 1.000450 };
 
     //  Double_t variable_default[7] = {0. , 0., 174.95, 0,-14.,0, 1.};
     // 1st optim
@@ -362,7 +372,7 @@ void R3BOptimizeMagfieldS494::Finish()
     Double_t step[7] = { 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.001 };
     Double_t fdata_scale = 1, fdata_scale_mem = 1, fdata_scale_mem_global = 1;
 
-    Int_t nroundsmax = 500;
+    Int_t nroundsmax = 1; // 500;
     Int_t datascalemax = 100;
     for (Int_t ij = 0; ij < datascalemax; ij++)
     {
@@ -388,28 +398,29 @@ void R3BOptimizeMagfieldS494::Finish()
         for (Int_t i = 0; i < nroundsmax; i++)
         {
 
-            gRandom->SetSeed(0);
-            variable[0] = gRandom->Gaus(variable_default[0], 2.); // x
-            variable[1] = gRandom->Gaus(variable_default[1], 2.); // y
-            variable[2] = gRandom->Gaus(variable_default[2], 3.); // z
-            // variable[3] = gRandom->Gaus(variable_default[3], 0.1);	// aX
-            variable[4] = gRandom->Gaus(variable_default[4], 1.); // aY
-            // variable[5] = gRandom->Gaus(variable_default[5], 0.1);	// aZ
-            variable[6] = gRandom->Gaus(variable_default[6], 0.1); // scale
-
-            // variable[0] = variable_default[0];	// x
-            // variable[1] = variable_default[1];	// y
-            // variable[2] = variable_default[2];	// z
-            variable[3] = variable_default[3]; // aX
-            // variable[4] = variable_default[4];	// aY
-            variable[5] = variable_default[5]; // aZ
-            // variable[6] = variable_default[6];	// scale
-
             /*
-            for(Int_t ip = 0; ip < 7; ip++)
+              gRandom->SetSeed(0);
+              variable[0] = gRandom->Gaus(variable_default[0], 2.); // x
+              variable[1] = gRandom->Gaus(variable_default[1], 2.); // y
+              variable[2] = gRandom->Gaus(variable_default[2], 3.); // z
+              // variable[3] = gRandom->Gaus(variable_default[3], 0.1);	// aX
+              variable[4] = gRandom->Gaus(variable_default[4], 1.); // aY
+              // variable[5] = gRandom->Gaus(variable_default[5], 0.1);	// aZ
+              variable[6] = gRandom->Gaus(variable_default[6], 0.1); // scale
+
+              // variable[0] = variable_default[0];	// x
+              // variable[1] = variable_default[1];	// y
+              // variable[2] = variable_default[2];	// z
+              variable[3] = variable_default[3]; // aX
+              // variable[4] = variable_default[4];	// aY
+              variable[5] = variable_default[5]; // aZ
+              // variable[6] = variable_default[6];	// scale
+            */
+
+            for (Int_t ip = 0; ip < 7; ip++)
             {
                 variable[ip] = variable_default[ip];
-            }*/
+            }
 
             cout << "** Step if fitpar: " << i << ", step in data scale: " << ij << endl;
             cout << "Start values in this step: " << endl;
@@ -430,13 +441,13 @@ void R3BOptimizeMagfieldS494::Finish()
             mini->SetLimitedVariable(5, "angleZ", variable[5], step[5], variable[5] - delta_aZ, variable[5] + delta_aZ);
             mini->SetLimitedVariable(6, "scale", variable[6], step[6], variable[6] - 0.5, variable[6] + 0.5);
 
-            // mini->FixVariable(0);
-            // mini->FixVariable(1);
-            // mini->FixVariable(2);
+            mini->FixVariable(0);
+            mini->FixVariable(1);
+            mini->FixVariable(2);
             mini->FixVariable(3);
-            // mini->FixVariable(4);
+            mini->FixVariable(4);
             mini->FixVariable(5);
-            // mini->FixVariable(6);
+            mini->FixVariable(6);
 
             Int_t status = 0;
 

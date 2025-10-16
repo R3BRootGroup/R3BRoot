@@ -250,6 +250,8 @@ InitStatus R3BCalifaCrystalCal2Cluster::Init()
     R3BLOG_IF(error, !fCalifaGeo->Init(fGeometryVersion), "Califa geometry not found");
 
     fCalifatoTargetPos = fTargetPos - fCalifaPos;
+
+    fCalifatoTargetPos.SetZ(0.);
     cout << "Correction : " << fCalifatoTargetPos.X() << " " << fCalifatoTargetPos.Y() << " " << fCalifatoTargetPos.Z()
          << endl;
     if (fRand)

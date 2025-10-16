@@ -54,7 +54,7 @@ R3BTPropagator::R3BTPropagator(R3BGladFieldMap* field, Bool_t vis)
     fNorm2 = ((fPlane2[1] - fPlane2[0]).Cross(fPlane2[2] - fPlane2[0])).Unit();
     //----------------------------------------------------------------------
 
-    //  fVis = kTRUE;
+    // fVis = kTRUE;
     if (fVis)
     {
         fc4 = new TCanvas("c4", "", 50, 50, 800, 800);
@@ -536,7 +536,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
     while (kTRUE)
     {
 
-        // cout<<"TEST0: "<<particle->GetPosition().Z()<<", "<<step<<"; "<<diff<<endl;
+        //  cout<<"TEST0: "<<particle->GetPosition().Z()<<", "<<step<<"; "<<diff<<endl;
 
         if (step > diff)
             step = diff;

@@ -161,12 +161,14 @@ double Chi2MomentumForward(const double* xx)
 
         if (gCandidate->GetMass() > 3.7 && gCandidate->GetMass() < 3.8) // alpha
         {
-            diffx = 0.0093 * (0.995);
+            // diffx = 0.058115; // test field
+            diffx = 0.0093 * 0.996;      // standard field
             diffy = -0.000365 * (0.125); // 0.0002;//(1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/pz0 ;
         }
         else if (gCandidate->GetMass() > 11.1) // && gCandidate->GetMass() < 11.2) // C&& O
         {
-            diffx = 0.0093 * (0.992);
+            // diffx = 0.058115; //0.058125 test field
+            diffx = 0.0093 * 0.996;       // standard field
             diffy = -0.000365 * (-0.226); // 0.0002; //(1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/ptot0 ;
         }
 
@@ -986,12 +988,14 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
     if (gCandidate->GetMass() > 3.7 && gCandidate->GetMass() < 3.8) // alpha
     {
-        diffx = 0.0093 * (0.992);
+        // diffx = 0.058115; // test field
+        diffx = 0.0093 * 0.996;      // standard field
         diffy = -0.000365 * (0.125); // 0.0002;// (1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/pz0 ;
     }
     else if (gCandidate->GetMass() > 11.1) //&& gCandidate->GetMass() < 11.2) // C && O
     {
-        diffx = 0.0093 * (0.995);
+        // diffx = 0.058115; // test field
+        diffx = 0.0093 * 0.996;       // standard field
         diffy = -0.000365 * (-0.226); // 0.0002;//(1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/pz0 ;
     }
 

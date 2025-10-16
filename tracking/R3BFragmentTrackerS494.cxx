@@ -335,8 +335,8 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_phi_16O->GetXaxis()->SetTitle("angle / degree");
     fh_phi_16O->GetYaxis()->SetTitle("pz / GeV/c");
 
-    Double_t ranges[] = { 10., 10., 10., 10., 10., 10., 10., 50 };
-    Int_t bins[] = { 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000 };
+    Double_t ranges[] = { 10., 5., 5., 10., 10., 10., 10., 50 };
+    Int_t bins[] = { 2000, 5000, 5000, 2000, 2000, 2000, 2000, 2000 };
     for (Int_t i = 0; i < 8; i++)
     {
         fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d", i), bins[i], -ranges[i], ranges[i]);
@@ -1257,6 +1257,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             {
                 // y0 = ymem;
                 x0 = xmem - (psum_mem - ps) / 978.518;
+                //  x0 = xmem + 10.8993 - 0.000626378*psum_mem ;
             }
             if (l == 2)
             {
@@ -2379,7 +2380,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         // bestevents = true;
 
                         // if (iAoverZ == 2 && iAoverZmem == 2 && psum < 17416. && psum > 17384. ){
-                        if (iAoverZ == 2 && iAoverZmem == 2 && Erel < 4.6 && Erel > 4.1 &&
+                        if (iAoverZ == 2 && iAoverZmem == 2 && Erel < 4.5 && Erel > 4.1 &&
                             ((pHex > 0. && pCx < 0.) || (pHex < 0. && pCx > 0.)))
                         { //&& psum > 17341. && psum < 17450.){
                             // if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 2. && iAoverZ == 2 &&
@@ -2428,7 +2429,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     }
                 }
 
-                fPropagator->SetVis(fVis);
+                fPropagator->SetVis(false);
 
                 bestcandidate->Reset();
 
@@ -2645,20 +2646,21 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     if (hit && det->res_x > 1e-6)
                     {
                         Double_t xres = x_l[iDet] - det_hit_x[iDet];
-                        if (TMath::Abs(x_l[iDet] - det_hit_x[iDet]) < det->res_x)
+                        if (TMath::Abs(x_l[iDet] - det_hit_x[iDet]) < det->res_x && iDet > 1)
                         {
                             xres = 0.0;
                         }
+                        //  if (iDet == 1)
                         if (debug_loopout)
+                        {
                             cout << "For charge: " << charge_requested
                                  << ", current lab-x position: " << bestcandidate->GetPosition().X() << "  "
                                  << bestcandidate->GetPosition().Y() << "  " << bestcandidate->GetPosition().Z()
                                  << endl;
-
-                        if (debug_loopout)
                             cout << "Residuals x - iDet: " << iDet << "; Det: " << det->GetDetectorName().Data()
                                  << ", tracked local-x: " << x_l[iDet] << ", local hit_x: " << det_hit_x[iDet]
                                  << ", dev: " << xres << endl;
+                        }
                         if (debug_loopout)
                             cout << "bestcandidate momentum - Px: " << bestcandidate->GetStartMomentum().X()
                                  << ", Py: " << bestcandidate->GetStartMomentum().Y()
@@ -2688,7 +2690,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     if (hit && det->res_y > 1e-6)
                     {
                         Double_t yres = y_l[iDet] - det_hit_y[iDet];
-                        if (TMath::Abs(y_l[iDet] - det_hit_y[iDet]) < det->res_y)
+                        if (TMath::Abs(y_l[iDet] - det_hit_y[iDet]) < det->res_y && iDet > 2)
                         {
                             yres = 0.;
                         }

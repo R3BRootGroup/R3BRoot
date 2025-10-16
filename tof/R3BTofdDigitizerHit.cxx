@@ -256,10 +256,10 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
 
                     gRandom->SetSeed(0);
 
-                    Double_t ysigma = 2.;
+                    Double_t ysigma = 1.;
                     if (qcharge < 3)
-                        ysigma = 4.;
-                    y_local = gRandom->Gaus(y_local, ysigma);
+                        ysigma = 3.;
+                    // y_local = gRandom->Gaus(y_local, ysigma);
 
                     //  if(layer_label == 0)
                     {

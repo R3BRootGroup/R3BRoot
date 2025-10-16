@@ -310,11 +310,7 @@ double Chi2AllEvents(const double* xx)
 
     Int_t nof = 0;
     cout.precision(7);
-    /*
-    cout << "new correction: " << xx[0] << "  " << xx[1] << "  " << xx[2] << "  " << xx[3] << "  " << xx[4] << "  "
-         << xx[5] << "  " << xx[6] << "  " << xx[7] << "  " << xx[8] << "  " << xx[9] << "  " << xx[10] << "  "
-         << xx[11] << "  " << xx[12] << "  " << xx[13] << "  " << xx[14] << "  " << xx[15] << "  " << endl;
-    */
+
     fi23x = 0.00000000;
     fi23y = 0.0000000;
     // fi23z = 91.2;
@@ -348,30 +344,29 @@ double Chi2AllEvents(const double* xx)
     {
         fi23x = xx[0];
         fi23y = xx[1];
-        fi23z = xx[2]; //*10.;
-        fi30x = xx[3]; //*10.;
-        fi30z = xx[4]; //*100.;
-        fi32x = xx[5]; //*10.;
-        fi31x = xx[6]; //*100.;
-        fi31z = xx[7]; //*100.;
-        fi33x = xx[8]; //*100.;
-        tofdx = xx[9]; //*100.;
-        tofdy = xx[10];
-        tofdz = xx[11]; //*100.;
-        fi30a = xx[12]; //*10.;
-        fi31a = xx[13]; //*100.;
-        fi32a = xx[14]; //*10.;
-        fi33a = xx[15]; //*100.;
-        // fi32a = xx[12];//*10.;
-        // fi33a = xx[13];//*100.;
+        fi23z = xx[2];
+        fi30x = xx[3];
+        fi30z = xx[4];
+        fi32x = xx[5];
+        fi32z = xx[6];
+        fi31x = xx[7];
+        fi31z = xx[8];
+        fi33x = xx[9];
+        fi33z = xx[10];
+        tofdx = xx[11];
+        tofdy = xx[12];
+        tofdz = xx[13];
+        fi30a = xx[14];
+        fi31a = xx[15];
+        fi32a = xx[16];
+        fi33a = xx[17];
     }
 
     // if(!fSimu)
     {
-        fi32z = fi30z + 62.77813349;
-        fi33z = fi31z + 62.77813349;
-    }
-    // else
+        //  fi32z = fi30z + 62.77813349;
+        //  fi33z = fi31z + 62.77813349;
+    } // else
     {
         // simu:
         // fi32z = fi30z + 632.9688-570.59330;
@@ -558,17 +553,18 @@ double Chi2AllEvents(const double* xx)
             // cout << "For event: "<<iev+1<<" Chi2 value: " << chi2 << endl;
             // cout<<"  "<<endl;
             // chi2_all += chi2;
-            sigma_erel += sigma1;
-            sigma_pos += sigma2;
+            sigma_erel += sigma1; // sigma1 = (Erel-4.34)**2
+            sigma_pos += sigma2;  // sigma2 = sqrt(dpos12C**2+dpos4He**2), dpos=dev**2
             nof++;
         }
         chi2par.clear();
     }
     // cout<<"Test: "<<sigma_erel<<"; "<<sigma_pos<<endl;
-    chi2_all_pos = sigma_pos / (double)(nof - 1);
+    chi2_all_pos = sqrt(sigma_pos / (double)(nof - 1));
     sigma_erel = sqrt(sigma_erel / (double)(nof - 1));
-    chi2_all_erel = sqrt((sigma_erel - 0.15) * (sigma_erel - 0.15)) * 100.;
-    chi2_all = sqrt(chi2_all_pos * chi2_all_pos + chi2_all_erel * chi2_all_erel);
+    chi2_all_erel = sigma_erel; // sqrt((sigma_erel - 0.15)/(0.1*0.15) * (sigma_erel - 0.15)/(0.1*0.15))*10. ;
+    // chi2_all = sqrt(chi2_all_pos * chi2_all_pos + chi2_all_erel * chi2_all_erel);
+    chi2_all = chi2_all_pos;
 
     // cout<<"chi2s out of Chi2AllEvents: sigma_erel= "<<sigma_erel<<", chi2_all_erel= "<<chi2_all_erel<<";
     // chi2_all_pos= "<<chi2_all_pos<<", chi2_all= "<<chi2_all<<endl; cout << "NoF: " << nof << endl; chi2_all =
@@ -579,7 +575,8 @@ double Chi2AllEvents(const double* xx)
     cout << " " << endl;
     cout << "With parameters: " << xx[0] << ", " << xx[1] << ", " << xx[2] << ", " << xx[3] << ", " << xx[4] << ", "
          << xx[5] << ", " << xx[6] << ", " << xx[7] << ", " << xx[8] << ", " << xx[9] << ", " << xx[10] << ", "
-         << xx[11] << ", " << xx[12] << ", " << xx[13] << ", " << xx[14] << ", " << xx[15] << endl;
+         << xx[11] << ", " << xx[12] << ", " << xx[13] << ", " << xx[14] << ", " << xx[15] << ", " << xx[16] << ", "
+         << xx[17] << endl;
     cout << "Chi2 all: " << chi2_all << " for nof: " << nof << ", chi2_all_erel= " << chi2_all_erel
          << "; chi2_all_pos= " << chi2_all_pos << endl;
     return chi2_all;
@@ -781,7 +778,7 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
     }
     // cout << "Test l: " << lmin << "  " << lmax << "  " << fBfield << endl;
 
-    Int_t iretrack_max = 1;
+    Int_t iretrack_max = 0;
     Double_t psum_mem = -10000.;
     vector<double> Chi2par;
     vector<double> Chi2parfalse;
@@ -1057,6 +1054,8 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
                                 y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
 
+                                y0 = 0.;
+
                                 // reject fib23b hits that don't correspond to tofdy:
                                 /*  if(abs(y0) > 1.5)
                                   {
@@ -1296,7 +1295,8 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
                                 y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
-                                // y0 = 0.0;
+
+                                y0 = 0.0;
                                 // reject fib23b hits that don't correspond to tofdy:
                                 /* if(abs(y0) > 1.5)
                                  {
@@ -1550,11 +1550,13 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
                         eChi2 = (Erel - 4.36) * (Erel - 4.36) / (sigmaErel * sigmaErel);
 
                         // parChi2 = sqrt(xChi2 * xChi2 + pChi2 * pChi2 + eChi2 * eChi2);
-
-                        if (iretrack == 0)
-                            parChi2 = xChi2;
-                        if (iretrack == iretrack_max)
-                            parChi2 = sqrt(xChi2 * xChi2 + eChi2 * eChi2);
+                        /*
+                            if (iretrack == 0)
+                                parChi2 = xChi2;
+                            if (iretrack == iretrack_max)
+                                parChi2 = sqrt(xChi2 * xChi2 + eChi2 * eChi2);
+                        */
+                        parChi2 = xChi2;
 
                         // cout<<"New 4He candidate: "<<iretrack<<", "<<psum<<", "<<Erel<<", "<<eChi2<<", "<<xChi2<<",
                         // "<<parChi2<<endl; 	cout<<"selected: "<<bestcandidate->GetStartMomentum().Z()<<",
@@ -1566,12 +1568,9 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
                             bestcandidate = x;
                             minChi2 = parChi2;
 
-                            if (l == 2)
-                            {
-                                psum_mem = psum;
-                                xChi2min = xChi2;
-                                eChi2min = eChi2 * (sigmaErel * sigmaErel);
-                            }
+                            psum_mem = psum;
+                            xChi2min = xChi2;
+                            eChi2min = eChi2 * (sigmaErel * sigmaErel);
 
                             //  cout << "New min chi2 for 4He: "<< minChi2 << ", xChi2: "<<xChi2min<< ", eChi2:
                             //  "<<eChi2<<" for iretrack= "<<iretrack<<"; "
@@ -1749,13 +1748,13 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
                     //   cout << "Beta   : " << bestcandidate->GetStartBeta() << endl;
                 }
 
-                if (minChi2 < 1.e6 && l == 2 && (carbon && alpha))
+                if (minChi2 < 1.e6 && l == 2 && (carbon && alpha) && iretrack == iretrack_max)
                 {
                     totalChi2Mass += (minChi2 + minChi2_12C);
                     totalEvents++;
                 }
 
-                if (l == 2)
+                if (l == 2 && iretrack == iretrack_max)
                     totalChi2P += sqrt(minChi2_12C * minChi2_12C + minChi2 * minChi2);
 
                 if (l == 2 && (carbon && alpha))
@@ -1826,7 +1825,7 @@ void R3BOptimizeGeometryS494::Finish()
 {
     // Optimize global Chi2
 
-    Int_t nvariables = 16; // 14
+    Int_t nvariables = 18; // 14
 
     // Place here Minuit part for
     // minimization of Chi2AllEvents()
@@ -1852,49 +1851,26 @@ void R3BOptimizeGeometryS494::Finish()
     ROOT::Math::Functor* fm1 = new ROOT::Math::Functor(&Chi2AllEvents, nvariables);
     mini->SetFunction(*fm1);
 
-    // Double_t step[16] = { 0.01, 0.013, 0.01, 0.5, 0.9, 0.5, 0.5, 0.9, 0.5, 1., 0.1, 1.0, 0.1, 0.1, 0.1, 0.1 };
-    // Double_t step[16] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 };   // scan
-    Double_t step[16] = { 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 }; // scan
+    Double_t step[18] = {
+        0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1
+    }; // scan
 
-    // Double_t step[16] = { 0.01, 0.05, 0.01, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1 };
-
-    // simu
-    // Double_t variable_true[16] = {0.0, 0.0, 91.04, -62.18069, 570.59330, -82.41713, -112.67330, 537.9038, -131.8124,
-    // -130.487, 0, 685.4, -13.68626, -193.8265, -14.02967, -193.88699};
-    // Double_t variable_mem[16] = {0.05242090, 0.05805132, 91.04061, -62.60678, 571.5501, -83.10044, -112.4452,
-    // 538.5381, -132.5500, -130.8368, 2.263945, 685.7456, -13.85543, -193.8466, -13.95070, -193.9429};
-
-    // default
-    //   Double_t variable_default[16] =
-    //   {0.,0.,91.2,-62.8664,570.7671,-82.8087,-111.1057,537.8183,-131.0650,-129.9365,0,685.4,-14.0,-194.0,-14.0,-194.0};
-    //   Double_t variable_mem[16] =
-    //   {0.,0.,91.2,-62.8664,570.7671,-82.8087,-111.1057,537.8183,-131.0650,-129.9365,0,685.4,-14.0,-194.0,-14.0,-194.0};
     // 23rd optim
-    Double_t variable_default[16] = { 0.007419462, 0.007327982, 91.02052,  -62.59230, 571.7103, -83.07132,
-                                      -112.4498,   538.1335,    -132.5532, -129.6732, 0.492008, 686.1278,
-                                      -13.89355,   -193.8936,   -13.99355, -193.9936 }; // 23rd
 
-    Double_t variable_mem[16] = { 0.007419462, 0.007327982, 91.02052,  -62.59230, 571.7103, -83.07132,
-                                  -112.4498,   538.1335,    -132.5532, -129.6732, 0.492008, 686.1278,
-                                  -13.89355,   -193.8936,   -13.99355, -193.9936 }; // 23rd
-    // Nov 2024
-    // Double_t variable_default[16] = {0.007419462, 0.007327982, 90.972, -62.59230, 571.7103, -83.07132, -112.4498,
-    // 538.1335, -132.5532, -129.6732, 1.492008, 686.1278, -13.66355, -193.8936, -13.89355, -193.9936}; // 23rd Double_t
-    // variable_mem[16]     = {0.007419462, 0.007327982, 90.972, -62.59230, 571.7103, -83.07132, -112.4498, 538.1335,
-    // -132.5532, -129.6732, 1.492008, 686.1278, -13.66355, -193.8936, -13.89355, -193.9936}; // 23rd
-    // Nov 2024
-    // Double_t variable_default[16] = { 0.007419462, 0.007327982, 90.972,    -62.59230, 571.7103, -83.07132,
-    //                                 -112.4498,   538.1335,    -132.5532, -129.6732, 1.492008, 686.1278,
-    //                               -13.89355,   -193.8936,   -13.99355, -193.9936 }; // 23rd
-    // Double_t variable_mem[16] = { 0.007419462, 0.007327982, 90.972,    -62.59230, 571.7103, -83.07132,
-    //                             -112.4498,   538.1335,    -132.5532, -129.6732, 1.492008, 686.1278,
-    //                           -13.89355,   -193.8936,   -13.99355, -193.9936 }; // 23rd
+    Double_t variable_default[18] = { 0.007419462, 0.007327982, 91.02052,  -62.59230, 571.7103,  -83.07132,
+                                      634.4884,    -112.4498,   538.1335,  -132.5532, 600.9116,  -129.6732,
+                                      0.492008,    686.1278,    -13.89355, -193.8936, -13.99355, -193.9936 }; // 23rd
 
-    Double_t variable_sigma[16] = { 0.2, 0.2, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1., 0.5, 0.1, 0.1, 0.1, 0.1 };
+    Double_t variable_mem[18] = { 0.007419462, 0.007327982, 91.02052,  -62.59230, 571.7103,  -83.07132,
+                                  634.4884,    -112.4498,   538.1335,  -132.5532, 600.9116,  -129.6732,
+                                  0.492008,    686.1278,    -13.89355, -193.8936, -13.99355, -193.9936 }; // 23rd
 
-    Double_t variable[16];
+    Double_t variable_sigma[18] = { 0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                                    0.5, 0.5, 0.5, 1.,  0.5, 0.1, 0.1, 0.1, 0.1 };
 
-    Int_t nroundsmax = 6; // 4;//000;
+    Double_t variable[18];
+
+    Int_t nroundsmax = 1000;
     Int_t nstepchi2 = 0;
     Int_t status = 0;
 
@@ -1907,58 +1883,41 @@ void R3BOptimizeGeometryS494::Finish()
         // ********************************************************************************************
         gRandom->SetSeed(0);
 
-        variable_mem[2] = variable_default[2] + (double)(i - 3) * 0.4;
+        // variable_mem[2] = variable_default[2] + (double)(i - 3) * 0.4;  // zfi23
 
-        //   variable_mem[3] = gRandom->Gaus(variable_default[3], variable_sigma[3]);    // xfi30
-        //   variable_mem[4] = gRandom->Gaus(variable_default[4], variable_sigma[4]);    // zfi30
-        //  variable_mem[5] = gRandom->Gaus(variable_default[5], variable_sigma[5]);    // xfi32
-        //  variable_mem[12] = gRandom->Gaus(variable_default[12], variable_sigma[12]); // thetafi30
-        //  variable_mem[14] = gRandom->Gaus(variable_default[14], variable_sigma[14]); // thetafi32
+        variable_mem[0] = variable_default[0]; // xfi23
+        variable_mem[1] = variable_default[1]; // yfi23
+        variable_mem[2] = variable_default[2]; // zfi23
 
-        /*
+        variable_mem[3] = gRandom->Gaus(variable_default[3], variable_sigma[3]);    // xfi30
+        variable_mem[4] = gRandom->Gaus(variable_default[4], variable_sigma[4]);    // zfi30
+        variable_mem[5] = gRandom->Gaus(variable_default[5], variable_sigma[5]);    // xfi32
+        variable_mem[6] = gRandom->Gaus(variable_default[6], variable_sigma[6]);    // zfi32
+        variable_mem[14] = gRandom->Gaus(variable_default[14], variable_sigma[14]); // thetafi30
+        variable_mem[16] = gRandom->Gaus(variable_default[16], variable_sigma[16]); // thetafi32
 
-                          variable_mem[0] = gRandom->Gaus(variable_default[0], variable_sigma[0]) ;		// xfi23
-                          variable_mem[1] = gRandom->Gaus(variable_default[1], variable_sigma[1]);		// yfi23
-                          variable_mem[2] = gRandom->Gaus(variable_default[2], variable_sigma[2]);		// zfi23
-                          variable_mem[3] = gRandom->Gaus(variable_default[3], variable_sigma[3]);		// xfi30
-                          variable_mem[4] = gRandom->Gaus(variable_default[4], variable_sigma[4]);		// zfi30
-                          variable_mem[5] = gRandom->Gaus(variable_default[5], variable_sigma[5]);		// xfi32
-                          variable_mem[6] = gRandom->Gaus(variable_default[6], variable_sigma[6]);		// xfi31
-                          variable_mem[7] = gRandom->Gaus(variable_default[7],  variable_sigma[7]);		// zfi31
-                          variable_mem[8] = gRandom->Gaus(variable_default[8], variable_sigma[8]);		// xfi33
-                          variable_mem[9] = gRandom->Gaus(variable_default[9], variable_sigma[9]);		// xtofd
-                          variable_mem[10] = gRandom->Gaus(variable_default[10], variable_sigma[10]);		// ytofd
-                          variable_mem[11] = gRandom->Gaus(variable_default[11],variable_sigma[11]);		// ztofd
-                          variable_mem[12] = gRandom->Gaus(variable_default[12],variable_sigma[12]);   	// thetafi30
-                          variable_mem[13] = gRandom->Gaus(variable_default[13],variable_sigma[13]);  	// thetafi31
-                          if(nvariables == 16){
-                              variable_mem[14] = gRandom->Gaus(variable_default[14],variable_sigma[14]);	// thetafi32
-                              variable_mem[15] = gRandom->Gaus(variable_default[15],variable_sigma[15]);	// thetafi33
-                          }
+        variable_mem[7] = gRandom->Gaus(variable_default[7], variable_sigma[7]);    // xfi31
+        variable_mem[8] = gRandom->Gaus(variable_default[8], variable_sigma[8]);    // zfi31
+        variable_mem[9] = gRandom->Gaus(variable_default[9], variable_sigma[9]);    // xfi33
+        variable_mem[10] = gRandom->Gaus(variable_default[10], variable_sigma[10]); // zfi33
+        variable_mem[15] = gRandom->Gaus(variable_default[15], variable_sigma[15]); // thetafi31
+        variable_mem[17] = gRandom->Gaus(variable_default[17], variable_sigma[17]); // thetafi33
 
-           */
+        //  variable_mem[11] = gRandom->Gaus(variable_default[11], variable_sigma[11]);	// xtofd
+        //  variable_mem[12] = gRandom->Gaus(variable_default[12],variable_sigma[12]);  	// ytofd
+        //  variable_mem[13] = gRandom->Gaus(variable_default[13],variable_sigma[13]);	// ztofd
 
         for (Int_t ivar = 0; ivar < nvariables; ivar++)
         {
             variable[ivar] = variable_mem[ivar];
             // cout<<"TESTING: varmem: "<<variable_mem[ivar]<<", var: "<<variable[ivar]<<endl;
         }
-        cout << " " << endl;
-        if (nvariables == 14)
-        {
-            cout << "Start values = {" << variable[0] << ", " << variable[1] << ", " << variable[2] << ", "
-                 << variable[3] << ", " << variable[4] << ", " << variable[5] << ", " << variable[6] << ", "
-                 << variable[7] << ", " << variable[8] << ", " << variable[9] << ", " << variable[10] << ", "
-                 << variable[11] << ", " << variable[12] << ", " << variable[13] << "}; " << endl;
-        }
-        if (nvariables == 16)
-        {
-            cout << "Start values = {" << variable[0] << ", " << variable[1] << ", " << variable[2] << ", "
-                 << variable[3] << ", " << variable[4] << ", " << variable[5] << ", " << variable[6] << ", "
-                 << variable[7] << ", " << variable[8] << ", " << variable[9] << ", " << variable[10] << ", "
-                 << variable[11] << ", " << variable[12] << ", " << variable[13] << ", " << variable[14] << ", "
-                 << variable[15] << "}; " << endl;
-        }
+
+        cout << "Start values = {" << variable[0] << ", " << variable[1] << ", " << variable[2] << ", " << variable[3]
+             << ", " << variable[4] << ", " << variable[5] << ", " << variable[6] << ", " << variable[7] << ", "
+             << variable[8] << ", " << variable[9] << ", " << variable[10] << ", " << variable[11] << ", "
+             << variable[12] << ", " << variable[13] << ", " << variable[14] << ", " << variable[15] << variable[16]
+             << variable[17] << "}; " << endl;
 
         mini->SetLimitedVariable(0, "xfi23", variable[0], step[0], variable[0] - 2.0, variable[0] + 2.0);
         mini->SetLimitedVariable(1, "yfi23", variable[1], step[1], variable[1] - 2.0, variable[1] + 2.0);
@@ -1966,23 +1925,22 @@ void R3BOptimizeGeometryS494::Finish()
         mini->SetLimitedVariable(3, "x30", variable[3], step[3], variable[3] - 2.5, variable[3] + 2.5);
         mini->SetLimitedVariable(4, "z30", variable[4], step[4], variable[4] - 2.5, variable[4] + 2.5);
         mini->SetLimitedVariable(5, "x32", variable[5], step[5], variable[5] - 2.5, variable[5] + 2.5);
-        mini->SetLimitedVariable(6, "x31", variable[6], step[6], variable[6] - 2.5, variable[6] + 2.5);
-        mini->SetLimitedVariable(7, "z31", variable[7], step[7], variable[7] - 2.5, variable[7] + 2.5);
-        mini->SetLimitedVariable(8, "x33", variable[8], step[8], variable[8] - 2.5, variable[8] + 2.5);
-        mini->SetLimitedVariable(9, "xtofd", variable[9], step[9], variable[9] - 2.5, variable[9] + 2.5);
-        mini->SetLimitedVariable(10, "ytofd", variable[10], step[10], variable[10] - 2.5, variable[10] + 2.5);
-        mini->SetLimitedVariable(11, "ztofd", variable[11], step[11], variable[11] - 2.5, variable[11] + 2.5);
-        mini->SetLimitedVariable(12, "a30", variable[12], step[12], variable[12] - 2.5, variable[12] + 2.5);
-        mini->SetLimitedVariable(13, "a31", variable[13], step[13], variable[13] - 2.5, variable[13] + 2.5);
-        if (nvariables == 16)
-        {
-            mini->SetLimitedVariable(14, "a32", variable[14], step[14], variable[14] - 2.5, variable[14] + 2.5);
-            mini->SetLimitedVariable(15, "a33", variable[15], step[15], variable[15] - 2.5, variable[15] + 2.5);
-        }
+        mini->SetLimitedVariable(6, "z32", variable[6], step[6], variable[6] - 2.5, variable[6] + 2.5);
+        mini->SetLimitedVariable(7, "x31", variable[7], step[7], variable[7] - 2.5, variable[7] + 2.5);
+        mini->SetLimitedVariable(8, "z31", variable[8], step[8], variable[8] - 2.5, variable[8] + 2.5);
+        mini->SetLimitedVariable(9, "x33", variable[9], step[9], variable[9] - 2.5, variable[9] + 2.5);
+        mini->SetLimitedVariable(10, "z33", variable[10], step[10], variable[10] - 2.5, variable[10] + 2.5);
+        mini->SetLimitedVariable(11, "xtofd", variable[11], step[11], variable[11] - 2.5, variable[11] + 2.5);
+        mini->SetLimitedVariable(12, "ytofd", variable[12], step[12], variable[12] - 2.5, variable[12] + 2.5);
+        mini->SetLimitedVariable(13, "ztofd", variable[13], step[13], variable[13] - 2.5, variable[13] + 2.5);
+        mini->SetLimitedVariable(14, "a30", variable[14], step[14], variable[14] - 2.5, variable[14] + 2.5);
+        mini->SetLimitedVariable(15, "a31", variable[15], step[15], variable[15] - 2.5, variable[15] + 2.5);
+        mini->SetLimitedVariable(16, "a32", variable[16], step[16], variable[16] - 2.5, variable[16] + 2.5);
+        mini->SetLimitedVariable(17, "a33", variable[17], step[17], variable[17] - 2.5, variable[17] + 2.5);
 
         mini->FixVariable(0);
         mini->FixVariable(1);
-        // mini->FixVariable(2);
+        mini->FixVariable(2);
         mini->FixVariable(3);
         mini->FixVariable(4);
         mini->FixVariable(5);
@@ -1994,11 +1952,10 @@ void R3BOptimizeGeometryS494::Finish()
         mini->FixVariable(11);
         mini->FixVariable(12);
         mini->FixVariable(13);
-        if (nvariables == 16)
-        {
-            mini->FixVariable(14);
-            mini->FixVariable(15);
-        }
+        mini->FixVariable(14);
+        mini->FixVariable(15);
+        mini->FixVariable(16);
+        mini->FixVariable(17);
 
         // do the minimization
         mini->Minimize();
@@ -2011,7 +1968,7 @@ void R3BOptimizeGeometryS494::Finish()
 
         // *************************************************************************************************
 
-        if (chi2_start > -1000.)
+        if (chi2_start > 35.)
         {
             cout << "Start chi2 to large: " << chi2_start << ", new start values will be chosen" << endl;
         }
@@ -2019,14 +1976,24 @@ void R3BOptimizeGeometryS494::Finish()
         {
             cout << "Start chi2 ok: " << chi2_start << ", optimization will start" << endl;
 
-            mini->ReleaseVariable(2); // zfi23
-                                      /*
-                                          mini->ReleaseVariable(3);  // xfi30
-                                          mini->ReleaseVariable(4);  // zfi30
-                                          mini->ReleaseVariable(5);  // xfi32
-                                          mini->ReleaseVariable(12); // thetafi30
-                                          mini->ReleaseVariable(14); // thetafi32
-                                      */
+            mini->ReleaseVariable(3);  // xfi30
+            mini->ReleaseVariable(4);  // zfi30
+            mini->ReleaseVariable(5);  // xfi32
+            mini->ReleaseVariable(6);  // zfi32
+            mini->ReleaseVariable(14); // thetafi30
+            mini->ReleaseVariable(16); // thetafi32
+
+            mini->ReleaseVariable(7);  // xfi31
+            mini->ReleaseVariable(8);  // zfi31
+            mini->ReleaseVariable(9);  // xfi33
+            mini->ReleaseVariable(10); // zfi33
+            mini->ReleaseVariable(15); // thetafi31
+            mini->ReleaseVariable(17); // thetafi33
+
+            // mini->ReleaseVariable(11);  // xtofd
+            // mini->ReleaseVariable(12); //  ytofd
+            // mini->ReleaseVariable(13); //  ztofd
+
             // do the minimization
             mini->Minimize();
 
@@ -2036,21 +2003,11 @@ void R3BOptimizeGeometryS494::Finish()
             cout << "optimized values: " << endl;
             cout.precision(7);
 
-            if (nvariables == 16)
-            {
-                cout << "{" << mini->X()[0] << ", " << mini->X()[1] << ", " << mini->X()[2] << ", " << mini->X()[3]
-                     << ", " << mini->X()[4] << ", " << mini->X()[5] << ", " << mini->X()[6] << ", " << mini->X()[7]
-                     << ", " << mini->X()[8] << ", " << mini->X()[9] << ", " << mini->X()[10] << ", " << mini->X()[11]
-                     << ", " << mini->X()[12] << ", " << mini->X()[13] << ", " << mini->X()[14] << ", " << mini->X()[15]
-                     << "}; // chi2= " << mini->MinValue() << endl;
-            }
-            else if (nvariables == 14)
-            {
-                cout << "{" << mini->X()[0] << ", " << mini->X()[1] << ", " << mini->X()[2] << ", " << mini->X()[3]
-                     << ", " << mini->X()[4] << ", " << mini->X()[5] << ", " << mini->X()[6] << ", " << mini->X()[7]
-                     << ", " << mini->X()[8] << ", " << mini->X()[9] << ", " << mini->X()[10] << ", " << mini->X()[11]
-                     << ", " << mini->X()[12] << ", " << mini->X()[13] << "}; // chi2= " << mini->MinValue() << endl;
-            }
+            cout << "{" << mini->X()[0] << ", " << mini->X()[1] << ", " << mini->X()[2] << ", " << mini->X()[3] << ", "
+                 << mini->X()[4] << ", " << mini->X()[5] << ", " << mini->X()[6] << ", " << mini->X()[7] << ", "
+                 << mini->X()[8] << ", " << mini->X()[9] << ", " << mini->X()[10] << ", " << mini->X()[11] << ", "
+                 << mini->X()[12] << ", " << mini->X()[13] << ", " << mini->X()[14] << ", " << mini->X()[15] << ", "
+                 << mini->X()[16] << ", " << mini->X()[17] << "}; // chi2= " << mini->MinValue() << endl;
 
             Double_t dzeven, dzodd;
             if (!fSimu)
@@ -2064,28 +2021,13 @@ void R3BOptimizeGeometryS494::Finish()
                 dzeven = 632.9688 - 570.59330;
                 dzodd = 597.7741 - 537.9038;
             }
-            if (nvariables == 16)
-            {
-                cout << "fi23x = " << mini->X()[0] << ", fi23y = " << mini->X()[1] << ", fi23z = " << mini->X()[2]
-                     << ", fi30x = " << mini->X()[3] << ", fi30z = " << mini->X()[4] << ", fi31x = " << mini->X()[6]
-                     << ", fi31z = " << mini->X()[7] << ", fi32x = " << mini->X()[5]
-                     << ", fi32z = " << mini->X()[4] + dzeven << ", fi33x = " << mini->X()[8]
-                     << ", fi33z = " << mini->X()[7] + dzodd << ", tofdx = " << mini->X()[9]
-                     << ", tofdy = " << mini->X()[10] << ", tofdz = " << mini->X()[11] << ", fi30a = " << mini->X()[12]
-                     << ", fi31a = " << mini->X()[13] << ", fi32a = " << mini->X()[14] << ", fi33a = " << mini->X()[15]
-                     << endl;
-            }
-            else if (nvariables == 14)
-            {
-                cout << "fi23x = " << mini->X()[0] << ", fi23y = " << mini->X()[1] << ", fi23z = " << mini->X()[2]
-                     << ", fi30x = " << mini->X()[3] << ", fi30z = " << mini->X()[4] << ", fi31x = " << mini->X()[6]
-                     << ", fi31z = " << mini->X()[7] << ", fi32x = " << mini->X()[5]
-                     << ", fi32z = " << mini->X()[4] + dzeven << ", fi33x = " << mini->X()[8]
-                     << ", fi33z = " << mini->X()[7] + dzodd << ", tofdx = " << mini->X()[9]
-                     << ", tofdy = " << mini->X()[10] << ", tofdz = " << mini->X()[11] << ", fi30a = " << mini->X()[12]
-                     << ", fi31a = " << mini->X()[13] << ", fi32a = " << mini->X()[12] << ", fi33a = " << mini->X()[13]
-                     << endl;
-            }
+            cout << "fi23x = " << mini->X()[0] << ", fi23y = " << mini->X()[1] << ", fi23z = " << mini->X()[2]
+                 << ", fi30x = " << mini->X()[3] << ", fi30z = " << mini->X()[4] << ", fi31x = " << mini->X()[7]
+                 << ", fi31z = " << mini->X()[8] << ", fi32x = " << mini->X()[5] << ", fi32z = " << mini->X()[6]
+                 << ", fi33x = " << mini->X()[9] << ", fi33z = " << mini->X()[10] << ", tofdx = " << mini->X()[11]
+                 << ", tofdy = " << mini->X()[12] << ", tofdz = " << mini->X()[13] << ", fi30a = " << mini->X()[14]
+                 << ", fi31a = " << mini->X()[15] << ", fi32a = " << mini->X()[16] << ", fi33a = " << mini->X()[17]
+                 << endl;
         }
 
         mini->Clear();

@@ -152,12 +152,22 @@ void R3BGladFieldMap::Init()
         fYAngle = -14.20966;
         fZAngle = -0.1381274;*/
 
+        // latest 2022+2023
         fPosX = 0.4942526;
         fPosY = -1.022616 + 1.5;
         fPosZ = 174.5851;
         fXAngle = 0.04190000; // fixed to the measured value by Michael
         fYAngle = -14.18602;
         fZAngle = -0.1464000; // fixed to the measured value by Michael
+
+        // optim 17
+        /*	fPosX = 0.08346731;
+            fPosY = 0.04214279;
+            fPosZ = 173.2198;
+            fXAngle = 0.04190000; // fixed to the measured value by Michael
+            fYAngle = -14.06277;
+            fZAngle = -0.1464000; // fixed to the measured value by Michael
+            */
     }
 
     if (!newField)
@@ -351,32 +361,28 @@ Double_t R3BGladFieldMap::GetBy(Double_t x, Double_t y, Double_t z)
           }
           //val = val/(1.-fcorr/100.);
           */
-        /*
-         Double_t fcorr = 0.0;
-         if(zz < 5.75 && zz > -44.25)
-          {
-              zz = zz + 121. +  53.25;
-              fcorr=fcorr + 1417.05
-                          - 33.2292 * TMath::Power(zz,1)
-                          + 0.292215 * TMath::Power(zz,2)
-                          - 0.00114258 * TMath::Power(zz,3)
-                          + 1.67625e-06* TMath::Power(zz,4);
-          }
-          val = val/(1.-fcorr/100.);
-       */
 
-        gRandom->SetSeed(0);
-        /*
-          //if(zz > -84.25 && zz < -43.25) //fi23-10cm
-         // if(zz < -84.25 && zz > -174.25)  // target and fi23
-          //if(zz < -53.25 && zz > -174.25)  // target and entrance
-          if(zz < -43.25 && zz > -174.25)  // target and 10cm
-          //if(zz > 400.)
-          {
-                val = val * 1.;
-           }
-         */
-        //   cout<<"xx: "<<xx<<", yy: "<<yy<<", zz: "<<zz<<", By: "<<fTrackerCorr * val<<endl;
+        // if(zz > -84.25 && zz < -43.25) //fi23-10cm
+        // if(zz < -84.25 && zz > -174.25)  // target and fi23
+        // if(zz < -53.25 && zz > -174.25)  // target and entrance
+        // if(zz < -43.25 && zz > -174.25)  // target and 10cm
+
+        Double_t fcorr = 1.; // = By_exp/By_theory
+                             /*
+                                   if(z <200.)  // global coordinate
+                                     {
+                     
+                                           fcorr =  9.99889732
+                                                   -0.19904425 * TMath::Power(z,1)
+                                                   +0.00165189 * TMath::Power(z,2)
+                                                   -6.099e-6   * TMath::Power(z,3)
+                                                   +8.4552e-9  * TMath::Power(z,4)
+                                                   -2.761e-15  * TMath::Power(z,5);
+                     
+                                      }
+                                 //    fcorr = 1.;
+                               */
+        val = val * fcorr;
 
         return (fTrackerCorr * val);
     }

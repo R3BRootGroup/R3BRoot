@@ -164,6 +164,10 @@ class R3BGlobalAnalysisS494 : public FairTask
 		fxfibcut = xfibcut;
 		fyfibcut = yfibcut;
 	}
+    inline void SetCalifaTofOffset(Double_t cto)
+    {
+		fCalifaTofOffset = cto;
+	}
 	inline void SetVisual(Bool_t vis)
 	{
 		fvis = vis;
@@ -171,6 +175,8 @@ class R3BGlobalAnalysisS494 : public FairTask
 	
 	inline void SetEvsECut(TString file){fEvsE = file;}
 	inline void SetCalifaCut(TString file){fCalifaCut = file;}
+	inline void SetCalifaCutTofd(TString file){fCalifaCutTofd = file;}
+	inline void SetCalifaCutNfNs(TString file){fCalifaCutNfNs = file;}
   
   private:
     TClonesArray* fMCTrack;
@@ -203,6 +209,9 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Double_t fxfibcut, fyfibcut;
 	TString fEvsE;
 	TString fCalifaCut;
+	TString fCalifaCutTofd;
+	TString fCalifaCutNfNs;
+	Double_t fCalifaTofOffset;
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long ic_start = 0, see_start = 0, tofdor_start = 0;
@@ -256,6 +265,8 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Int_t countdet;
 	TCutG *cut_EHe_EC;
 	TCutG *cut_CalifaTof;
+	TCutG *cut_CalifaTofD;
+	TCutG *cut_CalifaNfNs;
 	Int_t clocal = 0;
 	
     UInt_t num_spills = 0;
@@ -387,6 +398,8 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_Erel_vs_x0;
 	TH2F* fh_Erel_vs_yfi23;
 	TH2F* fh_Erel_vs_xfi23;
+	TH2F* fh_Erel_vs_ytofd;
+	TH2F* fh_Erel_vs_xtofd;
 	TH1F* fh_psum;
 	TH1F* fh_psum_MC;
 	TH1F* fh_pzsum;
@@ -492,9 +505,12 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_califa_hitenergy_rand_bg;
     TH2F* fh_califa_hitenergy_rand_ag; 
     TH2F* fh_califa_time_cId;
+    TH2F* fh_califaE_vs_theta16;
+    TH2F* fh_califaE_vs_theta16_rand;
 	
 	TH2F* fh_califa_tofd;
 	TH2F* fh_califa_tofd_cut;
+	TH2F* fh_califa_tofd_raw;
 	TH1F* fh_califa_hitenergy_select;
 	TH1F* fh_califa_hitenergy_nc;
 	TH2F* fh_Ecalifa_vs_theta;
@@ -511,6 +527,11 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_crystalNb;
 	TH1F* fh_califa_hitenergy_boost_rand;
 	TH2F* fh_Erel_vs_theta16O_withcalifa_rand;
+	TH2F* fh_phibccm_vs_theta16O_withcalifa_rand;
+	TH2F* fh_phibccm_vs_theta16O_withcalifa;
+	TH2F* fh_phibccm_vs_Erel_withcalifa_bg_rand;
+	TH2F* fh_phibccm_vs_Erel_withcalifa_bg;
+	TH2F* fh_Nf_vs_Ns;
 	
 	TH1F* fh_minv_simu;
 	TH1F* fh_minv;
@@ -527,6 +548,11 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_yy_fib23;
 	TH2F* fh_xy_fib23_bc;
 	TH1F* fh_dt_fib23_bc;
+	
+	TH1F* fh_Erel_cutTofd1;
+	TH1F* fh_Erel_cutTofd2;
+	TH1F* fh_Erel_cutTofd3;
+	TH1F* fh_Erel_cutTofd4;
 	
 	
 	

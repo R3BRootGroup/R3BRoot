@@ -231,14 +231,15 @@ class R3BPreTrackS494 : public FairTask
 	Bool_t fAverage;
 	Bool_t fHisto;
 	TString fFi30Fi32Cut, fFi31Fi33Cut, fTofiCut;
+	Bool_t graphicTofiCut = false;
     
-	unsigned long IcountwriteOut1[23]={0}, IcountwriteOut2[23]={0}, IcountwriteOut1mem = 0, IcountwriteOut2mem=0,countdet_written[10]={0};
-	
+	unsigned long IcountwriteOut1[23]={0}, IcountwriteOut2[23]={0}, IcountwriteOut1mem = 0, IcountwriteOut2mem=0,countdet_written[10]={0};	
 
-	TCutG *cut_qfi31_qfi33;
-	TCutG *cut_qfi30_qfi32;
-	TCutG *cut_qtofi_bar14;
-	
+	TCutG *cut_qfi31;
+	TCutG *cut_qfi30;
+	TCutG *cut_qfi33;
+	TCutG *cut_qfi32;
+	TCutG *cut_qtofi_bar14;	
 	
     unsigned long long time_start = 0, time = 0;
     unsigned long long ic_start = 0, see_start = 0, tofdor_start = 0;
