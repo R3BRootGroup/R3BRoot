@@ -93,13 +93,14 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     Int_t fGeometryVersion = 2024; // Selecting the geometry of the CALIFA calorimeter
     Int_t fTotalCrystals = 2544;
 
+    // Note: threshold values are in [MeV] for simulation data and in [keV] for experimental data
     Double_t fCrystalThreshold = 0.; // Minimum energy requested in a crystal to be included in a cluster
     Double_t fProtonClusterThreshold =
-        50.;                              // Minimum energy in a crystal to be considered as a proton cluster candidate
+        31.;                              // Minimum energy in a crystal to be considered as a proton cluster candidate
     Double_t fGammaClusterThreshold = 0.; // Minimum energy in a crystal to be considered as a gamma cluster candidate
     // Double_t fProtonThreshold;            // Defines the cut energy between proton and gamma readout
 
-    Double_t fRoundWindow = 0.25; // Cluster window
+    Double_t fRoundWindow = 0.25; // Cluster window [rad]
     bool fSimulation = false;     // Simulation flag
 
     Bool_t fRand = 0.; // Flag to set randomization procedure
