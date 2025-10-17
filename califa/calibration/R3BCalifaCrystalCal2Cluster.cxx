@@ -265,29 +265,31 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
         cryEnergy = dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i))->GetEnergy();
 
         if (cryEnergy >= fCrystalThreshold)
+        {
             allCrystalVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
 
-        /* -------- Real data ------- */
-        if (!fSimulation)
-        {
-            if (cryEnergy >= fGammaClusterThreshold && !std::isnan(cryEnergy))
-                gammaCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
+            /* -------- Real data ------- */
+            if (!fSimulation)
+            {
+                if (cryEnergy >= fGammaClusterThreshold && !std::isnan(cryEnergy))
+                    gammaCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
 
-            if (cryId > fTotalCrystals && cryEnergy >= fProtonClusterThreshold)
-                protonCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
+                if (cryId > fTotalCrystals && cryEnergy >= fProtonClusterThreshold)
+                    protonCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
 
-            if (cryId <= fTotalCrystals && std::isnan(cryEnergy))
-                saturatedCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
-        }
+                if (cryId <= fTotalCrystals && std::isnan(cryEnergy))
+                    saturatedCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
+            }
 
-        /* -------- Simulation data ------- */
-        else
-        {
-            if (cryEnergy >= fGammaClusterThreshold && cryEnergy < fProtonClusterThreshold)
-                gammaCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
+            /* -------- Simulation data ------- */
+            else
+            {
+                if (cryEnergy >= fGammaClusterThreshold && cryEnergy < fProtonClusterThreshold)
+                    gammaCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
 
-            if (cryEnergy >= fProtonClusterThreshold)
-                protonCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
+                if (cryEnergy >= fProtonClusterThreshold)
+                    protonCandidatesVec.push_back(dynamic_cast<R3BCalifaCrystalCalData*>(fCrystalCalData->At(i)));
+            }
         }
     }
 
@@ -378,8 +380,13 @@ void R3BCalifaCrystalCal2Cluster::Exec(Option_t* /*opt*/)
 
                 angles = R3BCalifaGeometry::Instance()->GetAngles(thisCryId);
 
-                if (InsideClusterWindow(mother_angles, angles))
+                // add to gamma or proton cluster depending on crystal id
+
+                if (InsideClusterWindow(mother_angles, angles) && thisCryId <= fTotalCrystals)
                     addCrystal2Cluster(&cluster, allCrystalVec.at(j), "gamma", &usedCrystals, fTotalCrystals);
+
+                if (InsideClusterWindow(mother_angles, angles) && thisCryId > fTotalCrystals)
+                    addCrystal2Cluster(&cluster, allCrystalVec.at(j), "proton", &usedCrystals, fTotalCrystals);
             }
         }
 
