@@ -141,11 +141,13 @@ Bool_t R3BFootHitPar::getParams(FairParamList* list)
     }
 
     // We assume that the calibration parameters are the same for all multiplicities
-    R3BLOG_IF(warn,
-              !(list->fill("footCharCalParSM", fCharCalParSM)),
-              "R3BFootHitPar::Could not initialize footCharCalParSM. Single multiplicity calibration will not be used");
-
-    list->fill("footCharCalPar", fCharCalParSM);
+    if (!(list->fill("footCharCalParSM", fCharCalParSM)))
+    {
+        R3BLOG(
+            warn,
+            "R3BFootHitPar::Could not initialize footCharCalParSM. Single multiplicity calibration will not be used");
+        list->fill("footCharCalPar", fCharCalParSM);
+    }
 
     if (!(list->fill("footEtaCorrPar", fEtaCorrPar)))
     {

@@ -367,6 +367,20 @@ void R3BFootStripCal2Hit::EtaCorrectionAndChargeCal()
         {
 
             int asicId = static_cast<int>(ClusterPos[i][j] / (fNumStrips / 10.));
+            int equivStrip = static_cast<int>(ClusterPos[i][j]);
+
+            // Avoid inter-asic clusters
+            bool isBadAsic = false;
+            if (fInterClusterWindow > 0)
+                for (int iwin = -fInterClusterWindow; iwin <= fInterClusterWindow; iwin++)
+                    if ((equivStrip + iwin) % static_cast<int>(fNumStrips / fNumAsic) == 0)
+                        isBadAsic = true;
+
+            if (isBadAsic)
+            {
+                ClusterCharge[i][j] = std::nan("");
+                continue;
+            }
 
             int generalIndex = i * fNumAsic + asicId;
             double energyCorrected = -1;
@@ -420,7 +434,13 @@ void R3BFootStripCal2Hit::EtaCorrectionAndChargeCal()
 
             // Get the coefficients for this asic
             auto name = Form("fitFunc_foot_%i_asic_%i", i, asicId);
-            auto polType = Form("pol%i", fNumParsCal - 1);
+
+            TString polType = Form("pol%i", fNumParsCal - 1);
+
+            // Use a power-law relation between charge and energy
+            if (fUsePowerLawCal)
+                polType = "[0]*pow(x,[1])";
+
             auto fitFunc = std::make_unique<TF1>(name, polType);
 
             auto chargeParams = fCharCalPar;
@@ -428,13 +448,10 @@ void R3BFootStripCal2Hit::EtaCorrectionAndChargeCal()
             if (Eta[i][j] == 0)
                 chargeParams = fCharCalParSM;
 
-            for (size_t iPol = 0; iPol < fNumParsCal; iPol++)
-            {
+            for (auto iPol = 0; iPol < fNumParsCal; iPol++)
                 fitFunc->SetParameter(iPol, chargeParams[generalIndex][iPol]);
-            }
 
             charge = fitFunc->Eval(energyCorrected);
-
             ClusterESum[i][j] = energyCorrected;
             ClusterCharge[i][j] = charge;
         }

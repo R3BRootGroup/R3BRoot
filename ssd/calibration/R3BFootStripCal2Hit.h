@@ -61,19 +61,26 @@ class R3BFootStripCal2Hit : public FairTask
     void SetTimesSigmas(Double_t sigmas) { fTimesSigmas = sigmas; };
 
     /** Accessor for selecting online mode **/
-    inline void SetOnline(Bool_t option) { fOnline = option; }
+    void SetOnline(Bool_t option) { fOnline = option; }
 
     /** Accessor for selecting max. number of clusters per FOOT detector **/
-    inline void SetMaxNumClusters(int max) { fMaxNumClusters = max; }
+    void SetMaxNumClusters(int max) { fMaxNumClusters = max; }
 
     /** Accessor to set up the threshold for the cluster energy sum **/
-    inline void SetClusterEnergy(double thsum) { fThSum = thsum; }
+    void SetClusterEnergy(double thsum) { fThSum = thsum; }
 
     // Method for setting the maximum number of strips for each cluster
-    inline void SetMaxNumStrips(int max) { fMaxNumStrips = max; }
+    void SetMaxNumStrips(int max) { fMaxNumStrips = max; }
 
     // Method to disable transformation of hits to lab coordinates (default: true)
-    inline void SetTransform2Lab(bool flag) { fTransform2Lab = flag; }
+    void SetTransform2Lab(bool flag) { fTransform2Lab = flag; }
+
+    // Method to set the number of inter-cluster strips that need to be disrigarded
+    void SetInterClusterWindow(int val) { fInterClusterWindow = val; }
+
+    // Method to use the power-law algoritm (Z = aE**gamma) instead of the default linear
+    // calibration
+    void SetUsePowerLawCal() { fUsePowerLawCal = true; }
 
   private:
     void SetParameter();
@@ -97,6 +104,8 @@ class R3BFootStripCal2Hit : public FairTask
 
     int fMaxNumClusters = 10;
     int fMaxNumStrips = 640;
+    int fInterClusterWindow = 2;
+    bool fUsePowerLawCal = false;
 
     std::vector<double> fDistTarget;
     std::vector<double> fAngleTheta;
