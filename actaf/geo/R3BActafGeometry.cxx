@@ -117,6 +117,47 @@ std::string R3BActafGeometry::GetPadVolumePath(const int iD)
     return oss.str();
 }
 
+std::vector<double> R3BActafGeometry::GetPadParams(const int iD)
+{
+    double rmin = 0, rmax = 0;
+    double phiMin = 0, phiMax = 0;
+
+    if (iD >= 1 && iD <= fNbPads)
+    {
+        std::string nameVolume = GetPadVolumePath(iD);
+        gGeoManager->CdTop();
+
+        if (gGeoManager->CheckPath(nameVolume.c_str()))
+            gGeoManager->cd(nameVolume.c_str());
+        else
+        {
+            R3BLOG(error, "Invalid pad path: " << nameVolume);
+            return std::vector<double>{ std::nan("") };
+        }
+
+        TGeoNode* node = gGeoManager->GetCurrentNode();
+        TGeoVolume* vol = node ? node->GetVolume() : nullptr;
+        TGeoShape* shp = vol ? vol->GetShape() : nullptr;
+
+        if (auto* seg = dynamic_cast<TGeoTubeSeg*>(shp))
+        {
+            rmin = seg->GetRmin();
+            rmax = seg->GetRmax();
+            phiMin = seg->GetPhi1() * TMath::DegToRad();
+            phiMax = seg->GetPhi2() * TMath::DegToRad();
+        }
+        else if (auto* tub = dynamic_cast<TGeoTube*>(shp))
+        {
+            rmin = 0.;
+            rmax = tub->GetRmax();
+            phiMin = 0. * TMath::DegToRad();
+            phiMax = 360. * TMath::DegToRad();
+        }
+    }
+
+    return std::vector<double>{ rmin, rmax, phiMin, phiMax };
+}
+
 const TVector3& R3BActafGeometry::GetPosition(int iD, bool rand)
 {
 

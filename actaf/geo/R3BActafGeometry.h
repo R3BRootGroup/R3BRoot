@@ -89,6 +89,8 @@ class R3BActafGeometry : public TObject
      */
     int GetPadId(const std::string volumePath);
 
+    std::vector<double> GetPadParams(const int iD);
+
     /**
      * @return if we are running the simulation or data analysis
      */

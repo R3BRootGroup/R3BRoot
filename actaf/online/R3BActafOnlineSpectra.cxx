@@ -25,6 +25,7 @@
 #include <TGaxis.h>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH2Poly.h>
 #include <THttpServer.h>
 #include <TLegend.h>
 #include <TLegendEntry.h>
@@ -62,7 +63,7 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
 
     fh1_RingCounts.resize(2);
     fh2_XYPos.resize(2);
-    fh2_XYPosRand.resize(2);
+    fh2_XYPos_Evts.resize(2);
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
     fh2_CorrectedTraces.resize(fPads);
@@ -182,8 +183,48 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     mapfol->Add(cSum);
 
+    // Canvas for ring and side
+    std::vector<std::vector<std::vector<TCanvas*>>> cMap_perRing(2);
+    std::vector<std::vector<int>> countsPerRing(2);
+
+    for (int iside = 0; iside < 2; iside++)
+    {
+
+        cMap_perRing[iside].resize(fRings);
+        countsPerRing[iside].resize(fRings);
+
+        for (int iring = 0; iring < fRings; iring++)
+        {
+
+            countsPerRing[iside][iring] = 0;
+
+            std::string sideName = iside == 0 ? "DOWN" : "UP";
+
+            std::string nameCanvas = sideName + "_RING_" + std::to_string(iring + 1) + "_traces_map";
+            auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
+            cMap->Divide(4, 4);
+            cMap_perRing[iside][iring].push_back(cMap);
+
+            std::string nameCanvasC = sideName + "_RING_" + std::to_string(iring + 1) + "_corrected_traces_map";
+            auto* cMapC = new TCanvas(nameCanvasC.c_str(), "mapped info", 10, 10, 500, 500);
+            cMapC->Divide(4, 4);
+            cMap_perRing[iside][iring].push_back(cMapC);
+
+            std::string nameCanvasE = sideName + "_RING_" + std::to_string(iring + 1) + "_ERaw";
+            auto* cMapE = new TCanvas(nameCanvasE.c_str(), "ERaw info", 10, 10, 500, 500);
+            cMapE->Divide(4, 4);
+            cMap_perRing[iside][iring].push_back(cMapE);
+
+            std::string nameCanvasB = sideName + "_RING_" + std::to_string(iring + 1) + "_Baseline";
+            auto* cMapB = new TCanvas(nameCanvasB.c_str(), "Baseline info", 10, 10, 500, 500);
+            cMapB->Divide(4, 4);
+            cMap_perRing[iside][iring].push_back(cMapB);
+        }
+    }
+
     for (int adc = 0; adc < fFadcs; adc++)
     {
+        // Canvas per FADC Module
         std::string nameCanvas = "FADC_" + std::to_string(adc + 1) + "_traces_map";
         auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
         cMap->Divide(4, 4);
@@ -207,8 +248,11 @@ InitStatus R3BActafOnlineSpectra::Init()
             int FADCnum = fMap_Par->GetFADCModuleByPad(index + 1);
             int FADCchn = fMap_Par->GetFADCChannelByPad(index + 1);
 
-            std::string titleHist =
-                "Raw trace: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
+            int sideNb = index + 1 > 64 ? 1 : 0;
+            int ringNb = fActafGeo->GetRingId(index + 1);
+
+            std::string titleHist = "Raw trace: Pad " + std::to_string(index + 1) + " (FADC Mod " +
+                                    std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
             std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
 
             // Only plot the pads that belong to the FADC
@@ -226,6 +270,10 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh2_RawTraces[index]->GetXaxis()->CenterTitle(true);
             fh2_RawTraces[index]->GetYaxis()->CenterTitle(true);
             cMap->cd(chn);
+            fh2_RawTraces[index]->Draw("colz");
+
+            // Draw the per-ring canvas
+            cMap_perRing[sideNb][ringNb - 1][0]->cd(++countsPerRing[sideNb][ringNb - 1]);
             fh2_RawTraces[index]->Draw("colz");
 
             std::string nameHistC = "fh2_Pad_" + std::to_string(index) + "corrected_trace";
@@ -247,9 +295,13 @@ InitStatus R3BActafOnlineSpectra::Init()
             cMapC->cd(chn);
             fh2_CorrectedTraces[index]->Draw("colz");
 
+            // Draw the per-ring canvas
+            cMap_perRing[sideNb][ringNb - 1][1]->cd(countsPerRing[sideNb][ringNb - 1]);
+            fh2_CorrectedTraces[index]->Draw("colz");
+
             std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
-            std::string titleHistE =
-                "ERaw: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
+            std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1) + " (FADC Mod " +
+                                     std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
             fh1_RawE[index] = R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 100, 0, 300000);
             fh1_RawE[index]->GetXaxis()->SetTitle("E [Chn]");
             fh1_RawE[index]->GetYaxis()->SetTitle("Counts");
@@ -260,9 +312,13 @@ InitStatus R3BActafOnlineSpectra::Init()
             cMapE->cd(chn);
             fh1_RawE[index]->Draw();
 
+            // Draw the per-ring canvas
+            cMap_perRing[sideNb][ringNb - 1][2]->cd(countsPerRing[sideNb][ringNb - 1]);
+            fh1_RawE[index]->Draw("colz");
+
             std::string nameHistB = "fh1_Pad_" + std::to_string(index) + "_Baseline";
-            std::string titleHistB =
-                "Baseline: Pad " + std::to_string(index + 1) + " (Channel " + std::to_string(FADCchn) + ")";
+            std::string titleHistB = "Baseline: Pad " + std::to_string(index + 1) + " (FADC Mod " +
+                                     std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
             fh1_Baseline[index] = R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 10000);
             fh1_Baseline[index]->GetXaxis()->SetTitle("Baseline [Chn]");
             fh1_Baseline[index]->GetYaxis()->SetTitle("Counts");
@@ -272,7 +328,12 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh1_Baseline[index]->SetFillColor(31);
             cMapB->cd(chn);
             fh1_Baseline[index]->Draw();
+
+            // Draw the per-ring canvas
+            cMap_perRing[sideNb][ringNb - 1][3]->cd(countsPerRing[sideNb][ringNb - 1]);
+            fh1_Baseline[index]->Draw("colz");
         }
+
         if (fDisplaytraces)
         {
             mapfol->Add(cMap);
@@ -282,6 +343,11 @@ InitStatus R3BActafOnlineSpectra::Init()
         mapfol->Add(cMapE);
         mapfol->Add(cMapB);
     }
+
+    for (auto const& vecSide : cMap_perRing)
+        for (auto const& vecSideRing : vecSide)
+            for (int iCanvasSideRing = 2 * (1 - fDisplaytraces); iCanvasSideRing < 4; iCanvasSideRing++)
+                mapfol->Add(vecSideRing[iCanvasSideRing]);
 
     // FADC Channel [1 - 16] vs Module [1 - 9] (8 modules + 1 for AMBER signal)
     auto* cModVsCh = new TCanvas("ModVsCh_map", "FADC Module vs Channel", 10, 10, 500, 500);
@@ -500,37 +566,106 @@ InitStatus R3BActafOnlineSpectra::Init()
         i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
 
         cXY->cd(i + 1);
-        fh2_XYPos[i] = R3B::root_owned<TH2F>(Form("fh2_XY_side%d", i + 1), tit, 100, -40, 40, 100, -40, 40);
+
+        fh2_XYPos[i] = new TH2Poly();
+
+        for (int iPad = 1 + 64 * i; iPad <= 65 + 64 * i; iPad++)
+        {
+
+            const std::vector<double> padParams = fActafGeo->GetPadParams(iPad);
+            TVector3 padPos = fActafGeo->GetPosition(iPad);
+            padPos.SetZ(0);
+
+            // Parameters of pad
+            const double rMin = padParams[0];
+            const double rMax = padParams[1];
+
+            const double phiCentral = padPos.Phi();
+            const double phiMin = phiCentral - padParams[3] / 2.;
+            const double phiMax = phiCentral + padParams[3] / 2.;
+
+            const int nPoints = 30;
+
+            // For the central pad
+            if (padParams[0] == 0)
+            {
+                Double_t x[nPoints + 1];
+                Double_t y[nPoints + 1];
+
+                for (int iPoint = 0; iPoint < nPoints; iPoint++)
+                {
+                    x[iPoint] = padParams[1] *
+                                TMath::Cos(static_cast<double>(iPoint) / static_cast<double>(nPoints) * padParams[3]);
+                    y[iPoint] = padParams[1] *
+                                TMath::Sin(static_cast<double>(iPoint) / static_cast<double>(nPoints) * padParams[3]);
+                }
+
+                fh2_XYPos[i]->AddBin(nPoints, x, y);
+            }
+
+            // other pads
+            else
+            {
+                std::vector<double> x_vec;
+                std::vector<double> y_vec;
+
+                for (int iPoint = 0; iPoint < nPoints; iPoint++)
+                {
+                    x_vec.push_back(rMax * TMath::Cos(static_cast<double>(iPoint) / static_cast<double>(nPoints - 1) *
+                                                          (phiMax - phiMin) +
+                                                      phiMin));
+
+                    y_vec.push_back(rMax * TMath::Sin(static_cast<double>(iPoint) / static_cast<double>(nPoints - 1) *
+                                                          (phiMax - phiMin) +
+                                                      phiMin));
+                }
+
+                for (int iPoint = 0; iPoint < nPoints; iPoint++)
+                {
+                    x_vec.push_back(rMin * TMath::Cos(static_cast<double>(nPoints - 1 - iPoint) /
+                                                          static_cast<double>(nPoints - 1) * (phiMax - phiMin) +
+                                                      phiMin));
+
+                    y_vec.push_back(rMin * TMath::Sin(static_cast<double>(nPoints - 1 - iPoint) /
+                                                          static_cast<double>(nPoints - 1) * (phiMax - phiMin) +
+                                                      phiMin));
+                }
+
+                fh2_XYPos[i]->AddBin(2 * nPoints, x_vec.data(), y_vec.data());
+            }
+        }
+
+        fh2_XYPos[i]->SetTitle(tit);
         fh2_XYPos[i]->GetXaxis()->SetTitle("X [cm]");
         fh2_XYPos[i]->GetYaxis()->SetTitle("Y [cm]");
         fh2_XYPos[i]->GetYaxis()->SetTitleOffset(1.1);
         fh2_XYPos[i]->GetXaxis()->CenterTitle(true);
         fh2_XYPos[i]->GetYaxis()->CenterTitle(true);
-        fh2_XYPos[i]->Draw("colz");
+        fh2_XYPos[i]->SetLineColor(kBlack);
+        fh2_XYPos[i]->SetLineWidth(1);
+        fh2_XYPos[i]->Draw("colz ]");
+        fh2_XYPos[i]->Draw("same L");
     }
 
     hitfol->Add(cXY);
 
-    // Canvas with XY positions randomly sampling the pad (one per ring)
-    auto* cXYRand = new TCanvas("X_Y_Rand", "XY positions (sampling the whole pad)", 10, 10, 500, 500);
-    cXYRand->Divide(2, 1);
+    // Canvas with XY positions (one per ring) storing the tracks of three events (updated each 3000 events)
+    auto* cXY_nevents = new TCanvas("X_Y_events", Form("XY positions (%d events)", nbEventsFilled), 10, 10, 500, 500);
+    cXY_nevents->Divide(2, 1);
 
-    for (auto i = 0; i < fh2_XYPosRand.size(); i++)
+    for (int i = 0; i < fh2_XYPos_Evts.size(); i++)
     {
-        TString tit;
-        i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
-
-        cXYRand->cd(i + 1);
-        fh2_XYPosRand[i] = R3B::root_owned<TH2F>(Form("fh2_XYRand_side%d", i + 1), tit, 400, -40, 40, 400, -40, 40);
-        fh2_XYPosRand[i]->GetXaxis()->SetTitle("X [cm]");
-        fh2_XYPosRand[i]->GetYaxis()->SetTitle("Y [cm]");
-        fh2_XYPosRand[i]->GetYaxis()->SetTitleOffset(1.1);
-        fh2_XYPosRand[i]->GetXaxis()->CenterTitle(true);
-        fh2_XYPosRand[i]->GetYaxis()->CenterTitle(true);
-        fh2_XYPosRand[i]->Draw("colz");
+        cXY_nevents->cd(i + 1);
+        fh2_XYPos_Evts[i] =
+            static_cast<TH2Poly*>(fh2_XYPos[i]->Clone((fh2_XYPos[i]->GetTitle() + TString("_events")).Data()));
+        fh2_XYPos_Evts[i]->SetTitle(fh2_XYPos[i]->GetTitle() + TString(Form(" %d Events", nbEventsFilled)));
+        fh2_XYPos_Evts[i]->SetLineColor(kBlack);
+        fh2_XYPos_Evts[i]->SetLineWidth(1);
+        fh2_XYPos_Evts[i]->Draw("colz ]");
+        fh2_XYPos_Evts[i]->Draw("same L");
     }
 
-    hitfol->Add(cXYRand);
+    hitfol->Add(cXY_nevents);
 
     // Canvas with phi angle -> 3 histograms
     auto* cPhi = new TCanvas("Phi_correlations", "Phi angles", 10, 10, 500, 500);
@@ -744,10 +879,10 @@ void R3BActafOnlineSpectra::Reset_Histo()
             h->Reset();
 
         for (auto& h : fh2_XYPos)
-            h->Reset();
+            h->Reset("");
 
-        for (auto& h : fh2_XYPosRand)
-            h->Reset();
+        for (auto& h : fh2_XYPos_Evts)
+            h->Reset("");
 
         for (auto& h : fh1_PhiCounts)
             h->Reset();
@@ -937,11 +1072,12 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             fh1_RingCounts[side]->Fill(ring);
             fh2_XYPos[side]->Fill(x, y);
 
-            TVector3 trackRand = fActafGeo->GetPosition(pad, true);
-            double xrand = trackRand.X();
-            double yrand = trackRand.Y();
+            if (fNEvents % updateRate == 0)
+                fh2_XYPos_Evts[side]->Reset("");
 
-            fh2_XYPosRand[side]->Fill(xrand, yrand);
+            for (int iEventFilled = 1; iEventFilled <= nbEventsFilled; iEventFilled++)
+                if ((fNEvents - iEventFilled) % updateRate == 0)
+                    fh2_XYPos_Evts[side]->Fill(x, y);
 
             fh1_PhiCounts[side]->Fill(phi);
             fh1_CountsPerSide->Fill(side + 1);
@@ -1105,7 +1241,7 @@ void R3BActafOnlineSpectra::FinishTask()
         for (auto& h : fh2_XYPos)
             h->Write();
 
-        for (auto& h : fh2_XYPosRand)
+        for (auto& h : fh2_XYPos_Evts)
             h->Write();
 
         for (auto& h : fh1_PhiCounts)

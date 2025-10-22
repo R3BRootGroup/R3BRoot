@@ -27,6 +27,7 @@
 class TClonesArray;
 class TH1F;
 class TH2F;
+class TH2Poly;
 class R3BEventHeader;
 class R3BActafMappingPar;
 class R3BActafGeometry;
@@ -132,53 +133,48 @@ class R3BActafOnlineSpectra : public FairTask
     /**
      * Method for setting the trigger value.
      */
-    inline void SetTrigger(int trigger) { fTrigger = trigger; }
-    inline void SetTpat(int tpat1, int tpat2)
+    void SetTrigger(int trigger) { fTrigger = trigger; }
+    void SetTpat(int tpat1, int tpat2)
     {
         fTpat1 = tpat1;
         fTpat2 = tpat2;
     }
 
     // Setters for the histogram setting
-    inline void setHistPars(int nBins, int minBin, int maxBin, int& nBinsRef, int& minRef, int& maxRef)
+    void setHistPars(int nBins, int minBin, int maxBin, int& nBinsRef, int& minRef, int& maxRef)
     {
         nBinsRef = nBins;
         minRef = minBin;
         maxRef = maxBin;
     }
 
-    inline void SetGeoVersion(int geo) { fGeoversion = geo; }
+    void SetGeoVersion(int geo) { fGeoversion = geo; }
 
-    inline void SetEcalHistPars(int n, int minB, int maxB)
-    {
-        setHistPars(n, minB, maxB, nBinsEcal, nEcalMin, nEcalMax);
-    }
+    void SetEcalHistPars(int n, int minB, int maxB) { setHistPars(n, minB, maxB, nBinsEcal, nEcalMin, nEcalMax); }
 
-    inline void SetTraceHistPars(int minB, int maxB)
+    void SetTraceHistPars(int minB, int maxB)
     {
         setHistPars(std::abs(maxB - minB) / 4, minB, maxB, nBinsTrace, nTraceMin, nTraceMax);
     }
 
-    inline void SetZcalHistPars(int n, int minB, int maxB)
-    {
-        setHistPars(n, minB, maxB, nBinsZcal, nZcalMin, nZcalMax);
-    }
-    inline void SetTLeadingHistPars(int n, int minB, int maxB)
+    void SetZcalHistPars(int n, int minB, int maxB) { setHistPars(n, minB, maxB, nBinsZcal, nZcalMin, nZcalMax); }
+    void SetTLeadingHistPars(int n, int minB, int maxB)
     {
         setHistPars(n, minB, maxB, nBinstLeading, ntLeadingMin, ntLeadingMax);
     }
-    inline void SetMaxAmpHistPars(int n, int minB, int maxB)
+    void SetMaxAmpHistPars(int n, int minB, int maxB)
     {
         setHistPars(n, minB, maxB, nBinsMaxAmp, nMaxAmpMin, nMaxAmpMax);
     }
-    inline void SetTSyncHistPars(int n, int minB, int maxB)
-    {
-        setHistPars(n, minB, maxB, nBinsTSync, nTSyncMin, nTSyncMax);
-    }
+    void SetTSyncHistPars(int n, int minB, int maxB) { setHistPars(n, minB, maxB, nBinsTSync, nTSyncMin, nTSyncMax); }
 
-    inline void SetNBinsSample(int n) { nBinsSample = n; }
+    void SetNBinsSample(int n) { nBinsSample = n; }
 
-    inline void SetMaxTimeForRate(int max) { max_second_for_rate = max; }
+    void SetMaxTimeForRate(int max) { max_second_for_rate = max; }
+
+    void SetUpdateRate(int num) { updateRate = num; }
+
+    void SetNbEventsFilled(int num) { nbEventsFilled = num; }
 
   private:
     void SetParameter();
@@ -199,6 +195,7 @@ class R3BActafOnlineSpectra : public FairTask
     static constexpr int fChn = 16;
     static constexpr int fFadcs = 8;
     static constexpr int fPads = fChn * fFadcs;
+    static constexpr int fRings = 8;
     bool fDisplaytraces = true;
 
     std::vector<TH2F*> fh2_RawTraces;
@@ -263,12 +260,15 @@ class R3BActafOnlineSpectra : public FairTask
     int max_second_for_rate = 600;
     int max_rate = 1000;
 
+    int nbEventsFilled = 3;
+    int updateRate = 500;
+
     std::vector<uint64_t> pre_timestamp{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     // Hit histograms
     std::vector<TH1F*> fh1_RingCounts;
-    std::vector<TH2F*> fh2_XYPos;
-    std::vector<TH2F*> fh2_XYPosRand;
+    std::vector<TH2Poly*> fh2_XYPos;
+    std::vector<TH2Poly*> fh2_XYPos_Evts;
     std::vector<TH1F*> fh1_PhiCounts;
     std::vector<TH1F*> fh1_Sync;
     std::vector<TH1F*> fh1_WrSync;
