@@ -366,6 +366,26 @@ namespace R3B::Neuland
         json_obj.at("write").get_to(option.write);
         set_enum_from_string(option.mode, json_obj, "mode");
     }
+
+    template <>
+    void to_json(json& json_obj, const AnalysisApplication::Options::Tasks::CalMonitorTask& option)
+    {
+        json_obj = json{
+            { "enable", option.enable },
+            { "mode", magic_enum::enum_name(option.mode) },
+            { "read", option.read },
+            { "write", option.write },
+        };
+    }
+
+    template <>
+    void from_json(const json& json_obj, AnalysisApplication::Options::Tasks::CalMonitorTask& option)
+    {
+        json_obj.at("enable").get_to(option.enable);
+        json_obj.at("read").get_to(option.read);
+        json_obj.at("write").get_to(option.write);
+        set_enum_from_string(option.mode, json_obj, "mode");
+    }
     // =============================================================================================
     // Analysis general options:
     template <>
@@ -390,6 +410,7 @@ namespace R3B::Neuland
             { option.los_map_to_cal_par_task.name, option.los_map_to_cal_par_task },
             { option.los_provide_t_start.name, option.los_provide_t_start },
             { option.cal_to_hit_task.name, option.cal_to_hit_task },
+            { option.cal_monitor_task.name, option.cal_monitor_task },
         };
     }
 
@@ -414,6 +435,7 @@ namespace R3B::Neuland
         json_obj.at(option.los_map_to_cal_par_task.name).get_to(option.los_map_to_cal_par_task);
         json_obj.at(option.los_provide_t_start.name).get_to(option.los_provide_t_start);
         json_obj.at(option.cal_to_hit_task.name).get_to(option.cal_to_hit_task);
+        json_obj.at(option.cal_monitor_task.name).get_to(option.cal_monitor_task);
     }
 
     template <>

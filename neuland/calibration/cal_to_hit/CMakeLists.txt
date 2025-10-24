@@ -23,6 +23,7 @@ set(SRCS
     engine/R3BNeulandMillepede.cxx
     engine/R3BNeulandMuonRecons.cxx
     engine/R3BNeulandTSyncAnalysis.cxx
+    R3BNeulandCalMonitorTask.cxx
     R3BNeulandCalToHitPar.cxx
     R3BNeulandCalToHitParTask.cxx
     R3BNeulandCalToHitTask.cxx)

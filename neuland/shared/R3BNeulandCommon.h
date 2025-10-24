@@ -89,7 +89,7 @@ namespace R3B::Neuland
     // bar number has the range of 1 ~ BarsPerPlane
     constexpr auto GetBarVerticalDisplacement(int module_num) -> double
     {
-        const auto bar_num = module_num % BarsPerPlane;
+        const auto bar_num = ((module_num - 1) % BarsPerPlane) + 1;
         return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
     }
     constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
@@ -134,6 +134,8 @@ namespace R3B::Neuland
         constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_NUM = 25;
         constexpr auto DEFAULT_TSYNC_MAX_TIME_DIFF = 300; // ns
         // Millepede calibration defaults:
+        constexpr auto DEFAULT_MINIMUM_PLANE_NUM = 10;
+        constexpr auto DEFAULT_MAX_SLOPE_VALUE = 10;
         constexpr auto DEFAULT_EFFECTIVE_C = 8.;                // cm/ns
         constexpr auto DEFAULT_CALIBRATION_P_VALUE_CUT = 1e-10; // any smaller values will be discarded
         constexpr auto DEFAULT_T_DIFF_RESIDUAL_CUT = 400;       // any larger values will be discarded

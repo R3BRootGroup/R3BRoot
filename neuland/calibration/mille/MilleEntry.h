@@ -13,6 +13,7 @@
 
 #pragma once
 
+#include <Rtypes.h>
 #include <fmt/base.h>
 #include <fmt/core.h>
 #include <nlohmann/json.hpp>
@@ -28,6 +29,14 @@ namespace R3B
         std::vector<std::pair<int, float>> globals; // global label and derivatives pair
         float measurement = 0.;                     // measurement corresponding to the error value
         float sigma = 1.;                           // error value
+        void clear()
+        {
+            locals.clear();
+            globals.clear();
+            measurement = 0.;
+            sigma = 1.;
+        }
+        ClassDefNV(MilleDataPoint, 1);
     };
 
     inline void to_json(nlohmann::json& json_obj, const MilleDataPoint& point)

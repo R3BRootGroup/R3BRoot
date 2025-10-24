@@ -551,7 +551,7 @@ endif(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in
                "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
 
-r3b_generate_version_info()
+# r3b_generate_version_info()
 
 # Recurse into the given subdirectories. This does not actually cause another cmake executable to
 # run. The same process will walk through the project's entire directory structure.

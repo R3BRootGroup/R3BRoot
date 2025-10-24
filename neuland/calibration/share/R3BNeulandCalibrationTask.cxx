@@ -11,6 +11,7 @@
 #include <TH1.h>
 #include <fairlogger/Logger.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/algorithm/for_each.hpp>
 #include <string_view>
@@ -94,6 +95,15 @@ namespace R3B::Neuland
         TriggeredExec();
     }
 
+    void CalibrationTask::ConditionFillToHist(std::string_view condition)
+    {
+        if (condition == "failure" or condition == "success")
+        {
+            LOGP(warn, "failure and success are reserved conditions!");
+        }
+        hist_condition_check_->Fill(condition.data(), 1);
+    }
+
     void CalibrationTask::execute_no_hist()
     {
         if (check_offspill_trigger() and CheckConditions())
@@ -123,7 +133,7 @@ namespace R3B::Neuland
                  is_hist_disabled_,
                  is_write_hist_disabled_);
         }
-        ranges::for_each(output_pars_, [](FairParSet* par) { par->setChanged(); });
+        ranges::for_each(output_pars_, [](FairParSet* par) -> void { par->setChanged(); });
         reset();
     }
 
@@ -140,13 +150,13 @@ namespace R3B::Neuland
     void CalibrationTask::init_histogram()
     {
         hist_trig_check_ = histograms_.add_hist<TH1I>("trig_check", "check the triggered or passed events", 1, 0., 0.);
-        hist_condition_check_ = histograms_.add_hist<TH1I>("condition_check", "check the condition", 1, 0., 0.);
+        hist_condition_check_ = histograms_.add_hist<TH1L>("condition_check", "check the condition", 1, 0., 0.);
         HistogramInit(histograms_);
     }
 
     void CalibrationTask::check_input_par()
     {
-        auto par_not_changed = ranges::find_if(input_pars_, [](auto* par) { return !par->hasChanged(); });
+        auto par_not_changed = ranges::find_if(input_pars_, [](auto* par) -> bool { return !par->hasChanged(); });
         if (par_not_changed != input_pars_.end())
         {
             auto par_name = std::string_view{ (*par_not_changed)->GetName() };

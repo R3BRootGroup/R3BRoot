@@ -234,14 +234,22 @@ namespace R3B::Neuland
         {
             larger_t -= R3B::Neuland::MaxCalTime;
         }
-        auto time_val = ((larger_t + smaller_t) / 2.) - global_time_offset_ - GetEventHeader()->GetTStart();
+        const auto t_start = [this]() -> double
+        {
+            const auto los_time = GetEventHeader()->GetTStart();
+            if (std::isnan(los_time))
+            {
+                return 0.;
+            }
+            return los_time;
+        }();
+        auto time_val = ((larger_t + smaller_t) / 2.) - global_time_offset_ - t_start;
         time_val.value = std::remainder(time_val.value, R3B::Neuland::MaxCalTime);
         return time_val;
     }
 
-    auto Cal2HitTask::get_calibrated_energy(const CalDataSignal& calSignal,
-                                            const HitModulePar& par,
-                                            R3B::Side side) -> ValueErrorD
+    auto Cal2HitTask::get_calibrated_energy(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
+        -> ValueErrorD
     {
         const auto tot_no_offset = calSignal.time_over_threshold - par.pedestal.get(side);
 
@@ -256,9 +264,8 @@ namespace R3B::Neuland
         return (tot_no_offset.value < 1) ? ValueErrorD{} : tot_no_offset / denominator;
     }
 
-    auto Cal2HitTask::get_calibrated_time(const CalDataSignal& calSignal,
-                                          const HitModulePar& par,
-                                          R3B::Side side) -> ValueErrorD
+    auto Cal2HitTask::get_calibrated_time(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
+        -> ValueErrorD
     {
         // TODO: why positive for left?
         const auto time_offset =
@@ -266,9 +273,8 @@ namespace R3B::Neuland
         return calSignal.leading_time - calSignal.trigger_time - time_offset;
     }
 
-    auto Cal2HitTask::to_calibrated_signal(const CalDataSignal& calSignal,
-                                           const HitModulePar& par,
-                                           R3B::Side side) -> CalibratedSignal
+    auto Cal2HitTask::to_calibrated_signal(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
+        -> CalibratedSignal
     {
         const auto energy = get_calibrated_energy(calSignal, par, side);
         const auto time = get_calibrated_time(calSignal, par, side);

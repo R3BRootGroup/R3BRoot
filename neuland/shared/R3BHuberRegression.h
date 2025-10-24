@@ -33,7 +33,6 @@ namespace R3B
         double regularization_rate = DEFAULT_REG_RATE;
         ParConfig weight;
         ParConfig bias;
-        ParConfig sigma;
     };
 
     class HuberRegressor
@@ -45,7 +44,6 @@ namespace R3B
             int iteration = 0;
             R3B::ValueErrorD weight;
             R3B::ValueErrorD bias;
-            R3B::ValueErrorD sigma;
         };
         using Config = HuberRegressorConfig;
 
@@ -61,12 +59,12 @@ namespace R3B
         auto get_config_ref() -> Config& { return config_; }
         [[nodiscard]] auto get_result() const -> const Result& { return result_; }
         [[nodiscard]] auto check_outlier(double x_val, double y_val) const -> std::pair<bool, double>;
-        [[nodiscard]] auto check_outlier(double x_val,
-                                         double y_val,
-                                         const std::pair<double, double>& weight_bias) const -> std::pair<bool, double>;
+        [[nodiscard]] auto check_outlier(double x_val, double y_val, const std::pair<double, double>& weight_bias) const
+            -> std::pair<bool, double>;
 
       private:
-        static constexpr auto n_pars = 3;
+        static constexpr auto n_pars = 2;
+        double sigma_ = 20.;
         Config config_;
         Result result_;
         std::span<const double> x_vals_;
@@ -91,11 +89,10 @@ class fmt::formatter<R3B::HuberRegressor::Result>
     constexpr auto format(const R3B::HuberRegressor::Result& result, FmtContent& ctn) const
     {
         return fmt::format_to(ctn.out(),
-                              "{{iteration: {}, weight: {}, bias: {}, sigma: {}, is_success: {}}}",
+                              "{{iteration: {}, weight: {}, bias: {}, is_success: {}}}",
                               result.iteration,
                               result.weight,
                               result.bias,
-                              result.sigma,
                               result.is_success);
     }
 };

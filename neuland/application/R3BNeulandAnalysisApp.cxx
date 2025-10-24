@@ -2,6 +2,7 @@
 #include "R3BLosMapped2CalPar.h"
 #include "R3BLosProvideTStart.h"
 #include "R3BNeulandApp.h"
+#include "R3BNeulandCalMonitorTask.h"
 #include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandCalToHitTask.h"
 #include "R3BNeulandCommonFunc.h"
@@ -257,6 +258,13 @@ namespace R3B::Neuland
                 read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
             task->SetTrigger(option.mode);
             task->SetGlobalTimeOffset(option.global_time_offset);
+            run->AddTask(task.release());
+        }
+        if (const auto& option = task_option.cal_monitor_task; option.enable)
+        {
+            parse_io_branch_names(option, read_branch_names, 1, write_branch_names, 0);
+            auto task = std::make_unique<R3B::Neuland::CalMonitorTask>(read_branch_names.at(0));
+            task->SetTrigger(option.mode);
             run->AddTask(task.release());
         }
     }

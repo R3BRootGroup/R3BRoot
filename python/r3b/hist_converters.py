@@ -2,30 +2,156 @@ import itertools
 
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 
-def th2d_to_arrays(histgram):
-    nbinsy = histgram.GetNbinsY()
-    nbinsx = histgram.GetNbinsX()
+def th2d_to_arrays(histogram):
+    xaxis, yaxis = (histogram.GetXaxis(), histogram.GetYaxis())
+    bin_xmin, bin_xmax = (xaxis.GetFirst(), xaxis.GetLast())
+    bin_ymin, bin_ymax = (yaxis.GetFirst(), yaxis.GetLast())
+    nbinsx, nbinsy = (bin_xmax - bin_xmin + 1, bin_ymax - bin_ymin + 1)
+
     x_data = np.zeros(nbinsx)
     y_data = np.zeros(nbinsy)
     z_data = np.zeros((nbinsy, nbinsx))
-    for index in range(nbinsx):
-        x_data[index] = histgram.GetXaxis().GetBinCenter(index + 1)
-    for index in range(nbinsy):
-        y_data[index] = histgram.GetYaxis().GetBinCenter(index + 1)
-    for idx_x, idx_y in itertools.product(range(1, nbinsx), range(1, nbinsy)):
-        z_data[idx_y, idx_x] = histgram.GetBinContent(idx_x + 1, idx_y + 1)
+    for index, bin_x in enumerate(range(bin_xmin, bin_xmax + 1)):
+        x_data[index] = histogram.GetXaxis().GetBinCenter(bin_x)
+    for index, bin_y in enumerate(range(bin_ymin, bin_ymax + 1)):
+        y_data[index] = histogram.GetYaxis().GetBinCenter(bin_y)
+    for (idx_x, bin_x), (idx_y, bin_y) in itertools.product(
+        enumerate(range(bin_xmin, bin_xmax + 1)),
+        enumerate(range(bin_ymin, bin_ymax + 1)),
+    ):
+        z_data[idx_y, idx_x] = histogram.GetBinContent(bin_x, bin_y)
+        # z_data[z_data == 0.] = np.nan
     return x_data, y_data, z_data
 
 
-def th1d_to_df(histgram):
-    nbinsx = histgram.GetNbinsX()
-    x_data = np.zeros(nbinsx)
-    y_data = np.zeros(nbinsx)
+def th1d_to_df(histogram):
+    xaxis = histogram.GetXaxis()
+    bin_xmin, bin_xmax = (xaxis.GetFirst(), xaxis.GetLast())
+    nbinsx = bin_xmax - bin_xmin + 1
 
-    for index in range(0, nbinsx):
-        x_data[index] = histgram.GetBinCenter(index + 1)
-        y_data[index] = histgram.GetBinContent(index + 1)
+    if bool(histogram.GetXaxis().GetLabels()):
+        x_data = []
+        y_data = []
+        for idx, name in zip(
+            range(0, nbinsx), histogram.GetXaxis().GetLabels()
+        ):
+            x_data.append(name)
+            y_data.append(histogram.GetBinContent(idx + 1))
+    else:
+        x_data = np.zeros(nbinsx)
+        y_data = np.zeros(nbinsx)
+
+        for index, bin_n in enumerate(range(bin_xmin, bin_xmax + 1)):
+            x_data[index] = histogram.GetBinCenter(bin_n)
+            y_data[index] = histogram.GetBinContent(bin_n)
 
     return pd.DataFrame({"x": x_data, "y": y_data})
+
+
+class PlotHist:
+    def __init__(self, root_folder, hist_names):
+        self._root_folder = root_folder
+        self._hist_names = hist_names
+        self._fig = None
+        self._axes = None
+
+    def __call__(self, fig=None, axes=None):
+        if fig is not None and axes is not None:
+            self._fig = fig
+            self._axes = axes
+        else:
+            self._fig, self._axes = plt.subplots(len(self._hist_names), 1)
+        if not hasattr(self._axes, "__len__"):
+            self._plot_hist(self._hist_names[0], self._axes)
+            return self._fig, self._axes
+        for hist_name, axis in zip(self._hist_names, self._axes.reshape(-1)):
+            self._plot_hist(hist_name, axis)
+        return self._fig, self._axes
+
+    def _plot_hist(self, hist_name, axis):
+        assert self._fig is not None
+        hist_obj = self._root_folder.Get(hist_name)
+        class_name = hist_obj.ClassName()
+        if "TH1" in class_name:
+            PlotHist.plot_th1(hist_obj, axis)
+        elif "TH2" in class_name:
+            pos = PlotHist.plot_th2(hist_obj, axis)
+            self._fig.colorbar(pos, ax=axis)
+        else:
+            raise NameError(
+                f"Cannot plot the object {hist_name} with class {class_name}"
+            )
+
+    @staticmethod
+    def plot_th1(hist_obj, axis):
+        data_df = th1d_to_df(hist_obj)
+
+        if bool(hist_obj.GetXaxis().GetLabels()):
+            sns.barplot(data=data_df, x="x", y="y", ax=axis)
+        else:
+            sns.lineplot(
+                data=data_df, x="x", y="y", drawstyle="steps-mid", ax=axis
+            )
+            x_bin_width = hist_obj.GetXaxis().GetBinWidth(0)
+            x_bin_min = hist_obj.GetXaxis().GetXmin()
+            x_bin_max = hist_obj.GetXaxis().GetXmax()
+            axis.set(
+                xlim=(x_bin_min + x_bin_width / 2, x_bin_max - x_bin_width / 2)
+            )
+        axis.set(xlabel=hist_obj.GetXaxis().GetTitle())
+        axis.set(ylabel=hist_obj.GetYaxis().GetTitle())
+        axis.set(title=hist_obj.GetTitle())
+
+    @staticmethod
+    def plot_th1s(hist_objs, axis):
+        data_dfs = []
+        for hist in hist_objs:
+            data_df = th1d_to_df(hist)
+            data_df["label"] = hist.GetTitle()
+            data_dfs.append(data_df)
+        total_data_df = pd.concat(data_dfs)
+
+        if bool(hist_objs[0].GetXaxis().GetLabels()):
+            sns.barplot(data=total_data_df, x="x", y="y", ax=axis, hue="label")
+        else:
+            sns.lineplot(
+                data=total_data_df,
+                x="x",
+                y="y",
+                drawstyle="steps-mid",
+                ax=axis,
+                hue="label",
+            )
+            x_bin_width = hist_objs[0].GetXaxis().GetBinWidth(0)
+            x_bin_min = hist_objs[0].GetXaxis().GetXmin()
+            x_bin_max = hist_objs[0].GetXaxis().GetXmax()
+            axis.set(
+                xlim=(x_bin_min + x_bin_width / 2, x_bin_max - x_bin_width / 2)
+            )
+        axis.set(xlabel=hist_objs[0].GetXaxis().GetTitle())
+        axis.set(ylabel=hist_objs[0].GetYaxis().GetTitle())
+        # axis.set(title=hist_obj.GetTitle())
+
+    @staticmethod
+    def plot_th2(hist_obj, axis):
+        x_data, y_data, z_data = th2d_to_arrays(hist_obj)
+        x_bin_width = hist_obj.GetXaxis().GetBinWidth(0)
+        y_bin_width = hist_obj.GetYaxis().GetBinWidth(0)
+        axis.set(xlabel=hist_obj.GetXaxis().GetTitle())
+        axis.set(ylabel=hist_obj.GetYaxis().GetTitle())
+        axis.set(title=hist_obj.GetTitle())
+        return axis.imshow(
+            z_data,
+            extent=[
+                min(x_data) - x_bin_width / 2,
+                max(x_data) + x_bin_width / 2,
+                min(y_data) - y_bin_width / 2,
+                max(y_data) + y_bin_width / 2,
+            ],
+            origin="lower",
+            aspect="auto",
+        )

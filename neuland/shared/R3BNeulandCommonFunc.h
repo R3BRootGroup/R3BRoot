@@ -23,7 +23,7 @@ namespace R3B::Neuland
       public:
         static constexpr auto GetBarVerticalDisplacement(int module_num) -> double
         {
-            const auto bar_num = module_num % BarsPerPlane;
+            const auto bar_num = ((module_num - 1) % BarsPerPlane) + 1;
             return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
         }
         static constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool
@@ -33,6 +33,7 @@ namespace R3B::Neuland
         static constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
         static constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
         static constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
+        static constexpr auto ModuleNum2BarID(int module_num) -> int { return ((module_num - 1) % BarsPerPlane); }
         static constexpr auto IsModuleNumHorizontal(int module_num) -> bool
         {
             return IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));

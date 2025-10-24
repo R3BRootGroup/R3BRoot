@@ -131,7 +131,7 @@ namespace R3B
         auto operator<(Arithmetic auto val) -> bool
 #else
         template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
-        auto operator<(OtherType other) -> bool
+        auto operator<(OtherType val) -> bool
 #endif
         {
             return value < val;

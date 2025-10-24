@@ -9,6 +9,7 @@
 #include <FairRootFileSink.h>
 #include <FairRun.h>
 #include <FairRuntimeDb.h>
+#include <algorithm>
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -28,6 +29,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
+#include <ranges>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -55,16 +57,43 @@ namespace
 
     enum class JSONConfigInputType : uint8_t
     {
+        native,
         file,
         string,
         invalid
     };
 
+    constexpr auto trim_space(std::string_view str) -> std::string_view
+    {
+        if (str.empty())
+        {
+            return std::string_view{};
+        }
+        const auto* start_pos = std::ranges::find_if(str, [](auto cha) -> bool { return cha != ' ' and cha != '\n'; });
+        auto end_pos = std::ranges::find_if(str | std::views::reverse,
+                                            [](auto cha) -> bool { return cha != ' ' and cha != '\n'; });
+        if (start_pos > end_pos.base())
+        {
+            return std::string_view{};
+        }
+        return std::string_view{ start_pos, end_pos.base() };
+    }
+
     auto check_json_input_type(std::string_view input) -> JSONConfigInputType
     {
-        auto is_json_string = [](std::string_view string) -> bool { return string.find('=') != std::string::npos; };
+        auto is_json_native_string = [](std::string_view string) -> bool
+        {
+            const auto trim_string = trim_space(string);
+            return trim_string.starts_with('{') and trim_string.ends_with('}');
+        };
+
+        auto is_json_string = [](std::string_view string) -> bool { return string.contains('='); };
         auto is_a_file = [](std::string_view string) -> bool { return std::filesystem::exists(string); };
 
+        if (is_json_native_string(input))
+        {
+            return JSONConfigInputType::native;
+        }
         if (is_json_string(input))
         {
             return JSONConfigInputType::string;
@@ -251,7 +280,9 @@ namespace R3B::Neuland
             auto file_path = option.output.working_dir.empty()
                                  ? fs::path{ output_name }
                                  : fs::path{ option.output.working_dir } / fs::path{ output_name };
-            auto file_sink = std::make_unique<FairRootFileSink>(file_path.c_str());
+            auto root_file =
+                std::make_unique<TFile>(file_path.c_str(), magic_enum::enum_name(option.output.mode).data());
+            auto file_sink = std::make_unique<FairRootFileSink>(root_file.release());
             run_->SetSink(file_sink.release());
         }
 
@@ -375,6 +406,12 @@ namespace R3B::Neuland
             {
                 switch (check_json_input_type(filename_or_option))
                 {
+                    case JSONConfigInputType::native:
+                    {
+                        auto json_string = filename_or_option;
+                        LOGP(info, "Reading the configuration from the native JSON string {:?}.", json_string);
+                        return nlohmann::ordered_json::parse(std::move(json_string), nullptr, true, true);
+                    }
                     case JSONConfigInputType::string:
                     {
                         auto json_string = transform_to_json_string(filename_or_option);

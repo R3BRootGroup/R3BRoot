@@ -50,6 +50,7 @@ namespace R3B::Neuland
             is_write_hist_disabled_ = is_write_hist_disabled;
         }
 
+        void ConditionFillToHist(std::string_view condition);
         [[nodiscard]] auto GetBasePar() const -> auto* { return base_par_; }
         // void SetOnline()
 
@@ -78,7 +79,7 @@ namespace R3B::Neuland
 
         CalibrationBasePar* base_par_ = AddInputPar<CalibrationBasePar>("NeulandCalibrationBasePar");
         TH1I* hist_trig_check_ = nullptr;
-        TH1I* hist_condition_check_ = nullptr;
+        TH1L* hist_condition_check_ = nullptr;
 
         // helpers:
         DataMonitor histograms_;

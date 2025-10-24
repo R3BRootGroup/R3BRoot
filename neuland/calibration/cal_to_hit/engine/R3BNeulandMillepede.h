@@ -28,6 +28,7 @@
 #include <cstdint>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <limits>
 #include <memory>
 #include <optional>
 #include <string>
@@ -37,6 +38,8 @@
 // #include <RankChecker.h>
 
 class TGraphErrors;
+
+class TH2D;
 
 namespace R3B::Neuland::Calibration
 {
@@ -50,11 +53,14 @@ namespace R3B::Neuland::Calibration
     struct MillepedeOptions
     {
         bool outdir_has_timestamp = true;
+        int min_plane_num = DEFAULT_MINIMUM_PLANE_NUM;
         int num_of_threads = 0;
         float scale_factor = 1000.F;
+        float max_abs_a_xz = DEFAULT_MAX_SLOPE_VALUE;
+        float max_abs_a_yz = DEFAULT_MAX_SLOPE_VALUE;
         double t_diff_residual_cut = DEFAULT_T_DIFF_RESIDUAL_CUT;
         double p_value_cut = DEFAULT_CALIBRATION_P_VALUE_CUT;
-        std::string mille_par_filename = "neuland_pars.txt";
+        std::string mille_data_filename = "neuland_cosmic_mille.bin";
         std::string pede_par_filename = "neuland_pars.txt";
         std::string mille_log_filename;
     };
@@ -64,33 +70,29 @@ namespace R3B::Neuland::Calibration
       public:
         MillepedeEngine() = default;
         void enable_rank_check(bool rank_check = true) { has_rank_check_ = rank_check; }
-        void set_t_diff_residual_cut(double val) { t_diff_residual_cut_ = val; }
-        void set_p_value_cut(double val) { p_value_cut_ = val; }
+        void set_t_diff_residual_cut(double val) { config_.t_diff_residual_cut = val; }
+        void set_p_value_cut(double val) { config_.p_value_cut = val; }
         void set_options(const MillepedeOptions& options);
 
       private:
-        bool outdir_has_timestamp_ = true;
         bool has_rank_check_ = false;
         int minimum_hit_ = 1;
-        int pede_num_of_threads_ = 0;
-        float error_scale_factor_ = 1000.F;
+
+        MillepedeOptions config_;
         // float minimum_pos_z_ = 0;
         // float smallest_time_sum_ = 0.;
         std::optional<float> average_t_sum_;
-        double t_diff_residual_cut_ = DEFAULT_T_DIFF_RESIDUAL_CUT;
-        double p_value_cut_ = DEFAULT_CALIBRATION_P_VALUE_CUT;
         constexpr static std::string_view DEFAULT_SUB_DIR = "millepede";
 
         MilleDataPoint input_data_buffer_;
         R3B::OutputVectorConnector<MilleCalData> output_mille_data_{ "MilleData" };
         R3B::OutputConnector<MilleTrackInfo> output_mille_track_info_{ "MilleTrackInfo" };
-        std::string input_data_filename_ = "neuland_cosmic_mille.bin";
+        // R3B::OutputVectorConnector<MilleDataPoint> output_mille_data_point_{ "MilleDataPoint" };
         std::string pede_steer_filename_ = "neuland_steer.txt";
         std::string input_parameter_filename_ = "neuland_pars.txt";
-        std::string output_parameter_filename_ = "neuland_pars.txt";
-        std::string mille_log_filename_;
         std::string working_dir_;
 
+        std::vector<int> plane_counter_;
         std::unique_ptr<Mille> binary_data_writer_;
         Millepede::ResultReader par_result_;
         Millepede::Launcher pede_launcher_;
@@ -106,6 +108,12 @@ namespace R3B::Neuland::Calibration
         TH1D* hist_b_xz_ = nullptr;
         TH1D* hist_a_yz_ = nullptr;
         TH1D* hist_b_yz_ = nullptr;
+        TH1D* hist_t_diff_module_counts_ = nullptr;
+        TH1D* hist_plane_hit_num_ = nullptr;
+        TH2D* hist_module_residuals_ = nullptr;
+        TH2D* hist_module_residuals_bar_pos_ = nullptr;
+        TH2D* hist_fit_diff_time_ = nullptr;
+        TH1L* barplot_filter_counts_ = nullptr;
 
         // parameter:
         Cal2HitPar* cal_to_hit_par_ = nullptr;
@@ -122,6 +130,7 @@ namespace R3B::Neuland::Calibration
         {
             output_mille_data_.clear();
             output_mille_track_info_.clear();
+            // output_mille_data_point_.clear();
         };
         void EndOfTask() override;
         void HistInit(DataMonitor& histograms) override;
@@ -130,7 +139,7 @@ namespace R3B::Neuland::Calibration
             minimum_hit_ = min;
             R3BLOG(info, fmt::format("Minimum number of hits is set to {}", minimum_hit_));
         }
-        void SetErrorScale(float scale) override { error_scale_factor_ = scale; }
+        void SetErrorScale(float scale) override { config_.scale_factor = scale; }
 
         void buffer_clear();
         void write_to_buffer();

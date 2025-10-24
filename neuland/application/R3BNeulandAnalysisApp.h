@@ -158,6 +158,14 @@ namespace R3B::Neuland
                     std::string read = "NeulandCalData;NeulandHitPar";
                     std::string write = "NeulandHit";
                 } cal_to_hit_task;
+                struct CalMonitorTask
+                {
+                    bool enable = false;
+                    CalTrigger mode = CalTrigger::offspill;
+                    std::string name = "NeulandCalMonitorTask";
+                    std::string read = "NeulandCalData";
+                    std::string write;
+                } cal_monitor_task;
                 struct LosMap2CalParTask
                 {
                     bool enable = false;

@@ -39,10 +39,13 @@ namespace R3B::Neuland::Calibration
             , right{ bar_cal_data.right.front() }
         {
         }
-        bool is_outlier = false;
-        int module_num = 0;   //!< 1 based bar num
-        float residual = 0.;  //!< residual value against the fitted line
-        ValueErrorD position; //!< position of the hit along the bar direction
+        bool is_outlier = false;      //!< check if outlier
+        int module_num = 0;           //!< 1 based bar num
+        float fit_diff = 0.F;         //!< Difference value from the fitted line and position (time derived)
+        float residual = -1.;         //!< residual value against the fitted line
+        float residual_bar_pos = -1.; //!< residual value against the fitted line of bar positions
+        ValueErrorD position;         //!< position of the hit along the bar direction
+        ValueErrorD z_pos;            //!< z positions
         CalDataSignal left;
         CalDataSignal right;
 
@@ -170,13 +173,11 @@ namespace R3B::Neuland::Calibration
         /**
          * Data buffer for the event data. The buffer is reset in the end of the event.
          */
+        using DataBufferType = std::unordered_map<int, std::vector<MilleCalData>>;
         std::unordered_map<int, std::vector<MilleCalData>> data_buffers_;
         TrackInfo track_info_;
         TrackFitDataSet track_fit_data_;
         HuberRegressor huber_regressor_;
-
-        ROOT::Fit::Fitter fitter_;
-        TF1 fit_function_{ "mille_fitting", "[0] * x + [1]" };
 
         void init_data_registers(int num_of_modules);
 
@@ -190,6 +191,9 @@ namespace R3B::Neuland::Calibration
         auto fit_planes(const Cal2HitPar& hit_par) -> bool;
         auto linear_fit(const FitDataSet& data, FitPar& fit_par) -> bool;
         void check_fit_result();
+        void set_data_buffers(DataBufferType& data_buffers,
+                              const TrackInfo& track_info,
+                              const Cal2HitPar& hit_par) const;
     };
 } // namespace R3B::Neuland::Calibration
 

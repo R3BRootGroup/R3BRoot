@@ -1,6 +1,7 @@
 #include "R3BNeulandMilleCalDataProcessor.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalToHitPar.h"
+#include "R3BNeulandCommonFunc.h"
 #include <Fit/BinData.h>
 #include <Math/WrappedMultiTF1.h>
 #include <R3BNeulandCommon.h>
@@ -9,6 +10,7 @@
 #include <fmt/core.h>
 #include <functional>
 #include <numeric>
+#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -34,12 +36,6 @@ namespace R3B::Neuland::Calibration
         config.weight.learning_rate = 0.1;
         config.bias.init = 0.;
         config.bias.learning_rate = 10.;
-        config.sigma.init = 1.;
-        config.sigma.learning_rate = 0.1;
-
-        fitter_.SetFunction(
-            ROOT::Math::WrappedMultiTF1{ fit_function_, static_cast<unsigned int>(fit_function_.GetNdim()) }, true);
-        fitter_.Config().SetMinimizer("Linear");
     }
 
     void MilleDataProcessor::init_data_registers(int num_of_modules)
@@ -52,12 +48,7 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    void MilleDataProcessor::reset_fit_pars()
-    {
-        fitter_.Config().ParSettings(0).SetValue(0.);
-        fitter_.Config().ParSettings(1).SetValue(0.);
-        huber_regressor_.reset_parameters();
-    }
+    void MilleDataProcessor::reset_fit_pars() { huber_regressor_.reset_parameters(); }
 
     void MilleDataProcessor::reset()
     {
@@ -77,8 +68,8 @@ namespace R3B::Neuland::Calibration
         {
             if (signal.left.size() == 1 && signal.right.size() == 1)
             {
-                const auto bar_num = static_cast<int>(signal.module_num);
-                const auto plane_id = ModuleID2PlaneID(bar_num - 1);
+                const auto module_num = static_cast<int>(signal.module_num);
+                const auto plane_id = ModuleID2PlaneID(module_num - 1);
                 data_buffers_[plane_id].emplace_back(signal);
             }
         }
@@ -102,10 +93,10 @@ namespace R3B::Neuland::Calibration
             {
                 const auto module_num = static_cast<int>(signal.module_num);
                 return (stdrng::find_if(bar_signals,
-                                        [module_num](const auto& bar_signal)
+                                        [module_num](const auto& bar_signal) -> auto
                                         { return bar_signal.module_num == module_num - 1; }) == bar_signals.end()) and
                        (stdrng::find_if(bar_signals,
-                                        [module_num](const auto& bar_signal)
+                                        [module_num](const auto& bar_signal) -> auto
                                         { return bar_signal.module_num == module_num + 1; }) == bar_signals.end());
             };
 
@@ -121,33 +112,48 @@ namespace R3B::Neuland::Calibration
     {
         using TrackInfo = MilleDataProcessor::TrackInfo;
 
-        auto calculate_residual(const TrackInfo& track_info, double val, int module_num) -> float
+        // auto calculate_residual(const TrackInfo& track_info, double val, int module_num) -> float
+        // {
+        //     const auto z_val = ModuleNum2ZPos(module_num);
+        //     const auto is_plane_horizontal = IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));
+        //     const auto& bar_disp_info = track_info.bar_disp_data;
+        //     const auto& fit_result = is_plane_horizontal ? bar_disp_info.x_z : bar_disp_info.y_z;
+        //     const auto diff = val - (fit_result.slope * z_val) - fit_result.offset;
+        //     return static_cast<float>(diff * diff);
+        // }
+
+        constexpr auto calculate_diff(const MilleFitPar& fit_result, double val, int module_num) -> float
         {
             const auto z_val = ModuleNum2ZPos(module_num);
-            const auto is_plane_horizontal = IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));
-            const auto& bar_disp_info = track_info.bar_disp_data;
-            const auto& fit_result = is_plane_horizontal ? bar_disp_info.x_z : bar_disp_info.y_z;
-            const auto diff = val - (fit_result.slope * z_val) - fit_result.offset;
+            return static_cast<float>(val - (fit_result.slope * z_val) - fit_result.offset);
+        }
+
+        constexpr auto calculate_residual(const MilleFitPar& fit_result, double val, int module_num) -> float
+        {
+            const auto diff = calculate_diff(fit_result, val, module_num);
             return static_cast<float>(diff * diff);
         }
 
-        void calculate_residual_values(DataBufferType& data_buffers,
-                                       const TrackInfo& track_info,
-                                       const Cal2HitPar& hit_par)
+        constexpr auto check_outlier_exist(const DataBufferType& data_buffer) -> bool
         {
-            for (auto& [plane_id, plane_data] : data_buffers)
+            for (const auto& [plane_num, bars_data] : data_buffer)
             {
-                for (auto& signal : plane_data)
+                if (std::ranges::any_of(bars_data, &MilleCalData::is_outlier))
                 {
-                    const auto t_diff = (signal.right.leading_time - signal.right.trigger_time) -
-                                        (signal.left.leading_time - signal.left.trigger_time);
-                    const auto& module_par = hit_par.GetModuleParAt(signal.module_num);
-                    const auto position = (-t_diff + module_par.t_diff) / 2 * module_par.effective_speed;
-                    signal.position = position;
-                    signal.residual = calculate_residual(track_info, position.value, signal.module_num);
+                    return true;
                 }
             }
+            return false;
         }
+
+        constexpr void remove_outliers(DataBufferType& data_buffer)
+        {
+            for (auto& [plane_num, bars_data] : data_buffer)
+            {
+                std::erase_if(bars_data, [](const auto& bar_data) -> bool { return bar_data.is_outlier; });
+            }
+        }
+
     } // namespace
 
     auto MilleDataProcessor::fit_planes(const Cal2HitPar& hit_par) -> bool
@@ -155,22 +161,24 @@ namespace R3B::Neuland::Calibration
         auto is_ok = true;
         fill_bar_disp_dataset();
         LOGP(debug, "Fitting the data of bar displacements ... ");
-        is_ok &= (linear_fit(track_fit_data_.bar_x_z, track_info_.bar_disp_data.x_z) and
-                  linear_fit(track_fit_data_.bar_y_z, track_info_.bar_disp_data.y_z));
-        if (not is_ok)
+        while (not std::ranges::all_of(data_buffers_ | std::views::values,
+                                       [](const auto& bars) -> bool { return bars.empty(); }))
         {
-            return false;
+            remove_outliers(data_buffers_);
+            is_ok &= (linear_fit(track_fit_data_.bar_x_z, track_info_.bar_disp_data.x_z) and
+                      linear_fit(track_fit_data_.bar_y_z, track_info_.bar_disp_data.y_z));
+            if (not is_ok)
+            {
+                return false;
+            }
+            set_data_buffers(data_buffers_, track_info_, hit_par);
+            if (not check_outlier_exist(data_buffers_))
+            {
+                break;
+            }
         }
-        calculate_residual_values(data_buffers_, track_info_, hit_par);
         fill_time_dataset();
         LOGP(debug, "Fitting the data of time-derived positions ... ");
-        is_ok &= (linear_fit(track_fit_data_.time_data_x_z, track_info_.time_data.x_z) and
-                  linear_fit(track_fit_data_.time_data_y_z, track_info_.time_data.y_z));
-
-        if (not is_ok)
-        {
-            return false;
-        }
         if (fair::Logger::GetConsoleSeverity() <= fair::Severity::debug)
         {
             check_fit_result();
@@ -236,7 +244,7 @@ namespace R3B::Neuland::Calibration
                 std::accumulate(plane_data.begin(),
                                 plane_data.end(),
                                 0.,
-                                [](double sum, const MilleCalData& signal)
+                                [](double sum, const MilleCalData& signal) -> double
                                 { return sum + GetBarVerticalDisplacement(static_cast<int>(signal.module_num)); }) /
                 static_cast<double>(plane_data.size());
             bar_disp_fit_data.z_vals.push_back(bar_z_val);
@@ -268,6 +276,33 @@ namespace R3B::Neuland::Calibration
             bar_time_data.z_errs.push_back(BarSize_Z / 2.);
             bar_time_data.errs.push_back(iter->position.error);
             bar_time_data.vals.push_back(iter->position.value);
+        }
+    }
+
+    void MilleDataProcessor::set_data_buffers(DataBufferType& data_buffers,
+                                              const TrackInfo& track_info,
+                                              const Cal2HitPar& hit_par) const
+    {
+        for (auto& [plane_id, plane_data] : data_buffers)
+        {
+            for (auto& signal : plane_data)
+            {
+                const auto t_diff = (signal.right.leading_time - signal.right.trigger_time) -
+                                    (signal.left.leading_time - signal.left.trigger_time);
+                const auto& module_par = hit_par.GetModuleParAt(signal.module_num);
+                const auto position_along_bar = (-t_diff + module_par.t_diff) / 2 * module_par.effective_speed;
+                const auto position_vert_bar = Common::GetBarVerticalDisplacement(signal.module_num);
+                signal.position = position_along_bar;
+                const auto& bar_disp_info = track_info.bar_disp_data;
+
+                const auto& [fit_result, fit_result_bar] = IsPlaneIDHorizontal(ModuleID2PlaneID(signal.module_num - 1))
+                                                               ? std::tie(bar_disp_info.x_z, bar_disp_info.y_z)
+                                                               : std::tie(bar_disp_info.y_z, bar_disp_info.x_z);
+                signal.fit_diff = calculate_diff(fit_result, position_along_bar.value, signal.module_num);
+                signal.residual = calculate_residual(fit_result, position_along_bar.value, signal.module_num);
+                signal.residual_bar_pos = calculate_residual(fit_result_bar, position_vert_bar, signal.module_num);
+                signal.is_outlier = check_is_outlier(signal.module_num);
+            }
         }
     }
 

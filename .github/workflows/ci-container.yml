@@ -105,7 +105,7 @@ jobs:
         with:
           style: 'file'  # Use .clang-format config file
           tidy-checks: '-*'
-          version: 18
+          version: 21
           verbosity: debug
           lines-changed-only: false
           files-changed-only: false
