@@ -384,8 +384,16 @@ bool R3BActafReader::R3BRead2025()
         {
             maxPos[chn] = FindMaxPosition(trace[chn]);
             maxAmplitude[chn] = FindMaxAmplitude(trace[chn]);
-            baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
-            baselineStdOld[chn] = ComputeBaselineMean(trace[chn], maxPos[chn], 0);
+            if (maxPos[chn] > 0)
+            {
+                baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
+                baselineStdOld[chn] = ComputeBaselineMean(trace[chn], maxPos[chn], 0);
+            }
+            else
+            {
+                baselineMean[chn] = ComputeBaselineMean(trace[chn], 400);
+                baselineStdOld[chn] = ComputeBaselineMean(trace[chn], 400, 0);
+            }
             integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
 
             SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
