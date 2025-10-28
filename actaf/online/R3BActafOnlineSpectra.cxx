@@ -261,8 +261,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             else
                 chn++;
 
-            fh2_RawTraces[index] = R3B::root_owned<TH2F>(
-                nameHist.c_str(), titleHist.c_str(), nBinsSample / 2, 1, nBinsSample, 2000, 0, 20000);
+            fh2_RawTraces[index] =
+                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, 2000, 0, 20000);
 
             fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_RawTraces[index]->GetYaxis()->SetTitle("A");
@@ -278,14 +278,8 @@ InitStatus R3BActafOnlineSpectra::Init()
 
             std::string nameHistC = "fh2_Pad_" + std::to_string(index) + "corrected_trace";
 
-            fh2_CorrectedTraces[index] = R3B::root_owned<TH2F>(nameHistC.c_str(),
-                                                               titleHist.c_str(),
-                                                               nBinsSample / 2,
-                                                               1,
-                                                               nBinsSample,
-                                                               nBinsTrace,
-                                                               nTraceMin,
-                                                               nTraceMax);
+            fh2_CorrectedTraces[index] = R3B::root_owned<TH2F>(
+                nameHistC.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, nBinsTrace, nTraceMin, nTraceMax);
 
             fh2_CorrectedTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_CorrectedTraces[index]->GetYaxis()->SetTitle("A");
@@ -998,7 +992,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                     //     continue;
                     if (hit->GetBaseline() > 0)
                     {
-                        fh2_CorrectedTraces[pad]->Fill(index++, value /*- hit->GetBaseline()*/);
+                        fh2_CorrectedTraces[pad]->Fill(index, value /*- hit->GetBaseline()*/);
 
                         fh2_RawTraces[pad]->Fill(index++, value + hit->GetBaseline());
                     }
