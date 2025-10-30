@@ -67,6 +67,7 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
     fh2_CorrectedTraces.resize(fPads);
+    fh2_FilteredTraces.resize(fPads);
     fh1_RawE.resize(fPads);
     fh1_Baseline.resize(fPads);
 }
@@ -241,6 +242,10 @@ InitStatus R3BActafOnlineSpectra::Init()
         auto* cMapB = new TCanvas(nameCanvasB.c_str(), "Baseline info", 10, 10, 500, 500);
         cMapB->Divide(4, 4);
 
+        std::string canvasFilteredTraces = "FADC_" + std::to_string(adc + 1) + "_Filtered";
+        auto* cCalFilt = new TCanvas(canvasFilteredTraces.c_str(), "Filtered Signals info", 10, 10, 500, 500);
+        cCalFilt->Divide(4, 4);
+
         int chn = 0;
 
         for (int index = 0; index < fPads; ++index)
@@ -293,6 +298,18 @@ InitStatus R3BActafOnlineSpectra::Init()
             cMap_perRing[sideNb][ringNb - 1][1]->cd(countsPerRing[sideNb][ringNb - 1]);
             fh2_CorrectedTraces[index]->Draw("colz");
 
+            // Filtered traces (CAL LEVEL!)
+            std::string nameFiltHist = "fh2_Pad_" + std::to_string(index) + "filtered_trace";
+            fh2_FilteredTraces[index] = R3B::root_owned<TH2F>(
+                nameFiltHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, nBinsTrace, nTraceMin, nTraceMax);
+            fh2_FilteredTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
+            fh2_FilteredTraces[index]->GetYaxis()->SetTitle("A");
+            fh2_FilteredTraces[index]->GetYaxis()->SetTitleOffset(1.1);
+            fh2_FilteredTraces[index]->GetXaxis()->CenterTitle(true);
+            fh2_FilteredTraces[index]->GetYaxis()->CenterTitle(true);
+            cCalFilt->cd(chn);
+            fh2_FilteredTraces[index]->Draw("colz");
+
             std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
             std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1) + " (Mod " + std::to_string(FADCnum) +
                                      " Chn " + std::to_string(FADCchn) + ")";
@@ -336,6 +353,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
         mapfol->Add(cMapE);
         mapfol->Add(cMapB);
+        calfol->Add(cCalFilt);
     }
 
     for (auto const& vecSide : cMap_perRing)
@@ -835,6 +853,11 @@ void R3BActafOnlineSpectra::Reset_Histo()
             hist->Reset();
         }
 
+        for (const auto& hist : fh2_FilteredTraces)
+        {
+            hist->Reset();
+        }
+
         for (const auto& hist : fh1_RawE)
         {
             hist->Reset();
@@ -1038,6 +1061,18 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             fh2_tLeading_cal->Fill(pad, tLeading);
             fh2_maxAmp_cal->Fill(pad, maxAmp);
             fh2_tSync_cal->Fill(pad, tSync);
+
+            if (fDisplaytraces && pad < 129)
+            {
+                auto vec = hit->GetTrace(); // std::vector
+                std::size_t index = 0;
+                for (const auto& value : vec)
+                {
+                    if (value == 0)
+                        continue;
+                    fh2_FilteredTraces[pad - 1]->Fill(index++, value);
+                }
+            }
         }
     }
 
@@ -1195,6 +1230,10 @@ void R3BActafOnlineSpectra::FinishTask()
             hist->Write();
         }
         for (const auto& hist : fh2_CorrectedTraces)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh2_FilteredTraces)
         {
             hist->Write();
         }

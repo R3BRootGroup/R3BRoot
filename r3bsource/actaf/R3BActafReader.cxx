@@ -169,32 +169,6 @@ inline double ComputeRiseTime(const std::array<double, ACTAF_BINS>& signal, doub
     return t90 - t0;
 }
 
-inline void ApplySGFilter(std::array<double, ACTAF_BINS>& signal, std::vector<double> coeffs)
-{
-    auto n = signal.size(), m = coeffs.size();
-    int half = m / 2;
-
-    std::vector<double> output(n), ext(n + 2 * half);
-
-    for (int i = 0; i < half; i++)
-        ext[i] = signal[0];
-    for (int i = 0; i < n; i++)
-        ext[i + half] = signal[i];
-    for (int i = 0; i < half; i++)
-        ext[n + half + i] = signal[n - 1];
-
-    for (int i = 0; i < n; i++)
-    {
-        double sum = 0.0;
-        for (int j = 0; j < m; j++)
-            sum += coeffs[j] * ext[i + j];
-        output[i] = sum;
-    }
-
-    for (int i = 0; i < n; i++)
-        signal[i] = output[i];
-}
-
 // ------------------------------ Reader impl ----------------------------------
 
 R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2023_onion* data, size_t offset)
@@ -268,12 +242,6 @@ Bool_t R3BActafReader::Init(ext_data_struct_info* a_struct_info)
         mapping[mod][chn] = index + 1;
     }
 
-    fNbSgCoeffs = fMapping_Par->GetNbSGCoeffs();
-    fSgCoeffs.resize(fNbSgCoeffs);
-    for (auto index = 0; index < fNbSgCoeffs; ++index)
-    {
-        fSgCoeffs[index] = fMapping_Par->GetSGCoeff(index);
-    }
     return kTRUE;
 }
 
@@ -397,8 +365,6 @@ bool R3BActafReader::R3BRead2025()
             integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
 
             SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
-            if (fApplyFilter)
-                ApplySGFilter(correctedtrace, fSgCoeffs);
             baselineStdNew[chn] = ComputeBaselineMean(correctedtrace, maxPos[chn], 0);
             riseTime[chn] = ComputeRiseTime(correctedtrace, maxPos[chn], true);
             leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0);

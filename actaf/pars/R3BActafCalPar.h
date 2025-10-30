@@ -20,6 +20,7 @@
 
 #include <FairParGenericSet.h>
 #include <FairParamList.h>
+#include <TArrayD.h>
 #include <TArrayF.h>
 #include <iostream>
 #include <vector>
@@ -42,12 +43,32 @@ class R3BActafCalPar : public FairParGenericSet
     // Methods to retrieve or set values (assumed from 0 to 127)
     [[nodiscard]] double GetGainVal(int index) { return fGainPars->GetAt(index); }
     [[nodiscard]] double GetThresholdVal(int index) { return fThresholdsPars->GetAt(index); }
+    [[nodiscard]] Double_t GetNbSGCoeffs() const { return fNbSGcoefs; }
+    [[nodiscard]] Double_t GetSGCoeff(Int_t index) const
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fSGCoeffs.size()))
+        {
+            throw std::out_of_range("GetPad: index out of range");
+        }
+        return fSGCoeffs[index];
+    }
+
     void SetGainVal(int index, double val) { fGainPars->SetAt(val, index); }
     void SetThresholdVal(int index, double val) { fThresholdsPars->SetAt(val, index); }
+    void SetNbSGCoeffs(Int_t num);
+    void SetSGCoeff(Int_t index, double val)
+    {
+        if (index < 0 || index >= static_cast<Int_t>(fSGCoeffs.size()))
+        {
+            throw std::out_of_range("SetSGCoeffs: index out of range");
+        }
+        fSGCoeffs[index] = val;
+    }
 
   private:
     static constexpr int fPads = 128;
-
+    int fNbSGcoefs = 49;
+    std::vector<double> fSGCoeffs;
     TArrayF* fGainPars = nullptr;
     TArrayF* fThresholdsPars = nullptr;
 

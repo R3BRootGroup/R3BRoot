@@ -32,7 +32,7 @@ R3BActafMappingPar::R3BActafMappingPar(const char* name, const char* title, cons
     fModule.resize(fNbPads);
     fChannel.resize(fNbPads);
     fPad.resize(fNbPads);
-    fSGCoeffs.resize(fNbSGcoefs);
+
     for (Int_t idx = 0; idx < fNbPads; idx++)
     {
         fIn_use[idx] = 1;
@@ -58,8 +58,6 @@ void R3BActafMappingPar::SetNbPads(Int_t pads)
     fChannel.resize(pads);
     fPad.resize(pads);
 }
-
-void R3BActafMappingPar::SetNbSGCoeffs(Int_t num) { fSGCoeffs.resize(num); }
 
 // ----  Method clear ----------------------------------------------------------
 void R3BActafMappingPar::clear()
@@ -87,9 +85,6 @@ void R3BActafMappingPar::putParams(FairParamList* list)
     list->add("NbPadsPar", fNbPads);
     R3BLOG(info, "Nb of pads: " << fNbPads);
 
-    list->add("NbSGPar", fNbSGcoefs);
-    R3BLOG(info, "Nb of pads: " << fNbSGcoefs);
-
     list->add("NbFADCModulesPar", fNbFADCModules);
     R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
 
@@ -105,17 +100,10 @@ void R3BActafMappingPar::putParams(FairParamList* list)
         Pads[idx] = fPad[idx];
     }
 
-    TArrayD SGCoeffs(fNbSGcoefs);
-    for (int idx = 0; idx < fNbSGcoefs; idx++)
-    {
-        SGCoeffs[idx] = fSGCoeffs[idx];
-    }
-
     list->add("InUsePar", In_use);
     list->add("ModulePar", Module);
     list->add("ChannelPar", Channel);
     list->add("PadPar", Pads);
-    list->add("SGCoeffs", SGCoeffs);
 }
 
 // Template to simplify the parameter getting
@@ -182,31 +170,17 @@ Bool_t R3BActafMappingPar::getParams(FairParamList* list)
         R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
     }
 
-    if (!list->fill("NbSGcoefs", &fNbSGcoefs))
-    {
-        R3BLOG(error, "Could not initialize SGCoeffs");
-        return kFALSE;
-    }
-    else
-    {
-        R3BLOG(info, "Nb of sg coeffs: " << fNbSGcoefs);
-    }
-
     // Map names to arrays for cleaner loop
     TArrayI In_use(fNbPads);
     TArrayI Module(fNbPads);
     TArrayI Channel(fNbPads);
     TArrayI Pads(fNbPads);
-    TArrayD SGCoeffs(fNbSGcoefs);
 
     // Ints
     FillAndCopy(list, "InUsePar", In_use, fIn_use);
     FillAndCopy(list, "ModulePar", Module, fModule);
     FillAndCopy(list, "ChannelPar", Channel, fChannel);
     FillAndCopy(list, "PadPar", Pads, fPad);
-
-    // Doubles
-    FillAndCopy(list, "SGCoeffs", SGCoeffs, fSGCoeffs);
 
     return kTRUE;
 }
@@ -221,7 +195,7 @@ void R3BActafMappingPar::printParams()
     R3BLOG(info, "Nb of Pads: " << fNbPads);
     R3BLOG(info, "Nb of Bins of the Sample: " << fNbBinsSample);
     R3BLOG(info, "Nb of FADC-Modules: " << fNbFADCModules);
-    R3BLOG(info, "Nb of SG Coeffs: " << fNbSGcoefs);
+
     for (Int_t idx = 0; idx < fNbPads; idx++)
     {
         R3BLOG(info, "Pad: " << idx + 1 << ", module: " << fModule[idx] << ", channel: " << fChannel[idx]);

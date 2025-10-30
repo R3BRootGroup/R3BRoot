@@ -19,25 +19,37 @@ R3BActafCalData::R3BActafCalData(UInt_t pad,
                                  double maxampl,
                                  double leadingedge,
                                  double zpos,
-                                 double syntime)
+                                 double syntime,
+                                 const std::array<double, ACTAF_BINS>& trace)
     : fPad(pad)
     , fEnergy(energy)
     , fEMaxAmpl(maxampl)
     , fLeadingEdge(leadingedge)
     , fZPos(zpos)
     , fSynTime(syntime)
+    , fTrace(trace)
 {
 }
 
 std::string R3BActafCalData::toString() const
 {
+    std::string trace_str = "[";
+    for (size_t i = 0; i < fTrace.size(); ++i)
+    {
+        trace_str += std::to_string(fTrace[i]);
+        if (i + 1 < fTrace.size())
+            trace_str += ", ";
+    }
+    trace_str += "]";
+
     return fmt::format("Pad: {}, Energy : {}, Max-ampl : {}, Leading-Time: {}, Z-Pos: {}, Syn-Time: {}",
                        GetPad(),
                        GetEnergy(),
                        GetEMaxAmpl(),
                        GetLeadingEdgeTime(),
                        GetZpos(),
-                       GetSynTime());
+                       GetSynTime(),
+                       trace_str);
 }
 
 void R3BActafCalData::Print(const Option_t*) const { std::cout << *this << std::endl; }

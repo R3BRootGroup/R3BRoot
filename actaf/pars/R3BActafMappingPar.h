@@ -60,7 +60,6 @@ class R3BActafMappingPar : public FairParGenericSet
     /** Accessor functions **/
     [[nodiscard]] Int_t GetNbPads() const { return fNbPads; }
     [[nodiscard]] Int_t GetNBinsSample() const { return fNbBinsSample; }
-    [[nodiscard]] Double_t GetNbSGCoeffs() const { return fNbSGcoefs; }
     [[nodiscard]] Int_t GetGeoVersion() const { return fGeoVersion; }
     [[nodiscard]] Int_t GetNbFADCModules() const { return fNbFADCModules; }
     [[nodiscard]] Int_t GetNbFADCChannels() const { return fNbFADCChannels; }
@@ -101,15 +100,6 @@ class R3BActafMappingPar : public FairParGenericSet
         return fPad[index];
     }
 
-    [[nodiscard]] Double_t GetSGCoeff(Int_t index) const
-    {
-        if (index < 0 || index >= static_cast<Int_t>(fSGCoeffs.size()))
-        {
-            throw std::out_of_range("GetPad: index out of range");
-        }
-        return fSGCoeffs[index];
-    }
-
     /** Accessor functions by pad (pad = index + 1) **/
     [[nodiscard]] Int_t GetInUseByPad(UInt_t pad) const { return GetInUse(pad - 1); }
     [[nodiscard]] Int_t GetFADCModuleByPad(UInt_t pad) const { return GetFADCModule(pad - 1); }
@@ -118,7 +108,7 @@ class R3BActafMappingPar : public FairParGenericSet
 
     /** Setter functions **/
     void SetNbPads(Int_t pads);
-    void SetNbSGCoeffs(Int_t num);
+
     void SetGeoVersion(Int_t v) { fGeoVersion = v; }
     void SetNBinsSample(Int_t n) { fNbBinsSample = n; }
 
@@ -158,18 +148,9 @@ class R3BActafMappingPar : public FairParGenericSet
         fPad[index] = val;
     }
 
-    void SetSGCoeff(Int_t index, double val)
-    {
-        if (index < 0 || index >= static_cast<Int_t>(fSGCoeffs.size()))
-        {
-            throw std::out_of_range("SetSGCoeffs: index out of range");
-        }
-        fSGCoeffs[index] = val;
-    }
-
   private:
     Int_t fNbPads = 128;
-    Int_t fNbSGcoefs = 49;
+
     Int_t fGeoVersion = 2025;
     Int_t fNbFADCModules = 8;
     Int_t fNbBinsSample = 2692;
@@ -178,7 +159,6 @@ class R3BActafMappingPar : public FairParGenericSet
     std::vector<Int_t> fModule;
     std::vector<Int_t> fChannel;
     std::vector<Int_t> fPad;
-    std::vector<double> fSGCoeffs;
 
     const R3BActafMappingPar& operator=(const R3BActafMappingPar&); /*< an assignment operator>*/
     R3BActafMappingPar(const R3BActafMappingPar&);                  /*< a copy constructor >*/

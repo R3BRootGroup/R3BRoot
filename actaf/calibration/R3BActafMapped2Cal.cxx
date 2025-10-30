@@ -89,6 +89,13 @@ void R3BActafMapped2Cal::SetParameter()
         fEGain[i] = fCal_Par->GetGainVal(i);
         fEThr[i] = fCal_Par->GetThresholdVal(i);
     }
+
+    fNbSgCoeffs = fCal_Par->GetNbSGCoeffs();
+    fSgCoeffs.resize(fNbSgCoeffs);
+    for (auto index = 0; index < fNbSgCoeffs; ++index)
+    {
+        fSgCoeffs[index] = fCal_Par->GetSGCoeff(index);
+    }
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -128,6 +135,32 @@ InitStatus R3BActafMapped2Cal::ReInit()
     return kSUCCESS;
 }
 
+inline void ApplySGFilter(std::array<double, ACTAF_BINS>& signal, std::vector<double> coeffs)
+{
+    auto n = signal.size(), m = coeffs.size();
+    int half = m / 2;
+
+    std::vector<double> output(n), ext(n + 2 * half);
+
+    for (int i = 0; i < half; i++)
+        ext[i] = signal[0];
+    for (int i = 0; i < n; i++)
+        ext[i + half] = signal[i];
+    for (int i = 0; i < half; i++)
+        ext[n + half + i] = signal[n - 1];
+
+    for (int i = 0; i < n; i++)
+    {
+        double sum = 0.0;
+        for (int j = 0; j < m; j++)
+            sum += coeffs[j] * ext[i + j];
+        output[i] = sum;
+    }
+
+    for (int i = 0; i < n; i++)
+        signal[i] = output[i];
+}
+
 // -----   Public method Execution   --------------------------------------------
 void R3BActafMapped2Cal::Exec(Option_t*)
 {
@@ -150,12 +183,17 @@ void R3BActafMapped2Cal::Exec(Option_t*)
             synTagTime = mappedData->GetLeadingEdgeTime() * fConversionCh2ns; // in ns
     }
 
+    // Apply the SG filter to the trace
     for (size_t index = 0; index < nHits; ++index)
     {
         auto mappedData = dynamic_cast<R3BActafMappedData const*>(fActafMappedData->At(index));
         auto pad = mappedData->GetPad();
         if (pad >= 129)
             continue; // syn-time
+
+        std::array<double, ACTAF_BINS> trace = mappedData->GetTrace();
+        ApplySGFilter(trace, fSgCoeffs);
+
         auto energy = mappedData->GetE() * fEGain[pad - 1];
         auto energyMaxAmpl = mappedData->GetMaxampl() * fEGain[pad - 1];
         auto drift = mappedData->GetLeadingEdgeTime() * fConversionCh2ns; // in ns
@@ -163,7 +201,9 @@ void R3BActafMapped2Cal::Exec(Option_t*)
         auto syntime = drift - synTagTime;                                // in ns
 
         if (energy >= fEThr[pad - 1])
-            AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime);
+            AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime, trace);
+        else if (energy < fEThr[pad - 1] && fDisplayTrace)
+            AddCalData(pad, 0, 0, 0, 0, 0, trace);
     }
     return;
 }
@@ -184,12 +224,13 @@ R3BActafCalData* R3BActafMapped2Cal::AddCalData(UInt_t padId,
                                                 double maxampl,
                                                 double drift,
                                                 double zpos,
-                                                double syntime)
+                                                double syntime,
+                                                const std::array<double, ACTAF_BINS>& trace)
 {
     // It fills the R3BActafCalData
     TClonesArray& clref = *fActafCalData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BActafCalData(padId, energy, maxampl, drift, zpos, syntime);
+    return new (clref[size]) R3BActafCalData(padId, energy, maxampl, drift, zpos, syntime, trace);
 }
 
 ClassImp(R3BActafMapped2Cal)
