@@ -222,6 +222,7 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_tLeading_cal = nullptr;
     TH2F* fh2_maxAmp_cal = nullptr;
     TH2F* fh2_tSync_cal = nullptr;
+    std::vector<TH2F*> fh2_FilteredTraces;
 
     int nBinsEcal = 100;
     int nEcalMin = 0;

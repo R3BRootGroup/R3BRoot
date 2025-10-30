@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <R3BActafMappedData.h>
 #include <TObject.h>
 #include <cmath>
 #include <cstdint>
@@ -37,18 +38,21 @@ class R3BActafCalData : public TObject
      *@param leadingedge  Leading time for each pad
      *@param zpos         Z-position for each pad
      *@param syntime      Synchronization time
+     *@param trace        Trace after the application of the SG filter
      **/
     explicit R3BActafCalData(UInt_t pad,
                              double energy = 0.,
                              double maxampl = 0.,
                              double leadingedge = 0.,
                              double zpos = 0.,
-                             double syntime = 0.);
+                             double syntime = 0.,
+                             const std::array<double, ACTAF_BINS>& trace = {});
 
     // Destructor
     virtual ~R3BActafCalData() = default;
 
     // Accessors with [[nodiscard]]
+    [[nodiscard]] inline const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
     [[nodiscard]] inline const UInt_t& GetPad() const { return fPad; }
     [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
     [[nodiscard]] inline const double& GetEMaxAmpl() const { return fEMaxAmpl; }
@@ -67,6 +71,7 @@ class R3BActafCalData : public TObject
     double fLeadingEdge = 0.;        // in ns
     double fZPos = 0.;               // in cm
     double fSynTime = std::nan("");  // in ns
+    std::array<double, ACTAF_BINS> fTrace{};
 
   public:
     ClassDefOverride(R3BActafCalData, 1);

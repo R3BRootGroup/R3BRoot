@@ -25,6 +25,7 @@ R3BActafCalPar::R3BActafCalPar(const TString& name, const TString& title, const 
 
     fGainPars = new TArrayF(fPads);
     fThresholdsPars = new TArrayF(fPads);
+    fSGCoeffs.resize(fNbSGcoefs);
 
     for (int i = 0; i < fPads; i++)
     {
@@ -32,6 +33,8 @@ R3BActafCalPar::R3BActafCalPar(const TString& name, const TString& title, const 
         fThresholdsPars->AddAt(0.0, i);
     }
 }
+
+void R3BActafCalPar::SetNbSGCoeffs(Int_t num) { fSGCoeffs.resize(num); }
 
 R3BActafCalPar::~R3BActafCalPar()
 {
@@ -60,6 +63,16 @@ void R3BActafCalPar::putParams(FairParamList* list)
 
     list->add("actafGainPars", *fGainPars);
     list->add("actafThresholdPars", *fThresholdsPars);
+
+    list->add("NbSGPar", fNbSGcoefs);
+    R3BLOG(info, "Nb of pads: " << fNbSGcoefs);
+
+    TArrayD SGCoeffs(fNbSGcoefs);
+    for (int idx = 0; idx < fNbSGcoefs; idx++)
+    {
+        SGCoeffs[idx] = fSGCoeffs[idx];
+    }
+    list->add("SGCoeffs", SGCoeffs);
 }
 bool R3BActafCalPar::getParams(FairParamList* list)
 {
@@ -81,7 +94,16 @@ bool R3BActafCalPar::getParams(FairParamList* list)
         return false;
     }
 
-    // Ajustar tamaño y copiar
+    if (!list->fill("NbSGcoefs", &fNbSGcoefs))
+    {
+        R3BLOG(error, "Could not initialize SGCoeffs");
+        return kFALSE;
+    }
+    else
+    {
+        R3BLOG(info, "Nb of sg coeffs: " << fNbSGcoefs);
+    }
+
     if (fGainPars->GetSize() != Gain.GetSize())
         fGainPars->Set(Gain.GetSize());
     if (fThresholdsPars->GetSize() != Thr.GetSize())
@@ -92,8 +114,18 @@ bool R3BActafCalPar::getParams(FairParamList* list)
     for (int i = 0; i < Thr.GetSize(); ++i)
         fThresholdsPars->SetAt(Thr.At(i), i);
 
-    status = kTRUE;
-    return true;
+    TArrayD SGCoeffs(fNbSGcoefs);
+    if (!list->fill("SGCoeffs", &SGCoeffs))
+    {
+        R3BLOG(warn, "---Could not initialize SGCoeffs");
+        return kFALSE;
+    }
+
+    const Int_t nSGValues = SGCoeffs.GetSize();
+    fSGCoeffs.resize(nSGValues);
+    std::copy_n(SGCoeffs.GetArray(), nSGValues, fSGCoeffs.begin());
+
+    return kTRUE;
 }
 
 void R3BActafCalPar::print()
@@ -104,6 +136,8 @@ void R3BActafCalPar::print()
     {
         R3BLOG(info, Form("Pad %d: gain = %f    thr = %f", i + 1, fGainPars->GetAt(i), fThresholdsPars->GetAt(i)));
     }
+
+    R3BLOG(info, "Nb of SG Coeffs: " << fNbSGcoefs);
 }
 
 ClassImp(R3BActafCalPar)

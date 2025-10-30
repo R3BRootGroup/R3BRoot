@@ -64,6 +64,9 @@ class R3BActafMapped2Cal : public FairTask
     // Method to define the velocity
     inline void SetVelocity(double opt) { fVelocity = opt; }
 
+    // Method to force all traces to be stored
+    void SetDisplayTraces(bool use = true) { fDisplayTrace = use; }
+
   private:
     void SetParameter();
 
@@ -79,9 +82,18 @@ class R3BActafMapped2Cal : public FairTask
     R3BActafCalPar* fCal_Par = nullptr; // Parameter container
     std::vector<double> fEGain;
     std::vector<double> fEThr;
+    std::vector<double> fSgCoeffs;
+    double fNbSgCoeffs = 0;
+    bool fDisplayTrace = true;
 
     // Private method AddCalData
-    R3BActafCalData* AddCalData(UInt_t padId, double energy, double maxampl, double drift, double zpos, double syntime);
+    R3BActafCalData* AddCalData(UInt_t padId,
+                                double energy,
+                                double maxampl,
+                                double drift,
+                                double zpos,
+                                double syntime,
+                                const std::array<double, ACTAF_BINS>& trace);
 
   public:
     // Class definition

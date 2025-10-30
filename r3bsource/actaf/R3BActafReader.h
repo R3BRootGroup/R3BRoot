@@ -30,6 +30,7 @@ typedef struct EXT_STR_h101_ACTAF2025_onion_t EXT_STR_h101_ACTAF2025_onion;
 
 class ext_data_struct_info;
 class R3BActafMappingPar;
+class R3BActafCalPar;
 
 /**
  * A reader of ACTAF data with UCESB.
@@ -54,8 +55,6 @@ class R3BActafReader : public R3BReader
     void Reset() override;
 
     inline void SetOnline(bool option = true) { fOnline = option; }
-
-    inline void SetFilter(bool opt = true) { fApplyFilter = opt; }
 
   private:
     enum class UnpackerVersion : int
@@ -91,9 +90,8 @@ class R3BActafReader : public R3BReader
 
     // Mapping parameters
     R3BActafMappingPar* fMapping_Par = nullptr;
+    R3BActafCalPar* fCal_Par = nullptr;
     std::vector<std::vector<int>> mapping;
-    std::vector<double> fSgCoeffs;
-    double fNbSgCoeffs;
     bool fApplyFilter = true;
 
   public:
