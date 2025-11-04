@@ -276,7 +276,7 @@ void R3BTrackingG249::Exec(Option_t* /*option*/)
     {
         tofd_hit = dynamic_cast<R3BTofdHitData*>(tofd_DataItems->At(i));
         R3BLOG_IF(fatal, !tofd_hit, "ERROR in the TOFD data");
-        if (tofd_hit->GetDetId() == 1) // only hits from first plane
+        if (tofd_hit->GetPlaneId() == 1) // only hits from first plane
         {
             is_good_tofd = true;
             break;
