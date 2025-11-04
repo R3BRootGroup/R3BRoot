@@ -56,6 +56,8 @@ void R3BEventFilter::SetParContainers()
     return;
 }
 
+R3BEventFilter::~R3BEventFilter() { delete fCutFrsId; }
+
 void R3BEventFilter::SetParameter()
 {
     //--- Parameter Containers ---
@@ -122,14 +124,15 @@ inline bool CheckFireConditionsTwoPlanes(const std::vector<int>& v)
 
 inline bool CheckFireConditionsAllPlanes(const std::vector<int>& v)
 {
+    if (v.size() < 4)
+        return false;
 
-    bool goodHit = true;
-
+    // if (std::all_of(v.begin(), v.end(), [](int x) { return x == -1; }))
+    //     return false;
     for (const auto& val : v)
-        if (val == 0)
-            goodHit = false;
-
-    return goodHit;
+        if (val != 1)
+            return false;
+    return true;
 }
 
 void R3BEventFilter::Exec(Option_t*)
@@ -161,6 +164,15 @@ void R3BEventFilter::Exec(Option_t*)
             else
                 return 0;
         };
+
+        if (fUseTofd)
+        {
+            if (!fTofdHit || fTofdHit->GetEntriesFast() <= 0)
+            {
+                StoreEvent(false);
+                return;
+            }
+        }
 
         if (fTofdHit != nullptr && fTofdHit->GetEntriesFast() > 0 && fValidEvent && !fChargeLimits.empty() && fUseTofd)
         {
@@ -196,6 +208,11 @@ void R3BEventFilter::FinishEvent()
     if (fFrsData)
     {
         fFrsData->Clear();
+    }
+
+    if (fTofdHit)
+    {
+        fTofdHit->Clear();
     }
 }
 
