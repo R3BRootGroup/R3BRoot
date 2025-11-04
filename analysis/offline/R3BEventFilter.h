@@ -85,10 +85,21 @@ class R3BEventFilter : public FairTask
 
     void SetParContainers() override;
 
-    inline void SetTCutFrsId(TCutG* tcut) { fCutFrsId = tcut; };
-    inline void SetChargeLimits(const std::vector<std::vector<double>>& vec) { fChargeLimits = vec; }
-    inline void SetTofd() { fUseTofd = true; }
-    inline void UseTwoPlanes() { fUseAllPlanes = false; }
+    void SetTCutFrsId(const TCutG* cut)
+    {
+        if (cut)
+        {
+            fCutFrsId.reset(static_cast<TCutG*>(cut->Clone()));
+            fCutFrsId->SetName("fCutFrsId");
+        }
+        else
+        {
+            fCutFrsId.reset();
+        }
+    }
+    void SetChargeLimits(const std::vector<std::vector<double>>& vec) { fChargeLimits = vec; }
+    void SetTofd() { fUseTofd = true; }
+    void UseTwoPlanes() { fUseAllPlanes = false; }
 
   private:
     void SetParameter();
@@ -98,7 +109,7 @@ class R3BEventFilter : public FairTask
     TClonesArray* fTofdHit = nullptr;
     TClonesArray* fFrsData = nullptr;
 
-    TCutG* fCutFrsId = nullptr;
+    std::unique_ptr<TCutG> fCutFrsId;
     std::vector<std::vector<double>> fChargeLimits;
 
     bool fUseTofd = false;

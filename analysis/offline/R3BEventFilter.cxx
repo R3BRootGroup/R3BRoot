@@ -56,8 +56,6 @@ void R3BEventFilter::SetParContainers()
     return;
 }
 
-R3BEventFilter::~R3BEventFilter() { delete fCutFrsId; }
-
 void R3BEventFilter::SetParameter()
 {
     //--- Parameter Containers ---
@@ -77,14 +75,15 @@ InitStatus R3BEventFilter::Init()
 
     fFrsData = dynamic_cast<TClonesArray*>(mgr->GetObject("FrsData"));
 
-    if (fCutFrsId == nullptr)
+    if (!fCutFrsId)
     {
-        fCutFrsId = new TCutG("fCutFrsId", 5);
-        fCutFrsId->SetPoint(0, 0.5, 0.5);
-        fCutFrsId->SetPoint(1, 4., 0.5);
-        fCutFrsId->SetPoint(2, 4., 4.);
-        fCutFrsId->SetPoint(3, 0.5, 4.);
-        fCutFrsId->SetPoint(4, 0.5, 0.5);
+        auto tmp = std::make_unique<TCutG>("fCutFrsId", 5);
+        tmp->SetPoint(0, 0.5, 0.5);
+        tmp->SetPoint(1, 4., 0.5);
+        tmp->SetPoint(2, 4., 4.);
+        tmp->SetPoint(3, 0.5, 4.);
+        tmp->SetPoint(4, 0.5, 0.5);
+        fCutFrsId = std::move(tmp);
     }
 
     if (fChargeLimits.empty())
