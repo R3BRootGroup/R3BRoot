@@ -101,7 +101,6 @@ void R3BAlpideCal2Hit::SetParameter()
     R3BLOG(info, "Geometry version: " << fGeoversion);
     fNbSensors = fMap_Par->GetNbSensors();
     R3BLOG(info, "Nb of sensors: " << fNbSensors);
-
     if (fAlpideGeoPar && fTargetGeoPar)
     {
         fTargetPos.SetXYZ(fTargetGeoPar->GetPosX(), fTargetGeoPar->GetPosY(), fTargetGeoPar->GetPosZ());
@@ -384,6 +383,26 @@ void R3BAlpideCal2Hit::FindClustersDefault()
     }
     else if (fGeoversion == 202506)
     {
+        const double Z_alpide1 = -1732.88;
+        const double Z_alpide2 = -1659.88;
+
+        const double z1_off = -0.837843;
+        const double z2_off = -2.69759;
+
+        const double rx = 0.0225419;
+        const double ry = 0.0137131;
+        const double rz[12] = { 0.00595207, 0.00815014, 0.0102531, 0.00857714,  0.00909736, 0.0015223,
+                                0.0133541,  0.00969408, 0.0134827, 0.000125173, 0.00982907, 0.021181 };
+
+        array<TVector3, 12> pos_offset = {
+            TVector3(0.231386, 0.18477, z1_off),      TVector3(0.03624, 0.0145723, z1_off),
+            TVector3(-0.162212, -0.217339, z1_off),   TVector3(-0.157992, -0.31182, z1_off),
+            TVector3(0.0596373, -0.07224198, z1_off), TVector3(0.2458, 0.131979, z1_off),
+            TVector3(0.713162, 0.203712, z2_off),     TVector3(0.5620141, -0.18166828, z2_off),
+            TVector3(0.316365, -0.445912, z2_off),    TVector3(0.323927, -0.298097, z2_off),
+            TVector3(0.5504176, -0.2855743, z2_off),  TVector3(0.781553, -0.0369948, z2_off)
+        };
+
         for (size_t s = 0; s < fNbSensors; s++)
             for (size_t i = 0; i < nHits; i++)
                 if (mult[s][i] > 0)
@@ -396,14 +415,34 @@ void R3BAlpideCal2Hit::FindClustersDefault()
                                     0.0);
 
                     TVector3 labpos;
+
+                    int sensorId = s;
+
+                    TRotation Rloc;
+                    Rloc.RotateZ(rz[sensorId]);
+                    TVector3 local_rot = Rloc * localpos;
+
                     if (s < 3)
-                        labpos.SetXYZ(45. - localpos.X() - 30. * s, -localpos.Y(), 0.0);
+                        labpos.SetXYZ(45. - local_rot.X() - 30. * s, -local_rot.Y(), Z_alpide1);
                     else if (s < 6)
-                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 3), localpos.Y(), 0.0);
+                        labpos.SetXYZ(-45. + local_rot.X() + 30. * (s - 3), local_rot.Y(), Z_alpide1);
                     else if (s < 9)
-                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 6), -localpos.Y(), 73.);
+                        labpos.SetXYZ(45. - local_rot.X() - 30. * (s - 6), -local_rot.Y(), Z_alpide2);
                     else
-                        labpos.SetXYZ(-45. + localpos.X() + 30. * (s - 9), localpos.Y(), 73.);
+                        labpos.SetXYZ(-45. + local_rot.X() + 30. * (s - 9), local_rot.Y(), Z_alpide2);
+
+                    TVector3 center;
+                    if (sensorId < 6)
+                        center.SetXYZ(0., 0., Z_alpide1);
+                    else
+                        center.SetXYZ(0., 0., Z_alpide2);
+
+                    TRotation R;
+                    R.RotateX(rx);
+                    R.RotateY(ry);
+
+                    labpos = R * (labpos - center) + center;
+                    labpos += pos_offset[sensorId];
 
                     AddHitData(s + 1,
                                mult[s][i],

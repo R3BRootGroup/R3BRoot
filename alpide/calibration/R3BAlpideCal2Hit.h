@@ -85,7 +85,7 @@ class R3BAlpideCal2Hit : public FairTask
 
     R3BTGeoPar* fTargetGeoPar = nullptr;
     R3BTGeoPar* fAlpideGeoPar = nullptr;
-    int fGeoversion = 202505;
+    int fGeoversion = 202506;
     R3BAlpideGeometry* fAlpideGeo = nullptr;
     R3BAlpideMappingPar* fMap_Par = nullptr;
     TClonesArray* fAlpideCalData = nullptr; // Array with Alpide Cal input data
