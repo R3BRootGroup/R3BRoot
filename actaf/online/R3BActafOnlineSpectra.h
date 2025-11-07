@@ -40,37 +40,6 @@ namespace r3b::util
         if (ptr)
             ptr->Clear();
     }
-
-    /*
-    inline TH1F* MakeH1F(TString name,
-                         TString title,
-                         int nbx,
-                         double xlow,
-                         double xup,
-                         TString xtitle,
-                         TString ytitle,
-                         TCanvas* where,
-                         TString drawopt = "")
-    {
-        auto* h = R3B::root_owned<TH1F>(name, title, nbx, xlow, xup);
-
-        h->SetTitle(title);
-        h->CenterTitle(true);
-
-        h->GetXaxis()->SetTitle(xtitle);
-        h->GetXaxis()->CenterTitle(true);
-
-        h->GetYaxis()->SetTitle(ytitle);
-        h->GetYaxis()->SetTitleOffset(1.1);
-        h->GetYaxis()->CenterTitle(true);
-
-        if (where)
-        {
-            where->cd();
-            h->Draw(drawopt);
-        }
-    }
-    */
 } // namespace r3b::util
 
 class R3BActafOnlineSpectra : public FairTask
@@ -174,8 +143,6 @@ class R3BActafOnlineSpectra : public FairTask
 
     void SetUpdateRate(int num) { updateRate = num; }
 
-    void SetNbEventsFilled(int num) { nbEventsFilled = num; }
-
   private:
     void SetParameter();
 
@@ -261,8 +228,7 @@ class R3BActafOnlineSpectra : public FairTask
     int max_second_for_rate = 600;
     int max_rate = 1000;
 
-    int nbEventsFilled = 3;
-    int updateRate = 500;
+    int updateRate = 1;
 
     std::vector<uint64_t> pre_timestamp{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
