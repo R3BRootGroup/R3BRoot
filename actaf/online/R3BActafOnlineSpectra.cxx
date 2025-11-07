@@ -281,7 +281,7 @@ InitStatus R3BActafOnlineSpectra::Init()
             cMap_perRing[sideNb][ringNb - 1][0]->cd(++countsPerRing[sideNb][ringNb - 1]);
             fh2_RawTraces[index]->Draw("colz");
 
-            std::string nameHistC = "fh2_Pad_" + std::to_string(index) + "corrected_trace";
+            std::string nameHistC = "fh2_Pad_" + std::to_string(index + 1) + "corrected_trace";
 
             fh2_CorrectedTraces[index] = R3B::root_owned<TH2F>(
                 nameHistC.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, nBinsTrace, nTraceMin, nTraceMax);
@@ -299,7 +299,7 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh2_CorrectedTraces[index]->Draw("colz");
 
             // Filtered traces (CAL LEVEL!)
-            std::string nameFiltHist = "fh2_Pad_" + std::to_string(index) + "filtered_trace";
+            std::string nameFiltHist = "fh2_Pad_" + std::to_string(index + 1) + "filtered_trace";
             fh2_FilteredTraces[index] = R3B::root_owned<TH2F>(
                 nameFiltHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, nBinsTrace, nTraceMin, nTraceMax);
             fh2_FilteredTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
@@ -310,7 +310,7 @@ InitStatus R3BActafOnlineSpectra::Init()
             cCalFilt->cd(chn);
             fh2_FilteredTraces[index]->Draw("colz");
 
-            std::string nameHistE = "fh1_Pad_" + std::to_string(index) + "_Eraw";
+            std::string nameHistE = "fh1_Pad_" + std::to_string(index + 1) + "_Eraw";
             std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1) + " (Mod " + std::to_string(FADCnum) +
                                      " Chn " + std::to_string(FADCchn) + ")";
             fh1_RawE[index] = R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 100, 0, 300000);
@@ -327,7 +327,7 @@ InitStatus R3BActafOnlineSpectra::Init()
             cMap_perRing[sideNb][ringNb - 1][2]->cd(countsPerRing[sideNb][ringNb - 1]);
             fh1_RawE[index]->Draw("colz");
 
-            std::string nameHistB = "fh1_Pad_" + std::to_string(index) + "_Baseline";
+            std::string nameHistB = "fh1_Pad_" + std::to_string(index + 1) + "_Baseline";
             std::string titleHistB = "Baseline: Pad " + std::to_string(index + 1) + " (Mod " + std::to_string(FADCnum) +
                                      " Chn " + std::to_string(FADCchn) + ")";
             fh1_Baseline[index] = R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 10000);
@@ -553,7 +553,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     {
 
         TString tit;
-        i == 0 ? tit = "Counts per ring (upstream side)" : tit = "Counts per ring (downstream side)";
+        i == 0 ? tit = "Counts per ring (upstream)" : tit = "Counts per ring (downstream)";
 
         cCounts->cd(i + 2);
         fh1_RingCounts[i] = R3B::root_owned<TH1F>(Form("fh1_RingCounts_side%d", i + 1), tit, 8, 0.5, 8.5);
@@ -575,11 +575,11 @@ InitStatus R3BActafOnlineSpectra::Init()
     for (auto i = 0; i < fh2_XYPos.size(); i++)
     {
         TString tit;
-        i == 0 ? tit = "XY (upstream)" : tit = "XY (downstream)";
+        i == 0 ? tit = "Pad plane (upstream)" : tit = "Pad plane (downstream)";
 
         cXY->cd(i + 1);
 
-        fh2_XYPos[i] = new TH2Poly();
+        fh2_XYPos[i] = R3B::root_owned<TH2Poly>();
 
         for (int iPad = 1 + 64 * i; iPad <= 65 + 64 * i; iPad++)
         {
@@ -662,7 +662,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     hitfol->Add(cXY);
 
     // Canvas with XY positions (one per ring) storing the tracks of three events (updated each 3000 events)
-    auto* cXY_nevents = new TCanvas("X_Y_events", Form("XY positions (%d events)", nbEventsFilled), 10, 10, 500, 500);
+    auto* cXY_nevents = new TCanvas("X_Y_events", "XY positions per event", 10, 10, 500, 500);
     cXY_nevents->Divide(2, 1);
 
     for (int i = 0; i < fh2_XYPos_Evts.size(); i++)
@@ -670,7 +670,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         cXY_nevents->cd(i + 1);
         fh2_XYPos_Evts[i] =
             static_cast<TH2Poly*>(fh2_XYPos[i]->Clone((fh2_XYPos[i]->GetTitle() + TString("_events")).Data()));
-        fh2_XYPos_Evts[i]->SetTitle(fh2_XYPos[i]->GetTitle() + TString(Form(" %d Events", nbEventsFilled)));
+        fh2_XYPos_Evts[i]->SetTitle(fh2_XYPos[i]->GetTitle() + TString(" per event"));
         fh2_XYPos_Evts[i]->SetLineColor(kBlack);
         fh2_XYPos_Evts[i]->SetLineWidth(1);
         fh2_XYPos_Evts[i]->Draw("colz ]");
@@ -963,7 +963,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                         if (value == 0)
                             continue;
 
-                        fh2_timetag_signal->Fill(index++, value + hit->GetBaseline());
+                        if (hit->GetBaseline() > 0)
+                            fh2_timetag_signal->Fill(index++, value + hit->GetBaseline());
                     }
                 }
             }
@@ -1011,8 +1012,6 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                     if (value == 0)
                         continue;
 
-                    // if (value < -hit->GetBaseline())
-                    //     continue;
                     if (hit->GetBaseline() > 0)
                     {
                         fh2_CorrectedTraces[pad]->Fill(index, value /*- hit->GetBaseline()*/);
@@ -1077,39 +1076,40 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Fill hit data
-    // In principle each events has 128 hits
+    if (fNEvents % updateRate == 0)
+    {
+        for (auto& hist : fh2_XYPos_Evts)
+            hist->Reset("");
+    }
+
     if (fHitItems && fHitItems->GetEntriesFast() > 0)
     {
         auto nHits = fHitItems->GetEntriesFast();
-        for (int ihit = 0; ihit < nHits; ihit++)
+        for (size_t ihit = 0; ihit < nHits; ihit++)
         {
             auto* hit = dynamic_cast<R3BActafHitData*>(fHitItems->At(ihit));
             if (!hit)
                 continue;
 
-            int pad = hit->GetPad();
+            auto pad = hit->GetPad();
 
             if (pad > fPads)
                 continue;
 
-            int side = hit->GetSide() - 1;
-            int ring = hit->GetRing();
-            double x = hit->GetXpos();
-            double y = hit->GetYpos();
-            // double z = hit->GetZpos();
+            auto side = hit->GetSide() - 1;
+            auto ring = hit->GetRing();
+            auto x = hit->GetXpos();
+            auto y = hit->GetYpos();
+            auto energy = hit->GetEnergy();
 
-            TVector3 track = hit->GetTrack();
-            double phi = track.Phi() * TMath::RadToDeg();
+            auto track = hit->GetTrack();
+            auto phi = track.Phi() * TMath::RadToDeg();
 
             fh1_RingCounts[side]->Fill(ring);
             fh2_XYPos[side]->Fill(x, y);
 
-            if (fNEvents % updateRate == 0)
-                fh2_XYPos_Evts[side]->Reset("");
-
-            for (int iEventFilled = 1; iEventFilled <= nbEventsFilled; iEventFilled++)
-                if ((fNEvents - iEventFilled) % updateRate == 0)
-                    fh2_XYPos_Evts[side]->Fill(x, y);
+            auto bin = fh2_XYPos_Evts[side]->FindBin(x, y);
+            fh2_XYPos_Evts[side]->SetBinContent(bin, energy);
 
             fh1_PhiCounts[side]->Fill(phi);
             fh1_CountsPerSide->Fill(side + 1);

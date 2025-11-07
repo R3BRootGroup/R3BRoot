@@ -21,9 +21,9 @@
 #include <FairTask.h>
 
 #include "R3BActafCalData.h"
+#include "R3BActafMappedData.h"
 
 #include <Rtypes.h>
-
 #include <vector>
 
 class TClonesArray;
@@ -64,15 +64,24 @@ class R3BActafMapped2Cal : public FairTask
     // Method to define the velocity
     inline void SetVelocity(double opt) { fVelocity = opt; }
 
-    // Method to force all traces to be stored
-    void SetDisplayTraces(bool use = true) { fDisplayTrace = use; }
+    // Method to apply SG filter
+    void SetSGFilter(bool use = true) { fApplySGFilter = use; }
+
+    // Method to set pulser channel/pad
+    void SetPulserChannel(int chn) { fPulserCh = chn; }
+
+    // Method to set max integral
+    void SetMaxEIntegral(int max) { fMaxE = max; }
 
   private:
     void SetParameter();
+    void ApplySGFilter(std::array<double, ACTAF_BINS>& signal, std::vector<double> coeffs);
 
     static constexpr int fPad = 128;
-
-    bool fOnline = false;            // Don't store data for online
+    bool fOnline = false; // Don't store data for online
+    bool fApplySGFilter = false;
+    int fPulserCh = 62;
+    int fMaxE = 300000;
     double fConversionCh2ns = 51.44; // in ns/bin
     double fVelocity = 0.02888;      // in cm/ns
 
@@ -97,5 +106,5 @@ class R3BActafMapped2Cal : public FairTask
 
   public:
     // Class definition
-    ClassDefOverride(R3BActafMapped2Cal, 1);
+    ClassDefOverride(R3BActafMapped2Cal, 2);
 };
