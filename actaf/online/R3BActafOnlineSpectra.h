@@ -99,6 +99,15 @@ class R3BActafOnlineSpectra : public FairTask
      */
     virtual void Reset_Histo();
 
+    /*
+     * Methods to control de event viewer
+     */
+
+    virtual void Next_event();
+    virtual void Prev_event();
+    virtual void Reset_event();
+    virtual void plotSingleEventCanvas();
+
     /**
      * Method for setting the trigger value.
      */
@@ -246,6 +255,14 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_Phi1VsPhi2 = nullptr;
     TH2F* fh2_timetag_signal = nullptr;
     TCanvas* cRates = nullptr;
+
+    // Params for the event viewer
+    int eventViewerNb = 0;
+    static constexpr int maxEventViewerBatch = 100;
+    int selectEvent = 0;
+    std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsX;
+    std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsY;
+    std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsE;
 
   public:
     ClassDefOverride(R3BActafOnlineSpectra, 1);
