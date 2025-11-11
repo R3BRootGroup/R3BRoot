@@ -199,7 +199,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
             countsPerRing[iside][iring] = 0;
 
-            std::string sideName = iside == 0 ? "DOWN" : "UP";
+            std::string sideName = iside == 0 ? "UP" : "DOWN";
 
             std::string nameCanvas = sideName + "_RING_" + std::to_string(iring + 1) + "_traces_map";
             auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
@@ -814,6 +814,10 @@ InitStatus R3BActafOnlineSpectra::Init()
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_Actaf_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
 
+    run->GetHttpServer()->RegisterCommand("Next_event", Form("/Objects/%s/->Next_event()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Prev_event", Form("/Objects/%s/->Prev_event()", GetName()));
+    run->GetHttpServer()->RegisterCommand("Reset_event", Form("/Objects/%s/->Reset_event()", GetName()));
+
     return kSUCCESS;
 }
 
@@ -823,6 +827,67 @@ InitStatus R3BActafOnlineSpectra::ReInit()
     SetParContainers();
     SetParameter();
     return kSUCCESS;
+}
+
+// Event viewer controls
+
+void R3BActafOnlineSpectra::plotSingleEventCanvas()
+{
+    if (eventViewerNb >= maxEventViewerBatch)
+    {
+
+        fh2_XYPos_Evts[0]->Reset("");
+        fh2_XYPos_Evts[1]->Reset("");
+
+        for (int ipad = 0; ipad < 128; ipad++)
+        {
+            int iside = ipad > 63 ? 1 : 0;
+
+            double x = eventCountsX[selectEvent][ipad];
+            double y = eventCountsY[selectEvent][ipad];
+            double energy = eventCountsE[selectEvent][ipad];
+
+            if (energy > 0)
+            {
+                auto bin = fh2_XYPos_Evts[iside]->FindBin(x, y);
+                fh2_XYPos_Evts[iside]->SetBinContent(bin, energy);
+            }
+        }
+    }
+    else
+    {
+        std::cout << "The buffer is being filled. Please wait some events more.\n";
+    }
+}
+
+void R3BActafOnlineSpectra::Next_event()
+{
+    if (selectEvent < maxEventViewerBatch - 1)
+        selectEvent++;
+    else
+    {
+        std::cout << "You have reached the last event of the buffer. Time to reset!\n";
+    }
+
+    plotSingleEventCanvas();
+}
+
+void R3BActafOnlineSpectra::Prev_event()
+{
+    if (selectEvent > 0)
+        selectEvent--;
+    else
+    {
+        std::cout << "You are already in the first event of the buffer.\n";
+    }
+
+    plotSingleEventCanvas();
+}
+
+void R3BActafOnlineSpectra::Reset_event()
+{
+    eventViewerNb = 0;
+    selectEvent = 0;
 }
 
 void R3BActafOnlineSpectra::Reset_Histo()
@@ -1076,11 +1141,15 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Fill hit data
+    /*
     if (fNEvents % updateRate == 0)
     {
         for (auto& hist : fh2_XYPos_Evts)
             hist->Reset("");
     }
+    */
+
+    bool goodEventForView = false;
 
     if (fHitItems && fHitItems->GetEntriesFast() > 0)
     {
@@ -1108,8 +1177,18 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             fh1_RingCounts[side]->Fill(ring);
             fh2_XYPos[side]->Fill(x, y);
 
-            auto bin = fh2_XYPos_Evts[side]->FindBin(x, y);
-            fh2_XYPos_Evts[side]->SetBinContent(bin, energy);
+            if (eventViewerNb < maxEventViewerBatch)
+            {
+                if (energy < 10)
+                    continue;
+
+                goodEventForView = true;
+                eventCountsX[eventViewerNb][pad - 1] = x;
+                eventCountsY[eventViewerNb][pad - 1] = y;
+                eventCountsE[eventViewerNb][pad - 1] = energy;
+            }
+            // auto bin = fh2_XYPos_Evts[side]->FindBin(x, y);
+            // fh2_XYPos_Evts[side]->SetBinContent(bin, energy);
 
             fh1_PhiCounts[side]->Fill(phi);
             fh1_CountsPerSide->Fill(side + 1);
@@ -1196,6 +1275,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     fNEvents++;
+    if (goodEventForView)
+        eventViewerNb++;
     return;
 }
 
