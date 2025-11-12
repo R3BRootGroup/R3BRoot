@@ -256,8 +256,10 @@ InitStatus R3BActafOnlineSpectra::Init()
             int sideNb = index + 1 > 64 ? 1 : 0;
             int ringNb = fActafGeo->GetRingId(index + 1);
 
-            std::string titleHist = "Raw trace: Pad " + std::to_string(index + 1) + " (Mod " + std::to_string(FADCnum) +
-                                    " Chn " + std::to_string(FADCchn) + ")";
+            int padOff = index + 1 > 64 ? 64 : 0;
+
+            std::string titleHist = "Raw trace: Pad " + std::to_string(index + 1 - padOff) + " (Mod " +
+                                    std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
             std::string nameHist = "fh2_Pad_" + std::to_string(index) + "_trace";
 
             // Only plot the pads that belong to the FADC
@@ -311,8 +313,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh2_FilteredTraces[index]->Draw("colz");
 
             std::string nameHistE = "fh1_Pad_" + std::to_string(index + 1) + "_Eraw";
-            std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1) + " (Mod " + std::to_string(FADCnum) +
-                                     " Chn " + std::to_string(FADCchn) + ")";
+            std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1 - padOff) + " (Mod " +
+                                     std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
             fh1_RawE[index] = R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 100, 0, 300000);
             fh1_RawE[index]->GetXaxis()->SetTitle("E [ADC Chn]");
             fh1_RawE[index]->GetYaxis()->SetTitle("Counts");
@@ -328,8 +330,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh1_RawE[index]->Draw("colz");
 
             std::string nameHistB = "fh1_Pad_" + std::to_string(index + 1) + "_Baseline";
-            std::string titleHistB = "Baseline: Pad " + std::to_string(index + 1) + " (Mod " + std::to_string(FADCnum) +
-                                     " Chn " + std::to_string(FADCchn) + ")";
+            std::string titleHistB = "Baseline: Pad " + std::to_string(index + 1 - padOff) + " (Mod " +
+                                     std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
             fh1_Baseline[index] = R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 10000);
             fh1_Baseline[index]->GetXaxis()->SetTitle("Baseline [ADC Chn]");
             fh1_Baseline[index]->GetYaxis()->SetTitle("Counts");
@@ -371,78 +373,6 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_ModVsCh_map->GetYaxis()->CenterTitle(true);
     fh2_ModVsCh_map->Draw("colz");
     mapfol->Add(cModVsCh);
-
-    // RMS of the baseline after and before filtering
-    auto* cRms = new TCanvas("Rms_map", "Baseline RMS", 10, 10, 500, 500);
-    cRms->Divide(2, 2);
-
-    cRms->cd(1);
-    fh2_sigmaInitVsPad =
-        R3B::root_owned<TH2F>("fh2_sigmaInitVsPad", "Baseline RMS per pad", fPads, 0.5, 0.5 + fPads, 100, 0, 50);
-    fh2_sigmaInitVsPad->GetXaxis()->SetTitle("Pad");
-    fh2_sigmaInitVsPad->GetYaxis()->SetTitle("RMS [ADC Chn]");
-    fh2_sigmaInitVsPad->GetYaxis()->SetTitleOffset(1.1);
-    fh2_sigmaInitVsPad->GetXaxis()->CenterTitle(true);
-    fh2_sigmaInitVsPad->GetYaxis()->CenterTitle(true);
-    fh2_sigmaInitVsPad->Draw("colz");
-
-    cRms->cd(2);
-    fh2_sigmaFiltVsPad = R3B::root_owned<TH2F>(
-        "fh2_sigmaFiltVsPad", "Baseline RMS (filtered) per pad", fPads, 0.5, 0.5 + fPads, 100, 0, 50);
-    fh2_sigmaFiltVsPad->GetXaxis()->SetTitle("Pad");
-    fh2_sigmaFiltVsPad->GetYaxis()->SetTitle("RMS [ADC Chn]");
-    fh2_sigmaFiltVsPad->GetYaxis()->SetTitleOffset(1.1);
-    fh2_sigmaFiltVsPad->GetXaxis()->CenterTitle(true);
-    fh2_sigmaFiltVsPad->GetYaxis()->CenterTitle(true);
-    fh2_sigmaFiltVsPad->Draw("colz");
-
-    cRms->cd(3);
-    fh1_sigmaInit = R3B::root_owned<TH1F>("fh1_sigmaInit", "Baseline RMS", 100, 0, 50);
-    fh1_sigmaInit->GetXaxis()->SetTitle("RMS [ADC Chn]");
-    fh1_sigmaInit->GetYaxis()->SetTitle("Counts");
-    fh1_sigmaInit->GetYaxis()->SetTitleOffset(1.1);
-    fh1_sigmaInit->GetXaxis()->CenterTitle(true);
-    fh1_sigmaInit->GetYaxis()->CenterTitle(true);
-    fh1_sigmaInit->SetFillColor(31);
-    fh1_sigmaInit->Draw();
-
-    cRms->cd(4);
-    fh1_sigmaFilt = R3B::root_owned<TH1F>("fh1_sigmaFilt", "Baseline RMS (filtered)", 100, 0, 50);
-    fh1_sigmaFilt->GetXaxis()->SetTitle("RMS [ADC Chn]");
-    fh1_sigmaFilt->GetYaxis()->SetTitle("Counts");
-    fh1_sigmaFilt->GetYaxis()->SetTitleOffset(1.1);
-    fh1_sigmaFilt->GetXaxis()->CenterTitle(true);
-    fh1_sigmaFilt->GetYaxis()->CenterTitle(true);
-    fh1_sigmaFilt->SetFillColor(31);
-    fh1_sigmaFilt->Draw();
-
-    mapfol->Add(cRms);
-
-    // Mean value of the baseline after and before filtering
-    auto* cmean = new TCanvas("Mean_map", "Baseline Mean", 10, 10, 500, 500);
-    cmean->Divide(2, 1);
-
-    cmean->cd(1);
-    fh2_meanInitVsPad =
-        R3B::root_owned<TH2F>("fh2_meanInitVsPad", "Baseline mean per pad", fPads, 0.5, 0.5 + fPads, 200, 5000, 10000);
-    fh2_meanInitVsPad->GetXaxis()->SetTitle("Pad");
-    fh2_meanInitVsPad->GetYaxis()->SetTitle("Baseline [ADC Chn]");
-    fh2_meanInitVsPad->GetYaxis()->SetTitleOffset(1.1);
-    fh2_meanInitVsPad->GetXaxis()->CenterTitle(true);
-    fh2_meanInitVsPad->GetYaxis()->CenterTitle(true);
-    fh2_meanInitVsPad->Draw("colz");
-
-    cmean->cd(2);
-    fh2_meanFiltVsPad = R3B::root_owned<TH2F>(
-        "fh2_meanFiltVsPad", "Baseline mean (filtered) per pad", fPads, 0.5, 0.5 + fPads, 200, 5000, 10000);
-    fh2_meanFiltVsPad->GetXaxis()->SetTitle("Pad");
-    fh2_meanFiltVsPad->GetYaxis()->SetTitle("Baseline [ADC Chn]");
-    fh2_meanFiltVsPad->GetYaxis()->SetTitleOffset(1.1);
-    fh2_meanFiltVsPad->GetXaxis()->CenterTitle(true);
-    fh2_meanFiltVsPad->GetYaxis()->CenterTitle(true);
-    fh2_meanFiltVsPad->Draw("colz");
-
-    mapfol->Add(cmean);
 
     auto* cdetmask = new TCanvas("Det_mask", "Detector mask", 10, 10, 500, 500);
     fh1_DetMask = R3B::root_owned<TH1F>("fh1_detmask", "Detector mask", 513, -0.5, 512.5);
@@ -525,6 +455,78 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_tSync_cal->GetXaxis()->CenterTitle(true);
     fh2_tSync_cal->GetYaxis()->CenterTitle(true);
     fh2_tSync_cal->Draw("colz");
+
+    // RMS of the baseline after and before filtering
+    auto* cRms = new TCanvas("Rms_map", "Baseline RMS", 10, 10, 500, 500);
+    cRms->Divide(2, 2);
+
+    cRms->cd(1);
+    fh2_sigmaInitVsPad =
+        R3B::root_owned<TH2F>("fh2_sigmaInitVsPad", "Baseline RMS per pad", fPads, 0.5, 0.5 + fPads, 100, 0, 50);
+    fh2_sigmaInitVsPad->GetXaxis()->SetTitle("Pad");
+    fh2_sigmaInitVsPad->GetYaxis()->SetTitle("RMS [ADC Chn]");
+    fh2_sigmaInitVsPad->GetYaxis()->SetTitleOffset(1.1);
+    fh2_sigmaInitVsPad->GetXaxis()->CenterTitle(true);
+    fh2_sigmaInitVsPad->GetYaxis()->CenterTitle(true);
+    fh2_sigmaInitVsPad->Draw("colz");
+
+    cRms->cd(2);
+    fh2_sigmaFiltVsPad = R3B::root_owned<TH2F>(
+        "fh2_sigmaFiltVsPad", "Baseline RMS (filtered) per pad", fPads, 0.5, 0.5 + fPads, 100, 0, 50);
+    fh2_sigmaFiltVsPad->GetXaxis()->SetTitle("Pad");
+    fh2_sigmaFiltVsPad->GetYaxis()->SetTitle("RMS [ADC Chn]");
+    fh2_sigmaFiltVsPad->GetYaxis()->SetTitleOffset(1.1);
+    fh2_sigmaFiltVsPad->GetXaxis()->CenterTitle(true);
+    fh2_sigmaFiltVsPad->GetYaxis()->CenterTitle(true);
+    fh2_sigmaFiltVsPad->Draw("colz");
+
+    cRms->cd(3);
+    fh1_sigmaInit = R3B::root_owned<TH1F>("fh1_sigmaInit", "Baseline RMS", 100, 0, 50);
+    fh1_sigmaInit->GetXaxis()->SetTitle("RMS [ADC Chn]");
+    fh1_sigmaInit->GetYaxis()->SetTitle("Counts");
+    fh1_sigmaInit->GetYaxis()->SetTitleOffset(1.1);
+    fh1_sigmaInit->GetXaxis()->CenterTitle(true);
+    fh1_sigmaInit->GetYaxis()->CenterTitle(true);
+    fh1_sigmaInit->SetFillColor(31);
+    fh1_sigmaInit->Draw();
+
+    cRms->cd(4);
+    fh1_sigmaFilt = R3B::root_owned<TH1F>("fh1_sigmaFilt", "Baseline RMS (filtered)", 100, 0, 50);
+    fh1_sigmaFilt->GetXaxis()->SetTitle("RMS [ADC Chn]");
+    fh1_sigmaFilt->GetYaxis()->SetTitle("Counts");
+    fh1_sigmaFilt->GetYaxis()->SetTitleOffset(1.1);
+    fh1_sigmaFilt->GetXaxis()->CenterTitle(true);
+    fh1_sigmaFilt->GetYaxis()->CenterTitle(true);
+    fh1_sigmaFilt->SetFillColor(31);
+    fh1_sigmaFilt->Draw();
+
+    calfol->Add(cRms);
+
+    // Mean value of the baseline after and before filtering
+    auto* cmean = new TCanvas("Mean_map", "Baseline Mean", 10, 10, 500, 500);
+    cmean->Divide(2, 1);
+
+    cmean->cd(1);
+    fh2_meanInitVsPad =
+        R3B::root_owned<TH2F>("fh2_meanInitVsPad", "Baseline mean per pad", fPads, 0.5, 0.5 + fPads, 200, 5000, 10000);
+    fh2_meanInitVsPad->GetXaxis()->SetTitle("Pad");
+    fh2_meanInitVsPad->GetYaxis()->SetTitle("Baseline [ADC Chn]");
+    fh2_meanInitVsPad->GetYaxis()->SetTitleOffset(1.1);
+    fh2_meanInitVsPad->GetXaxis()->CenterTitle(true);
+    fh2_meanInitVsPad->GetYaxis()->CenterTitle(true);
+    fh2_meanInitVsPad->Draw("colz");
+
+    cmean->cd(2);
+    fh2_meanFiltVsPad = R3B::root_owned<TH2F>(
+        "fh2_meanFiltVsPad", "Baseline mean (filtered) per pad", fPads, 0.5, 0.5 + fPads, 200, 5000, 10000);
+    fh2_meanFiltVsPad->GetXaxis()->SetTitle("Pad");
+    fh2_meanFiltVsPad->GetYaxis()->SetTitle("Baseline [ADC Chn]");
+    fh2_meanFiltVsPad->GetYaxis()->SetTitleOffset(1.1);
+    fh2_meanFiltVsPad->GetXaxis()->CenterTitle(true);
+    fh2_meanFiltVsPad->GetYaxis()->CenterTitle(true);
+    fh2_meanFiltVsPad->Draw("colz");
+
+    calfol->Add(cmean);
 
     calfol->Add(cCal);
 
@@ -830,7 +832,6 @@ InitStatus R3BActafOnlineSpectra::ReInit()
 }
 
 // Event viewer controls
-
 void R3BActafOnlineSpectra::plotSingleEventCanvas()
 {
     if (eventViewerNb >= maxEventViewerBatch)
@@ -852,6 +853,16 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
                 auto bin = fh2_XYPos_Evts[iside]->FindBin(x, y);
                 fh2_XYPos_Evts[iside]->SetBinContent(bin, energy);
             }
+        }
+
+        for (int iside = 0; iside < 2; iside++)
+        {
+            TString tit = "Pad plane";
+            tit += iside == 0 ? " (upstream)" : " (downstream)";
+            tit += Form(" event Nb: %d", selectEvent + firstBufferEvent);
+            fh2_XYPos_Evts[iside]->SetTitle(tit);
+            fh2_XYPos_Evts[iside]->Draw("colz ]");
+            fh2_XYPos_Evts[iside]->Draw("same L");
         }
     }
     else
@@ -888,6 +899,7 @@ void R3BActafOnlineSpectra::Reset_event()
 {
     eventViewerNb = 0;
     selectEvent = 0;
+    firstBufferEvent = fNEvents;
 }
 
 void R3BActafOnlineSpectra::Reset_Histo()
@@ -1053,19 +1065,11 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_Risetime_map->Fill(pad + 1, hit->GetRisetime());
                 fh2_MaxPos_map->Fill(pad + 1, hit->GetMaxpos());
             }
+
             if (hit->GetBaseline() > 0)
             {
                 fh1_Baseline[pad]->Fill(hit->GetBaseline());
                 fh2_Baseline_map->Fill(pad + 1, hit->GetBaseline());
-
-                fh1_sigmaInit->Fill(hit->GetRms());
-                fh1_sigmaFilt->Fill(hit->GetRmsFilt());
-
-                fh2_sigmaFiltVsPad->Fill(pad + 1, hit->GetRmsFilt());
-                fh2_sigmaInitVsPad->Fill(pad + 1, hit->GetRms());
-
-                fh2_meanFiltVsPad->Fill(pad + 1, hit->GetBaselineFilt());
-                fh2_meanInitVsPad->Fill(pad + 1, hit->GetBaseline());
             }
 
             if (fDisplaytraces)
@@ -1125,6 +1129,18 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             fh2_tLeading_cal->Fill(pad, tLeading);
             fh2_maxAmp_cal->Fill(pad, maxAmp);
             fh2_tSync_cal->Fill(pad, tSync);
+
+            if (hit->GetMean() > 0)
+            {
+                fh1_sigmaInit->Fill(hit->GetRmsRaw());
+                fh1_sigmaFilt->Fill(hit->GetRms());
+
+                fh2_sigmaFiltVsPad->Fill(pad + 1, hit->GetRms());
+                fh2_sigmaInitVsPad->Fill(pad + 1, hit->GetRmsRaw());
+
+                fh2_meanFiltVsPad->Fill(pad + 1, hit->GetMean());
+                fh2_meanInitVsPad->Fill(pad + 1, hit->GetMeanRaw());
+            }
 
             if (fDisplaytraces && pad < 129)
             {
