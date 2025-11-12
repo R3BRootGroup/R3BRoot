@@ -258,6 +258,7 @@ class R3BActafOnlineSpectra : public FairTask
 
     // Params for the event viewer
     int eventViewerNb = 0;
+    int firstBufferEvent = 0;
     static constexpr int maxEventViewerBatch = 100;
     int selectEvent = 0;
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsX;

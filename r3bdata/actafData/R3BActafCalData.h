@@ -39,6 +39,10 @@ class R3BActafCalData : public TObject
      *@param zpos         Z-position for each pad
      *@param syntime      Synchronization time
      *@param trace        Trace after the application of the SG filter
+     *@param rmsRaw       Trace before filtering
+     *@param rms          Rms value after filtering
+     *@param meanRaw      Baseline mean before filtering
+     *@param mean         Baseline mean after filtering
      **/
     explicit R3BActafCalData(UInt_t pad,
                              double energy = 0.,
@@ -46,7 +50,11 @@ class R3BActafCalData : public TObject
                              double leadingedge = 0.,
                              double zpos = 0.,
                              double syntime = 0.,
-                             const std::array<double, ACTAF_BINS>& trace = {});
+                             const std::array<double, ACTAF_BINS>& trace = {},
+                             double rmsRaw = 0.,
+                             double rms = 0.,
+                             double meanRaw = 0,
+                             double mean = 0);
 
     // Destructor
     virtual ~R3BActafCalData() = default;
@@ -59,6 +67,10 @@ class R3BActafCalData : public TObject
     [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge; }
     [[nodiscard]] inline const double& GetZpos() const { return fZPos; }
     [[nodiscard]] inline const double& GetSynTime() const { return fSynTime; }
+    [[nodiscard]] inline const double GetRms() const { return fRms; }
+    [[nodiscard]] inline const double GetRmsRaw() const { return fRmsRaw; }
+    [[nodiscard]] inline const double GetMean() const { return fMean; }
+    [[nodiscard]] inline const double GetMeanRaw() const { return fMeanRaw; }
 
     // Support for printing
     [[nodiscard]] std::string toString() const;
@@ -72,6 +84,10 @@ class R3BActafCalData : public TObject
     double fZPos = 0.;               // in cm
     double fSynTime = std::nan("");  // in ns
     std::array<double, ACTAF_BINS> fTrace{};
+    double fRmsRaw = 0;
+    double fRms = 0;
+    double fMeanRaw = 0;
+    double fMean = 0;
 
   public:
     ClassDefOverride(R3BActafCalData, 1);

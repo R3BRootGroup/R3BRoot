@@ -20,7 +20,11 @@ R3BActafCalData::R3BActafCalData(UInt_t pad,
                                  double leadingedge,
                                  double zpos,
                                  double syntime,
-                                 const std::array<double, ACTAF_BINS>& trace)
+                                 const std::array<double, ACTAF_BINS>& trace,
+                                 double rmsRaw,
+                                 double rms,
+                                 double meanRaw,
+                                 double mean)
     : fPad(pad)
     , fEnergy(energy)
     , fEMaxAmpl(maxampl)
@@ -28,6 +32,10 @@ R3BActafCalData::R3BActafCalData(UInt_t pad,
     , fZPos(zpos)
     , fSynTime(syntime)
     , fTrace(trace)
+    , fRmsRaw(rmsRaw)
+    , fRms(rms)
+    , fMeanRaw(meanRaw)
+    , fMean(mean)
 {
 }
 

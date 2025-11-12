@@ -102,7 +102,11 @@ class R3BActafMapped2Cal : public FairTask
                                 double drift,
                                 double zpos,
                                 double syntime,
-                                const std::array<double, ACTAF_BINS>& trace);
+                                const std::array<double, ACTAF_BINS>& trace,
+                                double rmsRaw,
+                                double rms,
+                                double meanRaw,
+                                double mean);
 
   public:
     // Class definition
