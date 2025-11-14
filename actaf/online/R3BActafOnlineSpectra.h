@@ -191,6 +191,7 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_sigmaFiltVsPad = nullptr;
     TH2F* fh2_meanInitVsPad = nullptr;
     TH2F* fh2_meanFiltVsPad = nullptr;
+    TH2F* fh2_RmsMapVsPad = nullptr;
 
     // Cal histograms
     TH2F* fh2_Ecal_cal = nullptr;

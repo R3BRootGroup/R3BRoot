@@ -141,7 +141,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     // ********* MAP HISTOGRAMS ********* //
 
     auto* cSum = new TCanvas("Summary_map", "mapped info", 10, 10, 500, 500);
-    cSum->Divide(1, 4);
+    cSum->Divide(3, 2);
 
     cSum->cd(1);
     fh2_ERaw_map = R3B::root_owned<TH2F>("fh2_ERaw_vs_pad_map", "ERaw vs Pad", fPads, 0.5, 0.5 + fPads, 500, 0, 30000);
@@ -181,6 +181,16 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_Risetime_map->GetXaxis()->CenterTitle(true);
     fh2_Risetime_map->GetYaxis()->CenterTitle(true);
     fh2_Risetime_map->Draw("colz");
+
+    cSum->cd(5);
+    fh2_RmsMapVsPad =
+        R3B::root_owned<TH2F>("fh2_RmsMapVsPad", "Baseline RMS per pad", fPads, 0.5, 0.5 + fPads, 100, 0, 50);
+    fh2_RmsMapVsPad->GetXaxis()->SetTitle("Pad");
+    fh2_RmsMapVsPad->GetYaxis()->SetTitle("RMS [ADC Chn]");
+    fh2_RmsMapVsPad->GetYaxis()->SetTitleOffset(1.1);
+    fh2_RmsMapVsPad->GetXaxis()->CenterTitle(true);
+    fh2_RmsMapVsPad->GetYaxis()->CenterTitle(true);
+    fh2_RmsMapVsPad->Draw("colz");
 
     mapfol->Add(cSum);
 
@@ -916,6 +926,7 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh1_sigmaInit->Reset();
         fh1_sigmaFilt->Reset();
         fh2_sigmaInitVsPad->Reset();
+        fh2_RmsMapVsPad->Reset();
         fh2_sigmaFiltVsPad->Reset();
         fh2_meanInitVsPad->Reset();
         fh2_meanFiltVsPad->Reset();
@@ -1070,6 +1081,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             {
                 fh1_Baseline[pad]->Fill(hit->GetBaseline());
                 fh2_Baseline_map->Fill(pad + 1, hit->GetBaseline());
+                fh2_RmsMapVsPad->Fill(pad + 1, hit->GetRms());
             }
 
             if (fDisplaytraces)
@@ -1317,6 +1329,7 @@ void R3BActafOnlineSpectra::FinishTask()
         fh1_sigmaInit->Write();
         fh1_sigmaFilt->Write();
         fh2_sigmaInitVsPad->Write();
+        fh2_RmsMapVsPad->Write();
         fh2_sigmaFiltVsPad->Write();
         fh2_meanInitVsPad->Write();
         fh2_meanFiltVsPad->Write();
