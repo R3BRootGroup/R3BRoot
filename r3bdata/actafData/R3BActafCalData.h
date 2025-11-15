@@ -43,6 +43,7 @@ class R3BActafCalData : public TObject
      *@param rms          Rms value after filtering
      *@param meanRaw      Baseline mean before filtering
      *@param mean         Baseline mean after filtering
+     *@param maw          MAW parameter
      **/
     explicit R3BActafCalData(UInt_t pad,
                              double energy = 0.,
@@ -54,7 +55,8 @@ class R3BActafCalData : public TObject
                              double rmsRaw = 0.,
                              double rms = 0.,
                              double meanRaw = 0,
-                             double mean = 0);
+                             double mean = 0,
+                             double maw = 0);
 
     // Destructor
     virtual ~R3BActafCalData() = default;
@@ -71,6 +73,7 @@ class R3BActafCalData : public TObject
     [[nodiscard]] inline const double GetRmsRaw() const { return fRmsRaw; }
     [[nodiscard]] inline const double GetMean() const { return fMean; }
     [[nodiscard]] inline const double GetMeanRaw() const { return fMeanRaw; }
+    [[nodiscard]] inline const double GetMaw() const { return fMaw; }
 
     // Support for printing
     [[nodiscard]] std::string toString() const;
@@ -88,6 +91,7 @@ class R3BActafCalData : public TObject
     double fRms = 0;
     double fMeanRaw = 0;
     double fMean = 0;
+    double fMaw = 0;
 
   public:
     ClassDefOverride(R3BActafCalData, 1);

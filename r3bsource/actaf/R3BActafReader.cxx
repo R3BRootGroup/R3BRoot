@@ -169,6 +169,43 @@ inline double ComputeRiseTime(const std::array<double, ACTAF_BINS>& signal, doub
     return t90 - t0;
 }
 
+template <class Cont>
+double CalculateMAW(const Cont& signal, int averaging = 4, int peakTimeNs = 200, int gapTimeNs = 200)
+{
+    const int binsPeakingTime = peakTimeNs / averaging;
+    const int binsGapTime = gapTimeNs / averaging;
+
+    const int nBins = static_cast<int>(signal.size());
+
+    if (nBins < binsPeakingTime + binsGapTime)
+        return 0;
+
+    double maxDiff = -1.0;
+    // int binMaxDiff = -1;
+
+    for (int i = 2 * binsPeakingTime + binsGapTime; i < nBins; ++i)
+    {
+        double sumPeaking = 0.0;
+        for (int j = i - binsPeakingTime; j < i; ++j)
+            sumPeaking += signal[j];
+
+        double sumGap = 0.0;
+        for (int j = i - 2 * binsPeakingTime - binsGapTime; j < i - binsPeakingTime - binsGapTime; ++j)
+            sumGap += signal[j];
+
+        const double diff = sumPeaking - sumGap;
+
+        if (diff > maxDiff)
+        {
+            maxDiff = diff;
+            // binMaxDiff = i;
+        }
+    }
+
+    const double mawmax = (maxDiff == -1.0) ? 0.0 : maxDiff * averaging;
+    return mawmax;
+}
+
 // ------------------------------ Reader impl ----------------------------------
 
 R3BActafReader::R3BActafReader(EXT_STR_h101_ACTAF2023_onion* data, size_t offset)
@@ -347,6 +384,7 @@ bool R3BActafReader::R3BRead2025()
         std::array<double, ACTAF_ECHN> riseTime{};
         std::array<double, ACTAF_ECHN> leadingEdge10{};
         std::array<double, ACTAF_BINS> correctedtrace{};
+        std::array<double, ACTAF_BINS> maw{};
 
         for (int chn = 0; chn < ACTAF_ECHN; ++chn)
         {
@@ -369,7 +407,7 @@ bool R3BActafReader::R3BRead2025()
             riseTime[chn] = ComputeRiseTime(correctedtrace, maxPos[chn], true);
             leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0);
             baselineMeanNew[chn] = ComputeBaselineMean(correctedtrace, maxPos[chn]) + baselineMean[chn];
-
+            maw[chn] = CalculateMAW(correctedtrace);
             // Store corrected trace
             trace[chn] = correctedtrace;
         }
@@ -388,7 +426,8 @@ bool R3BActafReader::R3BRead2025()
                                                                          leadingEdge10[chn],
                                                                          baselineStdOld[chn],
                                                                          baselineStdNew[chn],
-                                                                         baselineMeanNew[chn]);
+                                                                         baselineMeanNew[chn],
+                                                                         maw[chn]);
         }
     }
 

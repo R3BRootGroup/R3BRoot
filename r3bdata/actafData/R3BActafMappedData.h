@@ -45,6 +45,7 @@ class R3BActafMappedData : public TObject
      *@param rms           RMS of the baseline
      *@param rmsFilt       RMS of the baseline after filtering
      *@param baselineFilt  Baseline for each pad after filtering
+     *@param maw           Maw trigger parameter
      **/
 
     explicit R3BActafMappedData(UInt_t pad,
@@ -57,7 +58,8 @@ class R3BActafMappedData : public TObject
                                 double leadingedge10 = 0.,
                                 double rms = 0.,
                                 double rmsFilt = 0.,
-                                double baselineFilt = 0);
+                                double baselineFilt = 0,
+                                double maw = 0.);
 
     /** Constructor for AMBER data
      *@param pad           Pad number
@@ -82,6 +84,7 @@ class R3BActafMappedData : public TObject
     [[nodiscard]] inline double GetBaselineFilt() const { return fBaselineFilt; }
     [[nodiscard]] inline int GetTimeTag() const { return fTimeTag; }
     [[nodiscard]] inline int GetDetMask() const { return fDetMask; }
+    [[nodiscard]] inline double GetMaw() const { return fMaw; }
 
     [[nodiscard]] std::string toString() const;
     void Print(const Option_t*) const override;
@@ -95,6 +98,7 @@ class R3BActafMappedData : public TObject
     double fLeadingEdge10 = 0;
     double fRms = 0, fRmsFilt = 0, fBaselineFilt = 0;
     int fDetMask = 0, fTimeTag = 0, fSpillNb = 0;
+    double fMaw = 0.;
 
   public:
     ClassDefOverride(R3BActafMappedData, 6);
