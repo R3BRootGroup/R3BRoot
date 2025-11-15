@@ -248,6 +248,7 @@ class R3BActafOnlineSpectra : public FairTask
     std::vector<TH1F*> fh1_RingCounts;
     std::vector<TH2Poly*> fh2_XYPos;
     std::vector<TH2Poly*> fh2_XYPos_Evts;
+    std::vector<TH2Poly*> fh2_XYPos_Evts_Automatic;
     std::vector<TH1F*> fh1_PhiCounts;
     std::vector<TH1F*> fh1_Sync;
     std::vector<TH1F*> fh1_WrSync;

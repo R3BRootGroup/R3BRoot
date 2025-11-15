@@ -64,6 +64,7 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh1_RingCounts.resize(2);
     fh2_XYPos.resize(2);
     fh2_XYPos_Evts.resize(2);
+    fh2_XYPos_Evts_Automatic.resize(2);
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
     fh2_CorrectedTraces.resize(fPads);
@@ -720,7 +721,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     hitfol->Add(cXY);
 
-    // Canvas with XY positions (one per ring) storing the tracks of three events (updated each 3000 events)
+    // Canvas with XY positions (one per ring) storing the tracks of three events (updated manually)
     auto* cXY_nevents = new TCanvas("X_Y_events", "XY positions per event", 10, 10, 500, 500);
     cXY_nevents->Divide(2, 1);
 
@@ -728,8 +729,8 @@ InitStatus R3BActafOnlineSpectra::Init()
     {
         cXY_nevents->cd(i + 1);
         fh2_XYPos_Evts[i] =
-            static_cast<TH2Poly*>(fh2_XYPos[i]->Clone((fh2_XYPos[i]->GetTitle() + TString("_events")).Data()));
-        fh2_XYPos_Evts[i]->SetTitle(fh2_XYPos[i]->GetTitle() + TString(" per event"));
+            static_cast<TH2Poly*>(fh2_XYPos[i]->Clone((fh2_XYPos[i]->GetTitle() + TString("_events_auto")).Data()));
+        fh2_XYPos_Evts[i]->SetTitle(fh2_XYPos[i]->GetTitle() + TString(" per event (automatic)"));
         fh2_XYPos_Evts[i]->SetLineColor(kBlack);
         fh2_XYPos_Evts[i]->SetLineWidth(1);
         fh2_XYPos_Evts[i]->Draw("colz ]");
@@ -737,6 +738,24 @@ InitStatus R3BActafOnlineSpectra::Init()
     }
 
     hitfol->Add(cXY_nevents);
+
+    // Canvas with XY positions (one per ring) storing the tracks of three events (updated each 3000 events)
+    auto* cXY_nevents_auto = new TCanvas("X_Y_events_auto", "XY positions per event (automatic)", 10, 10, 500, 500);
+    cXY_nevents_auto->Divide(2, 1);
+
+    for (int i = 0; i < fh2_XYPos_Evts_Automatic.size(); i++)
+    {
+        cXY_nevents_auto->cd(i + 1);
+        fh2_XYPos_Evts_Automatic[i] =
+            static_cast<TH2Poly*>(fh2_XYPos[i]->Clone((fh2_XYPos[i]->GetTitle() + TString("_events")).Data()));
+        fh2_XYPos_Evts_Automatic[i]->SetTitle(fh2_XYPos[i]->GetTitle() + TString(" per event"));
+        fh2_XYPos_Evts_Automatic[i]->SetLineColor(kBlack);
+        fh2_XYPos_Evts_Automatic[i]->SetLineWidth(1);
+        fh2_XYPos_Evts_Automatic[i]->Draw("colz ]");
+        fh2_XYPos_Evts_Automatic[i]->Draw("same L");
+    }
+
+    hitfol->Add(cXY_nevents_auto);
 
     // Canvas with phi angle -> 3 histograms
     auto* cPhi = new TCanvas("Phi_correlations", "Phi angles", 10, 10, 500, 500);
@@ -1046,6 +1065,9 @@ void R3BActafOnlineSpectra::Reset_Histo()
         for (auto& h : fh2_XYPos_Evts)
             h->Reset("");
 
+        for (auto& h : fh2_XYPos_Evts_Automatic)
+            h->Reset("");
+
         for (auto& h : fh1_PhiCounts)
             h->Reset();
 
@@ -1233,13 +1255,12 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     // Fill hit data
-    /*
+
     if (fNEvents % updateRate == 0)
     {
-        for (auto& hist : fh2_XYPos_Evts)
+        for (auto& hist : fh2_XYPos_Evts_Automatic)
             hist->Reset("");
     }
-    */
 
     bool goodEventForView = false;
 
@@ -1279,8 +1300,8 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 eventCountsY[eventViewerNb][pad - 1] = y;
                 eventCountsE[eventViewerNb][pad - 1] = energy;
             }
-            // auto bin = fh2_XYPos_Evts[side]->FindBin(x, y);
-            // fh2_XYPos_Evts[side]->SetBinContent(bin, energy);
+            auto bin = fh2_XYPos_Evts_Automatic[side]->FindBin(x, y);
+            fh2_XYPos_Evts_Automatic[side]->SetBinContent(bin, energy);
 
             fh1_PhiCounts[side]->Fill(phi);
             fh1_CountsPerSide->Fill(side + 1);
@@ -1455,7 +1476,7 @@ void R3BActafOnlineSpectra::FinishTask()
         for (auto& h : fh2_XYPos)
             h->Write();
 
-        for (auto& h : fh2_XYPos_Evts)
+        for (auto& h : fh2_XYPos_Evts_Automatic)
             h->Write();
 
         for (auto& h : fh1_PhiCounts)
