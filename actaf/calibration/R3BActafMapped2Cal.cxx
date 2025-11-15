@@ -267,8 +267,11 @@ void R3BActafMapped2Cal::Exec(Option_t*)
         double rms = ComputeBaselineMean(waveform, maxPos, 0);
         double mean = ComputeBaselineMean(waveform, maxPos, 1) + mappedData->GetBaseline();
 
+        // MAW parameter value
+        double maw = mappedData->GetMaw();
+
         if (energyMaxAmpl >= fEThr[pad - 1] && energy < fMaxE)
-            AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime, waveform, rmsRaw, rms, meanRaw, mean);
+            AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime, waveform, rmsRaw, rms, meanRaw, mean, maw);
     }
     return;
 }
@@ -294,13 +297,14 @@ R3BActafCalData* R3BActafMapped2Cal::AddCalData(UInt_t padId,
                                                 double rmsRaw,
                                                 double rms,
                                                 double meanRaw,
-                                                double mean)
+                                                double mean,
+                                                double maw)
 {
     // It fills the R3BActafCalData
     TClonesArray& clref = *fActafCalData;
     Int_t size = clref.GetEntriesFast();
     return new (clref[size])
-        R3BActafCalData(padId, energy, maxampl, drift, zpos, syntime, trace, rmsRaw, rms, meanRaw, mean);
+        R3BActafCalData(padId, energy, maxampl, drift, zpos, syntime, trace, rmsRaw, rms, meanRaw, mean, maw);
 }
 
 ClassImp(R3BActafMapped2Cal)

@@ -24,7 +24,8 @@ R3BActafCalData::R3BActafCalData(UInt_t pad,
                                  double rmsRaw,
                                  double rms,
                                  double meanRaw,
-                                 double mean)
+                                 double mean,
+                                 double maw)
     : fPad(pad)
     , fEnergy(energy)
     , fEMaxAmpl(maxampl)
@@ -36,6 +37,7 @@ R3BActafCalData::R3BActafCalData(UInt_t pad,
     , fRms(rms)
     , fMeanRaw(meanRaw)
     , fMean(mean)
+    , fMaw(maw)
 {
 }
 

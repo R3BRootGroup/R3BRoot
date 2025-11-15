@@ -24,7 +24,8 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
                                        double leadingedge10,
                                        double rms,
                                        double rmsFilt,
-                                       double baselineFilt)
+                                       double baselineFilt,
+                                       double maw)
     : fPad(pad)
     , fE(energy)
     , fBaseline(baseline)
@@ -36,6 +37,7 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
     , fRms(rms)
     , fRmsFilt(rmsFilt)
     , fBaselineFilt(baselineFilt)
+    , fMaw(maw)
 {
 }
 

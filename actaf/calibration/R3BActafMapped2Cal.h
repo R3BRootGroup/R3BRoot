@@ -106,7 +106,8 @@ class R3BActafMapped2Cal : public FairTask
                                 double rmsRaw,
                                 double rms,
                                 double meanRaw,
-                                double mean);
+                                double mean,
+                                double maw);
 
   public:
     // Class definition

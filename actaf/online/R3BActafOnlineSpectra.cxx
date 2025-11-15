@@ -68,6 +68,8 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh2_RawTraces.resize(fPads);
     fh2_CorrectedTraces.resize(fPads);
     fh2_FilteredTraces.resize(fPads);
+    fh2_mawVsECal.resize(2);
+    fh2_mawVsEMap.resize(2);
     fh1_RawE.resize(fPads);
     fh1_Baseline.resize(fPads);
 }
@@ -406,8 +408,30 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_timetag_signal->GetXaxis()->CenterTitle(true);
     fh2_timetag_signal->GetYaxis()->CenterTitle(true);
     fh2_timetag_signal->Draw("colz");
-
     mapfol->Add(ctimetag);
+
+    // Mean value of the baseline after and before filtering
+    auto* cmawMap = new TCanvas("Maw_map", "Maw (Map) Vs Integrated Energy", 10, 10, 500, 500);
+    cmawMap->Divide(2, 1);
+
+    for (int iside = 0; iside < 2; iside++)
+    {
+
+        TString name = iside == 1 ? "fh2_mawVsEMap_Down" : "fh2_mawVsEMap_Up";
+        TString tit = iside == 1 ? "Maw (Map) Vs Integrated Energy (Downstream side)"
+                                 : "Maw (Map) Vs Integrated Energy (Upstream side)";
+
+        cmawMap->cd(iside + 1);
+        fh2_mawVsEMap[iside] = R3B::root_owned<TH2F>(name, tit, nBinsEcal, 0.5, 0.5 + nEcalMax, 300, 1, 500000);
+        fh2_mawVsEMap[iside]->GetXaxis()->SetTitle("Energy [Chn]");
+        fh2_mawVsEMap[iside]->GetYaxis()->SetTitle("MAW parameter");
+        fh2_mawVsEMap[iside]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_mawVsEMap[iside]->GetXaxis()->CenterTitle(true);
+        fh2_mawVsEMap[iside]->GetYaxis()->CenterTitle(true);
+        fh2_mawVsEMap[iside]->Draw("colz");
+    }
+
+    mapfol->Add(cmawMap);
 
     mainfol->Add(mapfol);
 
@@ -466,8 +490,10 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_tSync_cal->GetYaxis()->CenterTitle(true);
     fh2_tSync_cal->Draw("colz");
 
+    calfol->Add(cCal);
+
     // RMS of the baseline after and before filtering
-    auto* cRms = new TCanvas("Rms_map", "Baseline RMS", 10, 10, 500, 500);
+    auto* cRms = new TCanvas("Rms_cal", "Baseline RMS", 10, 10, 500, 500);
     cRms->Divide(2, 2);
 
     cRms->cd(1);
@@ -513,7 +539,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     calfol->Add(cRms);
 
     // Mean value of the baseline after and before filtering
-    auto* cmean = new TCanvas("Mean_map", "Baseline Mean", 10, 10, 500, 500);
+    auto* cmean = new TCanvas("Mean_cal", "Baseline Mean", 10, 10, 500, 500);
     cmean->Divide(2, 1);
 
     cmean->cd(1);
@@ -538,7 +564,28 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     calfol->Add(cmean);
 
-    calfol->Add(cCal);
+    // Mean value of the baseline after and before filtering
+    auto* cmaw = new TCanvas("Maw_cal", "Maw Vs Integrated Energy", 10, 10, 500, 500);
+    cmaw->Divide(2, 1);
+
+    for (int iside = 0; iside < 2; iside++)
+    {
+
+        TString name = iside == 1 ? "fh2_mawVsECal_Down" : "fh2_mawVsECal_Up";
+        TString tit =
+            iside == 1 ? "Maw Vs Integrated Energy (Downstream side)" : "Maw Vs Integrated Energy (Upstream side)";
+
+        cmaw->cd(iside + 1);
+        fh2_mawVsECal[iside] = R3B::root_owned<TH2F>(name, tit, nBinsEcal, 0.5, 0.5 + nEcalMax, 300, 1, 500000);
+        fh2_mawVsECal[iside]->GetXaxis()->SetTitle("Energy [Chn]");
+        fh2_mawVsECal[iside]->GetYaxis()->SetTitle("MAW parameter");
+        fh2_mawVsECal[iside]->GetYaxis()->SetTitleOffset(1.1);
+        fh2_mawVsECal[iside]->GetXaxis()->CenterTitle(true);
+        fh2_mawVsECal[iside]->GetYaxis()->CenterTitle(true);
+        fh2_mawVsECal[iside]->Draw("colz");
+    }
+
+    calfol->Add(cmaw);
 
     if (fCalItems != nullptr)
         mainfol->Add(calfol);
@@ -941,6 +988,16 @@ void R3BActafOnlineSpectra::Reset_Histo()
             hist->Reset();
         }
 
+        for (const auto& hist : fh2_mawVsECal)
+        {
+            hist->Reset();
+        }
+
+        for (const auto& hist : fh2_mawVsEMap)
+        {
+            hist->Reset();
+        }
+
         for (const auto& hist : fh2_FilteredTraces)
         {
             hist->Reset();
@@ -1082,6 +1139,9 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 fh1_Baseline[pad]->Fill(hit->GetBaseline());
                 fh2_Baseline_map->Fill(pad + 1, hit->GetBaseline());
                 fh2_RmsMapVsPad->Fill(pad + 1, hit->GetRms());
+
+                int indexside = pad < 65 ? 0 : 1;
+                fh2_mawVsEMap[indexside]->Fill(hit->GetE(), hit->GetMaw());
             }
 
             if (fDisplaytraces)
@@ -1152,6 +1212,10 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
                 fh2_meanFiltVsPad->Fill(pad + 1, hit->GetMean());
                 fh2_meanInitVsPad->Fill(pad + 1, hit->GetMeanRaw());
+
+                int indexside = pad < 65 ? 0 : 1;
+
+                fh2_mawVsECal[indexside]->Fill(Ecal, hit->GetMaw());
             }
 
             if (fDisplaytraces && pad < 129)
@@ -1344,6 +1408,10 @@ void R3BActafOnlineSpectra::FinishTask()
             hist->Write();
         }
         for (const auto& hist : fh2_FilteredTraces)
+        {
+            hist->Write();
+        }
+        for (const auto& hist : fh2_mawVsECal)
         {
             hist->Write();
         }

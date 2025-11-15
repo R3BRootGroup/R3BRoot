@@ -178,6 +178,7 @@ class R3BActafOnlineSpectra : public FairTask
     std::vector<TH2F*> fh2_CorrectedTraces;
     std::vector<TH1F*> fh1_RawE;
     std::vector<TH1F*> fh1_Baseline;
+    std::vector<TH2F*> fh2_mawVsEMap;
 
     // Map histograms
     TH2F* fh2_ERaw_map = nullptr;
@@ -200,6 +201,7 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_maxAmp_cal = nullptr;
     TH2F* fh2_tSync_cal = nullptr;
     std::vector<TH2F*> fh2_FilteredTraces;
+    std::vector<TH2F*> fh2_mawVsECal;
 
     int nBinsEcal = 100;
     int nEcalMin = 0;
