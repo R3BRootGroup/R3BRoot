@@ -1404,87 +1404,90 @@ void R3BActafOnlineSpectra::FinishEvent()
 
 void R3BActafOnlineSpectra::FinishTask()
 {
-    if (fMappedItems)
+    if (saveHistos)
     {
-        fh2_ERaw_map->Write();
-        fh2_Baseline_map->Write();
-        fh2_MaxPos_map->Write();
-        fh2_Risetime_map->Write();
-        fh2_ModVsCh_map->Write();
-        fh1_sigmaInit->Write();
-        fh1_sigmaFilt->Write();
-        fh2_sigmaInitVsPad->Write();
-        fh2_RmsMapVsPad->Write();
-        fh2_sigmaFiltVsPad->Write();
-        fh2_meanInitVsPad->Write();
-        fh2_meanFiltVsPad->Write();
-        fh1_DetMask->Write();
-        fh2_timetag_signal->Write();
-        for (const auto& hist : fh2_RawTraces)
+        if (fMappedItems)
         {
-            hist->Write();
+            fh2_ERaw_map->Write();
+            fh2_Baseline_map->Write();
+            fh2_MaxPos_map->Write();
+            fh2_Risetime_map->Write();
+            fh2_ModVsCh_map->Write();
+            fh1_sigmaInit->Write();
+            fh1_sigmaFilt->Write();
+            fh2_sigmaInitVsPad->Write();
+            fh2_RmsMapVsPad->Write();
+            fh2_sigmaFiltVsPad->Write();
+            fh2_meanInitVsPad->Write();
+            fh2_meanFiltVsPad->Write();
+            fh1_DetMask->Write();
+            fh2_timetag_signal->Write();
+            for (const auto& hist : fh2_RawTraces)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh2_CorrectedTraces)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh2_FilteredTraces)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh2_mawVsECal)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh1_RawE)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh1_Baseline)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh1_Sync)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh1_WrSync)
+            {
+                hist->Write();
+            }
+            for (auto* gr : fgraph_rates)
+            {
+                if (gr)
+                    gr->Write();
+            }
         }
-        for (const auto& hist : fh2_CorrectedTraces)
-        {
-            hist->Write();
-        }
-        for (const auto& hist : fh2_FilteredTraces)
-        {
-            hist->Write();
-        }
-        for (const auto& hist : fh2_mawVsECal)
-        {
-            hist->Write();
-        }
-        for (const auto& hist : fh1_RawE)
-        {
-            hist->Write();
-        }
-        for (const auto& hist : fh1_Baseline)
-        {
-            hist->Write();
-        }
-        for (const auto& hist : fh1_Sync)
-        {
-            hist->Write();
-        }
-        for (const auto& hist : fh1_WrSync)
-        {
-            hist->Write();
-        }
-        for (auto* gr : fgraph_rates)
-        {
-            if (gr)
-                gr->Write();
-        }
-    }
 
-    if (fCalItems)
-    {
-        fh2_Ecal_cal->Write();
-        fh2_zPos_cal->Write();
-        fh2_tLeading_cal->Write();
-        fh2_maxAmp_cal->Write();
-        fh2_tSync_cal->Write();
-    }
+        if (fCalItems)
+        {
+            fh2_Ecal_cal->Write();
+            fh2_zPos_cal->Write();
+            fh2_tLeading_cal->Write();
+            fh2_maxAmp_cal->Write();
+            fh2_tSync_cal->Write();
+        }
 
-    if (fHitItems)
-    {
-        for (auto& h : fh1_RingCounts)
-            h->Write();
+        if (fHitItems)
+        {
+            for (auto& h : fh1_RingCounts)
+                h->Write();
 
-        for (auto& h : fh2_XYPos)
-            h->Write();
+            for (auto& h : fh2_XYPos)
+                h->Write();
 
-        for (auto& h : fh2_XYPos_Evts_Automatic)
-            h->Write();
+            for (auto& h : fh2_XYPos_Evts_Automatic)
+                h->Write();
 
-        for (auto& h : fh1_PhiCounts)
-            h->Write();
+            for (auto& h : fh1_PhiCounts)
+                h->Write();
 
-        fh1_CountsPerSide->Write();
+            fh1_CountsPerSide->Write();
 
-        fh2_Phi1VsPhi2->Write();
+            fh2_Phi1VsPhi2->Write();
+        }
     }
 }
 ClassImp(R3BActafOnlineSpectra)
