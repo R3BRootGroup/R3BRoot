@@ -152,6 +152,8 @@ class R3BActafOnlineSpectra : public FairTask
 
     void SetUpdateRate(int num) { updateRate = num; }
 
+    void SetSaveHistos(bool save) { saveHistos = save; }
+
   private:
     void SetParameter();
 
@@ -268,6 +270,9 @@ class R3BActafOnlineSpectra : public FairTask
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsX;
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsY;
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsE;
+
+    // Bool for saving the histograms in the output file
+    bool saveHistos = true;
 
   public:
     ClassDefOverride(R3BActafOnlineSpectra, 1);
