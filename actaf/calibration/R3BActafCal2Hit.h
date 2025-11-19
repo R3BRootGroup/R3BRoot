@@ -71,7 +71,8 @@ class R3BActafCal2Hit : public FairTask
                                 double ypos,
                                 double zpos,
                                 double energy,
-                                TVector3 track);
+                                TVector3 track,
+                                double maxAmpl);
 
   public:
     // Class definition

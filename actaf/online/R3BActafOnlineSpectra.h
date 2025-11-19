@@ -175,9 +175,12 @@ class R3BActafOnlineSpectra : public FairTask
     static constexpr int fPads = fChn * fFadcs;
     static constexpr int fRings = 8;
     bool fDisplaytraces = true;
+    int countTracesDump = 0;
 
     std::vector<TH2F*> fh2_RawTraces;
     std::vector<TH2F*> fh2_CorrectedTraces;
+    std::vector<TGraph*> g_CorrectedTraces_4pads_highestAmp_auto;
+    std::vector<TGraph*> g_CorrectedTraces_4pads_highestAmp;
     std::vector<TH1F*> fh1_RawE;
     std::vector<TH1F*> fh1_Baseline;
     std::vector<TH2F*> fh2_mawVsEMap;
@@ -270,8 +273,7 @@ class R3BActafOnlineSpectra : public FairTask
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsX;
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsY;
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsE;
-
-    // Bool for saving the histograms in the output file
+    std::array<std::array<std::vector<double>, fPads>, maxEventViewerBatch> eventCountsTrace;
     bool saveHistos = true;
 
   public:

@@ -39,6 +39,8 @@ class R3BActafHitData : public TObject
      *@param ypos         Y-position for each pad
      *@param zpos         Z-position for each pad
      *@param track        track for each pad
+     *@param energy       Deposited energy for each pad
+     *@param maxAmpl      Maximum amplitude for each pad
      **/
     explicit R3BActafHitData(UInt_t pad,
                              UInt_t side,
@@ -47,7 +49,8 @@ class R3BActafHitData : public TObject
                              double ypos,
                              double zpos,
                              double energy,
-                             TVector3 track);
+                             TVector3 track, 
+                             double maxAmpl);
 
     // Destructor
     virtual ~R3BActafHitData() = default;
@@ -61,6 +64,7 @@ class R3BActafHitData : public TObject
     [[nodiscard]] inline const double& GetZpos() const { return fZPos; }
     [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
     [[nodiscard]] inline const TVector3 GetTrack() const { return fTrack; }
+    [[nodiscard]] inline const double& GetMaxAmpl() const { return fMaxAmpl; }
 
     // Support for printing
     [[nodiscard]] std::string toString() const;
@@ -75,9 +79,10 @@ class R3BActafHitData : public TObject
     double fZPos = 0.; // in cm
     double fEnergy = std::nan("");
     TVector3 fTrack;
+    double fMaxAmpl = 0.;
 
   public:
-    ClassDefOverride(R3BActafHitData, 1);
+    ClassDefOverride(R3BActafHitData, 2);
 };
 
 // Operator overloading for printing R3BActafHitData

@@ -21,7 +21,8 @@ R3BActafHitData::R3BActafHitData(UInt_t pad,
                                  double ypos,
                                  double zpos,
                                  double energy,
-                                 TVector3 track)
+                                 TVector3 track, 
+                                 double maxAmpl)
     : fPad(pad)
     , fSide(side)
     , fRing(ring)
@@ -30,6 +31,7 @@ R3BActafHitData::R3BActafHitData(UInt_t pad,
     , fZPos(zpos)
     , fEnergy(energy)
     , fTrack(track)
+    , fMaxAmpl(maxAmpl)
 {
 }
 
@@ -42,7 +44,8 @@ std::string R3BActafHitData::toString() const
                        GetXpos(),
                        GetYpos(),
                        GetZpos(),
-                       GetEnergy());
+                       GetEnergy(),
+                       GetMaxAmpl());
 }
 
 void R3BActafHitData::Print(const Option_t*) const { std::cout << *this << std::endl; }
