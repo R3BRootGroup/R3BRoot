@@ -110,8 +110,9 @@ void R3BActafCal2Hit::Exec(Option_t*)
         auto ring = fActafGeo->GetRingId(pad);
         auto zpos = calData->GetZpos();
         auto energy = calData->GetEnergy();
+        auto maxAmpl = calData->GetEMaxAmpl();
         TVector3 track = fActafGeo->GetPosition(pad);
-        AddHitData(pad, (pad < 65 ? 1 : 2), ring, track.X(), track.Y(), zpos, energy, track);
+        AddHitData(pad, (pad < 65 ? 1 : 2), ring, track.X(), track.Y(), zpos, energy, track, maxAmpl);
     }
     return;
 }
@@ -134,12 +135,13 @@ R3BActafHitData* R3BActafCal2Hit::AddHitData(UInt_t padId,
                                              double ypos,
                                              double zpos,
                                              double energy,
-                                             TVector3 track)
+                                             TVector3 track,
+                                             double maxAmpl)
 {
     // It fills the R3BActafCalData
     TClonesArray& clref = *fActafHitData;
     Int_t size = clref.GetEntriesFast();
-    return new (clref[size]) R3BActafHitData(padId, side, ring, xpos, ypos, zpos, energy, track);
+    return new (clref[size]) R3BActafHitData(padId, side, ring, xpos, ypos, zpos, energy, track, maxAmpl);
 }
 
 ClassImp(R3BActafCal2Hit)

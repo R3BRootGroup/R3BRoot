@@ -30,6 +30,7 @@
 #include <TLegend.h>
 #include <TLegendEntry.h>
 #include <TMath.h>
+#include <TROOT.h>
 #include <TStyle.h>
 
 // FAIR headers
@@ -68,6 +69,8 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
     fh2_CorrectedTraces.resize(fPads);
+    g_CorrectedTraces_4pads_highestAmp_auto.resize(4 * 2); // 4 pads per side
+    g_CorrectedTraces_4pads_highestAmp.resize(4 * 2);      // ensure main vector has room
     fh2_FilteredTraces.resize(fPads);
     fh2_mawVsECal.resize(2);
     fh2_mawVsEMap.resize(2);
@@ -757,6 +760,82 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     hitfol->Add(cXY_nevents_auto);
 
+    // Canvas with XY positions (one per ring) and waveforms of the 4 pads with highest amplitude
+    auto* cXY_nevents_waveform = new TCanvas("X_Y_events_waveform", "XY positions per event", 10, 10, 500, 500);
+    cXY_nevents_waveform->Divide(2, 2);
+    cXY_nevents_waveform->cd(1);
+    fh2_XYPos_Evts[0]->SetMaximum(2e3);
+    fh2_XYPos_Evts[1]->SetMaximum(2e3);
+    fh2_XYPos_Evts[0]->Draw("colz ]");
+    fh2_XYPos_Evts[0]->Draw("same L");
+    cXY_nevents_waveform->cd(2);
+    fh2_XYPos_Evts[1]->Draw("colz ]");
+    fh2_XYPos_Evts[1]->Draw("same L");
+    cXY_nevents_waveform->cd(3);
+    TPad* p3 = (TPad*)gPad;
+    p3->Divide(2, 2);
+    cXY_nevents_waveform->cd(4);
+    TPad* p4 = (TPad*)gPad;
+    p4->Divide(2, 2);
+    for (int iPad = 0; iPad < 8; iPad++)
+    {
+        // Use TGraph for the corrected traces of the 4 pads with highest amplitude
+        g_CorrectedTraces_4pads_highestAmp[iPad] = new TGraph();
+        g_CorrectedTraces_4pads_highestAmp[iPad]->SetName(Form("g_CorrectedTraces_4pads_highestAmp_%d", iPad));
+        g_CorrectedTraces_4pads_highestAmp[iPad]->SetTitle(
+            Form("Corrected Trace of pad with highest amplitude %d;Time [Chn];A", iPad + 1));
+        g_CorrectedTraces_4pads_highestAmp[iPad]->SetLineColor(kBlack);
+        g_CorrectedTraces_4pads_highestAmp[iPad]->SetMarkerStyle(20);
+        g_CorrectedTraces_4pads_highestAmp[iPad]->SetMarkerSize(0.5);
+        if (iPad < 4)
+            p3->cd(iPad + 1);
+        else
+            p4->cd(iPad - 4 + 1);
+        g_CorrectedTraces_4pads_highestAmp[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
+        g_CorrectedTraces_4pads_highestAmp[iPad]->Draw("AP");
+    }
+
+    hitfol->Add(cXY_nevents_waveform);
+
+    // Canvas with XY positions (one per ring) and waveforms of the 4 pads with highest amplitude (auto)
+    auto* cXY_nevents_waveform_auto =
+        new TCanvas("X_Y_events_waveform auto", "XY positions per event auto", 10, 10, 500, 500);
+    cXY_nevents_waveform_auto->Divide(2, 2);
+    cXY_nevents_waveform_auto->cd(1);
+    fh2_XYPos_Evts_Automatic[0]->SetMaximum(2e3);
+    fh2_XYPos_Evts_Automatic[1]->SetMaximum(2e3);
+    fh2_XYPos_Evts_Automatic[0]->Draw("colz ]");
+    fh2_XYPos_Evts_Automatic[0]->Draw("same L");
+    cXY_nevents_waveform_auto->cd(2);
+    fh2_XYPos_Evts_Automatic[1]->Draw("colz ]");
+    fh2_XYPos_Evts_Automatic[1]->Draw("same L");
+    cXY_nevents_waveform_auto->cd(3);
+    TPad* p3_auto = (TPad*)gPad;
+    p3_auto->Divide(2, 2);
+    cXY_nevents_waveform_auto->cd(4);
+    TPad* p4_auto = (TPad*)gPad;
+    p4_auto->Divide(2, 2);
+    for (int iPad = 0; iPad < 8; iPad++)
+    {
+        // Use TGraph for the corrected traces of the 4 pads with highest amplitude
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad] = new TGraph();
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetName(
+            Form("g_CorrectedTraces_4pads_highestAmp_auto_%d", iPad));
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetTitle(
+            Form("Corrected Trace of pad with highest amplitude %d;Time [Chn];A", iPad + 1));
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetLineColor(kBlack);
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetMarkerStyle(20);
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetMarkerSize(0.5);
+        if (iPad < 4)
+            p3_auto->cd(iPad + 1);
+        else
+            p4_auto->cd(iPad - 4 + 1);
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->Draw("AP");
+    }
+
+    hitfol->Add(cXY_nevents_waveform_auto);
+
     // Canvas with phi angle -> 3 histograms
     auto* cPhi = new TCanvas("Phi_correlations", "Phi angles", 10, 10, 500, 500);
     cPhi->Divide(1, 3);
@@ -891,7 +970,6 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     // Register command to reset histograms
     run->GetHttpServer()->RegisterCommand("Reset_Actaf_HIST", Form("/Objects/%s/->Reset_Histo()", GetName()));
-
     run->GetHttpServer()->RegisterCommand("Next_event", Form("/Objects/%s/->Next_event()", GetName()));
     run->GetHttpServer()->RegisterCommand("Prev_event", Form("/Objects/%s/->Prev_event()", GetName()));
     run->GetHttpServer()->RegisterCommand("Reset_event", Form("/Objects/%s/->Reset_event()", GetName()));
@@ -915,6 +993,11 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
 
         fh2_XYPos_Evts[0]->Reset("");
         fh2_XYPos_Evts[1]->Reset("");
+        for (auto& graph : g_CorrectedTraces_4pads_highestAmp)
+        {
+            if (graph)
+                graph->Set(0); // Clear
+        }
 
         for (int ipad = 0; ipad < 128; ipad++)
         {
@@ -939,6 +1022,131 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
             fh2_XYPos_Evts[iside]->SetTitle(tit);
             fh2_XYPos_Evts[iside]->Draw("colz ]");
             fh2_XYPos_Evts[iside]->Draw("same L");
+        }
+
+        // draw traces for the selected event: pick top-4 pads per side by energy
+        // compute top-4 pads per side
+        std::array<int, 4> topUp;
+        topUp.fill(-1);
+        std::array<double, 4> topUpE;
+        topUpE.fill(-1.0);
+        std::array<int, 4> topDown;
+        topDown.fill(-1);
+        std::array<double, 4> topDownE;
+        topDownE.fill(-1.0);
+
+        for (int ipad = 0; ipad < fPads; ++ipad)
+        {
+            double e = eventCountsE[selectEvent][ipad];
+            if (e <= 0.)
+                continue;
+            int pad = ipad + 1;
+            if (pad < 65)
+            {
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (e > topUpE[i])
+                    {
+                        for (int j = 3; j > i; --j)
+                        {
+                            topUpE[j] = topUpE[j - 1];
+                            topUp[j] = topUp[j - 1];
+                        }
+                        topUpE[i] = e;
+                        topUp[i] = pad;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (e > topDownE[i])
+                    {
+                        for (int j = 3; j > i; --j)
+                        {
+                            topDownE[j] = topDownE[j - 1];
+                            topDown[j] = topDown[j - 1];
+                        }
+                        topDownE[i] = e;
+                        topDown[i] = pad;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // find the waveform canvas and its pads (created in Init)
+        // use the global gROOT pointer to search the object table
+        TCanvas* cWave = static_cast<TCanvas*>(gROOT->FindObject("X_Y_events_waveform"));
+        TPad* p3 = nullptr;
+        TPad* p4 = nullptr;
+        if (cWave)
+        {
+            cWave->cd(3);
+            p3 = static_cast<TPad*>(gPad);
+            cWave->cd(4);
+            p4 = static_cast<TPad*>(gPad);
+        }
+
+        // fill and draw the graphs: upstream -> graphs 0..3 in p3, downstream -> 4..7 in p4
+        for (int i = 0; i < 4; ++i)
+        {
+            int pad = topUp[i];
+            auto* g = g_CorrectedTraces_4pads_highestAmp[i];
+            g->GetYaxis()->SetRangeUser(-200, 1000);
+            if (g)
+            {
+                g->Set(0);
+                if (pad > 0)
+                {
+                    const auto& vec = eventCountsTrace[selectEvent][pad - 1];
+                    std::size_t idx = 0;
+                    for (const auto& v : vec)
+                    {
+                        if (v == 0)
+                            continue;
+                        g->SetPoint(g->GetN(), idx++, v);
+                    }
+                    g->SetTitle(Form("Corrected Trace of pad U%d;Time [Chn];A", pad));
+                }
+                if (cWave && p3)
+                {
+                    cWave->cd(3);
+                    p3->cd(i + 1);
+                    g->Draw("AL");
+                }
+            }
+        }
+
+        for (int i = 0; i < 4; ++i)
+        {
+            int pad = topDown[i];
+            auto* g = g_CorrectedTraces_4pads_highestAmp[i + 4];
+            g->GetYaxis()->SetRangeUser(-200, 1000);
+            if (g)
+            {
+                g->Set(0);
+                if (pad > 0)
+                {
+                    const auto& vec = eventCountsTrace[selectEvent][pad - 1];
+                    std::size_t idx = 0;
+                    for (const auto& v : vec)
+                    {
+                        if (v == 0)
+                            continue;
+                        g->SetPoint(g->GetN(), idx++, v);
+                    }
+                    g->SetTitle(Form("Corrected Trace of pad D%d;Time [Chn];A", pad - 64));
+                }
+                if (cWave && p4)
+                {
+                    cWave->cd(4);
+                    p4->cd(i + 1);
+                    g->Draw("AL");
+                }
+            }
         }
     }
     else
@@ -976,6 +1184,11 @@ void R3BActafOnlineSpectra::Reset_event()
     eventViewerNb = 0;
     selectEvent = 0;
     firstBufferEvent = fNEvents;
+    for (int ie = 0; ie < maxEventViewerBatch; ++ie)
+    {
+        for (int ip = 0; ip < fPads; ++ip)
+            eventCountsTrace[ie][ip].clear();
+    }
 }
 
 void R3BActafOnlineSpectra::Reset_Histo()
@@ -1052,6 +1265,11 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh2_tLeading_cal->Reset();
         fh2_maxAmp_cal->Reset();
         fh2_tSync_cal->Reset();
+        for (const auto& hist : g_CorrectedTraces_4pads_highestAmp_auto)
+        {
+            if (hist)
+                hist->Set(0); // clear TGraph points
+        }
     }
 
     if (fHitItems)
@@ -1080,7 +1298,6 @@ void R3BActafOnlineSpectra::Reset_Histo()
 
 void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 {
-    // Check for requested trigger
     if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
         return;
 
@@ -1101,6 +1318,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
     }
 
     uint64_t timetag = 0;
+
     // Fill mapped data
     if (fMappedItems && fMappedItems->GetEntriesFast() > 0)
     {
@@ -1125,6 +1343,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 {
                     auto vec = hit->GetTrace(); // std::vector
                     std::size_t index = 0;
+
                     for (const auto& value : vec)
                     {
                         if (value == 0)
@@ -1168,7 +1387,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
             if (fDisplaytraces)
             {
-                auto vec = hit->GetTrace(); // std::vector
+                auto vec = hit->GetTrace();
                 std::size_t index = 0;
                 for (const auto& value : vec)
                 {
@@ -1190,6 +1409,19 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
     overall_rate += fCalItems->GetEntriesFast();
 
     // Fill cal data
+    std::array<double, 4> topAmpf;
+    std::array<int, 4> topPadf;
+    topAmpf.fill(0.);
+    topPadf.fill(0.);
+    std::array<double, 4> topAmps;
+    std::array<int, 4> topPads;
+    topAmps.fill(0.);
+    topPads.fill(0.);
+    for (auto& hist : g_CorrectedTraces_4pads_highestAmp_auto)
+    {
+        if (hist)
+            hist->Set(0); // clear TGraph points
+    }
     if (fCalItems && fCalItems->GetEntriesFast() > 0)
     {
         auto nHits = fCalItems->GetEntriesFast();
@@ -1199,24 +1431,52 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             if (!hit)
                 continue;
 
-            int pad = hit->GetPad();
-            if (pad < 65)
-            {
-                fsec_rate++;
-            }
-            else if (pad > 64 && pad < 129)
-            {
-                ssec_rate++;
-            }
-
-            if (pad > fPads)
-                continue;
-
             double Ecal = hit->GetEnergy();
             double maxAmp = hit->GetEMaxAmpl();
             double tLeading = hit->GetLeadingEdgeTime();
             double zPos = hit->GetZpos();
             double tSync = hit->GetSynTime();
+            int pad = hit->GetPad();
+            if (pad < 65)
+            {
+                fsec_rate++;
+                // Store top 4 pads with highest amplitude upstream
+                for (int i = 0; i < 4; i++)
+                {
+                    if (maxAmp > topAmpf[i])
+                    {
+                        for (int j = 3; j > i; j--)
+                        {
+                            topAmpf[j] = topAmpf[j - 1];
+                            topPadf[j] = topPadf[j - 1];
+                        }
+                        topAmpf[i] = maxAmp;
+                        topPadf[i] = pad;
+                        break;
+                    }
+                }
+            }
+            else if (pad > 64 && pad < 129)
+            {
+                ssec_rate++;
+                for (int i = 0; i < 4; i++)
+                {
+                    if (maxAmp > topAmps[i])
+                    {
+                        for (int j = 3; j > i; j--)
+                        {
+                            topAmps[j] = topAmps[j - 1];
+                            topPads[j] = topPads[j - 1];
+                        }
+                        topAmps[i] = maxAmp;
+                        topPads[i] = pad;
+                        break;
+                    }
+                }
+            }
+
+            if (pad > fPads)
+                continue;
 
             fh2_Ecal_cal->Fill(pad, Ecal);
             fh2_zPos_cal->Fill(pad, zPos);
@@ -1254,6 +1514,63 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
     }
 
+    // Second pass: fill the top-4 graphs now that topPadf/topPads are final
+    if (fDisplaytraces)
+    {
+        // map pad -> graph index (-1 = none); pads are 1..fPads
+        std::vector<int> padToGraph(fPads + 1, -1);
+        for (int i = 0; i < 4; ++i)
+        {
+            if (topPadf[i] >= 1 && topPadf[i] <= fPads)
+                padToGraph[topPadf[i]] = i; // upstream graphs 0..3
+            if (topPads[i] >= 1 && topPads[i] <= fPads)
+                padToGraph[topPads[i]] = i + 4; // downstream graphs 4..7
+        }
+
+        Int_t nHits2 = fCalItems ? fCalItems->GetEntriesFast() : 0;
+        for (int ih = 0; ih < nHits2; ++ih)
+        {
+            auto* h = dynamic_cast<R3BActafCalData*>(fCalItems->At(ih));
+            if (!h)
+                continue;
+            int pad = h->GetPad();
+            if (pad < 1 || pad > fPads)
+                continue;
+            int gidx = padToGraph[pad];
+            if (gidx < 0 || gidx >= static_cast<int>(g_CorrectedTraces_4pads_highestAmp_auto.size()))
+                continue;
+
+            auto vec = h->GetTrace();
+            // store trace for event viewer buffer (cal-level traces)
+            if (eventViewerNb < maxEventViewerBatch)
+            {
+                const auto& arr = h->GetTrace();
+                auto& vec_trace = eventCountsTrace[eventViewerNb][pad - 1];
+                vec_trace.assign(arr.begin(), arr.end());
+            }
+            std::size_t idx = 0;
+            for (const auto& v : vec)
+            {
+                if (v == 0)
+                    continue;
+                if (g_CorrectedTraces_4pads_highestAmp_auto[gidx])
+                    g_CorrectedTraces_4pads_highestAmp_auto[gidx]->SetPoint(
+                        g_CorrectedTraces_4pads_highestAmp_auto[gidx]->GetN(), idx++, v);
+            }
+            if (g_CorrectedTraces_4pads_highestAmp_auto[gidx])
+            {
+                if (gidx < 4)
+                    g_CorrectedTraces_4pads_highestAmp_auto[gidx]->SetTitle(
+                        Form("Corrected Trace of pad U%d;Time [Chn];A", pad));
+                else
+                    g_CorrectedTraces_4pads_highestAmp_auto[gidx]->SetTitle(
+                        Form("Corrected Trace of pad D%d;Time [Chn];A", pad - 64));
+            }
+        }
+        for (auto& graph : g_CorrectedTraces_4pads_highestAmp_auto)
+            graph->GetYaxis()->SetRangeUser(-200, 1000);
+    }
+
     // Fill hit data
 
     if (fNEvents % updateRate == 0)
@@ -1283,6 +1600,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto x = hit->GetXpos();
             auto y = hit->GetYpos();
             auto energy = hit->GetEnergy();
+            auto maxAmp = hit->GetMaxAmpl();
 
             auto track = hit->GetTrack();
             auto phi = track.Phi() * TMath::RadToDeg();
@@ -1292,16 +1610,17 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
             if (eventViewerNb < maxEventViewerBatch)
             {
-                if (energy < 10)
+                if (maxAmp < 200)
                     continue;
 
                 goodEventForView = true;
                 eventCountsX[eventViewerNb][pad - 1] = x;
                 eventCountsY[eventViewerNb][pad - 1] = y;
-                eventCountsE[eventViewerNb][pad - 1] = energy;
+                eventCountsE[eventViewerNb][pad - 1] = maxAmp;
             }
             auto bin = fh2_XYPos_Evts_Automatic[side]->FindBin(x, y);
-            fh2_XYPos_Evts_Automatic[side]->SetBinContent(bin, energy);
+            maxAmp ? 0 : maxAmp = 0.1; // to avoid zeroing bin content for visualization
+            fh2_XYPos_Evts_Automatic[side]->SetBinContent(bin, maxAmp);
 
             fh1_PhiCounts[side]->Fill(phi);
             fh1_CountsPerSide->Fill(side + 1);
@@ -1332,25 +1651,15 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
             fh1_Sync[id]->Fill(hit->GetTimeStamp() - pre_timestamp[id] - 2 * (timetag - pre_timetag));
 
-            // std::cout<<"1: "<< hit->GetTimeStamp()-pre_timestamp[id]<<" "<< timetag-pre_timetag<<std::endl;
-
-            // std::cout<< hit->GetTimeStamp()<<" "<< timetag<<std::endl;
-
-            // std::cout<< hit->GetTimeStamp() - pre_timestamp[id] - 2 * (timetag - pre_timetag) <<std::endl;
-
             pre_timestamp[id] = hit->GetTimeStamp();
         }
         pre_timetag = timetag;
-
-        // std::cout<< timestamps[0] << " " << timestamps[1] << " " << timestamps[2] << std::endl;
 
         if (first_timestamp == 0 || first_timestamp > timestamps[0])
             first_timestamp = timestamps[0];
 
         auto time_s = (timestamps[0] - first_timestamp) * 1e-9; // in seconds
         int sec = static_cast<int>(time_s);
-
-        // std::cout<< time_s <<" "<<overall_rate<<" "<< fsec_rate<<" "<<ssec_rate<<std::endl;
 
         if (sec > last_second)
         {
