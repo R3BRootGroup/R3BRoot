@@ -20,6 +20,7 @@
 #include <TClonesArray.h>
 #include <TMath.h>
 #include <array>
+#include <fstream>
 #include <iostream>
 #include <numeric>
 #include <utility>
@@ -245,14 +246,25 @@ void R3BActafMapped2Cal::Exec(Option_t*)
             continue;
 
         std::array<double, ACTAF_BINS> waveform = mappedData->GetTrace();
+        int maxPos = FindMaxPosition(waveform);
 
         // Calculate rms before filtering
-        int maxPos = FindMaxPosition(waveform);
+
         double rmsRaw = ComputeBaselineMean(waveform, maxPos, 0);
         double meanRaw = ComputeBaselineMean(waveform, maxPos, 1) + mappedData->GetBaseline();
-        // Apply the SG filter to the waveform
+
+        // create baseline-subtracted copy and write it to file (temporary tool)
+        std::array<double, ACTAF_BINS> waveform_bs = waveform;
+        double baseline = meanRaw;
+        for (auto& x : waveform_bs)
+            x -= baseline;
+
+        // Apply the SG filter to the waveform (on baseline-subtracted data)
         if (fApplySGFilter)
             ApplySGFilter(waveform, fSgCoeffs);
+
+        // Use baseline-subtracted waveform for further processing
+        // waveform = waveform_bs;
 
         auto integral = IntegratePulse(waveform, mappedData->GetMaxpos());
         auto energy = integral * fEGain[pad - 1];
