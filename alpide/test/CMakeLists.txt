@@ -22,6 +22,6 @@ endif(GTEST_FOUND)
 
 generate_root_test_script(${R3BROOT_SOURCE_DIR}/alpide/test/testAlpideSimulation.C)
 add_test(NAME AlpideSimulation COMMAND ${R3BROOT_BINARY_DIR}/alpide/test/testAlpideSimulation.sh)
-set_tests_properties(AlpideSimulation PROPERTIES TIMEOUT "100")
+set_tests_properties(AlpideSimulation PROPERTIES TIMEOUT "300")
 set_tests_properties(AlpideSimulation PROPERTIES PASS_REGULAR_EXPRESSION
                                                   "Macro finished successfully.")

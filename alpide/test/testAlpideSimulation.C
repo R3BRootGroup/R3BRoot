@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -49,7 +49,7 @@ void testAlpideSimulation(int nbevents = 100)
     boxGen->SetXYZ(0, 0, 0.);
     boxGen->SetThetaRange(7., 90.);
     boxGen->SetPhiRange(0., 360.);
-    boxGen->SetEkinRange(0.6, 0.6);
+    boxGen->SetEkinRange(0.2, 0.6);
     auto primGen = new FairPrimaryGenerator();
     primGen->AddGenerator(boxGen);
     run->SetGenerator(primGen);
