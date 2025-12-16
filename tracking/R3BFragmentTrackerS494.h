@@ -72,6 +72,11 @@ class R3BFragmentTrackerS494 : public FairTask
     {
         fHisto = histo;
     }
+	inline void SetFib23Cuts(Double_t xfibcut, Double_t yfibcut)
+	{
+		fxfibcut = xfibcut;
+		fyfibcut = yfibcut;
+	}
     
   private:
     Bool_t InitPropagator();
@@ -172,6 +177,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Bool_t fSimu;
     Bool_t fForward;
     Bool_t fOptimizeGeometry;
+	Double_t fxfibcut, fyfibcut;
 
     Bool_t fHisto;
     Double_t fAfterGladResolution;

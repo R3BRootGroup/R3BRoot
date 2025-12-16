@@ -69,6 +69,7 @@ class R3BFi23aDigitizerHit : public FairTask
     Float_t dead_layer = 0.9;
     Float_t air_layer = 0.01*0.; // relative to fiber_thickness
     Float_t detector_width = fiber_nbr * fiber_thickness * (1 + air_layer);
+    Int_t nevents = 0;
 
     ClassDef(R3BFi23aDigitizerHit, 1);
 };

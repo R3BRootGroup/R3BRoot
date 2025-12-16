@@ -79,16 +79,16 @@ InitStatus R3BTofdDigitizerHit::Init()
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     // Register output array fTofdHits
-    fTofdHits = new TClonesArray("R3BTofdHitData", 1000);
+    fTofdHits = new TClonesArray("R3BTofdHitData", 10000);
     ioman->Register("TofdHit", "Digital response in Tofd", fTofdHits, kTRUE);
 
     // Get random number for smearing in y, t, ELoss
 
     fRnd = new TRandom3();
 
-    fHist1 = new TH1F("fHist1", "Energy loss histogram of Monte Carlo Points", 5000, 0., 5.);
-    fHist2 = new TH1F("fHist2", "Energy loss histogram without merging", 5000, 0., 5.);
-    fHist3 = new TH1F("fHist3", "Energy loss histogram with merging", 5000, 0., 5.);
+    //    fHist1 = new TH1F("fHist1", "Energy loss histogram of Monte Carlo Points", 5000, 0., 5.);
+    //   fHist2 = new TH1F("fHist2", "Energy loss histogram without merging", 5000, 0., 5.);
+    //   fHist3 = new TH1F("fHist3", "Energy loss histogram with merging", 5000, 0., 5.);
 
     return kSUCCESS;
 }
@@ -147,7 +147,7 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
                 // energy threshold
                 if (vPoints[channel].at(point)->GetEnergyLoss() < 0.0000001)
                     continue;
-                fHist1->Fill(vPoints[channel].at(point)->GetEnergyLoss());
+                //    fHist1->Fill(vPoints[channel].at(point)->GetEnergyLoss());
 
                 if (0 == point || (vPoints[channel].at(point)->GetTime() - MapOfHits[channel]->GetTime()) > 30)
                 { // add new hits
@@ -294,7 +294,7 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
     for (auto& i : MapOfHits)
     {
 
-        fHist2->Fill(i.second->GetEloss());
+        // fHist2->Fill(i.second->GetEloss());
 
         if (i.first >= number_paddles)
         {
@@ -342,10 +342,11 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
     for (auto& i : MapOfHits)
     {
         new ((*fTofdHits)[counter]) R3BTofdHitData(*(i.second));
-        fHist3->Fill(i.second->GetEloss());
+        //  fHist3->Fill(i.second->GetEloss());
         delete i.second;
         counter++;
     }
+    vPoints->clear();
 }
 // -------------------------------------------------------------------------
 
@@ -360,9 +361,9 @@ void R3BTofdDigitizerHit::Reset()
 
 void R3BTofdDigitizerHit::Finish()
 {
-    fHist1->Write();
-    fHist2->Write();
-    fHist3->Write();
+    //    fHist1->Write();
+    //    fHist2->Write();
+    //    fHist3->Write();
 }
 
 ClassImp(R3BTofdDigitizerHit)

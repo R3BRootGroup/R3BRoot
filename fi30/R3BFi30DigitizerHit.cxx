@@ -86,7 +86,7 @@ InitStatus R3BFi30DigitizerHit::Init()
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     // Register output array DchDigi
-    fFi30Hits = new TClonesArray("R3BFiberMAPMTHitData", 1000);
+    fFi30Hits = new TClonesArray("R3BFiberMAPMTHitData", 10000);
     ioman->Register("Fi30Hit", "Digital response in Fi30", fFi30Hits, kTRUE);
 
     // for sigmas
@@ -269,6 +269,8 @@ void R3BFi30DigitizerHit::Exec(Option_t* opt)
         delete[] time;
         delete[] x;
         delete[] y;
+        delete[] z;
+        TempHits.clear();
     };
 
     // running the digitizer for the Fi detectors

@@ -20,6 +20,8 @@
 #include "R3BTofdHitData.h"
 #include <map>
 #include <string>
+#include <vector>
+#include "TVector3.h"
 
 class TClonesArray;
 class TH1F;
@@ -54,10 +56,11 @@ class R3BTofdDigitizerHit : public FairTask
     TClonesArray* fTofdPoints;
     TClonesArray* fMCTrack;
     TClonesArray* fTofdHits;
+     
     TRandom3* fRnd;
-    TH1F* fHist1;
-    TH1F* fHist2;
-    TH1F* fHist3;
+//    TH1F* fHist1;
+//    TH1F* fHist2;
+//    TH1F* fHist3;
 
     Float_t fsigma_y;
     Float_t fsigma_t;

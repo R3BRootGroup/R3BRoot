@@ -99,6 +99,8 @@ R3BFragmentTrackerS494::R3BFragmentTrackerS494(const char* name, Bool_t vis, Int
     , fPairs(kTRUE)
     , fOptimizeGeometry(kFALSE)
     , fHisto(kTRUE)
+    , fxfibcut(0.1512)
+    , fyfibcut(0.1512)
     , fTrackItems(new TClonesArray("R3BTrackData"))
     , fCalifaHitItems(new TClonesArray("R3BCalifaClusterData"))
     , fNofTrackItems(0)
@@ -1098,7 +1100,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         }
     }
 
-    Int_t iretrack_max = 1;
+    Int_t iretrack_max = 0;
     Double_t psum_mem = -10000.;
 
     for (Int_t iretrack = 0; iretrack < iretrack_max + 1; iretrack++)
@@ -1425,7 +1427,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             {
                                 if (ifi23b >= 0)
                                     fh_eloss_fi23b_mc->Fill(1000.0 * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
-                                if ((l > 0 && abs(fi23b->hits.at(ifi23b)->GetY()) < cut_yfib23) ||
+                                if ((l > 0 && abs(fi23b->hits.at(ifi23b)->GetY()) < fyfibcut) ||
                                     (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                     (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                                 abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
@@ -1447,7 +1449,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 Double_t y_tp =
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
-                                y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+                                y0 = 0.; // pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
@@ -1459,7 +1461,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 {
                                     if (ifi23a >= 0)
                                         fh_eloss_fi23a_mc->Fill(1000.0 * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
-                                    if ((l > 0 && abs(fi23a->hits.at(ifi23a)->GetX()) < cut_xfib23) ||
+                                    if ((l > 0 && abs(fi23a->hits.at(ifi23a)->GetX()) < fxfibcut) ||
                                         (l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                         (l == 2 &&
                                          ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
@@ -1704,7 +1706,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 if (ifi23b >= 0)
                                     fh_eloss_fi23b_mc->Fill(1000.0 * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
                                 // reject wrong hints:
-                                if ((l > 0 && abs(fi23b->hits.at(ifi23b)->GetY()) < cut_yfib23) ||
+                                if ((l > 0 && abs(fi23b->hits.at(ifi23b)->GetY()) < fyfibcut) ||
                                     (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                     (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                                 abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
@@ -1726,7 +1728,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 Double_t y_tp =
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
-                                y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+                                y0 = 0.; // pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
@@ -1739,7 +1741,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 {
                                     if (ifi23a >= 0)
                                         fh_eloss_fi23a_mc->Fill(1000.0 * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
-                                    if ((l > 0 && abs(fi23a->hits.at(ifi23a)->GetX()) < cut_xfib23) ||
+                                    if ((l > 0 && abs(fi23a->hits.at(ifi23a)->GetX()) < fxfibcut) ||
                                         (l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                         (l == 2 &&
                                          ((ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
@@ -2381,7 +2383,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                         // if (iAoverZ == 2 && iAoverZmem == 2 && psum < 17416. && psum > 17384. ){
                         if (iAoverZ == 2 && iAoverZmem == 2 && Erel < 4.5 && Erel > 4.1 &&
-                            ((pHex > 0. && pCx < 0.) || (pHex < 0. && pCx > 0.)))
+                            ((pHex > 0. && pCx < 0.) || (pHex < 0. && pCx > 0.)) && psum < 17450. && psum > 17380.)
                         { //&& psum > 17341. && psum < 17450.){
                             // if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 2. && iAoverZ == 2 &&
                             // iAoverZmem == 2 &&
@@ -2547,7 +2549,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         det_hit_tHe[iDet] = hit->GetTime();
                     }
 
-                    if (l > 0 && hit && iDet == 2 && abs(hit->GetY()) < cut_yfib23)
+                    if (l > 0 && hit && iDet == 2 && abs(hit->GetY()) < fyfibcut)
                     {
                         cout << "wrong fib23b in output: " << l << "; " << hit->GetY() << "; " << y_l[iDet] << endl;
                     }
@@ -2676,7 +2678,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             fh_x_pull[iDet]->Fill(xres / det->res_x);
                         if (iDet == 7)
                         {
-                            if (iAoverZ == 2 && abs(det_hit_x[1]) > 0.21 && abs(det_hit_y[2]) > 0.21 &&
+                            if (iAoverZ == 2 && abs(det_hit_x[1]) > fxfibcut && abs(det_hit_y[2]) > fyfibcut &&
                                 (iretrack == iretrack_max))
                             {
                                 pz_vs_x->Fill(det_hit_x[iDet], pzmemtarget);
@@ -2716,7 +2718,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             fh_y_pull[iDet]->Fill(yres / det->res_y);
                         if (iDet == 7 && (iretrack == iretrack_max))
                         {
-                            if (iAoverZ == 2 && abs(det_hit_x[1]) > 0.21 && abs(det_hit_y[2]) > 0.21)
+                            if (iAoverZ == 2 && abs(det_hit_x[1]) > fxfibcut && abs(det_hit_y[2]) > fyfibcut)
                             {
                                 pz_vs_y->Fill(det_hit_y[iDet], pzmemtarget);
                                 px_vs_y->Fill(det_hit_y[iDet], pxmemtarget * 1000.0);

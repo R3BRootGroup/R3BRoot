@@ -1549,14 +1549,14 @@ std::vector<double> R3BOptimizeGeometryS494::Chi2()
                         Double_t sigmaErel = 0.01 * 4.36;
                         eChi2 = (Erel - 4.36) * (Erel - 4.36) / (sigmaErel * sigmaErel);
 
-                        // parChi2 = sqrt(xChi2 * xChi2 + pChi2 * pChi2 + eChi2 * eChi2);
                         /*
                             if (iretrack == 0)
                                 parChi2 = xChi2;
                             if (iretrack == iretrack_max)
                                 parChi2 = sqrt(xChi2 * xChi2 + eChi2 * eChi2);
                         */
-                        parChi2 = xChi2;
+                        parChi2 = sqrt(xChi2 * xChi2 + pChi2 * pChi2);
+                        // parChi2 = xChi2;
 
                         // cout<<"New 4He candidate: "<<iretrack<<", "<<psum<<", "<<Erel<<", "<<eChi2<<", "<<xChi2<<",
                         // "<<parChi2<<endl; 	cout<<"selected: "<<bestcandidate->GetStartMomentum().Z()<<",
@@ -1903,6 +1903,10 @@ void R3BOptimizeGeometryS494::Finish()
         variable_mem[15] = gRandom->Gaus(variable_default[15], variable_sigma[15]); // thetafi31
         variable_mem[17] = gRandom->Gaus(variable_default[17], variable_sigma[17]); // thetafi33
 
+        variable_mem[11] = variable_default[11]; // xtofd
+        variable_mem[12] = variable_default[12]; // ytofd
+        variable_mem[13] = variable_default[13]; // ztofd
+
         //  variable_mem[11] = gRandom->Gaus(variable_default[11], variable_sigma[11]);	// xtofd
         //  variable_mem[12] = gRandom->Gaus(variable_default[12],variable_sigma[12]);  	// ytofd
         //  variable_mem[13] = gRandom->Gaus(variable_default[13],variable_sigma[13]);	// ztofd
@@ -1968,7 +1972,7 @@ void R3BOptimizeGeometryS494::Finish()
 
         // *************************************************************************************************
 
-        if (chi2_start > 35.)
+        if (chi2_start > 20.)
         {
             cout << "Start chi2 to large: " << chi2_start << ", new start values will be chosen" << endl;
         }

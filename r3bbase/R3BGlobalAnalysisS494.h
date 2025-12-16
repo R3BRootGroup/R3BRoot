@@ -174,6 +174,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	}
 	
 	inline void SetEvsECut(TString file){fEvsE = file;}
+	inline void SetBackgroundCut(TString file){fbackground = file;}
 	inline void SetCalifaCut(TString file){fCalifaCut = file;}
 	inline void SetCalifaCutTofd(TString file){fCalifaCutTofd = file;}
 	inline void SetCalifaCutNfNs(TString file){fCalifaCutNfNs = file;}
@@ -208,6 +209,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Bool_t tracker = true;
 	Double_t fxfibcut, fyfibcut;
 	TString fEvsE;
+	TString fbackground;
 	TString fCalifaCut;
 	TString fCalifaCutTofd;
 	TString fCalifaCutNfNs;
@@ -264,6 +266,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	Int_t counter4 = 0;
 	Int_t countdet;
 	TCutG *cut_EHe_EC;
+	TCutG *cut_background;
 	TCutG *cut_CalifaTof;
 	TCutG *cut_CalifaTofD;
 	TCutG *cut_CalifaNfNs;
@@ -296,10 +299,11 @@ class R3BGlobalAnalysisS494 : public FairTask
 
     TH2F* fh_chiy_vs_chix_nc;
     TH2F* fh_chiy_vs_chix;
-    TH2F* fh_phi26_vs_chi;
+    TH2F* fh_phibccm_vs_phi16O;
     TH2F* fh_psum_vs_theta26_nc;
     TH2F* fh_Erel_vs_psum;
     TH2F* fh_phiMC_bc_cm_polar;
+    TH2F* fh_thetacm_vs_Erel;
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -431,16 +435,31 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_dpHe_vs_dx0;
 	TH2F* fh_x0_vs_dx0;
 	TH2F* fh_Erel_vs_px;
-	TH2F* fh_Erel_vs_py;
-	TH2F* fh_Erel_vs_dr_tofd;
-	TH2F* fh_Erel_vs_dr_limit_tofd;
-	TH1F* fh_Erel_limit_tofd;
-	TH2F* fh_Erel_vs_dr_fi23;
-	TH2F* fh_Erel_vs_dr_limit_fi23;
-	TH1F* fh_Erel_limit_fi23;
-	TH2F* fh_dr_vs_dr;
-	TH2F* fh_dr_vs_dr_limit;
-	
+	TH2F* fh_Erel_vs_py;   		  
+	TH2F* fh_pt_vs_theta16;     
+	TH2F* fh_phi_vs_r;
+    TH2F* fh_Erel_vs_r;
+    TH2F* fh_thetacm_vs_r;
+    TH2F* fh_thetacm_vs_phibc;  
+                
+    TH2F* fh_thetacm_vs_Erel_ag;   		  
+	TH2F* fh_pt_vs_theta16_ag;     
+	TH2F* fh_phi_vs_r_ag;
+    TH2F* fh_Erel_vs_r_ag;
+    TH2F* fh_thetacm_vs_r_ag;
+    TH2F* fh_thetacm_vs_phibc_ag;  
+    
+    TH2F* fh_thetacm_vs_Erel_bg;   		  
+	TH2F* fh_pt_vs_theta16_bg;     
+	TH2F* fh_phi_vs_r_bg;
+    TH2F* fh_Erel_vs_r_bg;
+    TH2F* fh_thetacm_vs_r_bg;
+    TH2F* fh_thetacm_vs_phibc_bg;  	
+    
+    TH2F* fh_xx_fib23_bckgr;
+	TH2F* fh_yy_fib23_bckgr;
+	TH1F* fh_psum_bckgr;
+	TH1F* fh_Erel_bckgr;
 	
 	TH2F* fh_ErelB_vs_phibc_bg;
 	TH2F* fh_ErelB_vs_theta26_bg;

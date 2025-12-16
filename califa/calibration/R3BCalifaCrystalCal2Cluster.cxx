@@ -251,7 +251,7 @@ InitStatus R3BCalifaCrystalCal2Cluster::Init()
 
     fCalifatoTargetPos = fTargetPos - fCalifaPos;
 
-    fCalifatoTargetPos.SetZ(0.);
+    // fCalifatoTargetPos.SetX(2.);
     cout << "Correction : " << fCalifatoTargetPos.X() << " " << fCalifatoTargetPos.Y() << " " << fCalifatoTargetPos.Z()
          << endl;
     if (fRand)

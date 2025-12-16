@@ -86,7 +86,7 @@ InitStatus R3BFi23aDigitizerHit::Init()
     fMCTrack = (TClonesArray*)ioman->GetObject("MCTrack");
 
     // Register output array DchDigi
-    fFi23aHits = new TClonesArray("R3BFiberMAPMTHitData", 1000);
+    fFi23aHits = new TClonesArray("R3BFiberMAPMTHitData", 10000);
     ioman->Register("Fi23aHit", "Digital response in Fi23a", fFi23aHits, kTRUE);
 
     // for sigmas
@@ -101,6 +101,8 @@ void R3BFi23aDigitizerHit::Exec(Option_t* opt)
 
     auto Digitize = [this](TClonesArray* Points, TClonesArray* Hits, Int_t NumOfFibers) {
         Int_t entryNum = Points->GetEntries();
+
+        nevents++;
 
         if (!entryNum)
             return;
@@ -140,6 +142,8 @@ void R3BFi23aDigitizerHit::Exec(Option_t* opt)
         // ordering the hits in time
 
         std::vector<TempHit> TempHits;
+
+        LOG(debug) << "Hit Fi23a nevents: " << nevents << ", entrynum: " << entryNum << endl;
 
         for (Int_t i = 0; i < entryNum; ++i)
         {
@@ -233,6 +237,7 @@ void R3BFi23aDigitizerHit::Exec(Option_t* opt)
         delete[] time;
         delete[] x;
         delete[] y;
+        TempHits.clear();
     };
 
     // running the digitizer for the Fi detectors
