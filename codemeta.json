@@ -425,12 +425,6 @@
     },
     {
       "@type": "Person",
-      "givenName": "Fabio",
-      "familyName": "Risitano",
-      "affiliation": "INFN Laboratori Nazionali del Sud, 95123 Catania, Italy"
-    },
-    {
-      "@type": "Person",
       "givenName": "Dominic",
       "familyName": "Rossi",
       "affiliation": "Technische Universit\u00e4t Darmstadt, Fachbereich Physik, Institut f\u00fcr Kernphysik, 64289 Darmstadt, Germany"
