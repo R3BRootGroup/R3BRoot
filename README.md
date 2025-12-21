@@ -33,8 +33,6 @@ Please visit [releases](https://github.com/R3BRootGroup/R3BRoot/releases)
 
 ~~~bash
 git clone https://github.com/R3BRootGroup/R3BRoot.git
-cd R3BRoot
-git clone https://github.com/R3BRootGroup/macros.git
 ~~~
 
 ## Using the Project Template
@@ -48,9 +46,9 @@ R3BRoot delivers various project templates that can be used as a starting point 
 
 First, you will need to install FairSoft and FairRoot. For more details:
 
-1. Install [FairSoft](https://github.com/FairRootGroup/FairSoft), required version Nov22p1 or later
+1. Install [FairSoft](https://github.com/FairRootGroup/FairSoft), required version jan24p1 or later
 
-2. Install [FairRoot](http://fairroot.gsi.de), required version 18.2.1 or later
+2. Install [FairRoot](http://fairroot.gsi.de), required version 18.8.1 or later
 
 ### Configure and Compile
 
@@ -121,7 +119,7 @@ The following systems are tested regularly.
 | Debian      | x86\_64  | 13             | GCC 14.2.0    | 3.31.6 / 4.0.3  | C++17           |
 | Ubuntu      | x86\_64  | 24.04          | GCC 13.3.0    | 3.28.3 / 4.0.3  | C++17 / C++20   |
 | Ubuntu      | x86\_64  | 25.04          | GCC 14.2.0    | 3.31.6          | C++17           |
-| macOS       | arm64    | 15.3           | AppleClang 15 |  4.0.3          | C++17           |
+| MacOS       | arm64    | 15.3           | AppleClang 15 |  4.0.3          | C++17           |
 
 ## Security Policy
 

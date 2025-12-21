@@ -1,6 +1,4 @@
 # This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
 title: R3BRoot software
 message: >-
@@ -184,40 +182,23 @@ authors:
     affiliation: >-
       Faculty of Science of the University of Lisbon,
       1749-016 Lisboa, Portugal
-repository-code: 'https://github.com/R3BRootGroup/R3BRoot'
-url: 'https://github.com/R3BRootGroup/R3BRoot'
+repository-code: https://github.com/R3BRootGroup/R3BRoot
+url: https://github.com/R3BRootGroup/R3BRoot
 abstract: >-
-  The R3BRoot software is based on the FairRoot framework
-  and can be used to perform Monte Carlo simulations and
-  experimental data analysis of the R3B (Reactions with
-  Relativistic Radioactive Beams) nuclear physics
-  experiments at the GSI-FAIR research center (Facility for
-  Antiproton and Ion Research). The user can create
-  simulated data and/or perform analysis with the same
-  framework. Geant3 and Geant4 transport engines are
-  supported, however, the implemented tasks that create
-  simulated data do not depend on a particular Monte Carlo
-  engine. The framework delivers base classes which enable
-  the users to construct their detectors and/or analysis
-  tasks in a simple way, it also delivers some general
-  functionality like track visualization. Moreover, an
-  interface for reading experimental and/or simulated
-  magnetic field maps is also implemented. R3BRoot software
-  is a source distribution with recurring releases for macOS
-  and Linux.
+  The R3BRoot software is based on the FairRoot framework and can be used to
+  perform Monte Carlo simulations and experimental data analysis of the R3B
+  (Reactions with Relativistic Radioactive Beams) nuclear physics experiments
+  at the GSI-FAIR research center (Facility for Antiproton and Ion Research).
+  The user can create simulated data and/or perform analysis within the same
+  framework. Geant3 and Geant4 transport engines are supported; however, the
+  implemented tasks that create simulated data do not depend on a particular
+  Monte Carlo engine. The framework provides base classes that enable users to
+  construct their detectors and/or analysis tasks in a simple way. It also
+  delivers general functionality such as track visualization. Moreover, an
+  interface for reading experimental and/or simulated magnetic field maps is
+  implemented. R3BRoot is distributed as source code with recurring releases
+  for MacOS and Linux.
 license: GPL-3.0
-version: apr25
-date-released: '2025-04-12'
+version: dec25
+date-released: "2025-12-21"
 doi: 10.5281/zenodo.5549469
-preferred-citation:
-  type: article
-  title: R3BRoot software
-  authors:
-    - family-names: Rodríguez-Sánchez
-      given-names: Jose Luis
-    - family-names: et al.
-      given-names: ''
-  journal: zenodo
-  year: '2025'
-  doi: 10.5281/zenodo.5549469
-
