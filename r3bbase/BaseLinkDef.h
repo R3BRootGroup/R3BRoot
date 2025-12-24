@@ -1,8 +1,8 @@
 // clang-format off
 
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2015 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2015-2025 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -35,4 +35,6 @@
 #pragma link C++ class pair<R3B::ValueError<double>, R3B::ValueError<double>>+;
 #pragma link C++ class R3B::LRPair<R3B::ValueError<double>>+;
 #pragma link C++ class R3B::LRPair<int>+;
+#pragma link C++ class R3B::LRPair<double>+;
+#pragma link C++ class R3B::LRPair<float>+;
 #endif

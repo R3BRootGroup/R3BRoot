@@ -18,7 +18,6 @@ set(HEADERS
     ClusteringEngine.h
     ElasticScattering.h
     Filterable.h
-    TCAConnector.h
     Validated.h
     IsElastic.h
     R3BProgramOptions.h

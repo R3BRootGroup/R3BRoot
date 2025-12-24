@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,13 +11,14 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BEVENTHEADERPROPAGATOR_H
-#define R3BEVENTHEADERPROPAGATOR_H 1
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 #include <Rtypes.h>
 
 #include "R3BEventHeader.h"
+
+class R3BFileSource;
 class FairSource;
 
 class R3BEventHeaderPropagator : public FairTask
@@ -60,7 +61,5 @@ class R3BEventHeaderPropagator : public FairTask
     FairSource* fSource = nullptr;
 
   public:
-    ClassDefOverride(R3BEventHeaderPropagator, 1)
+    ClassDefOverride(R3BEventHeaderPropagator, 1);
 };
-
-#endif // R3BEVENTHEADERPROPAGATOR_H

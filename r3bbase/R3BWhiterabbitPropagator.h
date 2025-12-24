@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,10 +16,9 @@
 // -----   Created May 28th 2021 by J.L. Rodriguez-Sanchez  -----
 // --------------------------------------------------------------
 
-#ifndef R3BWhiterabbitPropagator_H
-#define R3BWhiterabbitPropagator_H
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 #include <Rtypes.h>
 
 class TClonesArray;
@@ -67,7 +66,5 @@ class R3BWhiterabbitPropagator : public FairTask
     TClonesArray* fInputItem; // Array with input items
 
   public:
-    ClassDefOverride(R3BWhiterabbitPropagator, 0)
+    ClassDefOverride(R3BWhiterabbitPropagator, 0); // NOLINT
 };
-
-#endif // R3BWhiterabbitPropagator_H

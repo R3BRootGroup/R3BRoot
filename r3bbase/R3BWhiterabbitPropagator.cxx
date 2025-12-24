@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,12 +16,12 @@
 // -----   Created May 28th 2021 by J.L. Rodriguez-Sanchez  -----
 // --------------------------------------------------------------
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
+#include <FairRootManager.h>
 
 #include "R3BWhiterabbitPropagator.h"
 
-#include "TClonesArray.h"
+#include <Rtypes.h>
+#include <TClonesArray.h>
 
 R3BWhiterabbitPropagator::R3BWhiterabbitPropagator()
     : R3BWhiterabbitPropagator("R3BWhiterabbitPropagator", 1, "WRMaster")
@@ -70,4 +70,4 @@ InitStatus R3BWhiterabbitPropagator::Init()
 
 void R3BWhiterabbitPropagator::Exec(Option_t* option) { return; }
 
-ClassImp(R3BWhiterabbitPropagator);
+ClassImp(R3BWhiterabbitPropagator)

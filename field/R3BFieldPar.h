@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -16,11 +16,8 @@
 // -------------------------------------------------------------------------
 
 /** R3BFieldPar.h
- ** @author
- ** @since 20.02.2006
- ** @version 1.0
  **
- ** Parameter set for the CBM magnetic field. For the runtime database.
+ ** Parameter set for the R3B magnetic field. For the runtime database.
  **/
 
 #pragma once
@@ -41,39 +38,37 @@ class R3BFieldPar : public FairParGenericSet
     /** default constructor  **/
     R3BFieldPar();
 
-    /** Destructor **/
-    ~R3BFieldPar();
-
     /** Put parameters **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Get parameters **/
-    virtual Bool_t getParams(FairParamList* list);
+    auto getParams(FairParamList* list) -> bool override;
 
     /** Set parameters from R3BField  **/
     void SetParameters(FairField* field);
 
     /** Accessors **/
-    Int_t GetType() const { return fType; }
-    Double_t GetXmin() const { return fXmin; }
-    Double_t GetXmax() const { return fXmax; }
-    Double_t GetYmin() const { return fYmin; }
-    Double_t GetYmax() const { return fYmax; }
-    Double_t GetZmin() const { return fZmin; }
-    Double_t GetZmax() const { return fZmax; }
-    Double_t GetBx() const { return fBx; }
-    Double_t GetBy() const { return fBy; }
-    Double_t GetBz() const { return fBz; }
+    [[nodiscard]] auto GetType() const -> int { return fType; }
+    [[nodiscard]] auto GetXmin() const -> double { return fXmin; }
+    [[nodiscard]] auto GetXmax() const -> double { return fXmax; }
+    [[nodiscard]] auto GetYmin() const -> double { return fYmin; }
+    [[nodiscard]] auto GetYmax() const -> double { return fYmax; }
+    [[nodiscard]] auto GetZmin() const -> double { return fZmin; }
+    [[nodiscard]] auto GetZmax() const -> double { return fZmax; }
+    [[nodiscard]] auto GetBx() const -> double { return fBx; }
+    [[nodiscard]] auto GetBy() const -> double { return fBy; }
+    [[nodiscard]] auto GetBz() const -> double { return fBz; }
+    auto GetFileName() -> const std::string& { return fMapFileName; }
+    [[nodiscard]] auto GetPositionX() const -> double { return fPosX; }
+    [[nodiscard]] auto GetPositionY() const -> double { return fPosY; }
+    [[nodiscard]] auto GetPositionZ() const -> double { return fPosZ; }
+    [[nodiscard]] auto GetXAngle() const -> double { return fXAngle; }
+    [[nodiscard]] auto GetYAngle() const -> double { return fYAngle; }
+    [[nodiscard]] auto GetZAngle() const -> double { return fZAngle; }
+    [[nodiscard]] auto GetScale() const -> double { return fScale; }
+    [[nodiscard]] auto GetCurrent() const -> double { return fCurrent; }
+    void MapName(std::string& name) { name = fMapName; }
     void MapName(TString& name) { name = fMapName; }
-    TString GetFileName() { return fMapFileName; }
-    Double_t GetPositionX() const { return fPosX; }
-    Double_t GetPositionY() const { return fPosY; }
-    Double_t GetPositionZ() const { return fPosZ; }
-    Double_t GetXAngle() const { return fXAngle; }
-    Double_t GetYAngle() const { return fYAngle; }
-    Double_t GetZAngle() const { return fZAngle; }
-    Double_t GetScale() const { return fScale; }
-    Double_t GetCurrent() const { return fCurrent; }
 
   private:
     /** Field type
@@ -81,31 +76,40 @@ class R3BFieldPar : public FairParGenericSet
      ** 1 = field map
      ** 2 = Glad field map
      **/
-    Int_t fType;
+    int fType = -1;
 
     /** Field limits in case of constant field **/
-    Double_t fXmin, fXmax;
-    Double_t fYmin, fYmax;
-    Double_t fZmin, fZmax;
+    double fXmin{};
+    double fXmax{};
+    double fYmin{};
+    double fYmax{};
+    double fZmin{};
+    double fZmax{};
 
     /** Field values in case of constant field [kG] **/
-    Double_t fBx, fBy, fBz;
+    double fBx{};
+    double fBy{};
+    double fBz{};
 
     /** Field map name in case of field map **/
-    TString fMapName;
-    TString fMapFileName;
+    std::string fMapName;
+    std::string fMapFileName;
 
     /** Field centre position for field map **/
-    Double_t fPosX, fPosY, fPosZ;
+    double fPosX{};
+    double fPosY{};
+    double fPosZ{};
 
     /** Euler rotations of the field map **/
-    Double_t fXAngle, fYAngle, fZAngle;
+    double fXAngle{};
+    double fYAngle{};
+    double fZAngle{};
 
     /** Scaling factor for field map **/
-    Double_t fScale;
+    double fScale{};
 
-    Double_t fCurrent;
+    double fCurrent{};
 
   public:
-    ClassDef(R3BFieldPar, 2);
+    ClassDefOverride(R3BFieldPar, 3);
 };
