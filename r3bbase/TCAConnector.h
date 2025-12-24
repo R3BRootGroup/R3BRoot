@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2017 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2017-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,12 +11,12 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef TCACONNECTOR
-#define TCACONNECTOR
+#pragma once
 
-#include "FairRootManager.h"
-#include "TClonesArray.h"
-#include "TString.h"
+#include <FairRootManager.h>
+
+#include <TClonesArray.h>
+#include <TString.h>
 #include <exception>
 #include <utility>
 #include <vector>
@@ -253,5 +253,3 @@ class TCAOutputConnector
         v.clear();
     }
 };
-
-#endif // TCACONNECTOR

@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2024-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,8 +12,10 @@
  ******************************************************************************/
 
 #pragma once
+#include <Rtypes.h>
 #include <TObject.h>
 #include <cmath>
+#include <nlohmann/json.hpp>
 #include <type_traits>
 
 namespace R3B
@@ -25,11 +27,17 @@ namespace R3B
         DataType value{};
         DataType error{};
 
-        ValueError(const DataType& val, const DataType& err)
+        constexpr ValueError(DataType val, DataType err)
             : value{ val }
             , error{ err }
         {
         }
+
+        // ValueError(const DataType& val, const DataType& err)
+        //     : value{ val }
+        //     , error{ err }
+        // {
+        // }
 
         ValueError()
             : valid{ false }
@@ -125,5 +133,21 @@ namespace R3B
     {
         left = left + right;
         return left;
+    }
+
+    template <typename DataType>
+    void to_json(nlohmann::ordered_json& json_obj, const ValueError<DataType>& value)
+    {
+        json_obj = nlohmann::ordered_json{
+            { "value", value.value },
+            { "error", value.error },
+        };
+    }
+
+    template <typename DataType>
+    void from_json(const nlohmann::ordered_json& json_obj, ValueError<DataType>& value)
+    {
+        json_obj.at("value").get_to(value.value);
+        json_obj.at("error").get_to(value.error);
     }
 } // namespace R3B

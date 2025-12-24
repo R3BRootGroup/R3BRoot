@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTSPLINEPAR_H
-#define R3BTSPLINEPAR_H 1
+#pragma once
 
-#include "TObject.h"
-#include "TSpline.h"
 #include <Rtypes.h>
+#include <TNamed.h>
+#include <TSpline.h>
 
 class FairParamList;
 
@@ -52,7 +51,5 @@ class R3BTsplinePar : public TNamed
     Double_t fxmax;
 
   public:
-    ClassDef(R3BTsplinePar, 0);
+    ClassDef(R3BTsplinePar, 0); // NOLINT
 };
-
-#endif // R3BTSPLINEPAR_H

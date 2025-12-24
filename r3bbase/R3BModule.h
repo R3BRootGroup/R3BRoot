@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,12 +11,11 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BMODULE_H
-#define R3BMODULE_H
+#pragma once
 
-#include "FairModule.h"
-#include "TGeoMatrix.h"
-#include "TString.h"
+#include <FairModule.h>
+#include <TGeoMatrix.h>
+#include <TString.h>
 
 class R3BModule : public FairModule
 {
@@ -54,5 +53,3 @@ class R3BModule : public FairModule
     // ClassDef(R3BModule, 3)
     ClassDefOverride(R3BModule, 3)
 };
-
-#endif // R3BMODULE_H

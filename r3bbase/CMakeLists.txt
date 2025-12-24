@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2015 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2015-2026 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -44,9 +44,12 @@ set(HEADERS
     R3BLogger.h
     R3BModule.h
     R3BShared.h
+    R3BFormatters.h
+    R3BValueError.h
     R3BTcutPar.h
     R3BTsplinePar.h
-    R3BWhiterabbitPropagator.h)
+    R3BWhiterabbitPropagator.h
+    TCAConnector.h)
 
 set(DEPENDENCIES FairRoot::Generators FairRoot::Online ROOT::RHTTP)
 

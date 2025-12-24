@@ -1,7 +1,7 @@
 
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,12 +20,11 @@
 #include "R3BTsplinePar.h"
 #include "R3BLogger.h"
 
-#include "FairLogger.h"
-#include "FairParamList.h"
+#include <FairParamList.h>
 
-#include "TArrayF.h"
-#include "TF1.h"
-#include "TMath.h"
+#include <Rtypes.h>
+#include <TArrayF.h>
+#include <TF1.h>
 
 // -----   Default constructor   -----------------------------------------------
 R3BTsplinePar::R3BTsplinePar(const TString& name)
@@ -117,4 +116,4 @@ void R3BTsplinePar::print()
     }
 }
 
-ClassImp(R3BTsplinePar);
+ClassImp(R3BTsplinePar)

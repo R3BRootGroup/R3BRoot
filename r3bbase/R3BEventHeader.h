@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2014 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2014-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,6 +14,9 @@
 #pragma once
 
 #include <FairEventHeader.h>
+#include <Rtypes.h>
+#include <TObject.h>
+#include <cstdint>
 #include <stdexcept>
 
 class R3BEventHeader : public FairEventHeader
@@ -57,20 +60,71 @@ class R3BEventHeader : public FairEventHeader
 
     [[nodiscard]] inline double GetTnext() const { return fTnext; }
 
-    void Register(bool Persistence = true) override{};
+    // void Register(bool Persistance = true) override{};
+
+    auto operator=(const TNamed& obj) -> R3BEventHeader&
+    {
+        obj.Copy(*this);
+        // auto& event_header = dynamic_cast<R3BEventHeader&>(obj);
+        if (const auto* event_header = dynamic_cast<const FairEventHeader*>(&obj); event_header != nullptr)
+        {
+            SetRunId(event_header->GetRunId());
+            SetEventTime(event_header->GetEventTime());
+            SetInputFileId(event_header->GetInputFileId());
+            SetMCEntryNumber(event_header->GetMCEntryNumber());
+        }
+        if (const auto* event_header = dynamic_cast<const R3BEventHeader*>(&obj); event_header != nullptr)
+        {
+            fExpId = event_header->fExpId;
+            fEventno = event_header->fEventno;
+            fTrigger = event_header->fTrigger;
+            fTimeStamp = event_header->fTimeStamp;
+            fTpat = event_header->fTpat;
+            fTStart = event_header->fTStart;
+            fTStartSimple = event_header->fTStartSimple;
+            fTprev = event_header->fTprev;
+            fTnext = event_header->fTnext;
+        }
+        return *this;
+    }
+
+    void Copy(TObject& obj) const override
+    {
+        TNamed::Copy(obj);
+        // auto& event_header = dynamic_cast<R3BEventHeader&>(obj);
+        if (auto* event_header = dynamic_cast<FairEventHeader*>(&obj); event_header != nullptr)
+        {
+            event_header->SetRunId(GetRunId());
+            event_header->SetEventTime(GetEventTime());
+            event_header->SetInputFileId(GetInputFileId());
+            event_header->SetMCEntryNumber(GetMCEntryNumber());
+        }
+        if (auto* event_header = dynamic_cast<R3BEventHeader*>(&obj); event_header != nullptr)
+        {
+            event_header->fExpId = fExpId;
+            event_header->fEventno = fEventno;
+            event_header->fTrigger = fTrigger;
+            event_header->fTimeStamp = fTimeStamp;
+            event_header->fTpat = fTpat;
+            event_header->fTStart = fTStart;
+            event_header->fTStartSimple = fTStartSimple;
+            event_header->fTprev = fTprev;
+            event_header->fTnext = fTnext;
+        }
+    }
 
   private:
-    int fExpId = 0;
-    uint64_t fEventno = 0;
-    int fTrigger = 0;
-    uint64_t fTimeStamp = 0;
-    int fTpat = 0;
-    double fTStart = 0;
-    double fTStartMaster = 0;
-    double fTStartSimple = 0;
-    double fTprev = 0;
-    double fTnext = 0;
+    int fExpId{};
+    uint64_t fEventno{};
+    int fTrigger{};
+    uint64_t fTimeStamp{};
+    int fTpat{};
+    double fTStart{};
+    double fTStartMaster{};
+    double fTStartSimple{};
+    double fTprev{};
+    double fTnext{};
 
   public:
-    ClassDefOverride(R3BEventHeader, 10)
+    ClassDefOverride(R3BEventHeader, 11);
 };
