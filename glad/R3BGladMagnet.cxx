@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2010 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2010-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,8 @@
  ******************************************************************************/
 
 #include "R3BGladMagnet.h"
-#include "FairLogger.h"
+
+#include <FairLogger.h>
 
 // NOTE: as for now, these values are the same used
 //       for the geometry creation (v17) and (v2023.1).
@@ -42,14 +43,4 @@ R3BGladMagnet::R3BGladMagnet(const TString& geoFile)
     R3BModule::SetRotation(rot);
 }
 
-void R3BGladMagnet::SetPosition(const TGeoTranslation&)
-{
-    LOG(fatal) << "Moving " << GetName() << " (which is a " << ClassName() << ") is not allowed!";
-}
-
-void R3BGladMagnet::SetRotation(const TGeoRotation&)
-{
-    LOG(fatal) << "Rotating " << GetName() << " (which is a " << ClassName() << ") is not allowed!";
-}
-
-ClassImp(R3BGladMagnet);
+ClassImp(R3BGladMagnet)

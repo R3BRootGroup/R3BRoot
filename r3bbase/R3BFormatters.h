@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2024-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,8 +14,15 @@
 #pragma once
 
 #include "R3BShared.h"
+#include "R3BValueError.h"
+
+#include <Math/Vector3Dfwd.h>
 #include <TVector3.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
+
+// NOLINTNEXTLINE(misc-include-cleaner)
+#include <Math/Vector3D.h>
 
 template <>
 class fmt::formatter<TVector3>
@@ -25,7 +32,7 @@ class fmt::formatter<TVector3>
     template <typename FmtContent>
     constexpr auto format(const TVector3& vec, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "[x: {}, y: {}, z: {}]", vec.X(), vec.Y(), vec.Z());
+        return fmt::format_to(ctn.out(), "[x: {}, y: {}, z: {}]", vec.X(), vec.Y(), vec.Z());
     }
 };
 
@@ -38,6 +45,46 @@ class fmt::formatter<R3B::ValueError<DataType>>
     template <typename FmtContent>
     constexpr auto format(const R3B::ValueError<DataType>& value_error, FmtContent& ctn) const
     {
-        return format_to(ctn.out(), "{}+/-{}", value_error.value, value_error.error);
+        return fmt::format_to(ctn.out(), "{}+/-{}", value_error.value, value_error.error);
+    }
+};
+
+template <>
+class fmt::formatter<ROOT::Math::XYZVector>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const ROOT::Math::XYZVector& vec, FmtContent& ctn) const
+    {
+        return fmt::format_to(ctn.out(), "[x: {}, y: {}, z: {}]", vec.X(), vec.Y(), vec.Z());
+    }
+};
+
+template <typename DataType>
+class fmt::formatter<R3B::LRPair<DataType>>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::LRPair<DataType>& data_pair, FmtContent& ctn) const
+    {
+        return fmt::format_to(ctn.out(), "[left: {}, right: {}]", data_pair.left(), data_pair.right());
+    }
+};
+
+template <>
+class fmt::formatter<R3B::Side>
+{
+  public:
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::Side& side, FmtContent& ctn) const
+    {
+        if (side == R3B::Side::left)
+        {
+            return fmt::format_to(ctn.out(), "{}", "left");
+        }
+        return fmt::format_to(ctn.out(), "{}", "right");
     }
 };

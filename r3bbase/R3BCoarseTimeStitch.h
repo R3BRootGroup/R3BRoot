@@ -46,5 +46,5 @@ class R3BCoarseTimeStitch : public TObject
     double fRangeClockTDC150;
 
   public:
-    ClassDefOverride(R3BCoarseTimeStitch, 1)
+    ClassDefOverride(R3BCoarseTimeStitch, 1); // NOLINT
 };

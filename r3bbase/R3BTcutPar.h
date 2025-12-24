@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,14 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTCUTPAR_H
-#define R3BTCUTPAR_H 1
+#pragma once
 
-#include "TCutG.h"
-#include "TObject.h"
 #include <Rtypes.h>
+#include <TCutG.h>
+#include <TNamed.h>
 
 class FairParamList;
+
+static constexpr UInt_t kMaxPoints = 40; // NOLINT
 
 class R3BTcutPar : public TNamed
 {
@@ -46,11 +47,9 @@ class R3BTcutPar : public TNamed
     TString GetNameObj() { return GetName(); }
 
   private:
-    UInt_t fMaxPoints;
-    TCutG* fCut;
+    UInt_t fMaxPoints = kMaxPoints;
+    TCutG* fCut = nullptr;
 
   public:
-    ClassDef(R3BTcutPar, 0);
+    ClassDef(R3BTcutPar, 0); // NOLINT
 };
-
-#endif // R3BTCUTPAR_H

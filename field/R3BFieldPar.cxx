@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -20,45 +20,29 @@
 #include "R3BFieldConst.h"
 #include "R3BGladFieldMap.h"
 
-#include "FairParamList.h"
+#include <FairParamList.h>
 
-#include "TDirectory.h"
+#include <TDirectory.h>
 #include <iostream>
 
 // ------   Constructor   --------------------------------------------------
 R3BFieldPar::R3BFieldPar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
-    fType = -1;
-    fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-    fBx = fBy = fBz = 0.;
-    fMapName = "";
-    fMapFileName = "";
-    fPosX = fPosY = fPosZ = 0.;
-    fXAngle = fYAngle = fZAngle = 0.;
-    fScale = 0.;
 }
 
 R3BFieldPar::R3BFieldPar()
+    : R3BFieldPar{ "R3BFieldPar", "Parameter for R3B field", "" }
 {
-    fType = -1;
-    fXmin = fXmax = fYmin = fYmax = fZmin = fZmax = 0.;
-    fBx = fBy = fBz = 0.;
-    fMapName = "";
-    fMapFileName = "";
-    fPosX = fPosY = fPosZ = 0.;
-    fXAngle = fYAngle = fZAngle = 0.;
-    fScale = 0.;
 }
-
-// ------   Destructor   ---------------------------------------------------
-R3BFieldPar::~R3BFieldPar() {}
 
 // ------   Put parameters   -----------------------------------------------
 void R3BFieldPar::putParams(FairParamList* list)
 {
-    if (!list)
+    if (list == nullptr)
+    {
         return;
+    }
 
     list->add("Field Type", fType);
 
@@ -77,8 +61,8 @@ void R3BFieldPar::putParams(FairParamList* list)
 
     else if (fType >= 1 && fType <= kMaxFieldMapType)
     { // field map
-        list->add("Field map name", fMapName);
-        list->add("Field map file name", fMapFileName);
+        list->add("Field map name", fMapName.c_str());
+        list->add("Field map file name", fMapFileName.c_str());
         list->add("Field x position", fPosX);
         list->add("Field y position", fPosY);
         list->add("Field z position", fPosZ);
@@ -93,32 +77,54 @@ void R3BFieldPar::putParams(FairParamList* list)
 // --------   Get parameters   ---------------------------------------------
 Bool_t R3BFieldPar::getParams(FairParamList* list)
 {
-    if (!list)
+    if (list == nullptr)
+    {
         return kFALSE;
+    }
 
     if (!list->fill("Field Type", &fType))
+    {
         return kFALSE;
+    }
 
     if (fType == 0)
     { // constant field
         if (!list->fill("Field min x", &fXmin))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field max x", &fXmax))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field min y", &fYmin))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field max y", &fYmax))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field min z", &fZmin))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field max z", &fZmax))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field Bx", &fBx))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field By", &fBy))
+        {
             return kFALSE;
+        }
         if (!list->fill("Field Bz", &fBz))
+        {
             return kFALSE;
+        }
     }
 
     else if (fType >= 1 && fType <= kMaxFieldMapType)
@@ -232,4 +238,4 @@ void R3BFieldPar::SetParameters(FairField* field)
     return;
 }
 
-ClassImp(R3BFieldPar);
+ClassImp(R3BFieldPar)

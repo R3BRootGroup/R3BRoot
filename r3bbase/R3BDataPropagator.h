@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,10 +11,9 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BDataPropagator_H
-#define R3BDataPropagator_H
+#pragma once
 
-#include "FairTask.h"
+#include <FairTask.h>
 #include <Rtypes.h>
 
 class TClonesArray;
@@ -33,14 +32,15 @@ class R3BDataPropagator : public FairTask
      * Creates an instance of the task.
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
+     * @param namebranch a name of the branch to be propagated.
      */
-    R3BDataPropagator(const TString& name, Int_t iVerbose = 1, const TString& namebranch = "");
+    explicit R3BDataPropagator(const TString& name, int iVerbose = 1, TString namebranch = "");
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BDataPropagator();
+    ~R3BDataPropagator() override = default;
 
     /**
      * Method for task initialization.
@@ -48,21 +48,19 @@ class R3BDataPropagator : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init() override;
+    InitStatus Init() override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option) override;
+    void Exec(Option_t* /*option*/) override; // NOLINT(misc-include-cleaner)
 
   private:
     TString fNameBranch;
-    TClonesArray* fInputData; // Array with input data
+    TClonesArray* fInputData = nullptr; // Array with input data
 
   public:
-    ClassDefOverride(R3BDataPropagator, 0)
+    ClassDefOverride(R3BDataPropagator, 0); // NOLINT
 };
-
-#endif // R3BDataPropagator_H
