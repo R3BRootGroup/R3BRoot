@@ -50,6 +50,6 @@ class R3BModule : public FairModule
   protected:
     TGeoCombiTrans fCombiTrans;
 
-    // ClassDef(R3BModule, 3)
-    ClassDefOverride(R3BModule, 3)
+  public:
+    ClassDefOverride(R3BModule, 3); // NOLINT
 };

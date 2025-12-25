@@ -15,13 +15,34 @@
 
 #include "R3BModule.h"
 
+#include <TString.h>
+
 class R3BGladMagnet : public R3BModule
 {
   public:
+    // This defines the experimental area: CaveC or HEC
+    enum ExpArea
+    {
+        CaveC,
+        HEC14,
+        HEC9
+    };
+
+    /** Default constructor **/
     R3BGladMagnet();
 
-    R3BGladMagnet(const TString& geoFile);
+    /** Standard constructor
+     ** @param geoFile       Name of field map file without extension
+     ** @param cave   Experimental area
+     **/
+    R3BGladMagnet(const TString& geoFile, ExpArea cave = CaveC);
 
   private:
-    ClassDefOverride(R3BGladMagnet, 3); // NOLINT
+    double fPosX = 0.0;    // offset on the X axis
+    double fPosY = 1.75;   // offset on the Y axis
+    double fPosZ = 160.8;  // offset on the Z axis (distance from target)
+    double fRotDeg = 14.0; // rotation around -Y axis
+
+  public:
+    ClassDefOverride(R3BGladMagnet, 4); // NOLINT
 };

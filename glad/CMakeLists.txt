@@ -27,3 +27,5 @@ add_library_with_dictionary(
     R3BGladMagnet.h
     DEPENDENCIES
     R3BTracking)
+    
+add_subdirectory(test)
