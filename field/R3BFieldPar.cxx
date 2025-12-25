@@ -39,6 +39,8 @@ R3BFieldPar::R3BFieldPar()
 // ------   Put parameters   -----------------------------------------------
 void R3BFieldPar::putParams(FairParamList* list)
 {
+    LOG(info) << "R3BFieldPar::putParams()";
+
     if (list == nullptr)
     {
         return;
@@ -77,6 +79,8 @@ void R3BFieldPar::putParams(FairParamList* list)
 // --------   Get parameters   ---------------------------------------------
 Bool_t R3BFieldPar::getParams(FairParamList* list)
 {
+    LOG(info) << "R3BFieldPar::getParams()";
+
     if (list == nullptr)
     {
         return kFALSE;
@@ -162,7 +166,7 @@ Bool_t R3BFieldPar::getParams(FairParamList* list)
 // ---------   Set parameters from R3BField   ------------------------------
 void R3BFieldPar::SetParameters(FairField* field)
 {
-
+    LOG(info) << "R3BFieldPar::SetParameters()";
     if (!field)
     {
         LOG(fatal) << "R3BFieldPar::SetParameters: Empty field pointer!";
@@ -200,13 +204,13 @@ void R3BFieldPar::SetParameters(FairField* field)
         fMapFileName = "";
         if (1 == fType)
         {
-            R3BAladinFieldMap* aladinFieldMap = dynamic_cast<R3BAladinFieldMap*>(field);
+            auto* aladinFieldMap = dynamic_cast<R3BAladinFieldMap*>(field);
             fScale = aladinFieldMap->GetScale();
             fCurrent = aladinFieldMap->GetCurrent();
         }
         else if (2 == fType) // proper GLAD field
         {
-            R3BGladFieldMap* gladFieldMap = dynamic_cast<R3BGladFieldMap*>(field);
+            auto* gladFieldMap = dynamic_cast<R3BGladFieldMap*>(field);
             fMapName = gladFieldMap->GetName();
             fScale = gladFieldMap->GetScale();
             fMapFileName = gladFieldMap->GetFileName();

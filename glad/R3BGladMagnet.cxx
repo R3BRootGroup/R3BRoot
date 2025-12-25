@@ -12,35 +12,54 @@
  ******************************************************************************/
 
 #include "R3BGladMagnet.h"
+#include "R3BLogger.h"
 
-#include <FairLogger.h>
-
-// NOTE: as for now, these values are the same used
-//       for the geometry creation (v17) and (v2023.1).
-//       These will move also old files.
-const Double_t __GLAD_POS_DX = -42.0; // offset on the Z axis
-const Double_t __GLAD_POS_DY = 1.75;  // offset on the Y axis (2cm with respect to the beam line)
-const Double_t __GLAD_POS_DZ = 308.8; // offset on the Z axis (distance from target)
-const Double_t __GLAD_ROT = 14;       // rotation on the -Y axis
-const TString __GLAD_NAME = "Glad Magnet";
+#include <TGeoMatrix.h>
+#include <sstream>
 
 R3BGladMagnet::R3BGladMagnet()
-    // NOTE: Delegate Constructor, such that geometry operations are set up.
     : R3BGladMagnet("")
 {
 }
 
-R3BGladMagnet::R3BGladMagnet(const TString& geoFile)
-    : R3BModule(__GLAD_NAME, __GLAD_NAME, kFALSE, geoFile, { __GLAD_POS_DX, __GLAD_POS_DY, __GLAD_POS_DZ })
+R3BGladMagnet::R3BGladMagnet(const TString& geoFile, ExpArea cave)
+    : R3BModule("GLAD Magnet", "GLAD Magnet", kFALSE, geoFile)
 {
-    // TODO: There is probably a better way to solve this
+    auto rot_y = fRotDeg;
+    std::string exparea = "Cave-C";
+    if (cave == HEC14)
+    {
+        fPosY = 0.;
+        fPosX = -fPosX - 7.;
+        rot_y = -fRotDeg;
+        exparea = "HEC";
+    }
+    else if (cave == HEC9)
+    {
+        fPosY = 0.;
+        fPosX = -fPosX;
+        rot_y = -9.;
+        exparea = "HEC";
+    }
+
     TGeoRotation rot;
     rot.RotateY(90.0);
     rot.RotateZ(-90.0);
-    rot.RotateY(__GLAD_ROT);
+    rot.RotateY(rot_y);
     rot.RotateZ(180.0);
 
+    TGeoTranslation trans(fPosX, fPosY, fPosZ);
+
+    std::ostringstream msg;
+    msg << "GLAD magnet configuration:\n"
+        << "  Experimental area  : " << exparea << " \n"
+        << "  Rotation-Y         : " << rot_y << " deg\n"
+        << "  Position (X,Y,Z)   : (" << fPosX << ", " << fPosY << ", " << fPosZ << ") cm\n";
+    R3BLOG(info, msg.str());
+
+    // Apply rotation first, then translate to the correct position
     R3BModule::SetRotation(rot);
+    R3BModule::SetPosition(trans);
 }
 
 ClassImp(R3BGladMagnet)

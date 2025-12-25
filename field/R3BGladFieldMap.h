@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2010 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2010-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -26,6 +26,14 @@ class TArrayD;
 class R3BGladFieldMap : public FairField
 {
   public:
+    // This defines the experimental area: CaveC or HEC
+    enum ExpArea
+    {
+        CaveC,
+        HEC14,
+        HEC9
+    };
+
     /** Default constructor **/
     R3BGladFieldMap();
 
@@ -33,7 +41,7 @@ class R3BGladFieldMap : public FairField
      ** @param name       Name of field map file without extension
      ** @param fileType   R = ROOT file, A = ASCII
      **/
-    R3BGladFieldMap(const TString& mapName, const TString& fileType = "A");
+    R3BGladFieldMap(const TString& mapName, const TString& fileType = "A", ExpArea cave = CaveC);
 
     /** Constructor from R3BGladFieldPar **/
     R3BGladFieldMap(R3BFieldPar* fieldPar);
@@ -125,10 +133,12 @@ class R3BGladFieldMap : public FairField
     /** Accessor to field map file **/
     TString GetFileName() { return fFileName; }
 
+    void SetCaveConfiguration(ExpArea opt) { fCave = opt; }
+
     /** Screen output **/
     virtual void Print(Option_t* option = "") const;
 
-  protected:
+  private:
     /** Reset the field parameters and data **/
     void Reset();
 
@@ -138,37 +148,39 @@ class R3BGladFieldMap : public FairField
     /** Read field map from a ROOT file **/
     void ReadRootFile(const TString& fileName);
 
+    ExpArea fCave = CaveC;
+
     /** Get field values by interpolation of the grid.
      ** @param dx,dy,dz  Relative distance from grid point [cell units]
      **/
     Double_t Interpolate(Double_t dx, Double_t dy, Double_t dz);
 
     /** Map file name **/
-    TString fFileName;
+    TString fFileName = "";
 
     /** Global scaling factor (w.r.t. map on file) **/
-    Double_t fScale;
+    double fScale = 1.;
 
     /** Field centre position in global coordinates  **/
-    Double_t fPosX, fPosY, fPosZ;
+    double fPosX = 0., fPosY = 0., fPosZ = 0.;
 
     /** Euler rotations of the field around field local X, Y, Z axis **/
-    Double_t fXAngle;
-    Double_t fYAngle;
-    Double_t fZAngle;
+    double fXAngle = 0.;
+    double fYAngle = 0.;
+    double fZAngle = 0.;
 
     /** Field limits in local coordinate system **/
-    Double_t fXmin, fXmax, fXstep;
-    Double_t fYmin, fYmax, fYstep;
-    Double_t fZmin, fZmax, fZstep;
+    double fXmin = 0., fXmax = 0., fXstep = 0.;
+    double fYmin = 0., fYmax = 0., fYstep = 0.;
+    double fZmin = 0., fZmax = 0., fZstep = 0.;
 
     /** Number of grid points  **/
-    Int_t fNx, fNy, fNz; //
+    int fNx = 0, fNy = 0, fNz = 0; //
 
     /** Arrays of doubles with the field values  **/
-    TArrayD* fBx; //!
-    TArrayD* fBy; //!
-    TArrayD* fBz; //!
+    TArrayD* fBx = nullptr;
+    TArrayD* fBy = nullptr;
+    TArrayD* fBz = nullptr;
 
     /** Variables for temporary storage
      ** Used in the very frequently called method GetFieldValue  **/
@@ -184,5 +196,5 @@ class R3BGladFieldMap : public FairField
     TFile* fFile; // root file with the map data
 
   public:
-    ClassDef(R3BGladFieldMap, 5)
+    ClassDef(R3BGladFieldMap, 5); // NOLINT
 };

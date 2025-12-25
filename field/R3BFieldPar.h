@@ -111,5 +111,5 @@ class R3BFieldPar : public FairParGenericSet
     double fCurrent{};
 
   public:
-    ClassDefOverride(R3BFieldPar, 3);
+    ClassDefOverride(R3BFieldPar, 3); // NOLINT
 };
