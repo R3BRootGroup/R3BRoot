@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2010 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2010-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -23,6 +23,9 @@
 #include "TFile.h"
 #include "TMath.h"
 
+#include <FairRunSim.h>
+#include <FairRuntimeDb.h>
+
 #include "R3BGladFieldMap.h"
 #include "R3BLogger.h"
 
@@ -41,56 +44,44 @@ using TMath::Nint;
 //
 R3BGladFieldMap::R3BGladFieldMap()
 {
-    fPosX = fPosY = fPosZ = 0.;
-    fXmin = fYmin = fZmin = 0.;
-    fXmax = fYmax = fZmax = 0.;
-    fXstep = fYstep = fZstep = 0.;
-    fNx = fNy = fNz = 0;
-    fScale = 1.;
-    fBx = fBy = fBz = NULL;
-    fPosX = fPosY = fPosZ = 0.;
     fName = "";
-    fFileName = "";
     fType = 2;
 }
 
 // -------------   Standard constructor   ---------------------------------
 //
-R3BGladFieldMap::R3BGladFieldMap(const TString& mapName, const TString& fileType)
+R3BGladFieldMap::R3BGladFieldMap(const TString& mapName, const TString& fileType, ExpArea cave)
     : FairField(mapName.Data())
 {
     // Default field positions (in cm) in lab:
     // between target position (0,0,0) and GLAD rotation point (field origin)
     // Override these values by calling SetPosition(x,y,z) before Init()
     fPosX = 0.;
-    fPosY = 1.75;
     fPosZ = 163.4;
+
+    // Default Euler rotations of the local field (in degrees)
+    // Override these values by calling SetXAngle(), SetYAngle(), SetZAngle() before Init()
+
+    // There is only a Y offset for Cave-C
+    if (cave == CaveC)
+    {
+        fPosY = 1.75;
+        fYAngle = -14.;
+    }
+    else if (cave == HEC14)
+    {
+        fPosY = 0.;
+        fYAngle = 14.;
+    }
+    else if (cave == HEC9)
+    {
+        fPosY = 0.;
+        fYAngle = 9.;
+    }
 
     // Default translation vector of the local filed coordinates
     gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
 
-    // Default Euler rotations of the local field (in degrees)
-    // Override these values by calling SetXAngle(), SetYAngle(), SetZAngle() before Init()
-    fXAngle = 0.;
-    fYAngle = -14.;
-    fZAngle = 0.;
-
-    fXmin = 0;
-    fYmin = 0;
-    fZmin = 0.;
-    fXmax = 0;
-    fYmax = 0;
-    fZmax = 0.;
-    fXstep = 0;
-    fYstep = 0;
-    fZstep = 0.;
-    fNx = 0;
-    fNy = 0;
-    fNz = 0;
-    fScale = 1.;
-    fBx = nullptr;
-    fBy = nullptr;
-    fBz = nullptr;
     fName = mapName;
     TString dir = getenv("VMCWORKDIR");
     fFileName = dir + "/field/magField/R3B/" + mapName;
@@ -109,7 +100,15 @@ R3BGladFieldMap::R3BGladFieldMap(const TString& mapName, const TString& fileType
 void R3BGladFieldMap::SetFieldfromCurrent(double current)
 {
     R3BLOG_IF(fatal, TMath::Abs(current) > 3583.81, "GLAD current cannot be larger than 3583.81 A.");
-    fScale = current / 3583.81;
+    if (fYAngle < 0)
+    {
+        fScale = -1. * abs(current) / 3583.81;
+    }
+    else
+    {
+        fScale = abs(current) / 3583.81;
+    }
+
     R3BLOG(info, "GLAD current set to " << current << " A, which corresponds to a scaling factor of " << fScale);
     return;
 }
@@ -118,27 +117,7 @@ void R3BGladFieldMap::SetFieldfromCurrent(double current)
 //
 R3BGladFieldMap::R3BGladFieldMap(R3BFieldPar* fieldPar)
 {
-    fType = 2;
-    fPosX = 0;
-    fPosY = 0;
-    fPosZ = 0.;
-    fXAngle = 0;
-    fYAngle = 0;
-    fZAngle = 0.;
-    fXmin = 0;
-    fYmin = 0;
-    fZmin = 0.;
-    fXmax = 0;
-    fYmax = 0;
-    fZmax = 0.;
-    fXstep = 0;
-    fYstep = 0;
-    fZstep = 0.;
-    fNx = 0;
-    fNy = 0;
-    fNz = 0;
-    fScale = 1.;
-    fBx = fBy = fBz = NULL;
+    R3BLOG(info, "Reading parameters");
     if (!fieldPar)
     {
         R3BLOG(warn, "empty parameter container!");
@@ -177,17 +156,28 @@ R3BGladFieldMap::~R3BGladFieldMap()
 //
 void R3BGladFieldMap::Init()
 {
-    if (!gTrans)
-        gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
-    if (fFileName.EndsWith(".dat"))
-        ReadAsciiFile(fFileName);
-    else if (fFileName.EndsWith(".root"))
-        ReadRootFile(fFileName);
-    else
+    auto* rtdb = FairRuntimeDb::instance();
+    R3BLOG_IF(fatal, !rtdb, "FairRuntimeDb not found");
+
+    auto fFieldPar = dynamic_cast<R3BFieldPar*>(rtdb->getContainer("R3BFieldPar"));
+    R3BLOG_IF(fatal, !fFieldPar, "Couldn't get handle on R3BFieldPar container");
+    R3BLOG_IF(info, fFieldPar, "Open R3BFieldPar container");
+
+    auto* frunsim = FairRunSim::Instance();
+    if (frunsim != nullptr)
     {
-        R3BLOG(fatal, "No proper file name defined! (" << fFileName.Data() << ")");
+        if (!gTrans)
+            gTrans = new TVector3(-fPosX, -fPosY, -fPosZ);
+        if (fFileName.EndsWith(".dat"))
+            ReadAsciiFile(fFileName);
+        else if (fFileName.EndsWith(".root"))
+            ReadRootFile(fFileName);
+        else
+        {
+            R3BLOG(fatal, "No proper file name defined! (" << fFileName.Data() << ")");
+        }
+        Print();
     }
-    Print();
 }
 // -----------   Get x component of the field   ---------------------------
 //
@@ -345,7 +335,6 @@ Bool_t R3BGladFieldMap::IsInside(Double_t x,
     dy = (yl - fYmin) / fYstep - Double_t(iy);
     dz = (zl - fZmin) / fZstep - Double_t(iz);
 
-    // cout << "-I- isInside true " << endl;
     return kTRUE;
 }
 
@@ -415,8 +404,7 @@ void R3BGladFieldMap::SetPosition(Double_t x, Double_t y, Double_t z)
     gTrans->SetXYZ(-fPosX, -fPosY, -fPosZ);
 }
 
-// ---------   Screen output   --------------------------------------------
-//
+// ---------   Print  --------------------------------------------
 void R3BGladFieldMap::Print(Option_t*) const
 {
     TString type = "Map";
@@ -495,7 +483,6 @@ void R3BGladFieldMap::Reset()
 }
 
 // -----   Read field map from ASCII file (private)   ---------------------
-//
 void R3BGladFieldMap::ReadAsciiFile(const TString& fileName)
 {
     Double_t bx = 0., by = 0., bz = 0.;
@@ -601,7 +588,6 @@ void R3BGladFieldMap::ReadAsciiFile(const TString& fileName)
 }
 
 // -----   Read field map from ROOT file (private)   ---------------------
-//
 void R3BGladFieldMap::ReadRootFile(const TString& fileName)
 {
     // Opening root file
@@ -660,7 +646,7 @@ void R3BGladFieldMap::ReadRootFile(const TString& fileName)
     for (Long64_t ev = 3; ev < Nentries; ev++) // first 3 entries are map info
     {
         if (ev % 100000 == 0)
-            cout << "\rProcessed " << ev << " entries..." << flush;
+            std::cout << "\rProcessed " << ev << " entries..." << flush;
 
         fTreeMap->GetEntry(ev);
 
@@ -670,6 +656,7 @@ void R3BGladFieldMap::ReadRootFile(const TString& fileName)
         fBy->AddAt(fBvec.Y(), ev - 3);
         fBz->AddAt(fBvec.Z(), ev - 3);
     }
+    std::cout << std::endl;
     R3BLOG(info, "Finished reading root tree");
 
     return;
@@ -692,6 +679,5 @@ Double_t R3BGladFieldMap::Interpolate(Double_t dx, Double_t dy, Double_t dz)
     // Interpolate in z coordinate
     return fHc[0] + (fHc[1] - fHc[0]) * dz;
 }
-// ------------------------------------------------------------------------
 
 ClassImp(R3BGladFieldMap)

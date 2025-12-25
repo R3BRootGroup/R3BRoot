@@ -10,10 +10,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: cache ucesb
+    - name: cache deps
       if: github.event_name == 'pull_request'
       id: cache-ucesb
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: |
           ${{ env.UCESB_DIR }}
@@ -25,7 +25,7 @@ runs:
     - name: cache r3b
       if: inputs.cache-name != 'false' && github.event_name == 'pull_request'
       id: cache-r3b
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: .ccache
         key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}

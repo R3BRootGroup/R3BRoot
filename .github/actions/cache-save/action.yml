@@ -11,7 +11,7 @@ runs:
   steps:
     - name: cache ucesb
       id: cache-ucesb
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: |
           ${{ env.UCESB_DIR }}
@@ -21,7 +21,7 @@ runs:
     - name: cache r3b
       if: matrix.save != 'false'
       id: cache-r3b
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: .ccache
         key: r3b-build-${{ inputs.cache-name }}-${{ matrix.os }}
