@@ -98,6 +98,12 @@ jobs:
         exclude:
           - os: debian11
             fsv: jan24p6
+          - os: debian11
+            fsv: jan24p5
+            repos: r3broot-conan
+          - os: debian12
+            fsv: jan24p5
+            repos: r3broot-conan
           - os: debian12
             fsv: jan24p6
           - os: debian13
