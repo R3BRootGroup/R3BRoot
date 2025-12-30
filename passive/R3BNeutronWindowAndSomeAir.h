@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2020 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2020-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROOT_R3BNEUTRONWINDOWANDSOMEAIR_H
-#define R3BROOT_R3BNEUTRONWINDOWANDSOMEAIR_H
+#pragma once
 
 /* Place a neutron window (4mm steel) at xstart and air between start and stop
  * This can be used for NeuLAND simulations as there is currently no vacuum chamber implemented.
@@ -21,7 +20,7 @@
  * The heavy ion will always fly through vacuum, and the neutrons through the right amount of material
  */
 
-#include "FairModule.h"
+#include <FairModule.h>
 
 class TGeoMedium;
 
@@ -39,7 +38,6 @@ class R3BNeutronWindowAndSomeAir : public FairModule
     double fStart;
     double fStop;
 
-    ClassDefOverride(R3BNeutronWindowAndSomeAir, 1)
+  public:
+    ClassDefOverride(R3BNeutronWindowAndSomeAir, 1); // NOLINT
 };
-
-#endif // R3BROOT_R3BNEUTRONWINDOWANDSOMEAIR_H

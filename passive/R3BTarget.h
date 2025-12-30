@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTARGET_H
-#define R3BTARGET_H 1
+#pragma once
 
 #include "R3BModule.h"
 
@@ -39,5 +38,3 @@ class R3BTarget : public R3BModule
   protected:
     R3BTGeoPar* fTGeoPar; //!
 };
-
-#endif // R3BTARGET_H

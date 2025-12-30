@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,29 +11,30 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGEOPASSIVEPAR_H
-#define R3BGEOPASSIVEPAR_H
+#pragma once
 
-#include "FairParGenericSet.h"
-#include "TH1F.h"
+#include <FairParGenericSet.h>
 
 class R3BGeoPassivePar : public FairParGenericSet
 {
   public:
-    TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
-    TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
-
     R3BGeoPassivePar(const char* name = "R3BGeoPassivePar",
                      const char* title = "Passive Geometry Parameters",
                      const char* context = "TestDefaultContext");
-    ~R3BGeoPassivePar(void);
+
+    ~R3BGeoPassivePar(void) = default;
+
     void clear(void);
+
     void putParams(FairParamList*);
+
     Bool_t getParams(FairParamList*);
+
+    TObjArray* fGeoSensNodes; // List of FairGeoNodes for sensitive volumes
+    TObjArray* fGeoPassNodes; // List of FairGeoNodes for sensitive volumes
+
     TObjArray* GetGeoSensitiveNodes() { return fGeoSensNodes; }
     TObjArray* GetGeoPassiveNodes() { return fGeoPassNodes; }
 
-    ClassDef(R3BGeoPassivePar, 1)
+    ClassDef(R3BGeoPassivePar, 1); // NOLINT
 };
-
-#endif /* !R3BGEOPASSIVEPAR_H */
