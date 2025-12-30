@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGEOCAVE_H
-#define R3BGEOCAVE_H 1
+#pragma once
 
 #include "FairGeoSet.h"
 
@@ -36,7 +35,5 @@ class R3BGeoCave : public FairGeoSet
     void addRefNodes();
     void write(std::fstream&);
     void print();
-    ClassDef(R3BGeoCave, 0) // Class for the geometry of CAVE
+    ClassDef(R3BGeoCave, 0); // Class for the geometry of CAVE
 };
-
-#endif /* !R3BGEOCAVE_H */

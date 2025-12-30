@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -10,16 +10,6 @@
  * granted to it by virtue of its status as an Intergovernmental Organization *
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
-
-//*-- AUTHOR : Ilse Koenig
-//*-- Created : 10/11/2003
-
-/////////////////////////////////////////////////////////////
-// R3BGeoTarget
-//
-// Class for geometry of Target
-//
-/////////////////////////////////////////////////////////////
 
 #include "R3BGeoTarget.h"
 

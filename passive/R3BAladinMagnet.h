@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BALADINMAGNET_H
-#define R3BALADINMAGNET_H
+#pragma once
 
 #include "R3BModule.h"
 
@@ -32,8 +31,6 @@ class R3BAladinMagnet : public R3BModule
     void SetRotation(const TGeoRotation&);    // override;
 
   private:
-    ClassDef(R3BAladinMagnet, 3)
+    ClassDef(R3BAladinMagnet, 3);
     // ClassDefOverride(R3BAladinMagnet, 3)
 };
-
-#endif // R3BALADINMAGNET_H

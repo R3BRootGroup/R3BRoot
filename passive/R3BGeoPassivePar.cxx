@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,26 +13,22 @@
 
 //*-- AUTHOR : Denis Bertini
 //*-- Created : 21/06/2005
+
+#include "R3BGeoPassivePar.h"
+
+#include <FairParamList.h>
+
+#include <TObjArray.h>
 #include <iomanip>
 #include <iostream>
 
-using namespace std;
-
-#include "FairParamList.h"
-#include "R3BGeoPassivePar.h"
-#include "TObjArray.h"
-
-ClassImp(R3BGeoPassivePar)
-
-    R3BGeoPassivePar::R3BGeoPassivePar(const char* name, const char* title, const char* context)
+R3BGeoPassivePar::R3BGeoPassivePar(const char* name, const char* title, const char* context)
     : FairParGenericSet(name, title, context)
 {
 
     fGeoSensNodes = new TObjArray();
     fGeoPassNodes = new TObjArray();
 }
-
-R3BGeoPassivePar::~R3BGeoPassivePar(void) {}
 
 void R3BGeoPassivePar::clear(void)
 {
@@ -61,3 +57,5 @@ Bool_t R3BGeoPassivePar::getParams(FairParamList* l)
 
     return kTRUE;
 }
+
+ClassImp(R3BGeoPassivePar)

@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BGEOTARGET_H
-#define R3BGEOTARGET_H
+#pragma once
 
 #include "FairGeoSet.h"
 
@@ -26,7 +25,5 @@ class R3BGeoTarget : public FairGeoSet
     ~R3BGeoTarget() {}
     const char* getModuleName(Int_t) { return modName; }
     const char* getEleName(Int_t) { return eleName; }
-    ClassDef(R3BGeoTarget, 0) // Class for geometry of Target
+    ClassDef(R3BGeoTarget, 0); // Class for geometry of Target
 };
-
-#endif /* !R3BGEOTARGET_H */

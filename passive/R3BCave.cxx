@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2009-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,21 +12,21 @@
  ******************************************************************************/
 
 #include "R3BCave.h"
-
-#include "FairGeoInterface.h"
-#include "FairGeoLoader.h"
-#include "FairGeoNode.h"
-#include "FairGeoRootBuilder.h"
-#include "FairGeoVolume.h"
-#include "FairRun.h"
-#include "FairRuntimeDb.h"
-
-#include "TObjArray.h"
-#include <TList.h>
-#include <stddef.h>
-
 #include "R3BGeoCave.h"
 #include "R3BGeoPassivePar.h"
+
+#include <FairGeoInterface.h>
+#include <FairGeoLoader.h>
+#include <FairGeoNode.h>
+#include <FairGeoRootBuilder.h>
+#include <FairGeoVolume.h>
+#include <FairRun.h>
+#include <FairRuntimeDb.h>
+
+#include <TList.h>
+#include <TObjArray.h>
+#include <algorithm>
+#include <stddef.h>
 
 R3BCave::R3BCave()
     : FairModule()
@@ -36,47 +36,40 @@ R3BCave::R3BCave()
 R3BCave::R3BCave(const char* name, const char* Title)
     : FairModule(name, Title)
 {
-    world[0] = 0;
-    world[1] = 0;
-    world[2] = 0;
 }
 
 R3BCave::R3BCave(const R3BCave& right)
     : FairModule(right)
 {
-    world[0] = right.world[0];
-    world[1] = right.world[1];
-    world[2] = right.world[2];
+    std::copy(std::begin(right.world), std::end(right.world), world);
 }
-
-R3BCave::~R3BCave() {}
 
 void R3BCave::ConstructGeometry()
 {
-    FairGeoLoader* loader = FairGeoLoader::Instance();
-    FairGeoInterface* GeoInterface = loader->getGeoInterface();
-    R3BGeoCave* MGeo = new R3BGeoCave();
+    auto* loader = FairGeoLoader::Instance();
+    auto* GeoInterface = loader->getGeoInterface();
+    auto* MGeo = new R3BGeoCave();
     MGeo->setGeomFile(GetGeometryFileName());
     GeoInterface->addGeoModule(MGeo);
-    Bool_t rc = GeoInterface->readSet(MGeo);
+    auto rc = GeoInterface->readSet(MGeo);
     if (rc)
     {
         MGeo->create(loader->getGeoBuilder());
     }
 
-    TList* volList = MGeo->getListOfVolumes();
+    auto* volList = MGeo->getListOfVolumes();
     // store geo parameter
 
-    FairRun* fRun = FairRun::Instance();
-    FairRuntimeDb* rtdb = FairRun::Instance()->GetRuntimeDb();
+    auto* fRun = FairRun::Instance();
+    auto* rtdb = FairRun::Instance()->GetRuntimeDb();
 
-    R3BGeoPassivePar* par = dynamic_cast<R3BGeoPassivePar*>(rtdb->getContainer("R3BGeoPassivePar"));
-    TObjArray* fSensNodes = par->GetGeoSensitiveNodes();
-    TObjArray* fPassNodes = par->GetGeoPassiveNodes();
+    auto* par = dynamic_cast<R3BGeoPassivePar*>(rtdb->getContainer("R3BGeoPassivePar"));
+    auto* fSensNodes = par->GetGeoSensitiveNodes();
+    auto* fPassNodes = par->GetGeoPassiveNodes();
 
     TListIter iter(volList);
-    FairGeoNode* node = NULL;
-    FairGeoVolume* aVol = NULL;
+    FairGeoNode* node = nullptr;
+    FairGeoVolume* aVol = nullptr;
 
     while ((node = dynamic_cast<FairGeoNode*>(iter.Next())))
     {
@@ -96,4 +89,4 @@ void R3BCave::ConstructGeometry()
 
 FairModule* R3BCave::CloneModule() const { return new R3BCave(*this); }
 
-ClassImp(R3BCave);
+ClassImp(R3BCave)

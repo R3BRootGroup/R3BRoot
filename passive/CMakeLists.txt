@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2009 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2009-2026 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -24,7 +24,6 @@ set(SRCS
     R3BNeutronWindowAndSomeAir.cxx
     R3BPassiveContFact.cxx
     R3BPipe.cxx
-    R3BVacVesselCool.cxx
     R3BTarget.cxx
     R3BCollimator.cxx)
 
@@ -37,7 +36,6 @@ set(HEADERS
     R3BNeutronWindowAndSomeAir.h
     R3BPassiveContFact.h
     R3BPipe.h
-    R3BVacVesselCool.h
     R3BTarget.h
     R3BCollimator.h)
 

@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2018 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2018-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,8 +13,8 @@
 
 #include "R3BCollimator.h"
 
-#include "TGeoManager.h"
-#include "TGeoTube.h"
+#include <TGeoManager.h>
+#include <TGeoTube.h>
 
 R3BCollimator::R3BCollimator()
     : R3BModule()
