@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,6 +14,7 @@
 #pragma once
 
 #include <FairGenerator.h>
+
 #include <TFile.h>
 #include <TString.h>
 #include <TTree.h>
@@ -50,14 +51,14 @@ class R3BINCLRootGenerator : public FairGenerator
     /**
      ** Set vertex point
      **/
-    void SetXYZ(Double32_t x = 0, Double32_t y = 0, Double32_t z = 0);
+    void SetXYZ(double x = 0, double y = 0, double z = 0);
 
     /**
      ** Set dispersion for the vertex point
      ** Gaussian distribution for x and y
      ** Uniform distribution for z, between z - sz and z + sz
      **/
-    void SetDxDyDz(Double32_t sx = 0, Double32_t sy = 0, Double32_t sz = 0);
+    void SetDxDyDz(double sx = 0, double sy = 0, double sz = 0);
 
     /**
      ** Method to simulate only fission events
@@ -74,12 +75,20 @@ class R3BINCLRootGenerator : public FairGenerator
      **/
     void SetOnlyP2pFission(bool Opt = true) { fOnlyP2pFission = Opt; }
 
+    /**
+     **  Method to simulate only fragments (changed with SetMinPdgCode)
+     **/
+    void SetOnlyfragments(bool Opt = true) { fOnlyFragments = Opt; }
+    void SetMinPdgCode(int Opt) { fPdgCodeMin = Opt; }
+
   private:
     TString fFileName; // Input file name
     TFile* fInput;
     bool fOnlyFission = false;    // True if we want to simulate only fission events
     bool fOnlyP2pFission = false; // True if we want to simulate only p2p-fission events
     bool fOnlySpallation = false; // True if we want to simulate only spallation events
+    bool fOnlyFragments = false;  // True if we want to simulate only fragments
+    int fPdgCodeMin = 1000050070; // Limit in Boro-7
 
     /** Private method RegisterIons. Goes through the input file and registers
      ** any ion needed. TODO: Should not be needed by FairRoot. **/
@@ -87,22 +96,22 @@ class R3BINCLRootGenerator : public FairGenerator
 
     inline Int_t GetIonPdgId(int z, int a) { return 1000000000 + 10000 * z + 10 * a; }
 
-    Int_t fEvt = 0;
+    int64_t fEvt = 0;
     TTree* Tree;
-    Int_t fEvtRoot = 0;
+    int64_t fEvtRoot = 0;
     Short_t fParticles;
     Short_t fOrigin[160];
     Short_t fMass[160];
     Short_t fCharge[160];
-    Int_t fPdgCode[160];
+    int fPdgCode[160];
     Float_t fPzPrime[160];
     Float_t fThetaPrime[160];
     Float_t fPhi[160];
 
-    Double32_t fX = 0., fY = 0., fZ = 0.;    // Point vertex coordinates [cm]
-    bool fPointVtxIsSet = false;             // True if point vertex is set
-    Double32_t fDX = 0., fDY = 0., fDZ = 0.; // Point vertex coordinates [cm]
-    bool fBoxVtxIsSet = false;               // True if point vertex is set
+    double fX = 0., fY = 0., fZ = 0.;    // Point vertex coordinates [cm]
+    bool fPointVtxIsSet = false;         // True if point vertex is set
+    double fDX = 0., fDY = 0., fDZ = 0.; // Point vertex coordinates [cm]
+    bool fBoxVtxIsSet = false;           // True if point vertex is set
 
   public:
     ClassDefOverride(R3BINCLRootGenerator, 0); // NOLINT

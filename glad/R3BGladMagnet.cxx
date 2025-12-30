@@ -14,6 +14,8 @@
 #include "R3BGladMagnet.h"
 #include "R3BLogger.h"
 
+#include <FairRunSim.h>
+
 #include <TGeoMatrix.h>
 #include <sstream>
 
@@ -25,6 +27,10 @@ R3BGladMagnet::R3BGladMagnet()
 R3BGladMagnet::R3BGladMagnet(const TString& geoFile, ExpArea cave)
     : R3BModule("GLAD Magnet", "GLAD Magnet", kFALSE, geoFile)
 {
+    auto* frunsim = FairRunSim::Instance();
+    if (frunsim == nullptr)
+        return;
+
     auto rot_y = fRotDeg;
     std::string exparea = "Cave-C";
     if (cave == HEC14)
