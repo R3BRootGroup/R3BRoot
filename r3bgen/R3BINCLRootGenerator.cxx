@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2021-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,13 +12,15 @@
  ******************************************************************************/
 
 #include "R3BINCLRootGenerator.h"
-#include "FairIon.h"
-#include "FairPrimaryGenerator.h"
-#include "FairRunSim.h"
-#include "G4NistManager.hh"
 #include "R3BLogger.h"
-#include "TMath.h"
-#include "TRandom.h"
+
+#include <FairIon.h>
+#include <FairPrimaryGenerator.h>
+#include <FairRunSim.h>
+
+#include <G4NistManager.hh>
+#include <TMath.h>
+#include <TRandom.h>
 
 R3BINCLRootGenerator::R3BINCLRootGenerator()
 {
@@ -136,16 +138,16 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
 
         if (validevent)
         {
-            for (Int_t j = 0; j < fParticles; j++)
+            for (size_t j = 0; j < fParticles; j++)
             {
-                Int_t pdg = 0;
+                int pdg = 0;
                 if (fMass[j] > 1 && fCharge[j] > 0)
                 {
                     iA = fMass[j];
                     iZ = fCharge[j];
                     pdg = GetIonPdgId(iZ, iA);
                     pz = fPzPrime[j] / 1000.;
-                    Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
+                    auto pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
                     px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
                     py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
                 }
@@ -153,12 +155,20 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 {
                     pdg = fPdgCode[j];
                     pz = fPzPrime[j] / 1000.;
-                    Double_t pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
+                    auto pt = pz * TMath::Tan(fThetaPrime[j] * TMath::DegToRad());
                     px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
                     py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
                 }
                 R3BLOG(debug, "PDG:Px:Py:Pz " << pdg << " " << px << " " << py << " " << pz);
-                primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
+                if (fOnlyFragments)
+                {
+                    if (pdg > fPdgCodeMin)
+                        primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
+                }
+                else
+                {
+                    primGen->AddTrack(pdg, px, py, pz, vx, vy, vz);
+                }
             }
         }
     }
@@ -172,10 +182,10 @@ void R3BINCLRootGenerator::RegisterIons()
     R3BLOG(info, "Looking for ions ...");
 
     // Track variables to be read from file
-    Int_t iZ = 0;
-    Int_t iA = 0;
+    int iZ = 0;
+    int iA = 0;
     // Keep a list of ions to register
-    std::map<Int_t, FairIon*> ions;
+    std::map<int, FairIon*> ions;
 
     fInput = new TFile(fFileName);
     Tree = dynamic_cast<TTree*>(fInput->Get("et"));
@@ -193,19 +203,19 @@ void R3BINCLRootGenerator::RegisterIons()
     Tree->SetBranchAddress("phi", fPhi);
     Tree->SetBranchAddress("PDGCode", fPdgCode);
 
-    for (Int_t ie = 0; ie < fEvtRoot; ie++)
+    for (auto ie = 0; ie < fEvtRoot; ie++)
     {
         Tree->GetEntry(ie);
 
-        for (Int_t j = 0; j < fParticles; j++)
+        for (auto j = 0; j < fParticles; j++)
             if (fMass[j] > 1 && fCharge[j] > 0)
             {
                 iA = fMass[j];
                 iZ = fCharge[j];
-                const Int_t pdg = GetIonPdgId(iZ, iA);
+                auto pdg = GetIonPdgId(iZ, iA);
                 if (ions.find(pdg) == ions.end())
                 {
-                    const Double_t mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
+                    auto mass = G4NistManager::Instance()->GetIsotopeMass(iZ, iA) / CLHEP::GeV;
                     R3BLOG(debug, "New ion " << iZ << "\t" << iA << "\t" << mass);
                     ions[pdg] = new FairIon(TString::Format("Ion_%d_%d", iA, iZ), iZ, iA, iZ, 0., mass);
                 }
@@ -220,20 +230,20 @@ void R3BINCLRootGenerator::RegisterIons()
     R3BLOG(info, ions.size() << " ions registered.");
 }
 
-void R3BINCLRootGenerator::SetXYZ(Double32_t x, Double32_t y, Double32_t z)
+void R3BINCLRootGenerator::SetXYZ(double x, double y, double z)
 {
     fX = x;
     fY = y;
     fZ = z;
-    fPointVtxIsSet = kTRUE;
+    fPointVtxIsSet = true;
 }
 
-void R3BINCLRootGenerator::SetDxDyDz(Double32_t sx, Double32_t sy, Double32_t sz)
+void R3BINCLRootGenerator::SetDxDyDz(double sx, double sy, double sz)
 {
     fDX = sx;
     fDY = sy;
     fDZ = sz;
-    fBoxVtxIsSet = kTRUE;
+    fBoxVtxIsSet = true;
 }
 
 ClassImp(R3BINCLRootGenerator)
