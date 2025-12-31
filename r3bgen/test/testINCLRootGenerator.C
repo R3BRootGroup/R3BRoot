@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2020 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2020-2026 Members of R3B Collaboration                     *
+ *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -14,10 +14,9 @@
 #include <TStopwatch.h>
 #include <TString.h>
 #include <TSystem.h>
-#include <iostream>
 #include <memory>
 
-void testR3BPhaseSpaceGeneratorIntegration(const int nbevents = 10)
+void testINCLRootGenerator(const int nbevents = 4)
 {
     // Timer
     TStopwatch timer;
@@ -34,47 +33,58 @@ void testR3BPhaseSpaceGeneratorIntegration(const int nbevents = 10)
     gSystem->Setenv("GEOMPATH", workDirectory + "/geometry");
     gSystem->Setenv("CONFIG_DIR", workDirectory + "/gconfig");
 
+    // Input file
+    const TString INCLinput = workDirectory + "/input/p_U238_500.root";
+
     // Output files
-    const TString simufile = "PhaseSpace.simu.root";
-    const TString parafile = "PhaseSpace.para.root";
+    const TString simufile = "incl.simu.root";
+    const TString parafile = "incl.para.root";
+
+    // Input GLAD geometry
+    const TString fGladGeo = "glad_v2025.1.geo.root";
 
     // Basic simulation setup
-    FairRunSim run;
-    run.SetName("TGeant4");
-    run.SetSink(std::make_unique<FairRootFileSink>(simufile.Data()));
-    run.SetMaterials("media_r3b.geo");
+    auto run = std::make_unique<FairRunSim>();
+    run->SetName("TGeant4");
+    run->SetStoreTraj(false);
+    run->SetMaterials("media_r3b.geo");
+
+    auto config = std::make_unique<FairGenericVMCConfig>();
+    run->SetSimulationConfig(std::move(config));
+    run->SetSink(std::make_unique<FairRootFileSink>(simufile.Data()));
 
     // -----   Runtime data base   --------------------------------------------
-    auto* rtdb = run.GetRuntimeDb();
+    auto* rtdb = run->GetRuntimeDb();
     UInt_t runId = 1;
     rtdb->initContainers(runId);
+
+    // Primary particle generator
+    auto inclGen = std::make_unique<R3BINCLRootGenerator>(INCLinput.Data());
+    inclGen->SetOnlyFission();
+    inclGen->SetOnlyfragments();
+    inclGen->SetRotationY(1.);         // deg
+    inclGen->SetXYZ(0., 0., -138.);    // cm
+    inclGen->SetDxDyDz(0.5, 0.5, 0.5); // cm
+
+    auto primGen = std::make_unique<FairPrimaryGenerator>();
+    primGen->AddGenerator(inclGen.release());
+    run->SetGenerator(primGen.release());
 
     // Geometry: Cave
     auto cave = std::make_unique<R3BCave>("CAVE");
     cave->SetGeometryFileName("r3b_cave_vacuum.geo");
-    run.AddModule(cave.release());
+    run->AddModule(cave.release());
 
-    // Magnet
-    auto GladField = new R3BGladFieldMap("R3BGladMap");
-    GladField->SetScale(-0.6);
-    run.SetField(GladField);
+    // Geometry: GLAD
+    run->AddModule(new R3BGladMagnet(fGladGeo.Data()));
 
-    // Primaries
-    auto primGen = std::make_unique<FairPrimaryGenerator>();
-    auto gen = new R3BPhaseSpaceGenerator();
-    gen->GetBeam().SetEnergyDistribution(R3BDistribution1D::Delta(600));
-    gen->SetErelDistribution(R3BDistribution1D::Delta(100));
-    gen->AddParticle(5, 17);
-    gen->AddNeutron();
-    gen->AddProton();
-    primGen->AddGenerator(gen);
-    run.SetGenerator(primGen.release());
+    // GLAD Filed
+    auto* GladField = new R3BGladFieldMap("R3BGladMap");
+    GladField->SetFieldfromCurrent(2600.); // Current in Amperes
+    run->SetField(GladField);
 
-    // Logging
-    run.SetStoreTraj(false);
-
-    // Init & Special MC Settings
-    run.Init();
+    // Init
+    run->Init();
 
     // Save field parameters
     auto* fieldPar = dynamic_cast<R3BFieldPar*>(rtdb->getContainer("R3BFieldPar"));
@@ -89,35 +99,8 @@ void testR3BPhaseSpaceGeneratorIntegration(const int nbevents = 10)
     rtdb->print();
 
     // Simulate
-    run.Run(nbevents);
-
-    // Report
-    auto file = TFile::Open("PhaseSpace.simu.root");
-    auto tree = (TTree*)file->Get("evt");
-    auto mctc = new TClonesArray("R3BMCTrack");
-    tree->SetBranchAddress("MCTrack", &mctc);
-
-    tree->GetEvent(0);
-    if (mctc->GetEntries() < 3)
-    {
-        std::cout << "Not enough particles produced" << std::endl;
-        return;
-    }
-
-    auto track = dynamic_cast<R3BMCTrack*>(mctc->At(1));
-    if (track->GetPdgCode() != 2112 || track->GetMotherId() != -1)
-    {
-        std::cout << "Not the correct primary particle" << std::endl;
-        return;
-    }
-
-    const auto ekin = track->GetEnergy() - track->GetMass();
-    std::cout << "Ekin of primary neutron:" << ekin << std::endl;
-    if (abs(ekin - 0.6) > 0.02)
-    {
-        std::cout << "Primary neutron doesn't have the correct energy!" << std::endl;
-        return;
-    }
+    if (nbevents > 0)
+        run->Run(nbevents);
 
     // Report
     timer.Stop();
