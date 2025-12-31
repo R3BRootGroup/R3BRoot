@@ -159,6 +159,20 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                     px = pt * TMath::Cos(fPhi[j] * TMath::DegToRad());
                     py = pt * TMath::Sin(fPhi[j] * TMath::DegToRad());
                 }
+
+                // Rotation according to the beam direction
+                if (fRotXBeam != 0 || fRotYBeam != 0)
+                {
+                    TVector3 ptotal(px, py, pz);
+                    auto rotx = fRotXBeam * TMath::DegToRad();
+                    auto roty = fRotYBeam * TMath::DegToRad();
+                    ptotal.RotateY(roty);
+                    ptotal.RotateX(rotx);
+                    px = ptotal.X();
+                    py = ptotal.Y();
+                    pz = ptotal.Z();
+                }
+
                 R3BLOG(debug, "PDG:Px:Py:Pz " << pdg << " " << px << " " << py << " " << pz);
                 if (fOnlyFragments)
                 {

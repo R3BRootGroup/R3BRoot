@@ -81,6 +81,12 @@ class R3BINCLRootGenerator : public FairGenerator
     void SetOnlyfragments(bool Opt = true) { fOnlyFragments = Opt; }
     void SetMinPdgCode(int Opt) { fPdgCodeMin = Opt; }
 
+    /**
+     **  Methods to rotate the particles according to the beam direction (deg)
+     **/
+    void SetRotationX(double rot) { fRotXBeam = rot; }
+    void SetRotationY(double rot) { fRotYBeam = rot; }
+
   private:
     TString fFileName; // Input file name
     TFile* fInput;
@@ -89,6 +95,8 @@ class R3BINCLRootGenerator : public FairGenerator
     bool fOnlySpallation = false; // True if we want to simulate only spallation events
     bool fOnlyFragments = false;  // True if we want to simulate only fragments
     int fPdgCodeMin = 1000050070; // Limit in Boro-7
+    double fRotXBeam = 0.;
+    double fRotYBeam = 0.;
 
     /** Private method RegisterIons. Goes through the input file and registers
      ** any ion needed. TODO: Should not be needed by FairRoot. **/
