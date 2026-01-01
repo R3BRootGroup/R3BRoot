@@ -25,7 +25,8 @@ set(SRCS
     R3BPassiveContFact.cxx
     R3BPipe.cxx
     R3BTarget.cxx
-    R3BCollimator.cxx)
+    R3BCollimator.cxx
+    R3BCaveFloor.cxx)
 
 set(HEADERS
     R3BCave.h
@@ -37,7 +38,8 @@ set(HEADERS
     R3BPassiveContFact.h
     R3BPipe.h
     R3BTarget.h
-    R3BCollimator.h)
+    R3BCollimator.h
+    R3BCaveFloor.h)
 
 add_library_with_dictionary(
     LIBNAME
