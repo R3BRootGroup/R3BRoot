@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2024 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2024-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -30,6 +30,9 @@ typedef struct EXT_STR_h101_MOSAIC202402_onion_t EXT_STR_h101_MOSAIC202402_onion
 struct EXT_STR_h101_MOSAIC202506_t;
 typedef struct EXT_STR_h101_MOSAIC202506_onion_t EXT_STR_h101_MOSAIC202506_onion;
 
+struct EXT_STR_h101_MOSAIC202507_t;
+typedef struct EXT_STR_h101_MOSAIC202507_onion_t EXT_STR_h101_MOSAIC202507_onion;
+
 class ext_data_struct_info;
 
 class R3BMosaicReader : public R3BReader
@@ -38,6 +41,7 @@ class R3BMosaicReader : public R3BReader
     // Standard constructor
     R3BMosaicReader(EXT_STR_h101_MOSAIC202402_onion*, size_t);
     R3BMosaicReader(EXT_STR_h101_MOSAIC202506_onion*, size_t);
+    R3BMosaicReader(EXT_STR_h101_MOSAIC202507_onion*, size_t);
 
     // Destructor
     virtual ~R3BMosaicReader();
@@ -67,19 +71,22 @@ class R3BMosaicReader : public R3BReader
     enum class UnpackerMosaicVersion : int
     {
         v202402 = 202402,
-        v202505 = 202505,
-        v202506 = 202506
+        v202506 = 202506,
+        v202507 = 202507
     };
-    // Read data from S091 setup
+    // Read data from S091, S118 and S111 setups
     auto R3BRead202402() -> bool;
     // Read data from G249 setup
     auto R3BRead202506() -> bool;
+    // Read data from Super-FRS setup
+    auto R3BRead202507() -> bool;
 
     // An event counter
     unsigned int fNEvent = 1;
     // Reader specific data structure from ucesb
     EXT_STR_h101_MOSAIC202402_onion* fData2402 = nullptr;
     EXT_STR_h101_MOSAIC202506_onion* fData2506 = nullptr;
+    EXT_STR_h101_MOSAIC202507_onion* fData2507 = nullptr;
     // Number of Mosaics
     int fNbMosaic = 1;
     // Data offset

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -58,7 +58,7 @@ class R3BAlpideCal2Hit : public FairTask
     InitStatus ReInit() override;
 
     // Method to setup online mode
-    inline void SetOnline(bool option = true) { fOnline = option; }
+    void SetOnline(bool option = true) { fOnline = option; }
 
     void SetAlgorithm(const std::string& algo) { fAlgorithm = algo; }
 

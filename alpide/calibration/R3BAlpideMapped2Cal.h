@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -54,16 +54,14 @@ class R3BAlpideMapped2Cal : public FairTask
     InitStatus ReInit() override;
 
     // Method to setup online mode
-    inline void SetOnline(bool option) { fOnline = option; }
+    void SetOnline(bool option = true) { fOnline = option; }
 
   private:
     void SetParameter();
-    int GetCol(int reg, int dcol, int ads);
-    int GetRow(int ads);
 
     bool fOnline = false; // Don't store data for online
 
-    R3BAlpideMappingPar* fMap_Par = nullptr;   /**< Parameter container. >*/
+    R3BAlpideMappingPar* fMap_Par = nullptr;   // Parameter container
     TClonesArray* fAlpideMappedData = nullptr; // Array with Alpide Mapped input data
     TClonesArray* fAlpideCalData = nullptr;    // Array with Alpide Cal output data
 
@@ -72,5 +70,5 @@ class R3BAlpideMapped2Cal : public FairTask
 
   public:
     // Class definition
-    ClassDefOverride(R3BAlpideMapped2Cal, 1)
+    ClassDefOverride(R3BAlpideMapped2Cal, 1); // NOLINT
 };

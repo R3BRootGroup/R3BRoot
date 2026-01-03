@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -134,22 +134,6 @@ void R3BAlpideMapped2Cal::Exec(Option_t*)
         //}
     }
     return;
-}
-
-// -----   Private method GetCol  -----------------------------------------------
-int R3BAlpideMapped2Cal::GetCol(int reg, int dcol, int ads)
-{
-    int col = reg * 32 + dcol * 2;
-    int lr = ((ads % 4) < 2 ? 1 : 0);
-    col += lr;
-    return col;
-}
-
-// -----   Private method GetRow  -----------------------------------------------
-int R3BAlpideMapped2Cal::GetRow(int ads)
-{
-    // This is OK for pixels within a group of 4
-    return ads / 2;
 }
 
 // -----   Public method Reset   ------------------------------------------------
