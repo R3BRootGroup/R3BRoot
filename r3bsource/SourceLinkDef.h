@@ -2,7 +2,7 @@
 
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -148,6 +148,7 @@
 #pragma link C++ class EXT_STR_h101_SYNC_CHECK_t;
 #pragma link C++ class EXT_STR_h101_MOSAIC202402_onion_t;
 #pragma link C++ class EXT_STR_h101_MOSAIC202506_onion_t;
+#pragma link C++ class EXT_STR_h101_MOSAIC202507_onion_t;
 #pragma link C++ class EXT_STR_h101_HMP_onion_t;
 #pragma link C++ class EXT_STR_h101_ACTAF2023_onion_t;
 #pragma link C++ class EXT_STR_h101_ACTAF2025_onion_t;

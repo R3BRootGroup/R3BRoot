@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -459,6 +459,68 @@ void R3BAlpideCal2Hit::FindClustersDefault()
                                localpos.Y());
                 }
     }
+    else if (fGeoversion == 202507)
+    {
+        for (size_t s = 0; s < fNbSensors; s++)
+            for (size_t i = 0; i < nHits; i++)
+                if (mult[s][i] > 0)
+                {
+                    nbcluster++;
+
+                    TVector3 localpos;
+                    localpos.SetXYZ(meancol[s][i] / double(mult[s][i]) * fPixelSize_ls,
+                                    meanrow[s][i] / double(mult[s][i]) * fPixelSize_ss,
+                                    0.0);
+
+                    TVector3 labpos;
+
+                    double Z_flex1 = 0.;
+
+                    double Z_flex2 = 7.;
+
+                    double Z_flex3 = 14.;
+
+                    // Mosaic-3
+                    if (s < 3)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * s, -localpos.Y(), Z_flex1);
+                    else if (s < 6)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 3), localpos.Y(), Z_flex1);
+                    // Mosaic-4
+                    else if (s < 9)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * s, -localpos.Y(), Z_flex1);
+                    else if (s < 12)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 3), localpos.Y(), Z_flex1);
+                    // Mosaic-5
+                    else if (s < 15)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * s, -localpos.Y(), Z_flex2);
+                    else if (s < 18)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 3), localpos.Y(), Z_flex2);
+                    // Mosaic-9
+                    else if (s < 21)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * s, -localpos.Y(), Z_flex2);
+                    else if (s < 24)
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 3), localpos.Y(), Z_flex2);
+                    // Mosaic-10
+                    else if (s < 27)
+                        labpos.SetXYZ(-45. + localpos.X() + 30. * s, -localpos.Y(), Z_flex3);
+                    else
+                        labpos.SetXYZ(45. - localpos.X() - 30. * (s - 3), localpos.Y(), Z_flex3);
+
+                    AddHitData(s + 1,
+                               mult[s][i],
+                               0,
+                               0,
+                               nullMajor,
+                               0,
+                               0,
+                               nullHu,
+                               labpos.X(),
+                               labpos.Y(),
+                               labpos.Z(),
+                               localpos.X(),
+                               localpos.Y());
+                }
+    }
 
     R3BLOG(debug, "Number of clusters: " << nbcluster);
     return;
@@ -467,21 +529,21 @@ void R3BAlpideCal2Hit::FindClustersDefault()
 // -----   Alternatvie methods: Flood fill  ---------------------------
 void R3BAlpideCal2Hit::FindClustersFloodFill()
 {
-    Int_t nHits = fAlpideCluster->GetEntriesFast();
+    auto nHits = fAlpideCluster->GetEntriesFast();
     if (nHits == 0)
         return;
 
-    std::map<Int_t, std::vector<std::pair<Int_t, Int_t>>> sensorPixels;
-    for (Int_t i = 0; i < nHits; i++)
+    std::map<int, std::vector<std::pair<int, int>>> sensorPixels;
+    for (auto i = 0; i < nHits; i++)
     {
         auto cluster = dynamic_cast<R3BAlpideCluster*>(fAlpideCluster->At(i));
-        Int_t sen = cluster->GetSensorId() - 1;
+        auto sen = cluster->GetSensorId() - 1;
         sensorPixels[sen].emplace_back(cluster->GetCol(), cluster->GetRow());
     }
 
     for (auto& sp : sensorPixels)
     {
-        Int_t senId = sp.first;
+        auto senId = sp.first;
         auto& pixels = sp.second;
 
         // Determine bounds with padding
@@ -493,8 +555,8 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
             minRow = std::min(minRow, p.second);
             maxRow = std::max(maxRow, p.second);
         }
-        Int_t nCols = maxCol - minCol + 3;
-        Int_t nRows = maxRow - minRow + 3;
+        auto nCols = maxCol - minCol + 3;
+        auto nRows = maxRow - minRow + 3;
 
         std::vector<std::vector<bool>> map(nCols, std::vector<bool>(nRows, false));
         std::vector<std::vector<bool>> visited(nCols, std::vector<bool>(nRows, false));
@@ -502,8 +564,8 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
             map[p.first - minCol + 1][p.second - minRow + 1] = true;
 
         // Flood-fill function
-        std::function<void(Int_t, Int_t, std::vector<std::pair<Int_t, Int_t>>&)> fill;
-        fill = [&](Int_t x, Int_t y, std::vector<std::pair<Int_t, Int_t>>& clusterPixels)
+        std::function<void(int, int, std::vector<std::pair<int, int>>&)> fill;
+        fill = [&](int x, int y, std::vector<std::pair<int, int>>& clusterPixels)
         {
             if (x < 0 || x >= nCols || y < 0 || y >= nRows)
                 return;
@@ -518,14 +580,14 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
         };
 
         // Process all pixels
-        for (Int_t x = 0; x < nCols; x++)
+        for (auto x = 0; x < nCols; x++)
         {
-            for (Int_t y = 0; y < nRows; y++)
+            for (auto y = 0; y < nRows; y++)
             {
                 if (!map[x][y] || visited[x][y])
                     continue;
 
-                std::vector<std::pair<Int_t, Int_t>> clusterPixels;
+                std::vector<std::pair<int, int>> clusterPixels;
                 fill(x, y, clusterPixels);
 
                 // ================== Hole Detection ==================
@@ -782,6 +844,29 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
                     else
                         labUnit.SetXYZ(+localUnit.X(), +localUnit.Y(), 0.0);
                 }
+                else if (fGeoversion == 202507)
+                {
+                    if (senId < 3)
+                        labUnit.SetXYZ(localUnit.X(), localUnit.Y(), 0.0);
+                    else if (senId < 6)
+                        labUnit.SetXYZ(-localUnit.X(), -localUnit.Y(), 0.0);
+                    else if (senId < 9)
+                        labUnit.SetXYZ(localUnit.X(), localUnit.Y(), 0.0);
+                    else if (senId < 12)
+                        labUnit.SetXYZ(-localUnit.X(), -localUnit.Y(), 0.0);
+                    else if (senId < 15)
+                        labUnit.SetXYZ(localUnit.X(), localUnit.Y(), 0.0);
+                    else if (senId < 18)
+                        labUnit.SetXYZ(-localUnit.X(), -localUnit.Y(), 0.0);
+                    else if (senId < 21)
+                        labUnit.SetXYZ(localUnit.X(), localUnit.Y(), 0.0);
+                    else if (senId < 24)
+                        labUnit.SetXYZ(-localUnit.X(), -localUnit.Y(), 0.0);
+                    else if (senId < 27)
+                        labUnit.SetXYZ(localUnit.X(), localUnit.Y(), 0.0);
+                    else
+                        labUnit.SetXYZ(-localUnit.X(), -localUnit.Y(), 0.0);
+                }
 
                 // Protect from NaN && Inf ->Set to non physical units where possible for later analysis.
                 if (!std::isfinite(localUnit.X()))
@@ -958,14 +1043,51 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
                 }
                 else if (fGeoversion == 202506)
                 {
+                    const double Z_alpide1 = -1732.88;
+                    const double Z_alpide2 = -1659.88;
+
+                    const double z1_off = -0.837843;
+                    const double z2_off = -2.69759;
+
+                    const double rx = 0.0225419;
+                    const double ry = 0.0137131;
+                    const double rz[12] = { 0.00595207, 0.00815014, 0.0102531, 0.00857714,  0.00909736, 0.0015223,
+                                            0.0133541,  0.00969408, 0.0134827, 0.000125173, 0.00982907, 0.021181 };
+
+                    array<TVector3, 12> pos_offset = {
+                        TVector3(0.231386, 0.18477, z1_off),      TVector3(0.03624, 0.0145723, z1_off),
+                        TVector3(-0.162212, -0.217339, z1_off),   TVector3(-0.157992, -0.31182, z1_off),
+                        TVector3(0.0596373, -0.07224198, z1_off), TVector3(0.2458, 0.131979, z1_off),
+                        TVector3(0.713162, 0.203712, z2_off),     TVector3(0.5620141, -0.18166828, z2_off),
+                        TVector3(0.316365, -0.445912, z2_off),    TVector3(0.323927, -0.298097, z2_off),
+                        TVector3(0.5504176, -0.2855743, z2_off),  TVector3(0.781553, -0.0369948, z2_off)
+                    };
+
+                    TRotation Rloc;
+                    Rloc.RotateZ(rz[senId]);
+                    TVector3 local_rot = Rloc * localpos;
+
                     if (senId < 3)
-                        labpos.SetXYZ(45. - localpos.X() - 30. * senId, -localpos.Y(), 0.);
+                        labpos.SetXYZ(45. - local_rot.X() - 30. * senId, -local_rot.Y(), Z_alpide1);
                     else if (senId < 6)
-                        labpos.SetXYZ(-45. + localpos.X() + 30. * (senId - 3), localpos.Y(), 0.);
+                        labpos.SetXYZ(-45. + local_rot.X() + 30. * (senId - 3), local_rot.Y(), Z_alpide1);
                     else if (senId < 9)
-                        labpos.SetXYZ(45. - localpos.X() - 30. * (senId - 6), -localpos.Y(), 73.);
+                        labpos.SetXYZ(45. - local_rot.X() - 30. * (senId - 6), -local_rot.Y(), Z_alpide2);
                     else
-                        labpos.SetXYZ(-45. + localpos.X() + 30. * (senId - 9), localpos.Y(), 73.);
+                        labpos.SetXYZ(-45. + local_rot.X() + 30. * (senId - 9), local_rot.Y(), Z_alpide2);
+
+                    TVector3 center;
+                    if (senId < 6)
+                        center.SetXYZ(0., 0., Z_alpide1);
+                    else
+                        center.SetXYZ(0., 0., Z_alpide2);
+
+                    TRotation R;
+                    R.RotateX(rx);
+                    R.RotateY(ry);
+
+                    labpos = R * (labpos - center) + center;
+                    labpos += pos_offset[senId];
                 }
 
                 if (std::isnan(elongation) || std::isinf(elongation))
