@@ -779,7 +779,7 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
 
                 // if (hasHole)
                 {
-                    R3BLOG(info,
+                    R3BLOG(debug,
                            "Cluster with hole(s): Sensor "
                                << senId + 1 << " Original size=" << clusterPixels.size()
                                << " Adjusted size=" << effectiveClusterSize << " Holes=" << holeCount
@@ -994,7 +994,7 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
                 double msTotalPerimeter = msOuterPerimeter + msHolePerimeter;
 
                 // ================== Compare Results ==================
-                R3BLOG(info,
+                R3BLOG(debug,
                        Form("Sensor %d: EdgeCount [outer=%.4f mm, hole=%.4f mm, total=%.4f mm] | "
                             "MarchSq [outer=%.4f mm, hole=%.4f mm, total=%.4f mm]",
                             senId + 1,
@@ -1096,7 +1096,7 @@ void R3BAlpideCal2Hit::FindClustersFloodFill()
                     holeCount = -1.0;
 
                 //  Need to now put in data.
-                R3BLOG(info,
+                R3BLOG(debug,
                        Form("Sensor %d: major_angle=%.5f rad, local_unit=(%.5f,%.5f,%.5f), lab_unit=(%.5f,%.5f,%.5f), "
                             "outerPerim=%.4f mm, holePerim=%.4f mm, totalPerim=%.4f mm",
                             senId + 1,

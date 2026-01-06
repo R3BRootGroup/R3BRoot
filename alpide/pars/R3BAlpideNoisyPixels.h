@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -49,18 +49,18 @@ class R3BAlpideNoisyPixels : public FairTask
     /** Method FinishTask **/
     void FinishTask() override;
 
-    void SetNbSensors(UInt_t n);
+    void SetNbSensors(int n);
 
     void SetThreshold(UInt_t th) { fThr = th; }
 
   private:
-    Int_t fNbSensors;
-    Int_t fThr;
-    std::vector<Int_t> fMap[DAlpideCols][DAlpideRows];
-    TClonesArray* fAlpideMappedData; // Array with Alpide Mapped input data
-    R3BAlpideMappingPar* fMap_Par;   /**< Parameter container. >*/
+    int fNbSensors = 1;
+    uint32_t fThr = 1000;
+    std::vector<int> fMap[DAlpideCols][DAlpideRows];
+    TClonesArray* fAlpideMappedData = nullptr; // Array with Alpide Mapped input data
+    R3BAlpideMappingPar* fMap_Par = nullptr;   // Parameter container
 
   public:
     // Class definition
-    ClassDefOverride(R3BAlpideNoisyPixels, 1)
+    ClassDefOverride(R3BAlpideNoisyPixels, 1); // NOLINT
 };

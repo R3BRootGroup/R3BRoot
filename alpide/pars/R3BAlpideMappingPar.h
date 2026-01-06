@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2024 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -21,6 +21,7 @@
 #include <FairParGenericSet.h>
 
 #include <Rtypes.h>
+#include <cstdint>
 #include <stdint.h>
 #include <vector>
 
@@ -41,40 +42,49 @@ class R3BAlpideMappingPar : public FairParGenericSet
     virtual ~R3BAlpideMappingPar();
 
     /** Method to reset all parameters **/
-    virtual void clear();
+    void clear() override;
 
     /** Method to store all parameters using FairRuntimeDB **/
-    virtual void putParams(FairParamList* list);
+    void putParams(FairParamList* list) override;
 
     /** Method to retrieve all parameters using FairRuntimeDB**/
-    Bool_t getParams(FairParamList* list);
+    Bool_t getParams(FairParamList* list) override;
 
     /** Method to print values of parameters to the standard output **/
-    virtual void print();
-    void printParams();
+    void print() override;
+    void printParams() override;
 
     /** Accessor functions **/
-    Int_t GetNbSensors() const { return fNbSensors; }
-    Int_t GetGeoVersion() const { return fGeoVersion; }
-    Int_t GetInUse(UInt_t sensor, UInt_t col, UInt_t row) const { return fIn_use[col - 1][row - 1][sensor - 1]; }
+    [[nodiscard]] int GetNbSensors() const { return fNbSensors; }
+    [[nodiscard]] int GetGeoVersion() const { return fGeoVersion; }
+    [[nodiscard]] int GetNbMaskPixel() const { return fNbMaskPixels; }
 
-    void SetNbSensors(Int_t n);
-    void SetGeoVersion(Int_t v) { fGeoVersion = v; }
-    void SetInUse(UInt_t sensor, UInt_t col, UInt_t row, Int_t val) { fIn_use[col - 1][row - 1][sensor - 1] = val; }
+    // [SENSOR][ROW][COL]
+    //    4      3    4  dígits
+    [[nodiscard]] uint32_t GetRow(uint64_t id) { return (id / 10'000) % 1'000; }
+    [[nodiscard]] uint32_t GetCol(uint64_t id) { return id % 10'000; }
+    [[nodiscard]] uint32_t GetSensorId(uint64_t id) { return id / 10'000'000; }
+    [[nodiscard]] uint64_t GetMaskPixel(int nbpixel) const { return fMask_sensors[nbpixel]; }
+
+    void SetNbSensors(int n) { fNbSensors = n; }
+    void SetGeoVersion(int v) { fGeoVersion = v; }
+    void SetMaskPixel(uint64_t maskid)
+    {
+        fMask_sensors.push_back(maskid);
+        fNbMaskPixels = fMask_sensors.size();
+    }
 
   private:
-    Int_t fNbSensors;
-    Int_t fGeoVersion;
-    Int_t fAlpideCols;
-    Int_t fAlpideRows;
-    std::vector<Int_t> fIn_use[DAlpideCols][DAlpideRows];
-
-    /** Method to fill all parameters using FairRuntimeDB **/
-    Bool_t fillParams(const Text_t* name, Int_t* values, FairParamList* list, const Int_t nValues = 1);
+    int fNbSensors = 363;
+    int fNbMaskPixels = 0;
+    int fGeoVersion = 2024;
+    int fAlpideCols = DAlpideCols;
+    int fAlpideRows = DAlpideRows;
+    std::vector<uint64_t> fMask_sensors;
 
     const R3BAlpideMappingPar& operator=(const R3BAlpideMappingPar&); /*< an assignment operator>*/
     R3BAlpideMappingPar(const R3BAlpideMappingPar&);                  /*< a copy constructor >*/
 
   public:
-    ClassDef(R3BAlpideMappingPar, 1);
+    ClassDefOverride(R3BAlpideMappingPar, 2); // NOLINT
 };

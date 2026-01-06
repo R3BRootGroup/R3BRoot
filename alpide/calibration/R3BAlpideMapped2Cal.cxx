@@ -70,6 +70,20 @@ void R3BAlpideMapped2Cal::SetParameter()
     //--- Parameter Container ---
     // R3BLOG(info, "Nb of sensors: " << fMap_Par->GetNbSensors());
     fMap_Par->printParams();
+
+    auto nSensors = fMap_Par->GetNbSensors();
+    auto nNbMaskPixels = fMap_Par->GetNbMaskPixel();
+
+    inUseCache.resize(nSensors, std::vector<std::vector<int>>(DAlpideCols, std::vector<int>(DAlpideRows, 1)));
+
+    for (auto pixel = 0; pixel < nNbMaskPixels; ++pixel)
+    {
+        auto pixelid = fMap_Par->GetMaskPixel(pixel);
+        auto sen = fMap_Par->GetSensorId(pixelid) - 1;
+        auto col = fMap_Par->GetCol(pixelid) - 1;
+        auto row = fMap_Par->GetRow(pixelid) - 1;
+        inUseCache[sen][col][row] = 0;
+    }
 }
 
 // -----   Public method Init   --------------------------------------------
@@ -115,23 +129,24 @@ void R3BAlpideMapped2Cal::Exec(Option_t*)
     Reset();
 
     // Reading the Input -- Mapped Data --
-    int nHits = fAlpideMappedData->GetEntriesFast();
-    if (nHits == 0)
+    if (fAlpideMappedData->GetEntriesFast() == 0)
     {
         return;
     }
 
-    for (int i = 0; i < nHits; i++)
+    for (auto* obj : *fAlpideMappedData)
     {
-        auto mappedData = dynamic_cast<R3BAlpideMappedData const*>(fAlpideMappedData->At(i));
-        auto det = mappedData->GetSensorId();
-        auto col = mappedData->GetCol();
-        auto row = mappedData->GetRow();
-        // std::cout << det <<" "<< col <<" "<< row <<std::endl;
-        // if (fMap_Par->GetInUse(det, col, row) == 1)
-        //{
-        AddCalData(det, row, col);
-        //}
+        if (auto const* mappedData = dynamic_cast<R3BAlpideMappedData const*>(obj))
+        {
+            auto sen = mappedData->GetSensorId();
+            auto col = mappedData->GetCol();
+            auto row = mappedData->GetRow();
+            // std::cout << det <<" "<< col <<" "<< row <<std::endl;
+            if (inUseCache[sen - 1][col - 1][row - 1] == 1)
+            {
+                AddCalData(sen, row, col);
+            }
+        }
     }
     return;
 }
@@ -151,7 +166,7 @@ R3BAlpideCalData* R3BAlpideMapped2Cal::AddCalData(uint16_t senId, uint16_t row, 
 {
     // It fills the R3BAlpideCalData
     TClonesArray& clref = *fAlpideCalData;
-    Int_t size = clref.GetEntriesFast();
+    auto size = clref.GetEntriesFast();
     return new (clref[size]) R3BAlpideCalData(senId, row, col);
 }
 
