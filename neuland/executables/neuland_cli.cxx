@@ -1,6 +1,5 @@
 #include "R3BException.h"
 #include "R3BNeulandAnalysisApp.h"
-#include "R3BNeulandAppOptionJson.h" // NOLINT
 #include "R3BNeulandBaseParCreator.h"
 #include "R3BNeulandCLIAbstract.h"
 #include "R3BNeulandSimApp.h"
@@ -9,6 +8,7 @@
 #include <cstdlib>
 #include <exception>
 #include <fairlogger/Logger.h>
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <memory>
 #ifdef HAS_MPI
@@ -32,7 +32,7 @@ auto main(int argc, char** argv) -> int
     {
         auto program_options = CLI::App{ "Neuland command line interface" };
 
-        auto instantiate_app = [&app, &program_options](std::size_t)
+        auto instantiate_app = [&app, &program_options](std::size_t) -> void
         {
             if (program_options.got_subcommand("sim"))
             {
@@ -88,7 +88,7 @@ auto main(int argc, char** argv) -> int
     catch (const std::exception& ex)
     {
         fmt::println("");
-        LOGP(error, "Exception ocurred: \n\n{}\n", ex.what());
+        LOGP(error, "Exception occurred: \n\n{}\n", ex.what());
 
         if (app == nullptr)
         {

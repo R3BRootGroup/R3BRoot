@@ -13,6 +13,7 @@ class CompressorRecipe(ConanFile):
         self.requires("magic_enum/0.9.7")  # type: ignore
         self.requires("cli11/2.5.0")  # type: ignore
         self.requires("re2/20240702")  # type: ignore
+        # self.requires("glaze/6.4.0") # type: ignore
 
     def generate(self):
         tc = CMakeToolchain(self)

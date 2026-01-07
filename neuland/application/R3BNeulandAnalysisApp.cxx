@@ -16,7 +16,6 @@
 #include <FairRunAna.h>
 #include <R3BEventHeader.h>
 #include <R3BNeulandAnalysisApp.h>
-#include <R3BNeulandAppOptionJson.h> // NOLINT
 #include <R3BNeulandClusterFinder.h>
 #include <R3BNeulandDigitizer.h>
 #include <R3BNeulandHitMon.h>
@@ -56,10 +55,12 @@ namespace R3B::Neuland
     void AnalysisApplication::setup_application_options(CLI::App& program_options)
     {
         const auto analysis_option_group = std::string{ "Analysis options" };
-        program_options.add_option("--paddle", options_.tasks.digi.paddle, R"(Set the paddle name. e.g. "neuland")")
+        program_options
+            .add_option("--paddle", options_.tasks.neuland_digitizer.paddle, R"(Set the paddle name. e.g. "neuland")")
             ->capture_default_str()
             ->group(analysis_option_group);
-        program_options.add_option("--channel", options_.tasks.digi.channel, R"(Set the channel name. e.g. "tamex")")
+        program_options
+            .add_option("--channel", options_.tasks.neuland_digitizer.channel, R"(Set the channel name. e.g. "tamex")")
             ->capture_default_str()
             ->group(analysis_option_group);
     }
@@ -75,13 +76,13 @@ namespace R3B::Neuland
 
         auto task_option = options_.tasks;
 
-        if (const auto& option = task_option.digi; option.enable)
+        if (const auto& option = task_option.neuland_digitizer; option.enable)
         {
             auto task = Digitizer::Create(option, run);
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.sim_cal_to_cal; option.enable)
+        if (const auto& option = task_option.neuland_sim_cal_to_cal; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 1, write_branch_names, 1);
             auto task = std::make_unique<R3B::Neuland::SimCal2Cal>(read_branch_names.at(0), write_branch_names.at(0));
@@ -89,7 +90,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.hit_monitor; option.enable)
+        if (const auto& option = task_option.neuland_hit_mon; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 1, write_branch_names, 0);
             auto task = std::make_unique<R3BNeulandHitMon>(read_branch_names.at(0));
@@ -97,7 +98,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.prim_inter_finder; option.enable)
+        if (const auto& option = task_option.neuland_primary_interaction_finder; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 3);
             auto task = std::make_unique<R3BNeulandPrimaryInteractionFinder>(read_branch_names.at(0),
@@ -109,7 +110,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.cluster_finder; option.enable)
+        if (const auto& option = task_option.neuland_cluster_finder; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 1, write_branch_names, 1);
             auto task = std::make_unique<R3BNeulandClusterFinder>(read_branch_names.at(0), write_branch_names.at(0));
@@ -117,7 +118,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.prim_cluster_finder; option.enable)
+        if (const auto& option = task_option.neuland_primary_cluster_finder; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 2);
             auto task = std::make_unique<R3BNeulandPrimaryClusterFinder>(
@@ -126,7 +127,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.multi_calorimeter_train; option.enable)
+        if (const auto& option = task_option.neuland_multi_calorimeter_train; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 3, write_branch_names, 0);
             auto task = std::make_unique<R3BNeulandMultiplicityCalorimetricTrain>(
@@ -150,7 +151,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.multi_bayes_train; option.enable)
+        if (const auto& option = task_option.neuland_multi_bayes_train; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 0);
             auto task =
@@ -159,7 +160,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.multi_bayes; option.enable)
+        if (const auto& option = task_option.neuland_multi_bayes; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 1, write_branch_names, 1);
             auto task =
@@ -168,7 +169,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.neutron_r_value; option.enable)
+        if (const auto& option = task_option.neuland_neutron_r_value; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
             auto task = std::make_unique<R3BNeulandNeutronsRValue>(
@@ -177,7 +178,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.map_data_converter_task; option.enable)
+        if (const auto& option = task_option.neuland_map_data_converter_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 2);
             auto task = std::make_unique<Calibration::MapDataConverterTask>(
@@ -186,7 +187,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.map_to_cal_par_task; option.enable)
+        if (const auto& option = task_option.neuland_map_to_cal_par_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 2);
             auto task = std::make_unique<R3B::Neuland::Map2CalParTask>(
@@ -195,7 +196,7 @@ namespace R3B::Neuland
             task->SetErrorMethod(option.error_method);
             run->AddTask(task.release());
         }
-        if (const auto& option = task_option.map_to_cal_task; option.enable)
+        if (const auto& option = task_option.neuland_map_to_cal_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 4, write_branch_names, 1);
             auto task = std::make_unique<R3B::Neuland::Map2CalTask>(read_branch_names.at(0),
@@ -225,7 +226,7 @@ namespace R3B::Neuland
             task->SetTrigger(1);
             run->AddTask(task.release());
         }
-        if (const auto& option = task_option.cal_to_hit_par_task; option.enable)
+        if (const auto& option = task_option.neuland_cal_to_hit_par_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
             auto task = std::make_unique<R3B::Neuland::Cal2HitParTask>(
@@ -251,7 +252,7 @@ namespace R3B::Neuland
             run->AddTask(task.release());
         }
 
-        if (const auto& option = task_option.cal_to_hit_task; option.enable)
+        if (const auto& option = task_option.neuland_cal_to_hit_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
             auto task = std::make_unique<R3B::Neuland::Cal2HitTask>(
@@ -260,7 +261,8 @@ namespace R3B::Neuland
             task->SetGlobalTimeOffset(option.global_time_offset);
             run->AddTask(task.release());
         }
-        if (const auto& option = task_option.cal_monitor_task; option.enable)
+
+        if (const auto& option = task_option.neuland_cal_monitor_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 1, write_branch_names, 0);
             auto task = std::make_unique<R3B::Neuland::CalMonitorTask>(read_branch_names.at(0));
@@ -271,18 +273,7 @@ namespace R3B::Neuland
 
     void AnalysisApplication::set_parameters() {}
 
-    void AnalysisApplication::print_json_options()
-    {
-        auto json_obj = ordered_json{ options_ };
-        if (json_obj.is_array())
-        {
-            fmt::print("{}\n", json_obj.front().dump(4));
-        }
-        else
-        {
-            fmt::print("{}\n", json_obj.dump(4));
-        }
-    }
+    void AnalysisApplication::print_json_options() { CLIApplication::print_json_options(options_); }
 
     void AnalysisApplication::dump_json_options(const std::string& filename)
     {

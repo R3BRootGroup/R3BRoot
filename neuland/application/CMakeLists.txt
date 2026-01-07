@@ -2,7 +2,6 @@ add_library(
     R3BNeulandApp SHARED
     R3BNeulandAnalysisApp.cxx
     R3BNeulandApp.cxx
-    R3BNeulandAppOptionJson.cxx
     R3BNeulandBaseParCreator.cxx
     R3BNeulandSimApp.cxx)
 
@@ -16,7 +15,6 @@ target_link_libraries(
     R3BNeulandApp
     PRIVATE magic_enum::magic_enum
     PUBLIC R3BNeulandDigitizing
-           nlohmann_json::nlohmann_json
            R3BNeulandReconstruction
            R3BLos
            R3BNeulandSimulation
@@ -25,4 +23,5 @@ target_link_libraries(
            ${Geant4VMC_LIBRARIES}
            R3BGen
            CLI11::CLI11
+           glaze::glaze
            re2::re2)

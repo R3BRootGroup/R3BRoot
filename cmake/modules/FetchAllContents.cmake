@@ -1,12 +1,23 @@
 include(FetchContent)
 
 if(FETCH_GTEST)
-    fetchcontent_declare(
+    FetchContent_Declare(
         googletest
-        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+        URL
+            https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
     )
-    fetchcontent_makeavailable(googletest)
+    FetchContent_MakeAvailable(googletest)
 endif()
+
+FetchContent_Declare(
+    glaze
+    GIT_REPOSITORY https://github.com/stephenberry/glaze.git
+    GIT_TAG main
+    GIT_SHALLOW TRUE
+)
+
+FetchContent_MakeAvailable(glaze)
+
 # # fetch CLI11
 
 # fetchcontent_declare(

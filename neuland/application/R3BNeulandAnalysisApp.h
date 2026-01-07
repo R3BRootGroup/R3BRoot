@@ -41,42 +41,42 @@ namespace R3B::Neuland
             CLIApplication::Options general;
             struct Tasks
             {
-                R3B::Neuland::DigiTaskOptions digi;
+                R3B::Neuland::DigiTaskOptions neuland_digitizer;
                 struct SimCal2Cal
                 {
                     bool enable = false;
                     std::string name = "NeulandSimCal2Cal";
                     std::string read = "NeulandSimCal";
                     std::string write = "NeulandCalData";
-                } sim_cal_to_cal;
+                } neuland_sim_cal_to_cal;
                 struct HitMon
                 {
                     bool enable = false;
                     std::string name = "NeulandHitMon";
                     std::string read = "NeulandHits";
                     std::string write;
-                } hit_monitor;
+                } neuland_hit_mon;
                 struct PrimInteractionFinder
                 {
                     bool enable = false;
                     std::string name = "NeulandPrimaryInteractionFinder";
                     std::string read = "NeulandPoints;NeulandHits";
                     std::string write = "NeulandPrimaryPoints;NeulandPrimaryHits;NeulandPrimaryTracks";
-                } prim_inter_finder;
+                } neuland_primary_interaction_finder;
                 struct ClusterFinder
                 {
                     std::string read = "NeulandHits";
                     std::string write = "NeulandClusters";
                     bool enable = false;
                     std::string name = "NeulandClusterFinder";
-                } cluster_finder;
+                } neuland_cluster_finder;
                 struct PrimClusterFinder
                 {
                     bool enable = false;
                     std::string name = "NeulandPrimaryClusterFinder";
                     std::string read = "NeulandPrimaryHits;NeulandClusters";
                     std::string write = "NeulandPrimaryClusters;NeulandSecondaryClusters";
-                } prim_cluster_finder;
+                } neuland_primary_cluster_finder;
                 struct MultiTrain
                 {
                     bool enable = false;
@@ -89,21 +89,21 @@ namespace R3B::Neuland
                     std::string name = "NeulandMultiplicityCalorimetricTrain";
                     std::string read = "NeulandClusters;NeulandPrimaryTracks;NeulandPrimaryHits";
                     std::string write;
-                } multi_calorimeter_train;
+                } neuland_multi_calorimeter_train;
                 struct MultiBayesTrain
                 {
                     bool enable = false;
                     std::string name = "NeulandMultiplicityBayesTrain";
                     std::string read = "NeulandClusters;NeulandPrimaryTracks";
                     std::string write;
-                } multi_bayes_train;
+                } neuland_multi_bayes_train;
                 struct MultiBayes
                 {
                     bool enable = false;
                     std::string name = "NeulandMultiplicityBayes";
                     std::string read = "NeulandClusters";
                     std::string write = "NeulandMultiplicity";
-                } multi_bayes;
+                } neuland_multi_bayes;
                 struct NeutronRValue
                 {
                     bool enable = false;
@@ -111,14 +111,14 @@ namespace R3B::Neuland
                     std::string name = "NeulandNeutronsRValue";
                     std::string read = "NeulandMultiplicity;NeulandClusters";
                     std::string write = "NeulandNeutrons";
-                } neutron_r_value;
+                } neuland_neutron_r_value;
                 struct MapDataConverterTask
                 {
                     bool enable = false;
-                    std::string name = "MapDataConverterTask";
+                    std::string name = "NeulandMapDataConverterTask";
                     std::string read = "NeulandMappedData;NeulandTrigMappedData";
                     std::string write = "NeulandMapData;NeulandTrigMapData";
-                } map_data_converter_task;
+                } neuland_map_data_converter_task;
                 struct Map2CalParTask
                 {
                     bool enable = false;
@@ -127,7 +127,7 @@ namespace R3B::Neuland
                     std::string name = "NeulandMap2CalParTask";
                     std::string read = "NeulandMapData;NeulandTrigMapData";
                     std::string write = "LandTCalPar;LandTrigTCalPar";
-                } map_to_cal_par_task;
+                } neuland_map_to_cal_par_task;
                 struct Map2CalTask
                 {
                     bool enable = false;
@@ -137,7 +137,7 @@ namespace R3B::Neuland
                     std::string name = "NeulandMap2CalTask";
                     std::string read = "NeulandMapData;NeulandTrigMapData;LandTCalPar;LandTrigTCalPar";
                     std::string write = "NeulandCalData";
-                } map_to_cal_task;
+                } neuland_map_to_cal_task;
                 struct Cal2HitParTask
                 {
                     bool enable = false;
@@ -148,7 +148,7 @@ namespace R3B::Neuland
                     std::string name = "NeulandCal2HitParTask";
                     std::string read = "NeulandCalData;NeulandCalibrationBasePar";
                     std::string write = "NeulandHitPar";
-                } cal_to_hit_par_task;
+                } neuland_cal_to_hit_par_task;
                 struct Cal2HitTask
                 {
                     bool enable = false;
@@ -157,7 +157,7 @@ namespace R3B::Neuland
                     std::string name = "NeulandCal2HitTask";
                     std::string read = "NeulandCalData;NeulandHitPar";
                     std::string write = "NeulandHit";
-                } cal_to_hit_task;
+                } neuland_cal_to_hit_task;
                 struct CalMonitorTask
                 {
                     bool enable = false;
@@ -165,7 +165,7 @@ namespace R3B::Neuland
                     std::string name = "NeulandCalMonitorTask";
                     std::string read = "NeulandCalData";
                     std::string write;
-                } cal_monitor_task;
+                } neuland_cal_monitor_task;
                 struct LosMap2CalParTask
                 {
                     bool enable = false;
@@ -192,8 +192,8 @@ namespace R3B::Neuland
 
         explicit AnalysisApplication();
 
-        void set_channel(std::string_view channel) { options_.tasks.digi.channel = channel; }
-        void set_paddle(std::string_view paddle) { options_.tasks.digi.paddle = paddle; }
+        void set_channel(std::string_view channel) { options_.tasks.neuland_digitizer.channel = channel; }
+        void set_paddle(std::string_view paddle) { options_.tasks.neuland_digitizer.paddle = paddle; }
 
       private:
         Options options_;

@@ -1,18 +1,26 @@
 #pragma once
 
+#include "JsonParse/SpecialParsing.h" // IWYU pragma: keep
+#include <R3BException.h>
 #include <R3BNeulandCLIAbstract.h>
 #include <TStopwatch.h>
 #include <algorithm>
 #include <cstdint>
+#include <fairlogger/Logger.h>
 #include <fmt/base.h>
 #include <fmt/core.h>
+#include <fmt/format.h>
 #include <fstream>
 #include <functional>
+#include <glaze/core/context.hpp>
+#include <glaze/core/istream_buffer.hpp>
+#include <glaze/core/opts.hpp>
+#include <glaze/core/ostream_buffer.hpp>
+#include <glaze/core/reflect.hpp>
+#include <glaze/json/write.hpp>
 #include <ios>
 #include <iterator>
 #include <memory>
-#include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -31,9 +39,9 @@ namespace R3B
     enum class WriteMode : uint8_t
     {
         NEW,
-        RECREATE,
-        UPDATE,
-        READ,
+        recreate,
+        update,
+        read,
     };
 
 }
@@ -49,7 +57,7 @@ namespace R3B::Neuland
         struct Options
         {
             int run_id = DEFAULT_RUN_ID;
-            int event_num = DEFAULT_EVENT_NUM;
+            int number_of_events = DEFAULT_EVENT_NUM;
             bool enable_mpi = false;
             std::string log_level = "error";
             std::string verbose_level = "user1";
@@ -65,7 +73,7 @@ namespace R3B::Neuland
                 std::string working_dir;
                 std::string data = "output.root";
                 std::string par = "output.par.root";
-                WriteMode mode = WriteMode::UPDATE;
+                WriteMode mode = WriteMode::update;
             } output;
         };
 
@@ -102,14 +110,14 @@ namespace R3B::Neuland
         {
             option_.get().output.par = outputpar_filename;
         }
-        void set_event_num(int val) { option_.get().event_num = val; }
+        void set_event_num(int val) { option_.get().number_of_events = val; }
         void set_input_filename(const std::vector<std::string>& input_filename)
         {
-            std::copy(input_filename.begin(), input_filename.end(), std::back_inserter(option_.get().input.data));
+            std::ranges::copy(input_filename, std::back_inserter(option_.get().input.data));
         }
         void set_tree_input_filename(const std::vector<std::string>& input_filename)
         {
-            std::copy(input_filename.begin(), input_filename.end(), std::back_inserter(option_.get().input.tree_data));
+            std::ranges::copy(input_filename, std::back_inserter(option_.get().input.tree_data));
         }
 
         // Getters:
@@ -162,52 +170,83 @@ namespace R3B::Neuland
         void add_inout_pars();
         void extract_input_files();
         static void setup_logger();
-        static void patch_files_or_strings(nlohmann::ordered_json& json_obj,
-                                           const std::vector<std::string>& filenames_or_options);
+
+        enum class JSONConfigInputType : uint8_t
+        {
+            native,
+            file,
+            string,
+            invalid
+        };
+        static auto check_json_input_type(std::string_view input) -> JSONConfigInputType;
+        static void transform_to_json_string(std::string_view input, std::string& buffer);
     };
 
     template <typename OptionType>
     void CLIApplication::print_json_options(const OptionType& options)
     {
-        using json = nlohmann::ordered_json;
-        auto json_obj = json{ options };
-        if (json_obj.is_array())
-        {
-            fmt::print("{}\n", json_obj.front().dump(4));
-        }
-        else
-        {
-            fmt::print("{}\n", json_obj.dump(4));
-        }
+        fmt::println("{}", glz::write<glz::opts{ .prettify = true }>(options).value_or("error occurred"));
     }
 
     template <typename OptionType>
     void CLIApplication::dump_json_options(const OptionType& options, const std::string& filename)
     {
-        using json = nlohmann::ordered_json;
+
         auto file = std::ofstream{ filename, std::ios::trunc };
-        auto json_obj = json{ options };
-        if (json_obj.is_array())
+        auto buffer = glz::basic_ostream_buffer<std::ofstream>{ file };
+        auto error = glz::write<glz::opts{ .prettify = true }>(options, buffer);
+
+        if (error)
         {
-            file << json_obj.front().dump(4);
+            fmt::println("Error occurred:{}", glz::format_error(error));
         }
         else
         {
-            file << json_obj.dump(4);
+            fmt::println("Configuration of {} is saved into the file {:?}", app_name_, filename);
         }
-        fmt::println("Configuration of {} is saved into the file {:?}", app_name_, filename);
     }
 
     template <typename OptionType>
     void CLIApplication::ParseApplicationOptionImp(const std::vector<std::string>& filenames_or_options,
                                                    OptionType& options)
     {
-        auto json_obj = [&options]()
+        auto buffer = std::string{};
+
+        for (const auto& filename_or_option : filenames_or_options)
         {
-            auto json_obj_tmp = nlohmann::ordered_json{ options };
-            return json_obj_tmp.is_array() ? json_obj_tmp.front() : json_obj_tmp;
-        }();
-        patch_files_or_strings(json_obj, filenames_or_options);
-        json_obj.get_to(options);
+            buffer.clear();
+            auto error_code = glz::error_ctx{};
+            switch (check_json_input_type(filename_or_option))
+            {
+                case JSONConfigInputType::native:
+                {
+                    buffer = filename_or_option;
+                    LOGP(info, "Reading the configuration from the native JSON string {:?}.", buffer);
+                    error_code = glz::read_json(options, buffer);
+                    break;
+                }
+                case JSONConfigInputType::string:
+                {
+                    transform_to_json_string(filename_or_option, buffer);
+                    LOGP(info, "Reading the configuration from the string {:?}.", buffer);
+                    error_code = glz::read_json(options, buffer);
+                    break;
+                }
+                case JSONConfigInputType::file:
+                {
+                    LOGP(info, "Reading the configuration from the JSON file {:?}.", filename_or_option);
+                    error_code = glz::read_file_json(options, filename_or_option, buffer);
+                    break;
+                }
+                case JSONConfigInputType::invalid:
+                    throw R3B::logic_error(fmt::format("Cannot parse the string {:?}", filename_or_option));
+            }
+            if (error_code)
+            {
+                throw R3B::logic_error(fmt::format("Failed to parse to the JSON object from {:?}:\n{}",
+                                                   filename_or_option,
+                                                   glz::format_error(error_code, buffer)));
+            }
+        }
     }
 } // namespace R3B::Neuland

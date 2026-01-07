@@ -6,7 +6,6 @@
 #include <FairRunSim.h>
 #include <G4RunManager.hh>
 #include <R3BFieldConst.h>
-#include <R3BNeulandAppOptionJson.h> // NOLINT
 #include <R3BNeulandGeneratorFactory.h>
 #include <TG4EventAction.h>
 #include <TGeoMatrix.h>

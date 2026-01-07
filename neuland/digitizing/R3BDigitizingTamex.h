@@ -21,7 +21,6 @@
  */
 
 #include "R3BDigitizingChannel.h"
-#include "R3BDigitizingPaddle.h"
 #include "R3BShared.h"
 #include "TRandom3.h"
 #include <R3BNeulandCalToHitPar.h>
