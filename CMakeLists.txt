@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2013 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2013-2026 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -14,7 +14,7 @@
 # The name of our project is “R3BROOT”.  CMakeLists files in this project can refer to the root
 # source directory of the project as ${R3BROOT_SOURCE_DIR} or as ${CMAKE_SOURCE_DIR} and to the root
 # binary directory of the project as ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}. This difference
-# is is important for the base classes which are in R3BROOT and PANDAROOT.
+# is important for the base classes which are in R3BROOT and PANDAROOT.
 
 if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
     message(FATAL_ERROR "In-source builds are not supported, please, create a folder build.")
@@ -24,7 +24,7 @@ endif()
 cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 # set cmake policies
-cmake_policy(VERSION 3.27...4.1)
+cmake_policy(VERSION 3.27...4.2)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
@@ -97,8 +97,7 @@ find_package2(PUBLIC FairRoot CONFIG REQUIRED)
 
 # FairRoot_VERSION is eventually set by find_package, for now let's set it explicitly
 execute_process(
-    COMMAND ${FAIRROOTPATH}/bin/fairroot-config --version
-    COMMAND sed "s/^v//"
+    COMMAND bash -c "${FAIRROOTPATH}/bin/fairroot-config --version | sed 's/^v//'"
     OUTPUT_VARIABLE FairRoot_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 if("${FairRoot_VERSION}" VERSION_LESS 18.2.1)
@@ -520,8 +519,8 @@ configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in
 
 r3b_generate_version_info()
 
-# Recurse into the given subdirectories.  This does not actually cause another cmake executable to
-# run.  The same process will walk through the project's entire directory structure.
+# Recurse into the given subdirectories. This does not actually cause another cmake executable to
+# run. The same process will walk through the project's entire directory structure.
 
 # FIXME in FairSoft / FairRoot
 find_package(VMC QUIET)

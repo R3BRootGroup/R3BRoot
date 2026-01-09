@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2026 Members of R3B Collaboration                     #
+#   Copyright (C) 2015 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2015-2026 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -302,3 +302,8 @@ add_library_with_dictionary(
     R3BData
     R3BActaf
     Ucesb)
+
+if("${FairRoot_VERSION}" VERSION_GREATER_EQUAL 19.0.0)
+    target_compile_definitions(R3BSource PUBLIC FAIRROOT_GE_19)
+endif()
+
