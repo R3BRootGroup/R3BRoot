@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2022-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2022-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,38 +17,6 @@
 
 #include "R3BAlpideHitData.h"
 #include <fmt/core.h>
-// Needed for TVector3 fmt
-template <>
-struct fmt::formatter<TVector3>
-{
-    constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const TVector3& vec, FormatContext& ctx)
-    {
-        return fmt::format_to(ctx.out(), "({}, {}, {})", vec.X(), vec.Y(), vec.Z());
-    }
-};
-// Needed for std::vector<double>
-template <>
-struct fmt::formatter<std::vector<double>>
-{
-    constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.begin(); }
-
-    template <typename FormatContext>
-    auto format(const std::vector<double>& v, FormatContext& ctx)
-    {
-        std::string s = "[";
-        for (size_t i = 0; i < v.size(); ++i)
-        {
-            s += fmt::format("{}", v[i]);
-            if (i + 1 < v.size())
-                s += ", ";
-        }
-        s += "]";
-        return fmt::format_to(ctx.out(), "{}", s);
-    }
-};
 R3BAlpideHitData::R3BAlpideHitData(uint16_t sensorId,
                                    uint16_t clustersize,
                                    uint16_t genus,
@@ -83,16 +51,14 @@ R3BAlpideHitData::R3BAlpideHitData(uint16_t sensorId,
 
 std::string R3BAlpideHitData::toString() const
 {
-    return fmt::format("SensorID: {}, ClusterSize: {},Genus: {},Elong: {},MajorUnit:{},HolePerimeter: "
-                       "{},TotalPerimeter:{},Hu:{}, Xpos: {}, Ypos: {}, Zpos: {}",
+    return fmt::format("SensorID: {}, ClusterSize: {},Genus: {},Elong: {},HolePerimeter: "
+                       "{},TotalPerimeter:{}, Xpos: {}, Ypos: {}, Zpos: {}",
                        GetSensorId(),
                        GetClusterSize(),
                        GetGenus(),
                        GetElong(),
-                       GetMajorUnit(),
                        GetHolePerimeter(),
                        GetTotalPerimeter(),
-                       GetHu(),
                        GetX(),
                        GetY(),
                        GetZ());

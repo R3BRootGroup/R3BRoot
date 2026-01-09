@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -135,5 +135,5 @@ class R3BFootVsAlpideOnlineSpectra : public FairTask
     Int_t fNbDet = 8; /**< Number of FOOT detectors. */
 
   public:
-    ClassDef(R3BFootVsAlpideOnlineSpectra, 1)
+    ClassDefOverride(R3BFootVsAlpideOnlineSpectra, 1)
 };

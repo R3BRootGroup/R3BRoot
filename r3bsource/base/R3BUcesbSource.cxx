@@ -72,8 +72,12 @@ Bool_t R3BUcesbSource::Init()
     }
     else
     {
+#ifdef FAIRROOT_GE_19
+        run->SetEventHeader(std::unique_ptr<R3BEventHeader>());
+#else
         eventHeader = new R3BEventHeader();
         run->SetEventHeader(eventHeader); // Implicit conversion and transfer ownership to FairRun
+#endif
         R3BLOG(warn, "EventHeader. has been created from R3BEventHeader");
     }
 
