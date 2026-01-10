@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2020 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2020-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BATIMA_H
-#define R3BATIMA_H
+#pragma once
 
 #include "Rtypes.h"
 
@@ -21,7 +20,6 @@
 
 namespace R3BAtima
 {
-
     struct MaterialCompound
     {
         MaterialCompound(const Double_t mass_u = 1, const Double_t charge_e = 1)
@@ -102,5 +100,3 @@ namespace R3BAtima
                                  Double_t tarThickness_mm);
 
 }; // namespace R3BAtima
-
-#endif
