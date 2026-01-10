@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2020 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2020-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -11,11 +11,10 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BATIMACACHE_H
-#define R3BATIMACACHE_H
+#pragma once
 
-#include "TGraph2D.h"
-#include "TString.h"
+#include <TGraph2D.h>
+#include <TString.h>
 
 #include "R3BAtima.h"
 
@@ -76,4 +75,3 @@ namespace R3BAtima
         mutable TGraph2D fG_InterpolatedTargetThickness;
     };
 } // namespace R3BAtima
-#endif

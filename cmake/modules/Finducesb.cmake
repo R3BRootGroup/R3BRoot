@@ -16,8 +16,8 @@
 # Check out the git repository and compile:                                    #
 #  git clone http://fy.chalmers.se/~f96hajo/ucesb/ucesb.git                    #
 #  cd ucesb                                                                    #
-#  make -j empty/empty								  #
-# Make sure to use the same ROOT version as for R3BROOT			  #
+#  make -j empty/empty							       #
+# Make sure to use the same ROOT version as for R3BROOT			       #
 # After installation export an environment variable UCESB_DIR                  #
 # which points to the 'unpacker' directory you have checked out.               #
 # More information: http://fy.chalmers.se/~f96hajo/ucesb/                      #
