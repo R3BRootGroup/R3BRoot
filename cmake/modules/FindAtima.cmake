@@ -15,7 +15,11 @@
 # FindAtima.cmake - Find module for CaTima / Atima using $ENV{ATIMAPATH}
 ################################################################################
 
-message(STATUS "Looking for Atima...")
+message(STATUS "Looking for ATIMA...")
+
+set(Atima_INCLUDE_DIR Atima_INCLUDE_DIR-NOTFOUND)
+set(Atima_LIBRARY Atima_LIBRARY-NOTFOUND)
+set(Atima_VERSION "")
 
 if(NOT DEFINED ENV{ATIMAPATH})
     message("    - Environment variable ATIMAPATH is not set.")
@@ -26,22 +30,30 @@ else()
         NAMES catima/catima.h
         HINTS ${CATIMA_ROOT}/include
         PATH_SUFFIXES catima
-        DOC "Path to CaTima include directory"
+        DOC "Path to ATIMA include directory"
     )
 
     find_library(Atima_LIBRARY_SHARED
         NAMES catima libcatima
         HINTS ${CATIMA_ROOT}/lib
-        DOC "Path to CaTima shared library"
+        DOC "Path to ATIMA shared library"
     )
 
     if(Atima_LIBRARY_SHARED)
         set(Atima_LIBRARY ${Atima_LIBRARY_SHARED})
     endif()
 
+    if(EXISTS "${CATIMA_ROOT}/share/catima/catimaConfigVersion.cmake")
+        include("${CATIMA_ROOT}/share/catima/catimaConfigVersion.cmake")
+        if(DEFINED PACKAGE_VERSION)
+            set(Atima_VERSION "${PACKAGE_VERSION}")
+        endif()
+    endif()
+
     include(FindPackageHandleStandardArgs)
-        find_package_handle_standard_args(Atima
+    find_package_handle_standard_args(Atima
         REQUIRED_VARS Atima_LIBRARY Atima_INCLUDE_DIR
+        VERSION_VAR Atima_VERSION
     )
 
     if(ATIMA_FOUND AND NOT TARGET Atima::Atima)
@@ -55,9 +67,11 @@ else()
 endif()
 
 message("    - ${Cyan}ATIMAPATH${CR} = ${BGreen}$ENV{ATIMAPATH}${CR}")
-message("    - ${Cyan}Atima_INCLUDE_DIR${CR} = ${BGreen}${Atima_INCLUDE_DIR}${CR}")
-message("    - ${Cyan}Atima_LIBRARY${CR} = ${BGreen}${Atima_LIBRARY}${CR}")
+message("    - ${Cyan}ATIMA_INCLUDE_DIR${CR} = ${BGreen}${Atima_INCLUDE_DIR}${CR}")
+message("    - ${Cyan}ATIMA_LIBRARY${CR} = ${BGreen}${Atima_LIBRARY}${CR}")
 
 if(ATIMA_FOUND)
-    add_definitions(-DWITH_ATIMA)
+  message(STATUS "${BGreen}ATIMA was FOUND${CR} (version ${Atima_VERSION})")
+else()
+  message(STATUS "${BYellow}Could not find package ATIMA${CR}")
 endif()

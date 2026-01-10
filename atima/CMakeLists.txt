@@ -13,12 +13,10 @@
 
 set(SRCS
 R3BAtima.cxx
-R3BAtimaCache.cxx
 )
 
 set(HEADERS
 R3BAtima.h
-R3BAtimaCache.h
 )
 
 add_library_with_dictionary(

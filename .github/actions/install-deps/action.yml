@@ -18,6 +18,8 @@ runs:
         path: |
           ${{ env.UCESB_DIR }}
           ${{ github.workspace }}/build/_deps
+          ${{ env.ATIMA_DIR }}
+          ${{ env.ATIMAPATH }}
         key: build-deps-${{ matrix.os }}
         restore-keys: |
           build-deps-${{ matrix.os }}
@@ -37,8 +39,12 @@ runs:
     - name: build ucesb
       if: steps.cache-ucesb.outputs.cache-hit == ''
       run: |
-        echo "ucesb directory is set as ${UCESB_DIR}"
+        echo "UCESB directory is set as ${UCESB_DIR}"
         export LD_LIBRARY_PATH="${SIMPATH}/lib/:${LD_LIBRARY_PATH}"
         git clone https://git.chalmers.se/expsubphys/ucesb.git ${UCESB_DIR}
         cd ${UCESB_DIR} && make -j${NUM_THREADS} empty/empty
+        echo "ATIMA directory is set as ${ATIMAPATH}"
+        git clone https://github.com/hrosiak/catima.git ${ATIMA_DIR}
+        cd ${ATIMA_DIR} && mkdir build && mkdir install && cd build 
+        cmake ../ -DCMAKE_INSTALL_PREFIX=../install/ && make -j${NUM_THREADS} && make install
       shell: bash

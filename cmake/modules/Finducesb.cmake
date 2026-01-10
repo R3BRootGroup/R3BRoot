@@ -1,6 +1,6 @@
 ################################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH      #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                       #
+#   Copyright (C) 2015 GSI Helmholtzzentrum für Schwerionenforschung GmbH      #
+#   Copyright (C) 2015-2026 Members of R3B Collaboration                       #
 #                                                                              #
 #             This software is distributed under the terms of the              #
 #                 GNU General Public Licence (GPL) version 3,                  #
@@ -23,7 +23,7 @@
 # More information: http://fy.chalmers.se/~f96hajo/ucesb/                      #
 ################################################################################
 
-message(STATUS "Looking for ucesb...")
+message(STATUS "Looking for UCESB...")
 
 set(ucesb_LIBRARY_SHARED ext_data_clnt)
 
@@ -78,10 +78,10 @@ endif(
     AND ucesb_LIBRARY_DIR)
 
 message("    - ${Cyan}UCESB_DIR${CR} = ${BGreen}$ENV{UCESB_DIR}${CR}")
-message("    - ${Cyan}ucesb_INCLUDE_DIR${CR} = ${BGreen}${ucesb_INCLUDE_DIR}${CR}")
-message("    - ${Cyan}ucesb_LIBRARY_SHARED${CR} = ${BGreen}${ucesb_LIBRARY_SHARED}${CR}")
-message("    - ${Cyan}ucesb_LIBRARY_STATIC${CR} = ${BGreen}${ucesb_LIBRARY_STATIC}${CR}")
-message("    - ${Cyan}ucesb_LIBRARY_DIR${CR} = ${BGreen}${ucesb_LIBRARY_DIR}${CR}")
+message("    - ${Cyan}UCESB_INCLUDE_DIR${CR} = ${BGreen}${ucesb_INCLUDE_DIR}${CR}")
+message("    - ${Cyan}UCESB_LIBRARY_SHARED${CR} = ${BGreen}${ucesb_LIBRARY_SHARED}${CR}")
+message("    - ${Cyan}UCESB_LIBRARY_STATIC${CR} = ${BGreen}${ucesb_LIBRARY_STATIC}${CR}")
+message("    - ${Cyan}UCESB_LIBRARY_DIR${CR} = ${BGreen}${ucesb_LIBRARY_DIR}${CR}")
 
 if(ucesb_FOUND)
     add_definitions(-DWITH_UCESB)
