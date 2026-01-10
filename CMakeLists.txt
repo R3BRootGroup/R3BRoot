@@ -457,6 +457,7 @@ else(EPICS_FOUND)
 endif(EPICS_FOUND)
 
 find_package(Atima)
+
 if(ATIMA_FOUND)
     set(atima_summary "${BGreen}YES${CR}       ${BMagenta}$ENV{ATIMAPATH}${CR}")
 else(ATIMA_FOUND)
