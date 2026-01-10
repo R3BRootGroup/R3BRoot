@@ -13,90 +13,100 @@
 
 #pragma once
 
-#include "Rtypes.h"
+#include "R3BAtima.h"
 
-#include <array>
-#include <vector>
+#include <Rtypes.h>
+#include <TObject.h>
+#include <catima/catima.h>
+#include <memory>
 
-namespace R3BAtima
+class R3BAtima : public TObject
 {
-    struct MaterialCompound
+  public:
+    /** Default constructor */
+    R3BAtima();
+
+    /** Destructor **/
+    ~R3BAtima() = default;
+
+    struct MaterialComponent
     {
-        MaterialCompound(const Double_t mass_u = 1, const Double_t charge_e = 1)
-            : Mass_u(mass_u)
-            , Charge_e(charge_e)
-            , Ratio(1.)
-        {
-        }
-        MaterialCompound(const Double_t mass_u, const Double_t charge_e, const Double_t ratio)
-            : Mass_u(mass_u)
-            , Charge_e(charge_e)
-            , Ratio(ratio)
-        {
-        }
-        MaterialCompound(const std::array<Double_t, 3>& arr)
-            : Mass_u(arr[0])
-            , Charge_e(arr[1])
-            , Ratio(arr[2])
-        {
-        }
-
-        bool operator==(const MaterialCompound& other) const
-        {
-            return (Mass_u == other.Mass_u && Charge_e == other.Charge_e && Ratio == other.Ratio);
-        }
-        bool operator!=(const MaterialCompound& other) const { return !(*this == other); }
-
-        Double_t Mass_u;
-        Double_t Charge_e;
-        Double_t Ratio;
+        int a;           // Mass number
+        int z;           // Atomic number
+        double fraction; // Stoichiometric fraction
     };
 
-    struct TargetMaterial
-    {
-        static const TargetMaterial Air;
-        static const TargetMaterial LH2;
-        static const TargetMaterial Si;
-        static const TargetMaterial BC400;
+    /**
+     * Setters for energy loss and range calculations
+     * @param kinE      Kinetic energy per nucleon
+     * @param thickness Thickness of the layer in g/cm2
+     */
+    const double GetdEdx(double kinE);
 
-        TargetMaterial(const std::vector<MaterialCompound>& compounds, const Double_t density, const Bool_t isGas)
-            : Compounds(compounds)
-            , Density(density)
-            , IsGas(isGas)
+    const double GetRange(double kinE);
+
+    const double GetEnergyLoss(double kinE, double thickness)
+    {
+        return (kinE - GetEnergy(kinE, thickness)) * fProjectile->A;
+    }
+
+    const double GetEnergy(double kinE, double thickness);
+
+    /**
+     * Setter of the catima projectile used for calculations
+     * @param a    Mass number of the projectile
+     * @param z    Charge number of the projectile
+     * @param kinE Kinetic energy per nucleon
+     * @param q    Charge state
+     */
+    void SetProjectile(double a, double z, double kinE = 0., double q = 0.)
+    {
+        fProjectile = std::make_unique<catima::Projectile>(a, z, q);
+        if (kinE > 0)
+            fProjectile->T = kinE;
+    }
+
+    /**
+     * Setter of the catima materials
+     * @param a    Mass number of the projectile
+     * @param z    Charge number of the projectile
+     * @param kinE Kinetic energy per nucleon
+     * @param q    Charge state
+     */
+    void SetMaterial(const std::vector<MaterialComponent>& components,
+                     const double density_g_cm3,
+                     const double thickness_g_cm2,
+                     const double ionization_eV = 0.)
+    {
+        auto material = std::make_unique<catima::Material>();
+
+        for (const auto& c : components)
         {
+            material->add_element(c.a, c.z, c.fraction);
         }
 
-        std::vector<MaterialCompound> Compounds;
-        Double_t Density;
-        Bool_t IsGas;
-    };
+        if (density_g_cm3 > 0)
+        {
+            material->density(density_g_cm3);
+        }
 
-    struct TransportResult
-    {
-        Double_t EnergyIn_MeV_per_u;
-        Double_t EnergyOut_MeV_per_u;
-        Double_t ELoss_MeV_per_u;
-        Double_t EStrag_MeV_per_u;
-        Double_t AngStrag_mRad;
-        Double_t Range_mg_per_cm2;
-        Double_t RangeStrag_mg_per_cm2;
-        Double_t RemainingRange_mg_per_cm2;
-        Double_t dEdXIn_MeVcm2_per_mg;
-        Double_t dEdXOut_MeVcm2_per_mg;
-        Double_t ToF_ns;
-        Double_t InterpolatedTargetThickness;
-    };
+        if (thickness_g_cm2 > 0)
+        {
+            material->thickness(thickness_g_cm2);
+        }
 
-    TransportResult Calculate(Double_t projMass_u,
-                              Double_t projCharge_e,
-                              Double_t projEnergy_MeV_per_u,
-                              const TargetMaterial& targetMaterial,
-                              Double_t tarThickness_mg_per_cm2);
+        if (ionization_eV > 0.)
+        {
+            material->I(ionization_eV);
+        }
 
-    TransportResult Calculate_mm(Double_t projMass_u,
-                                 Double_t projCharge_e,
-                                 Double_t projEnergy_per_u,
-                                 const TargetMaterial& targetMaterial,
-                                 Double_t tarThickness_mm);
+        fMaterial = std::move(material);
+    }
 
-}; // namespace R3BAtima
+  private:
+    std::unique_ptr<catima::Material> fMaterial{ nullptr };
+    std::unique_ptr<catima::Projectile> fProjectile{ nullptr };
+
+  public:
+    ClassDefOverride(R3BAtima, 0);
+};

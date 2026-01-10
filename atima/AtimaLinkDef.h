@@ -19,8 +19,6 @@
 #pragma link off all classes;
 #pragma link off all functions;
 
-#pragma link C++ class R3BAtima::Cache+;
-#pragma link C++ class R3BAtima::TargetMaterial+;
-#pragma link C++ class R3BAtima::MaterialCompound+;
+#pragma link C++ class R3BAtima+;
 
 #endif

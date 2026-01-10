@@ -18,6 +18,15 @@ runs:
           ${{ github.workspace }}/build/_deps
         key: build-deps-${{ matrix.os }}
 
+    - name: cache atima
+      id: cache-atima
+      uses: actions/cache/save@v5
+      with:
+        path: |
+          ${{ env.ATIMA_DIR }}
+          ${{ env.ATIMAPATH }}
+        key: atima-${{ matrix.os }}
+
     - name: cache r3b
       if: matrix.save != 'false'
       id: cache-r3b
