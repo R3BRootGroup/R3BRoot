@@ -12,42 +12,102 @@
  ******************************************************************************/
 
 #include "R3BAtima.h"
-#include "R3BAtimaCache.h"
-#include "gtest/gtest.h"
+
+#include <cmath>
+#include <gtest/gtest.h>
 #include <map>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 namespace
 {
-    constexpr auto ELOSS_Prot100 = 1.085;
-
     TEST(testR3BAtima, basicCalculation)
     {
-        // Eloss of 100 MeV Protons in 1cm LH2
-        const auto eloss = R3BAtima::Calculate_mm(1., 1., 100., R3BAtima::TargetMaterial::LH2, 10).ELoss_MeV_per_u;
+        // Create the vector with the gas components for H2.
+        std::vector<std::tuple<int, int, int>> components;
+        components.push_back({ 1, 1, 2 }); // (A, Z, stoichiometry)
 
-        EXPECT_NEAR(eloss, ELOSS_Prot100, 0.01);
-    }
+        // Calculate the gas density for 600Torr H2 from LISE.
+        double density = 6.5643e-5; // g/cm3
 
-    TEST(testR3BAtima, cacheCalculation)
-    {
-        const auto cache = R3BAtima::Cache(1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 });
-        EXPECT_GT(cache(100., 18.).ELoss_MeV_per_u, ELOSS_Prot100);
-        EXPECT_LT(cache(107., 10.).ELoss_MeV_per_u, ELOSS_Prot100);
-    }
+        // Create the CATIMA ELoss model.
+        R3B::Atima catimaModel(density, components);
 
-    TEST(testR3BAtima, writeReadCache)
-    {
+        // Set the projectile to proton.
+        catimaModel.SetProjectile(1, 1, 1.007825031898); // (A, Z, massUMA)
+
+        // Calculate ranges for different energies with LISE.
+        std::vector<std::pair<double, double>> kinEnergyRange; // (MeV, mm)
+        kinEnergyRange.push_back(std::make_pair(1, 1.33e2));
+        kinEnergyRange.push_back(std::make_pair(5, 2.2381e3));
+        kinEnergyRange.push_back(std::make_pair(10, 7.8883e3));
+
+        // Compare with the results from this class.
+        for (auto pair : kinEnergyRange)
         {
-            // create cache file
-            const auto cache1 = R3BAtima::Cache(
-                1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 }, "test.atima");
-        }
-        // read cache file
-        const auto cache1 =
-            R3BAtima::Cache(1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 }, "test.atima");
-        // calculate without cache file
-        const auto cache2 = R3BAtima::Cache(1., 1., { 100., 200., 10 }, R3BAtima::TargetMaterial::LH2, { 10., 50., 4 });
-        EXPECT_EQ(cache1(100., 20.).ELoss_MeV_per_u, cache2(100., 20.).ELoss_MeV_per_u);
-    }
+            double energy = pair.first;
+            double rangeLISE = pair.second;
 
+            double range = catimaModel.GetRange(energy);
+            EXPECT_TRUE(std::abs(range - rangeLISE) / rangeLISE < 0.05);
+        }
+
+        // Calculate ELosses for different distances using LISE at 10MeV initial energy.
+        std::vector<std::pair<double, double>> distanceELoss; // (mm, MeV)
+        distanceELoss.push_back(std::make_pair(100, 0.0694));
+        distanceELoss.push_back(std::make_pair(1000, 0.7138));
+        distanceELoss.push_back(std::make_pair(5000, 4.2409));
+
+        // Compare with the results from this class.
+        for (auto pair : distanceELoss)
+        {
+            double distance = pair.first;
+            double ELossLISE = pair.second;
+
+            double ELoss = catimaModel.GetEnergyLoss(10, distance);
+            EXPECT_TRUE(std::abs(ELoss - ELossLISE) / ELossLISE < 0.05);
+        }
+
+        // Do the same for 4He projectile.
+        catimaModel.SetProjectile(4, 2, 4.00260325413); // (A, Z, massUMA)
+
+        std::vector<std::pair<double, double>> kinEnergyRange4He; // (MeV, mm)
+        kinEnergyRange4He.push_back(std::make_pair(1, 2.5742e1));
+        kinEnergyRange4He.push_back(std::make_pair(5, 2.0547e2));
+        kinEnergyRange4He.push_back(std::make_pair(10, 6.5724e2));
+
+        // Compare with the results from this class.
+        for (auto pair : kinEnergyRange4He)
+        {
+            double energy = pair.first;
+            double rangeLISE = pair.second;
+
+            double range = catimaModel.GetRange(energy);
+            EXPECT_TRUE(std::abs(range - rangeLISE) / rangeLISE < 0.05);
+        }
+
+        // Calculate ELosses for different distances using LISE at 10MeV initial energy.
+        std::vector<std::pair<double, double>> distanceELoss4He; // (mm, MeV)
+        distanceELoss4He.push_back(std::make_pair(100, 0.9121));
+        distanceELoss4He.push_back(std::make_pair(500, 5.7726));
+        distanceELoss4He.push_back(std::make_pair(1000, 10));
+
+        // Compare with the results from this class.
+        for (auto pair : distanceELoss4He)
+        {
+            double distance = pair.first;
+            double ELossLISE = pair.second;
+
+            double ELoss = catimaModel.GetEnergyLoss(10, distance);
+            EXPECT_TRUE(std::abs(ELoss - ELossLISE) / ELossLISE < 0.05);
+        }
+
+        // Finally, for 4He, we test if GetRange works when setting a non-zero final energy.
+        double energyIni{ 10 };
+        double energyFin{ 4.227 };
+        double rangeLISE{ 500 };
+        double range = catimaModel.GetRange(energyIni, energyFin);
+        EXPECT_TRUE(std::abs(range - rangeLISE) / rangeLISE < 0.05);
+    }
 } // namespace

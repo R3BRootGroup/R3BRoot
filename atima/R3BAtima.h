@@ -14,89 +14,62 @@
 #pragma once
 
 #include "Rtypes.h"
+#include <TObject.h>
 
-#include <array>
+#include "R3BAtima.h"
+
+#include <catima/catima.h>
+#include <memory>
+#include <tuple>
 #include <vector>
 
-namespace R3BAtima
+namespace R3B
 {
-    struct MaterialCompound
+    class Atima : public TObject
     {
-        MaterialCompound(const Double_t mass_u = 1, const Double_t charge_e = 1)
-            : Mass_u(mass_u)
-            , Charge_e(charge_e)
-            , Ratio(1.)
-        {
-        }
-        MaterialCompound(const Double_t mass_u, const Double_t charge_e, const Double_t ratio)
-            : Mass_u(mass_u)
-            , Charge_e(charge_e)
-            , Ratio(ratio)
-        {
-        }
-        MaterialCompound(const std::array<Double_t, 3>& arr)
-            : Mass_u(arr[0])
-            , Charge_e(arr[1])
-            , Ratio(arr[2])
-        {
-        }
+      protected:
+        std::unique_ptr<catima::Material> fMaterial{ nullptr };
+        std::unique_ptr<catima::Projectile> fProjectile{ nullptr };
 
-        bool operator==(const MaterialCompound& other) const
-        {
-            return (Mass_u == other.Mass_u && Charge_e == other.Charge_e && Ratio == other.Ratio);
-        }
-        bool operator!=(const MaterialCompound& other) const { return !(*this == other); }
+        double fProjectileMassUma{ -1 };
 
-        Double_t Mass_u;
-        Double_t Charge_e;
-        Double_t Ratio;
+        double fRangeStepSize{ 0.1 }; // mm
+
+      public:
+        /**
+         * Initializer of the CATIMA ELossModel wrapper.
+         * @param[in] density Density of the material.
+         * @param[in] materialComponents Components of the material. They are passed as a vector of tuples (A, Z,
+         * stoichiometry).
+         */
+        Atima(double density, std::vector<std::tuple<int, int, int>> materialComponents);
+
+        double fDensity = 0.;
+
+        virtual double GetdEdx(double energy) const;
+        virtual double GetRange(double energyIni, double energyFin = 0) const;
+        virtual double GetEnergyLoss(double energyIni, double distance) const
+        {
+            return energyIni - GetEnergy(energyIni, distance);
+        }
+        virtual double GetEnergy(double energyIni, double distance) const;
+
+        /**
+         * Setter of the catima projectile used for calculations.
+         * @param[in] A Mass number of the projectile.
+         * @param[in] Z Charge number of the projectile.
+         * @param[in] massUma Mass of the projectile in umas.
+         */
+        void SetProjectile(double A, double Z, double massUma)
+        {
+            fProjectile = std::make_unique<catima::Projectile>(A, Z);
+            fProjectileMassUma = massUma;
+        }
+        /**
+         * Setter of the range step size used for calculations. By default it is set to 0.1mm.
+         * @param[in] stepSize The step size used for ranges. It must be input in mm.
+         */
+        void SetRangeStepSize(double stepSize) { fRangeStepSize = stepSize; }
     };
 
-    struct TargetMaterial
-    {
-        static const TargetMaterial Air;
-        static const TargetMaterial LH2;
-        static const TargetMaterial Si;
-        static const TargetMaterial BC400;
-
-        TargetMaterial(const std::vector<MaterialCompound>& compounds, const Double_t density, const Bool_t isGas)
-            : Compounds(compounds)
-            , Density(density)
-            , IsGas(isGas)
-        {
-        }
-
-        std::vector<MaterialCompound> Compounds;
-        Double_t Density;
-        Bool_t IsGas;
-    };
-
-    struct TransportResult
-    {
-        Double_t EnergyIn_MeV_per_u;
-        Double_t EnergyOut_MeV_per_u;
-        Double_t ELoss_MeV_per_u;
-        Double_t EStrag_MeV_per_u;
-        Double_t AngStrag_mRad;
-        Double_t Range_mg_per_cm2;
-        Double_t RangeStrag_mg_per_cm2;
-        Double_t RemainingRange_mg_per_cm2;
-        Double_t dEdXIn_MeVcm2_per_mg;
-        Double_t dEdXOut_MeVcm2_per_mg;
-        Double_t ToF_ns;
-        Double_t InterpolatedTargetThickness;
-    };
-
-    TransportResult Calculate(Double_t projMass_u,
-                              Double_t projCharge_e,
-                              Double_t projEnergy_MeV_per_u,
-                              const TargetMaterial& targetMaterial,
-                              Double_t tarThickness_mg_per_cm2);
-
-    TransportResult Calculate_mm(Double_t projMass_u,
-                                 Double_t projCharge_e,
-                                 Double_t projEnergy_per_u,
-                                 const TargetMaterial& targetMaterial,
-                                 Double_t tarThickness_mm);
-
-}; // namespace R3BAtima
+}; // namespace R3B

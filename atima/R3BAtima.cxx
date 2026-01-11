@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2020 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2020-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,113 +13,100 @@
 
 #include "R3BAtima.h"
 
-#include <numeric>
+#include <FairLogger.h>
 
-extern "C"
+R3B::Atima::Atima(double density, std::vector<std::tuple<int, int, int>> materialComponents)
 {
-    void calculate_(double* proj,
-                    int* pn,
-                    double* ein,
-                    double* targ,
-                    int* nnuca,
-                    int* tm,
-                    double* rhoa,
-                    int* igasa,
-                    double* thick,
-                    double* eout,
-                    double* range,
-                    double* dedxi,
-                    double* dedxo,
-                    double* remra,
-                    double* rstr,
-                    double* estr,
-                    double* astr,
-                    double* tof,
-                    double* intrthick);
+    fMaterial = std::make_unique<catima::Material>();
+
+    for (auto materialComponent : materialComponents)
+        fMaterial->add_element(
+            std::get<0>(materialComponent), std::get<1>(materialComponent), std::get<2>(materialComponent));
 }
 
-namespace R3BAtima
+double R3B::Atima::GetdEdx(double energy) const
 {
-
-    const TargetMaterial TargetMaterial::Air = TargetMaterial({ MaterialCompound(14, 7, 0.755267),
-                                                                MaterialCompound(16, 8, 0.231781),
-                                                                MaterialCompound(39.948, 18, 0.012827),
-                                                                MaterialCompound(12, 6, 0.000124) },
-                                                              0.0012,
-                                                              kTRUE);
-    const TargetMaterial TargetMaterial::LH2 = TargetMaterial({ MaterialCompound(1, 1) }, 0.0708, kFALSE);
-    const TargetMaterial TargetMaterial::Si = TargetMaterial({ MaterialCompound(28, 14) }, 2.336, kFALSE);
-    const TargetMaterial TargetMaterial::BC400 =
-        TargetMaterial({ MaterialCompound(1, 1, 0.085292), MaterialCompound(12, 6, 0.914708) }, 1.032, kFALSE);
-
-    TransportResult Calculate(Double_t projMass_u,
-                              Double_t projCharge_e,
-                              Double_t projEnergy_MeV_per_u,
-                              const TargetMaterial& targetMaterial,
-                              Double_t tarThickness_mg_per_cm2)
+    if (fProjectile == nullptr)
     {
-        TransportResult res;
+        LOG(warning)
+            << " Warning in AtTools::AtELossCATIMA::GetdEdx : The projectile was not set! GetdEdx will return 0!";
+        return 0;
+    }
 
-        const auto invTotRatio = std::accumulate(targetMaterial.Compounds.begin(),
-                                                 targetMaterial.Compounds.end(),
-                                                 0.,
-                                                 [](const Double_t sum, const MaterialCompound& comp) -> Double_t
-                                                 { return sum + comp.Ratio; });
+    if (fProjectileMassUma <= 0)
+    {
+        LOG(error) << " Error in AtTools::AtELossCATIMA::GetdEdx : The projectile's mass in umas can not be <= 0! "
+                      "GetdEdx will return 0!";
+        return 0;
+    }
 
-        Int_t tcompsize = 3, tcompnum = targetMaterial.Compounds.size(), pn = 2;
-        std::vector<Double_t> tarFortran;
-        tarFortran.resize(tcompnum * tcompsize);
-        for (int i = 0; i < tcompnum; ++i)
+    catima::Result result = catima::calculate(*fProjectile, *fMaterial, energy / fProjectileMassUma);
+    double dEdx = result.dEdxi * fDensity;
+    return dEdx;
+}
+
+double R3B::Atima::GetRange(double energyIni, double energyFin) const
+{
+    if (energyFin < 0)
+    {
+        LOG(warning) << " Warning in AtTools::AtELossCATIMA::GetRange : The final energy was set to a negative value! "
+                        "Setting energyFin to 0!";
+        energyFin = 0;
+    }
+
+    if (energyFin == 0)
+    {
+        fProjectile->T = energyIni / fProjectileMassUma;
+        return catima::range(*fProjectile, *fMaterial) / fDensity * 10.;
+    }
+
+    double remainingEnergy{ energyIni };
+    double range{ 0 };
+    while (remainingEnergy > energyFin)
+    {
+        catima::Result result = catima::calculate(*fProjectile, *fMaterial, remainingEnergy / fProjectileMassUma);
+        double dEdx = result.dEdxi * fDensity;
+        double DE = dEdx * fRangeStepSize / 10.;
+
+        if (remainingEnergy - energyFin > DE)
         {
-            tarFortran[i + tcompnum * 0] = targetMaterial.Compounds[i].Mass_u;
-            tarFortran[i + tcompnum * 1] = targetMaterial.Compounds[i].Charge_e;
-            tarFortran[i + tcompnum * 2] = targetMaterial.Compounds[i].Ratio * invTotRatio;
+            range += fRangeStepSize;
+            remainingEnergy -= DE;
         }
-
-        Double_t proj[2] = { projMass_u, projCharge_e };
-        Double_t density = targetMaterial.Density;
-        Int_t tGas = 0;
-        if (targetMaterial.IsGas)
-            tGas = 1;
-
-        calculate_(proj,
-                   &pn,
-                   &projEnergy_MeV_per_u,
-                   &tarFortran[0],
-                   &tcompnum,
-                   &tcompsize,
-                   &density,
-                   &tGas,
-                   &tarThickness_mg_per_cm2,
-                   &res.EnergyOut_MeV_per_u,
-                   &res.Range_mg_per_cm2,
-                   &res.dEdXIn_MeVcm2_per_mg,
-                   &res.dEdXOut_MeVcm2_per_mg,
-                   &res.RemainingRange_mg_per_cm2,
-                   &res.RangeStrag_mg_per_cm2,
-                   &res.EStrag_MeV_per_u,
-                   &res.AngStrag_mRad,
-                   &res.ToF_ns,
-                   &res.InterpolatedTargetThickness);
-
-        res.EnergyIn_MeV_per_u = projEnergy_MeV_per_u;
-        res.EStrag_MeV_per_u *= res.dEdXOut_MeVcm2_per_mg;
-        res.ELoss_MeV_per_u = res.EnergyIn_MeV_per_u - res.EnergyOut_MeV_per_u;
-        res.AngStrag_mRad *= 1e3;
-        res.dEdXIn_MeVcm2_per_mg *= projMass_u;
-        res.dEdXOut_MeVcm2_per_mg *= projMass_u;
-        return res;
+        else
+        {
+            range += (remainingEnergy - energyFin) / dEdx * 10.;
+            remainingEnergy = energyFin;
+            break;
+        }
     }
-    TransportResult Calculate_mm(Double_t projMass_u,
-                                 Double_t projCharge_e,
-                                 Double_t projEnergy_MeV_per_u,
-                                 const TargetMaterial& targetMaterial,
-                                 Double_t tarThickness_mm)
+    return range;
+}
+
+double R3B::Atima::GetEnergy(double energyIni, double distance) const
+{
+    double remainingEnergy{ energyIni };
+    double range{ 0 };
+    while (range < distance)
     {
-        return Calculate(projMass_u,
-                         projCharge_e,
-                         projEnergy_MeV_per_u,
-                         targetMaterial,
-                         targetMaterial.Density * tarThickness_mm * 100);
+        catima::Result result = catima::calculate(*fProjectile, *fMaterial, remainingEnergy / fProjectileMassUma);
+        double dEdx = result.dEdxi * fDensity;
+        double DE{};
+
+        if (range + fRangeStepSize < distance)
+        {
+            DE = dEdx * fRangeStepSize / 10.;
+            range += fRangeStepSize;
+            remainingEnergy -= DE;
+        }
+        else
+        {
+            DE = dEdx * (distance - range) / 10.;
+            range = distance;
+            remainingEnergy -= DE;
+            break;
+        }
     }
-} // namespace R3BAtima
+
+    return remainingEnergy;
+}

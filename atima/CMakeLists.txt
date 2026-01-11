@@ -13,12 +13,10 @@
 
 set(SRCS
 R3BAtima.cxx
-R3BAtimaCache.cxx
 )
 
 set(HEADERS
 R3BAtima.h
-R3BAtimaCache.h
 )
 
 add_library_with_dictionary(
@@ -35,4 +33,6 @@ add_library_with_dictionary(
     DEPENDENCIES
     Atima::Atima R3BBase)
 
-add_subdirectory(test)
+#target_link_libraries(R3BAtima PUBLIC gfortran)
+
+#add_subdirectory(test)
