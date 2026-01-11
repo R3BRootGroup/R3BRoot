@@ -61,7 +61,7 @@ else()
         set_target_properties(Atima::Atima PROPERTIES
            IMPORTED_LOCATION "${Atima_LIBRARY}"
            INTERFACE_INCLUDE_DIRECTORIES "${Atima_INCLUDE_DIR}"
-           INTERFACE_LINK_LIBRARIES Fortran
+           INTERFACE_LINK_LIBRARIES gfortran
         )
     endif()
 endif()
