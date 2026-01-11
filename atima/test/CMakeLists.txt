@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2020 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2020-2026 Members of R3B Collaboration                     #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -11,7 +11,14 @@
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
 
-#cmake_minimum_required(VERSION 3.0)
+if(GTEST_FOUND)
+    add_executable(
+        testR3BAtima
+        testR3BAtima.cxx)
+    target_link_libraries(testR3BAtima PRIVATE GTest::gtest_main GTest::gmock_main
+                                                   R3BAtima)
+    gtest_discover_tests(testR3BAtima DISCOVERY_TIMEOUT "100")
+endif(GTEST_FOUND)
 
 #enable_testing()
 #set(PROJECT_TEST_NAME AtimaUnitTests)

@@ -17,6 +17,10 @@
 
 message(STATUS "Looking for ATIMA...")
 
+set(Atima_INCLUDE_DIR Atima_INCLUDE_DIR-NOTFOUND)
+set(Atima_LIBRARY Atima_LIBRARY-NOTFOUND)
+set(Atima_VERSION "")
+
 if(NOT DEFINED ENV{ATIMAPATH})
     message("    - Environment variable ATIMAPATH is not set.")
 else()
@@ -38,8 +42,7 @@ else()
     if(Atima_LIBRARY_SHARED)
         set(Atima_LIBRARY ${Atima_LIBRARY_SHARED})
     endif()
-    
-    set(Atima_VERSION "")
+
     if(EXISTS "${CATIMA_ROOT}/share/catima/catimaConfigVersion.cmake")
         include("${CATIMA_ROOT}/share/catima/catimaConfigVersion.cmake")
         if(DEFINED PACKAGE_VERSION)
