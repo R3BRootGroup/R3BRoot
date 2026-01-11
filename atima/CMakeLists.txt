@@ -33,6 +33,4 @@ add_library_with_dictionary(
     DEPENDENCIES
     Atima::Atima R3BBase)
 
-#target_link_libraries(R3BAtima PUBLIC gfortran)
-
-#add_subdirectory(test)
+add_subdirectory(test)
