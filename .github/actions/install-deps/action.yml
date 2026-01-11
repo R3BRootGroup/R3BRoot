@@ -37,8 +37,14 @@ runs:
     - name: build ucesb
       if: steps.cache-ucesb.outputs.cache-hit == ''
       run: |
-        echo "ucesb directory is set as ${UCESB_DIR}"
+        echo "UCESB directory is set as ${UCESB_DIR}"
         export LD_LIBRARY_PATH="${SIMPATH}/lib/:${LD_LIBRARY_PATH}"
         git clone https://git.chalmers.se/expsubphys/ucesb.git ${UCESB_DIR}
         cd ${UCESB_DIR} && make -j${NUM_THREADS} empty/empty
+        echo "ATIMA directory is set as ${ATIMAPATH}"
+        git clone https://github.com/hrosiak/catima.git ${ATIMAPATH}
+        cd ${ATIMAPATH} && mkdir build && mkdir install && cd build 
+        cmake ../ -DCMAKE_INSTALL_PREFIX=../install/ && make -j${NUM_THREADS} && make install
+        export ATIMAPATH="${ATIMAPATH}/install"
+        echo "ATIMA install directory is set as ${ATIMAPATH}"
       shell: bash

@@ -8,6 +8,7 @@ runs:
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
         echo "UCESB_DIR=$GITHUB_WORKSPACE/ucesb/" >> $GITHUB_ENV
+        echo "ATIMAPATH=$GITHUB_WORKSPACE/catima/" >> $GITHUB_ENV
         if [ "${{ matrix.cpp }}" == "20" ]; then
           export SIMPATH=${CVMDIR}/${{ matrix.os }}/fairsoft/cpp20/${{ matrix.fsv }}
           echo "SIMPATH=${SIMPATH}" >> $GITHUB_ENV
@@ -49,5 +50,6 @@ runs:
         mkdir -p ${CVMDIR}
         mount -t cvmfs fairsoft.gsi.de ${CVMDIR}
         mkdir -p ${UCESB_DIR}
+        mkdir -p ${ATIMAPATH}
         mkdir -p ${CCACHE_DIR}
       shell: bash
