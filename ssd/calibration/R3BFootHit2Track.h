@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -78,6 +78,8 @@ class R3BFootHit2Track : public FairTask
     void PrepareMinimizer(); // reset and set limits for the minimizer
     bool RunMinimizer();     // execute minimzation
 
+    void SetVFTXNumber(int nb) { vftxNumber = nb; };
+
     R3BTrackingParticle* AddTrack(const R3BTrackingParticle& p);
     void Transform_Point(TString flag, TVector3& hit_point, TVector3* offset, TVector3* rotation);
     bool FitParticle(R3BTrackingParticle& part, TrackDirection direction); // flag = "in" or "out"
@@ -141,6 +143,9 @@ class R3BFootHit2Track : public FairTask
     TrackDirection fInOutFlag;
     R3BEventHeader* fHeader = nullptr;
 
-  public:
-    ClassDefOverride(R3BFootHit2Track, 1);
+  private:
+    // Select the VFTX
+    int vftxNumber = 2;
+
+    ClassDefOverride(R3BFootHit2Track, 2);
 };

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -13,8 +13,7 @@
 
 // Created on 16/09/2025 by V.Panin
 
-#ifndef R3BTRACKINGG249
-#define R3BTRACKINGG249
+#pragma once
 
 #include "FairTask.h"
 #include "R3BEventHeader.h"
@@ -73,6 +72,9 @@ class R3BTrackingG249 : public FairTask
     void SetAnglesFib32(double x, double y, double z) { f32_angles.SetXYZ(x, y, z); } // rad
     void SetAnglesFib33(double x, double y, double z) { f33_angles.SetXYZ(x, y, z); } // rad
     void SetAnglesTofd(double x, double y, double z) { tofd_angles.SetXYZ(x, y, z); } // rad
+
+    // Setter for the VFTX number
+    void SetVFTXNumber(int nb) { vftxNumber = nb; }
 
     // Get lab positions and angles (needed by alignment function)
     inline TVector3 GetPositionLOS() { return los_position; }   // cm
@@ -187,6 +189,8 @@ class R3BTrackingG249 : public FairTask
     std::unique_ptr<ROOT::Math::Minimizer> minimizer;
 
   private:
+    int vftxNumber = 2;
+
     //-- Input hit data from the TClonesArray
     // do not change the order, add new det in the end
     enum DetectorInstances
@@ -291,8 +295,5 @@ class R3BTrackingG249 : public FairTask
 
     TH2F* h2_lab_XZ;
 
-  public:
-    ClassDefOverride(R3BTrackingG249, 1)
+    ClassDefOverride(R3BTrackingG249, 2)
 };
-
-#endif
