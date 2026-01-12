@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -165,8 +165,10 @@ void R3BFootHit2Track::Exec(Option_t* /*option*/)
     for (auto j = 0; j < nFrsHits; ++j)
     {
         auto frs_item = dynamic_cast<R3BFrsData*>(fFrsData->At(j));
-        if (frs_item->GetStaId() != 2)
+
+        if (frs_item->GetStaId() != vftxNumber)
             continue; // 2 - new VFTX with 10ps resolution
+
         frsZ = frs_item->GetZ();
         frsAoQ = frs_item->GetAq();
     }
