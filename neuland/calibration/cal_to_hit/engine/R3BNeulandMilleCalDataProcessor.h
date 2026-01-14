@@ -52,7 +52,7 @@ namespace R3B::Neuland::Calibration
         ClassDefNV(MilleCalData, 1);
     };
 
-    struct MilleFitPar
+    struct TrackFitPar
     {
         double offset = 0.;
         double slope = 0.;
@@ -60,7 +60,7 @@ namespace R3B::Neuland::Calibration
 
         static constexpr auto diff_threshold = 0.1; //!< 10% difference
 
-        auto operator!=(const MilleFitPar& other) const
+        auto operator!=(const TrackFitPar& other) const
         {
             return (std::abs(other.offset - offset) / offset > diff_threshold) or
                    (std::abs(other.slope - slope) / slope > diff_threshold);
@@ -71,62 +71,63 @@ namespace R3B::Neuland::Calibration
             slope = 0.;
             p_value = 0.;
         }
-        ClassDefNV(MilleFitPar, 1);
+        ClassDefNV(TrackFitPar, 1);
     };
 
-    struct MilleFitResult
+    struct TrackFitResult
     {
-        MilleFitPar x_z;
-        MilleFitPar y_z;
+        TrackFitPar x_z;
+        TrackFitPar y_z;
         void clear()
         {
             x_z.clear();
             y_z.clear();
         }
-        ClassDefNV(MilleFitResult, 1);
+        ClassDefNV(TrackFitResult, 1);
     };
 
-    struct MilleTrackInfo
+    struct NeulandTrackInfo
     {
-        MilleFitResult time_data;
-        MilleFitResult bar_disp_data;
+        TrackFitResult time_data;
+        TrackFitResult bar_disp_data;
         void clear()
         {
             time_data.clear();
             bar_disp_data.clear();
         }
-        ClassDefNV(MilleTrackInfo, 1);
+        ClassDefNV(NeulandTrackInfo, 1);
+    };
+
+    struct NeulandTrackDataSet
+    {
+        std::vector<double> z_vals;
+        std::vector<double> z_errs;
+        std::vector<double> vals;
+        std::vector<double> errs;
+
+        void clear()
+        {
+            z_vals.clear();
+            z_errs.clear();
+            vals.clear();
+            errs.clear();
+        }
+        [[nodiscard]] auto size() const { return z_vals.size(); }
     };
 
     class MilleDataProcessor
     {
       public:
-        using FitPar = MilleFitPar;
-        using FitResult = MilleFitResult;
-        using TrackInfo = MilleTrackInfo;
-        struct FitDataSet
-        {
-            std::vector<double> z_vals;
-            std::vector<double> z_errs;
-            std::vector<double> vals;
-            std::vector<double> errs;
-
-            void clear()
-            {
-                z_vals.clear();
-                z_errs.clear();
-                vals.clear();
-                errs.clear();
-            }
-            [[nodiscard]] auto size() const { return z_vals.size(); }
-        };
+        using FitPar = TrackFitPar;
+        using FitResult = TrackFitResult;
+        using TrackInfo = NeulandTrackInfo;
 
         struct TrackFitDataSet
         {
-            FitDataSet bar_x_z;
-            FitDataSet bar_y_z;
-            FitDataSet time_data_x_z;
-            FitDataSet time_data_y_z;
+            NeulandTrackDataSet bar_x_z;
+            NeulandTrackDataSet bar_y_z;
+            NeulandTrackDataSet time_data_x_z;
+            NeulandTrackDataSet time_data_y_z;
 
             void clear()
             {
@@ -167,6 +168,10 @@ namespace R3B::Neuland::Calibration
         [[nodiscard]] auto get_track_fit_data() const -> const auto& { return track_fit_data_; }
         // [[nodiscard]] auto calculate_residual(double val, int module_num) const -> float;
 
+        static auto linear_fit(const NeulandTrackDataSet& data,
+                               FitPar& fit_par,
+                               HuberRegressor& huber_regressor,
+                               double p_value_cut) -> bool;
       private:
         double p_value_cut_ = DEFAULT_CALIBRATION_P_VALUE_CUT;
 
@@ -189,7 +194,6 @@ namespace R3B::Neuland::Calibration
         void fill_time_dataset();
         void reset_fit_pars();
         auto fit_planes(const Cal2HitPar& hit_par) -> bool;
-        auto linear_fit(const FitDataSet& data, FitPar& fit_par) -> bool;
         void check_fit_result();
         void set_data_buffers(DataBufferType& data_buffers,
                               const TrackInfo& track_info,
@@ -243,13 +247,12 @@ class fmt::formatter<R3B::Neuland::Calibration::MilleDataProcessor::FitResult>
 };
 
 template <>
-class fmt::formatter<R3B::Neuland::Calibration::MilleDataProcessor::FitDataSet>
+class fmt::formatter<R3B::Neuland::Calibration::NeulandTrackDataSet>
 {
   public:
     static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
     template <typename FmtContent>
-    constexpr auto format(const R3B::Neuland::Calibration::MilleDataProcessor::FitDataSet& fit_data,
-                          FmtContent& ctn) const
+    constexpr auto format(const R3B::Neuland::Calibration::NeulandTrackDataSet& fit_data, FmtContent& ctn) const
     {
         return fmt::format_to(ctn.out(),
                               "\tx = np.array({})\n"

@@ -4,6 +4,7 @@
 #include "R3BFTCalEngine.h"
 #include "R3BNeulandApp.h"
 #include "R3BNeulandDigitizer.h"
+#include "R3BNeulandHitCosmicMonitorTask.h"
 #include "R3BNeulandMillepede.h"
 #include "R3BNeulandTriggerTypes.h"
 #include <R3BNeulandCalToHitParTask.h>
@@ -156,7 +157,7 @@ namespace R3B::Neuland
                     double global_time_offset = 0.;
                     std::string name = "NeulandCal2HitTask";
                     std::string read = "NeulandCalData;NeulandHitPar";
-                    std::string write = "NeulandHit";
+                    std::string write = "NeulandHits";
                 } neuland_cal_to_hit_task;
                 struct CalMonitorTask
                 {
@@ -166,6 +167,7 @@ namespace R3B::Neuland
                     std::string read = "NeulandCalData";
                     std::string write;
                 } neuland_cal_monitor_task;
+                Calibration::CosmicMonitorTaskConfig neuland_cosmic_monitor_task;
                 struct LosMap2CalParTask
                 {
                     bool enable = false;

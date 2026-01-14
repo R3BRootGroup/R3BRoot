@@ -39,15 +39,17 @@ def th1d_to_df(histogram):
         for idx, name in zip(
             range(0, nbinsx), histogram.GetXaxis().GetLabels()
         ):
-            x_data.append(name)
+            x_data.append(str(name))
             y_data.append(histogram.GetBinContent(idx + 1))
-    else:
-        x_data = np.zeros(nbinsx)
-        y_data = np.zeros(nbinsx)
+        return pd.DataFrame(
+            {"x": pd.Series(x_data, dtype="string"), "y": y_data}
+        )
+    x_data = np.zeros(nbinsx)
+    y_data = np.zeros(nbinsx)
 
-        for index, bin_n in enumerate(range(bin_xmin, bin_xmax + 1)):
-            x_data[index] = histogram.GetBinCenter(bin_n)
-            y_data[index] = histogram.GetBinContent(bin_n)
+    for index, bin_n in enumerate(range(bin_xmin, bin_xmax + 1)):
+        x_data[index] = histogram.GetBinCenter(bin_n)
+        y_data[index] = histogram.GetBinContent(bin_n)
 
     return pd.DataFrame({"x": x_data, "y": y_data})
 
@@ -87,14 +89,21 @@ class PlotHist:
             )
 
     @staticmethod
-    def plot_th1(hist_obj, axis):
+    def plot_th1(hist_obj, axis, **kwargs):
         data_df = th1d_to_df(hist_obj)
 
         if bool(hist_obj.GetXaxis().GetLabels()):
-            sns.barplot(data=data_df, x="x", y="y", ax=axis)
+            sns.barplot(data=data_df, x="y", y="x", ax=axis, **kwargs)
+            axis.set(xlabel=hist_obj.GetYaxis().GetTitle())
+            axis.set(ylabel=hist_obj.GetXaxis().GetTitle())
         else:
             sns.lineplot(
-                data=data_df, x="x", y="y", drawstyle="steps-mid", ax=axis
+                data=data_df,
+                x="x",
+                y="y",
+                drawstyle="steps-mid",
+                ax=axis,
+                **kwargs,
             )
             x_bin_width = hist_obj.GetXaxis().GetBinWidth(0)
             x_bin_min = hist_obj.GetXaxis().GetXmin()
@@ -102,21 +111,31 @@ class PlotHist:
             axis.set(
                 xlim=(x_bin_min + x_bin_width / 2, x_bin_max - x_bin_width / 2)
             )
-        axis.set(xlabel=hist_obj.GetXaxis().GetTitle())
-        axis.set(ylabel=hist_obj.GetYaxis().GetTitle())
+            axis.set(xlabel=hist_obj.GetXaxis().GetTitle())
+            axis.set(ylabel=hist_obj.GetYaxis().GetTitle())
         axis.set(title=hist_obj.GetTitle())
 
     @staticmethod
-    def plot_th1s(hist_objs, axis):
+    def plot_th1s(hist_objs, axis, **kwargs):
         data_dfs = []
-        for hist in hist_objs:
+        for key, hist in hist_objs.items():
             data_df = th1d_to_df(hist)
-            data_df["label"] = hist.GetTitle()
+            data_df["label"] = key
             data_dfs.append(data_df)
         total_data_df = pd.concat(data_dfs)
 
-        if bool(hist_objs[0].GetXaxis().GetLabels()):
-            sns.barplot(data=total_data_df, x="x", y="y", ax=axis, hue="label")
+        first_hist = list(hist_objs.values())[0]
+        if bool(first_hist.GetXaxis().GetLabels()):
+            sns.barplot(
+                data=total_data_df,
+                x="y",
+                y="x",
+                ax=axis,
+                hue="label",
+                **kwargs,
+            )
+            axis.set(xlabel=first_hist.GetYaxis().GetTitle())
+            axis.set(ylabel=first_hist.GetXaxis().GetTitle())
         else:
             sns.lineplot(
                 data=total_data_df,
@@ -126,14 +145,14 @@ class PlotHist:
                 ax=axis,
                 hue="label",
             )
-            x_bin_width = hist_objs[0].GetXaxis().GetBinWidth(0)
-            x_bin_min = hist_objs[0].GetXaxis().GetXmin()
-            x_bin_max = hist_objs[0].GetXaxis().GetXmax()
+            x_bin_width = first_hist.GetXaxis().GetBinWidth(0)
+            x_bin_min = first_hist.GetXaxis().GetXmin()
+            x_bin_max = first_hist.GetXaxis().GetXmax()
             axis.set(
                 xlim=(x_bin_min + x_bin_width / 2, x_bin_max - x_bin_width / 2)
             )
-        axis.set(xlabel=hist_objs[0].GetXaxis().GetTitle())
-        axis.set(ylabel=hist_objs[0].GetYaxis().GetTitle())
+            axis.set(xlabel=first_hist.GetXaxis().GetTitle())
+            axis.set(ylabel=first_hist.GetYaxis().GetTitle())
         # axis.set(title=hist_obj.GetTitle())
 
     @staticmethod
@@ -144,7 +163,7 @@ class PlotHist:
         axis.set(xlabel=hist_obj.GetXaxis().GetTitle())
         axis.set(ylabel=hist_obj.GetYaxis().GetTitle())
         axis.set(title=hist_obj.GetTitle())
-        return axis.imshow(
+        plot = axis.imshow(
             z_data,
             extent=[
                 min(x_data) - x_bin_width / 2,
@@ -155,3 +174,5 @@ class PlotHist:
             origin="lower",
             aspect="auto",
         )
+        plot.set(cmap="gnuplot2_r")
+        return plot

@@ -84,7 +84,7 @@ namespace R3B::Neuland
             hist_trig_check_->Fill(fmt::format("{:016b}", eventHeader_->GetTpat()).c_str(), 1);
             return;
         }
-        hist_trig_check_->Fill("triggered", 1);
+        hist_trig_check_->Fill(fmt::format("*{:016b}", eventHeader_->GetTpat()).c_str(), 1);
         if (!CheckConditions())
         {
             hist_condition_check_->Fill("failure", 1);
@@ -150,7 +150,11 @@ namespace R3B::Neuland
     void CalibrationTask::init_histogram()
     {
         hist_trig_check_ = histograms_.add_hist<TH1I>("trig_check", "check the triggered or passed events", 1, 0., 0.);
+        hist_trig_check_->GetYaxis()->SetTitle("Entries");
+        hist_trig_check_->GetXaxis()->SetTitle("TPAT");
         hist_condition_check_ = histograms_.add_hist<TH1L>("condition_check", "check the condition", 1, 0., 0.);
+        hist_condition_check_->GetYaxis()->SetTitle("Entries");
+        hist_condition_check_->GetXaxis()->SetTitle("Condition");
         HistogramInit(histograms_);
     }
 

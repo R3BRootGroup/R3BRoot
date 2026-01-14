@@ -8,10 +8,12 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <cstddef>
 #include <fairlogger/Logger.h>
 #include <fmt/format.h>
 #include <root/TH1.h>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <vector>
 
@@ -94,6 +96,49 @@ namespace R3B::Neuland
                 write.size(),
                 option.write));
         }
+    }
+
+    constexpr auto trim_space(std::string_view input) -> std::string_view
+    {
+        auto pos = input.find_first_not_of(' ');
+        if (pos == std::string_view::npos)
+        {
+            return {};
+        }
+        auto output = input.substr(pos);
+        pos = output.find_last_not_of(' ');
+        if (pos == std::string_view::npos)
+        {
+            return {};
+        }
+        output = output.substr(0, pos + 1);
+        return output;
+    }
+
+    constexpr auto get_from_sep_string(std::size_t target_idx, std::string_view input, std::string_view sep = ";")
+        -> std::string_view
+    {
+        auto idx = 0;
+        auto last_string = std::string_view{};
+        auto res_string = input;
+        while (idx <= target_idx)
+        {
+            auto pos = res_string.find_first_of(sep);
+            if (pos != std::string_view::npos)
+            {
+                last_string = trim_space(res_string.substr(0, pos));
+                res_string = res_string.substr(pos + 1);
+            }
+            else
+            {
+                return trim_space(res_string);
+            }
+            if (not last_string.empty())
+            {
+                ++idx;
+            }
+        }
+        return last_string;
     }
 
     inline auto calculate_cdf(TH1* histogram) -> TH1*

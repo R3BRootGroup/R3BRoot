@@ -85,7 +85,7 @@ namespace R3B::Neuland::Calibration
 
         MilleDataPoint input_data_buffer_;
         R3B::OutputVectorConnector<MilleCalData> output_mille_data_{ "MilleData" };
-        R3B::OutputConnector<MilleTrackInfo> output_mille_track_info_{ "MilleTrackInfo" };
+        R3B::OutputConnector<NeulandTrackInfo> output_mille_track_info_{ "MilleTrackInfo" };
         // R3B::OutputVectorConnector<MilleDataPoint> output_mille_data_point_{ "MilleDataPoint" };
         std::string pede_steer_filename_ = "neuland_steer.txt";
         std::string input_parameter_filename_ = "neuland_pars.txt";

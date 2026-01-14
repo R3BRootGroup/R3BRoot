@@ -6,6 +6,7 @@
 #include "R3BNeulandCalToHitParTask.h"
 #include "R3BNeulandCalToHitTask.h"
 #include "R3BNeulandCommonFunc.h"
+#include "R3BNeulandHitCosmicMonitorTask.h"
 #include "R3BNeulandMapDataConverterTask.h"
 #include "R3BNeulandMapToCalParTask.h"
 #include "R3BNeulandMapToCalTask.h"
@@ -33,6 +34,7 @@
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <utility>
 #include <vector>
 
@@ -226,6 +228,7 @@ namespace R3B::Neuland
             task->SetTrigger(1);
             run->AddTask(task.release());
         }
+
         if (const auto& option = task_option.neuland_cal_to_hit_par_task; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
@@ -245,6 +248,7 @@ namespace R3B::Neuland
             task->SetTrigger(option.mode);
             run->AddTask(task.release());
         }
+
         if (const auto& option = task_option.los_provide_t_start; option.enable)
         {
             parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 0);
@@ -259,6 +263,12 @@ namespace R3B::Neuland
                 read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
             task->SetTrigger(option.mode);
             task->SetGlobalTimeOffset(option.global_time_offset);
+            run->AddTask(task.release());
+        }
+
+        if (const auto& option = task_option.neuland_cosmic_monitor_task; option.enable)
+        {
+            auto task = std::make_unique<std::remove_cvref_t<decltype(option)>::Task>(option);
             run->AddTask(task.release());
         }
 

@@ -36,7 +36,7 @@ namespace R3B
         set_par_values(minimizer_->X());
         set_par_errors(minimizer_->Errors());
         result_.iteration = static_cast<int>(minimizer_->NIterations());
-
+        result_.n_data = x_vals_.size();
         if (not is_ok)
         {
             result_.is_success = false;

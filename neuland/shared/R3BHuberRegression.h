@@ -6,6 +6,7 @@
 #include <Math/GSLMinimizer.h>
 #include <Math/Minimizer.h>
 #include <Minuit2/Minuit2Minimizer.h>
+#include <cstddef>
 #include <fmt/base.h>
 #include <memory>
 #include <span>
@@ -42,6 +43,7 @@ namespace R3B
         {
             bool is_success = false;
             int iteration = 0;
+            std::size_t n_data = 0;
             R3B::ValueErrorD weight;
             R3B::ValueErrorD bias;
         };

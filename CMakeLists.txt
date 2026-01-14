@@ -303,12 +303,11 @@ else()
 endif()
 
 if(CONAN_ENABLED)
-    # find_package(glaze REQUIRED)
-    find_package(range-v3 REQUIRED)
-    find_package(Microsoft.GSL REQUIRED)
-    find_package(nlohmann_json REQUIRED)
-    find_package(CLI11 REQUIRED)
-    find_package(re2 REQUIRED)
+    find_package2(PUBLIC CLI11)
+    find_package2(PUBLIC Microsoft.GSL)
+    find_package2(PUBLIC nlohmann_json)
+    find_package2(PUBLIC range-v3)
+    find_package2(PUBLIC re2)
     set(JSON_ImplicitConversions
         OFF
         CACHE BOOL "disable implicit conversion of JSON" FORCE)

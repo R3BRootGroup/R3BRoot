@@ -1,4 +1,5 @@
 #include "R3BNeulandMilleCalDataProcessor.h"
+#include "R3BHuberRegression.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandCommonFunc.h"
@@ -122,13 +123,13 @@ namespace R3B::Neuland::Calibration
         //     return static_cast<float>(diff * diff);
         // }
 
-        constexpr auto calculate_diff(const MilleFitPar& fit_result, double val, int module_num) -> float
+        constexpr auto calculate_diff(const TrackFitPar& fit_result, double val, int module_num) -> float
         {
             const auto z_val = ModuleNum2ZPos(module_num);
             return static_cast<float>(val - (fit_result.slope * z_val) - fit_result.offset);
         }
 
-        constexpr auto calculate_residual(const MilleFitPar& fit_result, double val, int module_num) -> float
+        constexpr auto calculate_residual(const TrackFitPar& fit_result, double val, int module_num) -> float
         {
             const auto diff = calculate_diff(fit_result, val, module_num);
             return static_cast<float>(diff * diff);
@@ -165,8 +166,9 @@ namespace R3B::Neuland::Calibration
                                        [](const auto& bars) -> bool { return bars.empty(); }))
         {
             remove_outliers(data_buffers_);
-            is_ok &= (linear_fit(track_fit_data_.bar_x_z, track_info_.bar_disp_data.x_z) and
-                      linear_fit(track_fit_data_.bar_y_z, track_info_.bar_disp_data.y_z));
+            is_ok &=
+                (linear_fit(track_fit_data_.bar_x_z, track_info_.bar_disp_data.x_z, huber_regressor_, p_value_cut_) and
+                 linear_fit(track_fit_data_.bar_y_z, track_info_.bar_disp_data.y_z, huber_regressor_, p_value_cut_));
             if (not is_ok)
             {
                 return false;
@@ -306,7 +308,10 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    auto MilleDataProcessor::linear_fit(const FitDataSet& data, FitPar& fit_par) -> bool
+    auto MilleDataProcessor::linear_fit(const NeulandTrackDataSet& data,
+                                        FitPar& fit_par,
+                                        HuberRegressor& huber_regressor,
+                                        double p_value_cut) -> bool
     {
 
         // // NOTE: ROOT::FIT::BinData only contains the references to the raw data.
@@ -316,12 +321,12 @@ namespace R3B::Neuland::Calibration
         //                                           data.z_errs.data(),
         //                                           data.errs.data() };
 
-        reset_fit_pars();
+        huber_regressor.reset_parameters();
 
         LOGP(debug, "fitting the data with x: {} and y: {}", data.z_vals, data.vals);
-        auto is_ok = huber_regressor_.train_from_data(data.z_vals, data.vals);
+        auto is_ok = huber_regressor.train_from_data(data.z_vals, data.vals);
 
-        const auto& result = huber_regressor_.get_result();
+        const auto& result = huber_regressor.get_result();
         LOGP(debug, "Fitting result: {}", result);
 
         if (not is_ok)
@@ -331,15 +336,13 @@ namespace R3B::Neuland::Calibration
         }
 
         // INFO: scale the error by 2 such that p_value isn't too small.
-        fit_par.p_value = huber_regressor_.calculate_p_value(data.errs, 2.);
+        fit_par.p_value = huber_regressor.calculate_p_value(data.errs, 2.);
         fit_par.slope = result.weight.value;
         fit_par.offset = result.bias.value;
-        if (fit_par.p_value < p_value_cut_)
+        if (fit_par.p_value < p_value_cut)
         {
-            LOGP(debug,
-                 "p-value ({}) is too small from the fit. Must be larger than {}.",
-                 fit_par.p_value,
-                 p_value_cut_);
+            LOGP(
+                debug, "p-value ({}) is too small from the fit. Must be larger than {}.", fit_par.p_value, p_value_cut);
             LOGP(debug, "fit data: \n {}", data);
             return false;
         }

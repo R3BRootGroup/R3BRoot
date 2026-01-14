@@ -105,7 +105,7 @@ namespace R3B
         if (not is_success)
         {
             throw R3B::logic_error(fmt::format(
-                "Element with the name {} has been already added. Please use different name!", element_name));
+                "Element with the name {} has been already added. Please use a different name!", element_name));
         }
         return element_ptr;
     }
