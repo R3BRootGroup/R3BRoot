@@ -142,7 +142,7 @@ void R3BAlpideMapped2Cal::Exec(Option_t*)
             auto col = mappedData->GetCol();
             auto row = mappedData->GetRow();
             // std::cout << det <<" "<< col <<" "<< row <<std::endl;
-            if (inUseCache[sen - 1][col - 1][row - 1] == 1)
+            if (inUseCache[sen - 1][col][row] == 1) // this should be 1-base
             {
                 AddCalData(sen, row, col);
             }
