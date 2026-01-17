@@ -33,10 +33,10 @@ extern "C"
 
 R3BWhiterabbitCalifaReader::R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA* data,
                                                        size_t offset,
-                                                       UInt_t whiterabbit_id1,
-                                                       UInt_t whiterabbit_id2,
-                                                       UInt_t whiterabbit_id3,
-                                                       UInt_t whiterabbit_id4)
+                                                       uint32_t whiterabbit_id1,
+                                                       uint32_t whiterabbit_id2,
+                                                       uint32_t whiterabbit_id3,
+                                                       uint32_t whiterabbit_id4)
     : R3BReader("R3BWhiterabbitCalifaReader")
     , fData(data)
     , fOffset(offset)
@@ -72,7 +72,7 @@ Bool_t R3BWhiterabbitCalifaReader::Init(ext_data_struct_info* a_struct_info)
     // Look for the R3BEventHeader
     FairRootManager* frm = FairRootManager::Instance();
     fEventHeader = dynamic_cast<R3BEventHeader*>(frm->GetObject("EventHeader."));
-    LOG(info) << "R3BWhiterabbitCalifaReader::Init() R3BEventHeader found";
+    R3BLOG(info, "R3BEventHeader found");
 
     // Register output array in tree
     FairRootManager::Instance()->Register("WRCalifaData", "WRCalifa", fArray, !fOnline);
@@ -91,7 +91,7 @@ Bool_t R3BWhiterabbitCalifaReader::R3BRead()
     fData->TIMESTAMP_CALIFA_WR_T4, fData->TIMESTAMP_CALIFA_WR_T3,
     fData->TIMESTAMP_CALIFA_WR_T2, fData->TIMESTAMP_CALIFA_WR_T1);*/
 
-    if (fWhiterabbitId1 != fData->TIMESTAMP_CALIFA1ID)
+    if (fWhiterabbitId1 != fData->TIMESTAMP_CALIFA1ID && fData->TIMESTAMP_CALIFA1ID > 0)
     {
         char strMessage[1000];
         snprintf(strMessage,
@@ -103,7 +103,7 @@ Bool_t R3BWhiterabbitCalifaReader::R3BRead()
         LOG(error) << strMessage;
     }
 
-    if (fWhiterabbitId2 != fData->TIMESTAMP_CALIFA2ID)
+    if (fWhiterabbitId2 != fData->TIMESTAMP_CALIFA2ID && fData->TIMESTAMP_CALIFA2ID > 0)
     {
         char strMessage[1000];
         snprintf(strMessage,
@@ -115,7 +115,7 @@ Bool_t R3BWhiterabbitCalifaReader::R3BRead()
         LOG(error) << strMessage;
     }
 
-    if (fWhiterabbitId3 != fData->TIMESTAMP_CALIFA3ID)
+    if (fWhiterabbitId3 != fData->TIMESTAMP_CALIFA3ID && fData->TIMESTAMP_CALIFA3ID > 0)
     {
         char strMessage[1000];
         snprintf(strMessage,
@@ -127,7 +127,7 @@ Bool_t R3BWhiterabbitCalifaReader::R3BRead()
         LOG(error) << strMessage;
     }
 
-    if (fWhiterabbitId4 != fData->TIMESTAMP_CALIFA4ID)
+    if (fWhiterabbitId4 != fData->TIMESTAMP_CALIFA4ID && fData->TIMESTAMP_CALIFA4ID > 0)
     {
         char strMessage[1000];
         snprintf(strMessage,
@@ -141,27 +141,30 @@ Bool_t R3BWhiterabbitCalifaReader::R3BRead()
 
     if (fEventHeader != nullptr)
     {
+        fNEvent = fEventHeader->GetEventno();
         uint64_t timestamp1 = ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T4 << 48) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T3 << 32) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA1WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA1WR_T1;
-
-        fNEvent = fEventHeader->GetEventno();
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp1, fWhiterabbitId1);
+        if (timestamp1 > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp1, fWhiterabbitId1);
 
         uint64_t timestamp2 = ((uint64_t)fData->TIMESTAMP_CALIFA2WR_T4 << 48) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA2WR_T3 << 32) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA2WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA2WR_T1;
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp2, fWhiterabbitId2);
+        if (timestamp2 > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp2, fWhiterabbitId2);
 
         uint64_t timestamp3 = ((uint64_t)fData->TIMESTAMP_CALIFA3WR_T4 << 48) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA3WR_T3 << 32) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA3WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA3WR_T1;
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp3, fWhiterabbitId3);
+        if (timestamp3 > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp3, fWhiterabbitId3);
 
         uint64_t timestamp4 = ((uint64_t)fData->TIMESTAMP_CALIFA4WR_T4 << 48) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA4WR_T3 << 32) |
                               ((uint64_t)fData->TIMESTAMP_CALIFA4WR_T2 << 16) | (uint64_t)fData->TIMESTAMP_CALIFA4WR_T1;
-        new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp4, fWhiterabbitId4);
+        if (timestamp4 > 0)
+            new ((*fArray)[fArray->GetEntriesFast()]) R3BWRData(timestamp4, fWhiterabbitId4);
     }
     else
     {
