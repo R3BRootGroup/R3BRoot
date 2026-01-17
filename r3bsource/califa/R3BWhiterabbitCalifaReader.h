@@ -26,7 +26,12 @@ class R3BWhiterabbitCalifaReader : public R3BReader
 {
   public:
     // Standard constructor
-    R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA*, size_t, UInt_t, UInt_t, UInt_t = 0, UInt_t = 0);
+    R3BWhiterabbitCalifaReader(EXT_STR_h101_WRCALIFA*,
+                               size_t,
+                               uint32_t = 0x1a00,
+                               uint32_t = 0x1c00,
+                               uint32_t = 0x1b00,
+                               uint32_t = 0x1d00);
 
     // Destructor
     virtual ~R3BWhiterabbitCalifaReader();
@@ -45,22 +50,22 @@ class R3BWhiterabbitCalifaReader : public R3BReader
 
   private:
     // An event counter
-    UInt_t fNEvent = 0;
+    uint64_t fNEvent = 0;
     // Reader specific data structure from ucesb
     EXT_STR_h101_WRCALIFA* fData;
     // Offset of detector specific data in full data structure
     size_t fOffset;
     // The whiterabbit subsystem ID
-    UInt_t fWhiterabbitId1 = 0;
-    UInt_t fWhiterabbitId2 = 0;
-    UInt_t fWhiterabbitId3 = 0;
-    UInt_t fWhiterabbitId4 = 0;
+    uint32_t fWhiterabbitId1 = 0;
+    uint32_t fWhiterabbitId2 = 0;
+    uint32_t fWhiterabbitId3 = 0;
+    uint32_t fWhiterabbitId4 = 0;
     // A pointer to the R3BEventHeader structure
     R3BEventHeader* fEventHeader = nullptr;
     // Don't store data for online
     bool fOnline = false;
     // Output array
-    TClonesArray* fArray;
+    TClonesArray* fArray = nullptr;
 
   public:
     ClassDefOverride(R3BWhiterabbitCalifaReader, 0);
