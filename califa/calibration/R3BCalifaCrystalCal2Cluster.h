@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -80,6 +80,8 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     void SetRoundWindow(Double_t window);
 
   private:
+    void SetParameter();
+
     TClonesArray* fCrystalCalData = nullptr;
     TClonesArray* fCalifaClusterData = nullptr;
 
@@ -103,8 +105,8 @@ class R3BCalifaCrystalCal2Cluster : public FairTask
     Double_t fRoundWindow = 0.25; // Cluster window [rad]
     bool fSimulation = false;     // Simulation flag
 
-    Bool_t fRand = 0.; // Flag to set randomization procedure
-    TString fRandFile; // File with angular coverages for each crystal
+    bool fRand = false; // Flag to set randomization procedure
+    TString fRandFile;  // File with angular coverages for each crystal
     TFile* fHistoFile = NULL;
     TH2F** fAngularDistributions;
     TString fWindowAlg = "Round";
