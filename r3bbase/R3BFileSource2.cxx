@@ -268,7 +268,7 @@ void R3BEventProgressPrinter::Print(uint64_t event_num, double speed_per_ms)
     }
     const auto event_num_str =
         fmt::format(fg(fmt::terminal_color::bright_green) | fmt::emphasis::bold, "{:^5d}k", event_num / 1000);
-    const auto speed_str = fmt::format(fg(fmt::color::white), "{:^6.1F}k/s", speed_per_ms);
+    const auto speed_str = fmt::format("{:^6.1F}k/s", speed_per_ms);
     const auto progress_str = fmt::format(fg(fmt::terminal_color::bright_yellow) | fmt::emphasis::bold,
                                           "{:^6.2F}",
                                           100. * static_cast<double>(event_num) / static_cast<double>(max_event_num_));

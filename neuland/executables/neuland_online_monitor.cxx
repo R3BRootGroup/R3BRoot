@@ -193,8 +193,8 @@ auto main(int argc, char** argv) -> int
         losMapped2Cal->SetOnline(true);
         run.AddTask(losMapped2Cal.release());
 
-        auto map2Cal = std::make_unique<R3BNeulandMapped2Cal2>();
-        map2Cal->SetTrigger(R3B::Neuland::CalTrigger::allspill);
+        auto map2Cal = std::make_unique<R3BNeulandMapped2Cal2>(
+            R3BNeulandMapped2Cal2::Config{ .mode = R3B::Neuland::CalTrigger::allspill });
         map2Cal->SetDisableHist();
         run.AddTask(map2Cal.release());
     }

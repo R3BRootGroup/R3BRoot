@@ -132,6 +132,7 @@ namespace R3B::Neuland
     namespace Calibration
     {
         constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_NUM = 25;
+        constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_VALUE = 0.F;
         constexpr auto DEFAULT_TSYNC_MAX_TIME_DIFF = 300; // ns
         // Millepede calibration defaults:
         constexpr auto DEFAULT_MINIMUM_PLANE_NUM = 10;

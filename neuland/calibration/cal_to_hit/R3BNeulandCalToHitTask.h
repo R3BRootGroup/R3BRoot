@@ -29,6 +29,8 @@
 #include <string_view>
 #include <vector>
 
+class TH1L;
+
 namespace R3B::Neuland
 {
     struct CalibratedSignal
@@ -74,7 +76,7 @@ namespace R3B::Neuland
         void BeginOfEvent() override { hit_data_.clear(); };
         void TriggeredExec() override;
         void EndOfTask() override;
-        [[nodiscard]] auto CheckConditions() const -> bool override;
+        [[nodiscard]] auto CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool override;
 
         // non-virtual private functions:
         void calibrate();
@@ -85,17 +87,14 @@ namespace R3B::Neuland
                             const std::vector<CalibratedSignal>& right_signals,
                             const HitModulePar& par,
                             /* inout */ std::vector<Hit>& hits);
-        [[nodiscard]] auto construct_hit(const LRPair<CalibratedSignal>& signalPair,
-                                         const HitModulePar& par) const -> Hit;
-        static auto get_calibrated_energy(const CalDataSignal& calSignal,
-                                          const HitModulePar& par,
-                                          R3B::Side side) -> ValueErrorD;
-        static auto get_calibrated_time(const CalDataSignal& calSignal,
-                                        const HitModulePar& par,
-                                        R3B::Side side) -> ValueErrorD;
-        static auto to_calibrated_signal(const CalDataSignal& calSignal,
-                                         const HitModulePar& par,
-                                         R3B::Side side) -> CalibratedSignal;
+        [[nodiscard]] auto construct_hit(const LRPair<CalibratedSignal>& signalPair, const HitModulePar& par) const
+            -> Hit;
+        static auto get_calibrated_energy(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
+            -> ValueErrorD;
+        static auto get_calibrated_time(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
+            -> ValueErrorD;
+        static auto to_calibrated_signal(const CalDataSignal& calSignal, const HitModulePar& par, R3B::Side side)
+            -> CalibratedSignal;
         [[nodiscard]] auto signal_match_checking(const CalibratedSignal& first_signal,
                                                  const CalibratedSignal& second_signal,
                                                  const HitModulePar& par) -> bool;

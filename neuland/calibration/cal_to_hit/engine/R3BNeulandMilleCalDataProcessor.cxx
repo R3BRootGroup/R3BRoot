@@ -113,16 +113,6 @@ namespace R3B::Neuland::Calibration
     {
         using TrackInfo = MilleDataProcessor::TrackInfo;
 
-        // auto calculate_residual(const TrackInfo& track_info, double val, int module_num) -> float
-        // {
-        //     const auto z_val = ModuleNum2ZPos(module_num);
-        //     const auto is_plane_horizontal = IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));
-        //     const auto& bar_disp_info = track_info.bar_disp_data;
-        //     const auto& fit_result = is_plane_horizontal ? bar_disp_info.x_z : bar_disp_info.y_z;
-        //     const auto diff = val - (fit_result.slope * z_val) - fit_result.offset;
-        //     return static_cast<float>(diff * diff);
-        // }
-
         constexpr auto calculate_diff(const TrackFitPar& fit_result, double val, int module_num) -> float
         {
             const auto z_val = ModuleNum2ZPos(module_num);

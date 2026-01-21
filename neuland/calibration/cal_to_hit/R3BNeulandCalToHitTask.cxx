@@ -26,6 +26,7 @@
 #include <Math/Vector3Dfwd.h>
 #include <R3BNeulandSignalMatcher.h>
 #include <R3BShared.h>
+#include <TH1.h>
 #include <cmath>
 #include <fairlogger/Logger.h>
 #include <fmt/core.h>
@@ -210,7 +211,7 @@ namespace R3B::Neuland
 
     void Cal2HitTask::EndOfTask() {}
 
-    auto Cal2HitTask::CheckConditions() const -> bool
+    auto Cal2HitTask::CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool
     {
         if (GetTrigger() == CalTrigger::onspill)
         {

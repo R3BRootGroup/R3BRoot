@@ -22,6 +22,7 @@ set(SRCS
     R3BNeulandCalToHitParTask.cxx
     R3BNeulandCalToHitTask.cxx
     R3BNeulandHitCosmicMonitorTask.cxx
+    R3BNeulandHitOnlineMonitorTask.cxx
     engine/R3BNeulandCal2HitHistAnalysis.cxx
     engine/R3BNeulandMilleCalDataProcessor.cxx
     engine/R3BNeulandMillepede.cxx

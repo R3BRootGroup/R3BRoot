@@ -15,6 +15,7 @@
 #include "R3BDataMonitor.h"
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandMapToCalPar.h"
+#include "R3BNeulandTriggerTypes.h"
 #include "R3BPaddleTamexMappedData2.h"
 #include "R3BParView.h"
 #include "R3BShared.h"
@@ -24,36 +25,43 @@
 #include <R3BNeulandBasePar.h>
 #include <R3BNeulandCalibrationTask.h>
 #include <R3BNeulandCommon.h>
-#include <string_view>
+#include <string>
 #include <vector>
 
 class R3BEventHeader;
 class FairRuntimeDb;
+class TH1L;
+
 namespace R3B::Neuland
 {
+    class Map2CalTask;
+    struct Map2CalTaskConfig
+    {
+        using Task = Map2CalTask;
+        bool enable = false;
+        bool enable_pulse_mode = false;
+        bool enable_walk_effect = true;
+        int min_stat = 1;
+        CalTrigger mode = CalTrigger::allspill;
+        std::string name = "NeulandMap2CalTask";
+        std::string read = "NeulandMapData;NeulandTrigMapData;LandTCalPar;LandTrigTCalPar";
+        std::string write = "NeulandCalData";
+    };
     class Map2CalTask : public CalibrationTask
     {
       public:
-        explicit Map2CalTask(std::string_view map_data_name = "NeulandMapData",
-                             std::string_view trig_map_data_name = "NeulandTrigMapData",
-                             std::string_view par_name = "LandTCalPar",
-                             std::string_view trig_par_name = "LandTrigTCalPar",
-                             std::string_view cal_data_name = "NeulandCalData");
-        void SetPulserMode(bool pulser_mode = true) { is_pulse_mode_ = pulser_mode; }
-        void SetNhitmin(unsigned int size) { signal_min_size_ = size; }
-        void EnableWalk(bool is_walk_enabled = true) { is_walk_enabled_ = is_walk_enabled; }
+        using Config = Map2CalTaskConfig;
+        explicit Map2CalTask(const Config& config);
 
       private:
-        bool is_pulse_mode_ = false;
-        bool is_walk_enabled_ = true;
+        Config config_;
         float coarse_time_frequency_ = 0.; // MHz
         unsigned int coarse_time_max_num_ = MAXCTValue;
         double max_coarse_time_ = R3B::Neuland::MaxCalTime;
         unsigned int total_pmt_nums_ = 0;
-        unsigned int signal_min_size_ = 1;
         unsigned int plane_num_ = 0;
 
-        // IO data and paramters:
+        // IO data and parameters:
         InputMapConnector<int, PaddleTamexMappedData> map_data_;
         InputMapConnector<int, PaddleTamexTrigMappedData> trig_map_data_;
         OutputVectorConnector<BarCalData> cal_data_;
@@ -67,7 +75,7 @@ namespace R3B::Neuland
         void TriggeredExec() override;
         void FinishEvent() override;
         void SetExtraPar(FairRuntimeDb* rtdb) override;
-        [[nodiscard]] auto CheckConditions() const -> bool override;
+        [[nodiscard]] auto CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool override;
 
         void set_pmt_num();
         void set_ct_freq();
@@ -85,9 +93,8 @@ namespace R3B::Neuland
                                                 SingleEdgeSignal signal,
                                                 FTType ftType,
                                                 int module_num) const -> ValueError<double>;
-        [[nodiscard]] auto get_tot(const DoubleEdgeSignal& pmtSignal,
-                                   int module_num,
-                                   R3B::Side module_side) const -> ValueError<double>;
+        [[nodiscard]] auto get_tot(const DoubleEdgeSignal& pmtSignal, int module_num, R3B::Side module_side) const
+            -> ValueError<double>;
         [[nodiscard]] auto get_trigger_time(int module_num, Side side) const -> ValueError<double>;
         void overflow_correct(R3B::Neuland::CalDataSignal& calSignal) const;
     };

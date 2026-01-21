@@ -5,6 +5,8 @@
 #include "R3BNeulandApp.h"
 #include "R3BNeulandDigitizer.h"
 #include "R3BNeulandHitCosmicMonitorTask.h"
+#include "R3BNeulandHitOnlineMonitorTask.h"
+#include "R3BNeulandMapToCalTask.h"
 #include "R3BNeulandMillepede.h"
 #include "R3BNeulandTriggerTypes.h"
 #include <R3BNeulandCalToHitParTask.h>
@@ -30,7 +32,6 @@ namespace R3B::Neuland
     constexpr auto DEFAULT_EDEP_OFF_OPT = MinimizerLimVar{ .init = 5., .step = 1., .lower = 0., .upper = 250. };
     constexpr auto DEFAULT_N_CLUSTER_OPT = MinimizerLimVar{ .init = 10., .step = 5., .lower = 5., .upper = 50. };
     constexpr auto DEFAULT_N_CLUSTER_OFF_OPT = MinimizerLimVar{ .init = 2., .step = 1., .lower = 0., .upper = 10. };
-    constexpr auto DEFAULT_MIN_STAT = 10;
 
     class AnalysisApplication : public CLIApplication
     {
@@ -129,27 +130,8 @@ namespace R3B::Neuland
                     std::string read = "NeulandMapData;NeulandTrigMapData";
                     std::string write = "LandTCalPar;LandTrigTCalPar";
                 } neuland_map_to_cal_par_task;
-                struct Map2CalTask
-                {
-                    bool enable = false;
-                    bool enable_pulse_mode = false;
-                    bool enable_walk_effect = true;
-                    int min_stat = 1;
-                    std::string name = "NeulandMap2CalTask";
-                    std::string read = "NeulandMapData;NeulandTrigMapData;LandTCalPar;LandTrigTCalPar";
-                    std::string write = "NeulandCalData";
-                } neuland_map_to_cal_task;
-                struct Cal2HitParTask
-                {
-                    bool enable = false;
-                    int min_stat = DEFAULT_MIN_STAT;
-                    CalTrigger mode = CalTrigger::offspill;
-                    Cal2HitParMethod method = Cal2HitParMethod::recons;
-                    Calibration::MillepedeOptions millepede;
-                    std::string name = "NeulandCal2HitParTask";
-                    std::string read = "NeulandCalData;NeulandCalibrationBasePar";
-                    std::string write = "NeulandHitPar";
-                } neuland_cal_to_hit_par_task;
+                struct Map2CalTaskConfig neuland_map_to_cal_task;
+                struct Cal2HitParTaskConfig neuland_cal_to_hit_par_task;
                 struct Cal2HitTask
                 {
                     bool enable = false;
@@ -168,6 +150,7 @@ namespace R3B::Neuland
                     std::string write;
                 } neuland_cal_monitor_task;
                 Calibration::CosmicMonitorTaskConfig neuland_cosmic_monitor_task;
+                Calibration::HitOnlineMonitorTaskConfig neuland_hit_online_monitor_task;
                 struct LosMap2CalParTask
                 {
                     bool enable = false;

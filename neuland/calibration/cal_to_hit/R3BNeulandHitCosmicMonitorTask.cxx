@@ -126,11 +126,6 @@ namespace R3B::Neuland::Calibration
 
     void CosmicMonitorTask::TriggeredExec()
     {
-        if (hit_data_.get().size() < config_.n_hit_min)
-        {
-            ConditionFillToHist("undersized");
-            return;
-        }
         for (const auto& hit : hit_data_)
         {
             track_dataset_xz_.z_vals.push_back(hit.position.Z().value);
@@ -207,9 +202,20 @@ namespace R3B::Neuland::Calibration
         }
     }
 
-    auto CosmicMonitorTask::CheckConditions() const -> bool
+    auto CosmicMonitorTask::CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool
     {
+        auto res = true;
+        if (hit_data_.get().size() < config_.n_hit_min)
+        {
+            ConditionFillToHist(hist_condition, "undersized");
+            res = false;
+        }
         auto n_plane = std::ranges::count_if(plane_counter_, [](auto val) -> bool { return val > 0; });
-        return n_plane >= config_.n_plane_min;
+        if (n_plane <= config_.n_plane_min)
+        {
+            ConditionFillToHist(hist_condition, "too_few_planes");
+            res = false;
+        }
+        return res;
     }
 } // namespace R3B::Neuland::Calibration

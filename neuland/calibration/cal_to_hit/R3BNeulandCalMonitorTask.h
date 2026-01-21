@@ -12,6 +12,7 @@
 
 class TH2D;
 class TH1D;
+class TH1L;
 
 namespace R3B::Neuland
 {
@@ -38,7 +39,10 @@ namespace R3B::Neuland
         void BeginOfEvent() override {};
         void TriggeredExec() override;
         void EndOfTask() override {}
-        [[nodiscard]] auto CheckConditions() const -> bool override { return true; }
+        [[nodiscard]] auto CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool override
+        {
+            return true;
+        }
     };
 
 } // namespace R3B::Neuland

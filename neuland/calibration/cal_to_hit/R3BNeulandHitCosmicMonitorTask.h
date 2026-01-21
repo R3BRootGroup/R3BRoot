@@ -1,18 +1,23 @@
 #pragma once
 
-#include "R3BDataMonitor.h"
 #include "R3BHuberRegression.h"
 #include "R3BIOConnector.h"
 #include "R3BNeulandCalibrationTask.h"
 #include "R3BNeulandHit2.h"
 #include "R3BNeulandMilleCalDataProcessor.h"
-#include <FairRootManager.h>
-#include <FairRuntimeDb.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <chrono>
 #include <string>
 #include <vector>
+
+class FairRootManager;
+class FairRuntimeDb;
+
+namespace R3B
+{
+    class DataMonitor;
+}
 
 namespace R3B::Neuland::Calibration
 {
@@ -39,7 +44,7 @@ namespace R3B::Neuland::Calibration
         explicit CosmicMonitorTask(const Config& config);
 
       private:
-        CosmicMonitorTaskConfig config_;
+        Config config_;
         InputVectorConnector<Hit> hit_data_;
         TrackFitResult track_info_;
         NeulandTrackDataSet track_dataset_xz_;
@@ -65,7 +70,7 @@ namespace R3B::Neuland::Calibration
         void SetExtraPar(FairRuntimeDb* rtdb) override {}
         void BeginOfEvent() override;
         void EndOfTask() override {}
-        [[nodiscard]] auto CheckConditions() const -> bool override;
+        [[nodiscard]] auto CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool override;
 
         // non-virtual functions:
         void fill_histograms();

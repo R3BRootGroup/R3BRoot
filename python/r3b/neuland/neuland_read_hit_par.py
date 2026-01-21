@@ -82,7 +82,7 @@ class HitParReader:
     def header(self):
         return list(self._dataframe.columns.values)
 
-    def read(self, all_cycles: bool = True):
+    def read(self, all_cycles: bool = False):
         par_file = ROOT.TFile(self._filename, "read")
         cycles = (
             self._get_all_cycles(par_file, self._hit_par_name)

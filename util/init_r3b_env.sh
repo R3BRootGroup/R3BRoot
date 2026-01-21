@@ -26,6 +26,7 @@ else
       - black
       - jupyterlab_vim
       - jupyterlab-lsp
+      - jupyterlab-git
       - conan
     " > /tmp/r3bdev.yml
     conda env create -f /tmp/r3bdev.yml

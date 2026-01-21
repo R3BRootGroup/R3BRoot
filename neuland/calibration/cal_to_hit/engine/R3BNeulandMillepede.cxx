@@ -38,6 +38,7 @@
 #include <fmt/format.h>
 #include <functional>
 #include <iterator>
+#include <magic_enum/magic_enum.hpp>
 #include <memory>
 #include <numeric>
 #include <optional>
@@ -62,10 +63,11 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <utility>
 #include <vector>
 
-#define TWO_PAR
+// #define TWO_PAR
 
 namespace rng = ranges;
 
@@ -120,6 +122,7 @@ namespace
         }
     }
 
+    namespace sv = ranges::views;
 } // namespace
 
 namespace R3B::Neuland::Calibration
@@ -142,6 +145,7 @@ namespace R3B::Neuland::Calibration
     {
         set_working_dir();
         output_mille_data_.init();
+        output_tsync_mille_data_.init();
         output_mille_track_info_.init();
         // output_mille_data_point_.init();
         fs::create_directories(fs::path(working_dir_));
@@ -161,7 +165,8 @@ namespace R3B::Neuland::Calibration
             throw R3B::runtime_error(
                 "Environment variable R3BROOTPATH is not defined! Did you forget to source the \"config.sh\" file?");
         }
-        binary_data_writer_ = std::make_unique<Mille>((fs::path{ working_dir_ } / config_.mille_data_filename).string());
+        binary_data_writer_ =
+            std::make_unique<Mille>((fs::path{ working_dir_ } / config_.mille_data_filename).string());
         binary_data_writer_->set_buffer_size(MILLE_BUFFER_SIZE);
         if (not config_.mille_log_filename.empty())
         {
@@ -191,33 +196,59 @@ namespace R3B::Neuland::Calibration
     {
         const auto num_of_module = GetModuleSize();
         auto res = std::pair<int, GlobalLabel>{};
-        const auto factor = (par_num - 1) / num_of_module;
         res.first = ((par_num - 1) % num_of_module) + 1;
 
-        switch (factor)
+        if (config_.cal_mode == MillepedeCalibrationMode::tsync)
         {
-#ifndef TWO_PAR
-
-            // case 0:
-            //     res.second = GlobalLabel::tsync;
-            //     break;
-            // case 1:
-            //     res.second = GlobalLabel::offset_effective_c;
-            //     break;
-            // case 2:
-            //     res.second = GlobalLabel::effective_c;
-            //     break;
-#else
-            case 0:
-                res.second = GlobalLabel::offset_effective_c;
-                break;
-            case 1:
-                res.second = GlobalLabel::effective_c;
-                break;
-#endif
-            default:
-                throw R3B::logic_error(fmt::format("An error occurred with unrecognized global par id: {}", par_num));
+            res.second = GlobalLabel::tsync;
         }
+        else if (config_.cal_mode == MillepedeCalibrationMode::offset_effective_c)
+        {
+            const auto factor = (par_num - 1) / num_of_module;
+            switch (factor)
+            {
+                case 0:
+                    res.second = GlobalLabel::offset_effective_c;
+                    break;
+                case 1:
+                    res.second = GlobalLabel::effective_c;
+                    break;
+                default:
+                    throw R3B::logic_error(
+                        fmt::format("An error occurred with unrecognized global par id: {}", par_num));
+            }
+        }
+        else
+        {
+            throw R3B::logic_error(
+                fmt::format("cal mode {} is not implemented!", magic_enum::enum_name(config_.cal_mode)));
+        }
+
+        //         switch (factor)
+        //         {
+        // #ifndef TWO_PAR
+
+        //             case 0:
+        //                 res.second = GlobalLabel::tsync;
+        //                 break;
+        //             case 1:
+        //                 res.second = GlobalLabel::offset_effective_c;
+        //                 break;
+        //             case 2:
+        //                 res.second = GlobalLabel::effective_c;
+        //                 break;
+        // #else
+        //             case 0:
+        //                 res.second = GlobalLabel::offset_effective_c;
+        //                 break;
+        //             case 1:
+        //                 res.second = GlobalLabel::effective_c;
+        //                 break;
+        // #endif
+        //             default:
+        //                 throw R3B::logic_error(fmt::format("An error occurred with unrecognized global par id: {}",
+        //                 par_num));
+        //         }
 
         return res;
     }
@@ -225,24 +256,41 @@ namespace R3B::Neuland::Calibration
     inline auto MillepedeEngine::get_global_label_id(int module_num, GlobalLabel label) -> int
     {
         const auto num_of_module = GetModuleSize();
-        switch (label)
+
+        if (config_.cal_mode == MillepedeCalibrationMode::tsync)
         {
-#ifndef TWO_PAR
-            case GlobalLabel::tsync:
-                return module_num;
-            case GlobalLabel::offset_effective_c:
-                return module_num + num_of_module;
-            case GlobalLabel::effective_c:
-                return module_num + (2 * num_of_module);
-#else
-            case GlobalLabel::offset_effective_c:
-                return module_num;
-            case GlobalLabel::effective_c:
-                return module_num + num_of_module;
-#endif
-            default:
-                throw R3B::logic_error("An error occurred with unrecognized global tag");
+            return module_num;
         }
+        if (config_.cal_mode == MillepedeCalibrationMode::offset_effective_c)
+        {
+            switch (label)
+            {
+                case GlobalLabel::offset_effective_c:
+                    return module_num;
+                case GlobalLabel::effective_c:
+                    return module_num + num_of_module;
+                default:
+            }
+        }
+        throw R3B::logic_error(fmt::format("cal mode {} is not implemented!", magic_enum::enum_name(config_.cal_mode)));
+        //         switch (label)
+        //         {
+        // #ifndef TWO_PAR
+        //             case GlobalLabel::tsync:
+        //                 return module_num;
+        //             case GlobalLabel::offset_effective_c:
+        //                 return module_num + num_of_module;
+        //             case GlobalLabel::effective_c:
+        //                 return module_num + (2 * num_of_module);
+        // #else
+        //             case GlobalLabel::offset_effective_c:
+        //                 return module_num;
+        //             case GlobalLabel::effective_c:
+        //                 return module_num + num_of_module;
+        // #endif
+        //             default:
+        //                 throw R3B::logic_error("An error occurred with unrecognized global tag");
+        //         }
     }
 
     void MillepedeEngine::fill_module_parameters(const Millepede::ResultReader& result,
@@ -258,30 +306,80 @@ namespace R3B::Neuland::Calibration
             auto& module_pars = cal_to_hit_par.GetListOfModuleParRef();
 
             auto& par_ref = module_pars.emplace(module_num, HitModulePar{}).first->second;
-            switch (global_label)
+            if (config_.cal_mode == MillepedeCalibrationMode::tsync)
             {
-#ifndef TWO_PAR
-                case GlobalLabel::tsync:
+                if (module_num == DEFAULT_TSYNC_REFERENCE_BAR_NUM)
+                {
+                    par_ref.t_sync.value = DEFAULT_TSYNC_REFERENCE_BAR_VALUE;
+                    par_ref.t_sync.error = 0.;
+                }
+                else
+                {
                     par_ref.t_sync.value += par.value * SCALE_FACTOR;
                     par_ref.t_sync.error = par.error * SCALE_FACTOR;
-                    break;
-#endif
-                case GlobalLabel::offset_effective_c:
-                    // The value here is the product of tDiff and effectiveSped. Real tDiff will be calculated later
-                    par_ref.t_diff.value += par.value * SCALE_FACTOR;
-                    par_ref.t_diff.error = par.error * SCALE_FACTOR;
-                    break;
-                case GlobalLabel::effective_c:
-                    par_ref.effective_speed.value += par.value;
-                    par_ref.effective_speed.error = par.error;
-                    break;
-                default:
-                    throw std::runtime_error("An error occurred with unrecognized global tag");
+                }
+            }
+            else if (config_.cal_mode == MillepedeCalibrationMode::offset_effective_c)
+            {
+                switch (global_label)
+                {
+                    case GlobalLabel::offset_effective_c:
+                        // NOTE: The value here is the product of tDiff and effectiveSped. Real tDiff will be calculated
+                        // later
+                        par_ref.t_diff.value += par.value * SCALE_FACTOR;
+                        par_ref.t_diff.error = par.error * SCALE_FACTOR;
+                        break;
+                    case GlobalLabel::effective_c:
+                        par_ref.effective_speed.value += par.value;
+                        par_ref.effective_speed.error = par.error;
+                        break;
+                    default:
+                        throw std::runtime_error("An error occurred with unrecognized global tag");
+                }
+            }
+            else
+            {
+                throw R3B::logic_error(
+                    fmt::format("cal mode {} is not implemented!", magic_enum::enum_name(config_.cal_mode)));
             }
         }
 
-        // this changes the product of t_diff and speed back to the t_diff value.
-        calculate_time_offset(cal_to_hit_par);
+        if (config_.cal_mode == MillepedeCalibrationMode::offset_effective_c)
+        {
+            calculate_time_offset(cal_to_hit_par);
+        }
+        //             switch (global_label)
+        //             {
+        // #ifndef TWO_PAR
+        //                 case GlobalLabel::tsync:
+        //                     if (module_num == DEFAULT_TSYNC_REFERENCE_BAR_NUM)
+        //                     {
+        //                         par_ref.t_sync.value = DEFAULT_TSYNC_REFERENCE_BAR_VALUE;
+        //                         par_ref.t_sync.error = 0.;
+        //                     }
+        //                     else
+        //                     {
+        //                         par_ref.t_sync.value += par.value * SCALE_FACTOR;
+        //                         par_ref.t_sync.error = par.error * SCALE_FACTOR;
+        //                     }
+        //                     break;
+        // #endif
+        //                 case GlobalLabel::offset_effective_c:
+        //                     // The value here is the product of tDiff and effectiveSped. Real tDiff will be
+        //                     calculated later par_ref.t_diff.value += par.value * SCALE_FACTOR;
+        //                     par_ref.t_diff.error = par.error * SCALE_FACTOR;
+        //                     break;
+        //                 case GlobalLabel::effective_c:
+        //                     par_ref.effective_speed.value += par.value;
+        //                     par_ref.effective_speed.error = par.error;
+        //                     break;
+        //                 default:
+        //                     throw std::runtime_error("An error occurred with unrecognized global tag");
+        //             }
+        //         }
+
+        //         // this changes the product of t_diff and speed back to the t_diff value.
+        //         calculate_time_offset(cal_to_hit_par);
     }
 
     auto MillepedeEngine::set_minimum_values(const std::vector<R3B::Neuland::BarCalData>& signals) -> bool
@@ -364,40 +462,47 @@ namespace R3B::Neuland::Calibration
         return true;
     }
 
-    void MillepedeEngine::add_signal_t_sum(const MilleCalData& signal, double a_t)
+    auto MillepedeEngine::add_signal_t_sum(const MilleCalData& signal, const TrackFitResult& fit_coeff) -> float
     {
         buffer_clear();
+
+        const auto x_z_slope = fit_coeff.x_z.slope;
+        const auto y_z_slope = fit_coeff.y_z.slope;
+        const auto a_z = std::sqrt(1 + (x_z_slope * x_z_slope) + (y_z_slope * y_z_slope)) / CLight;
+        const auto sign_factor = (y_z_slope > 0.) ? 1. : -1.;
+
         const auto module_num = static_cast<int>(signal.module_num);
         const auto pos_z = ModuleNum2ZPos<float>(static_cast<int>(module_num));
 
         const auto init_effective_c = cal_to_hit_par_->GetModuleParAt(module_num).effective_speed.value;
-        const auto init_t_sync = cal_to_hit_par_->GetModuleParAt(module_num).t_sync.value;
+        const auto init_t_sync = (module_num == DEFAULT_TSYNC_REFERENCE_BAR_NUM)
+                                     ? DEFAULT_TSYNC_REFERENCE_BAR_VALUE / SCALE_FACTOR
+                                     : cal_to_hit_par_->GetModuleParAt(module_num).t_sync.value;
 
         const auto& left_signal = signal.left;
         const auto& right_signal = signal.right;
         const auto t_sum = (left_signal.leading_time - left_signal.trigger_time) +
                            (right_signal.leading_time - right_signal.trigger_time) - average_t_sum_.value_or(0.F);
 
-        input_data_buffer_.measurement = static_cast<float>((t_sum.value / 2.F) - (pos_z * a_t) -
-                                                            (BarLength / init_effective_c / 2.F) - init_t_sync) /
-                                         SCALE_FACTOR;
+        auto meas = static_cast<float>((t_sum.value / 2.F) + (sign_factor * pos_z * a_z) -
+                                       (BarLength / init_effective_c / 2.F) - init_t_sync) /
+                    SCALE_FACTOR;
+        // auto meas = static_cast<float>((t_sum.value / 2.F) + (sign_factor * pos_z * a_z) +
+        //                                (BarLength / init_effective_c) - init_t_sync) /
+        //             SCALE_FACTOR;
+        input_data_buffer_.measurement = meas;
         input_data_buffer_.sigma = static_cast<float>(t_sum.error / SCALE_FACTOR / 2. * config_.scale_factor);
 
-        // fmt::println("write measurement: {}, sigma: {}", input_data_buffer_.measurement, input_data_buffer_.sigma);
-        // input_data_buffer_.sigma = static_cast<float>(DEFAULT_MEAS_ERROR);
-        // const auto local_derivs_t = std::array{ 0.F, 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F };
-        const auto local_derivs_t = std::array{ 0.F, 0.F, 0.F, 0.F, 1.F };
+        const auto local_derivs_t = std::array{ 1.F };
 #ifdef HAS_CPP_STANDARD_17
         std::copy(local_derivs_t.begin(), local_derivs_t.end(), std::back_inserter(input_data_buffer_.locals));
 #else
         ranges::copy(local_derivs_t, std::back_inserter(input_data_buffer_.locals));
 #endif
         input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::tsync), 1.F);
-        // input_data_buffer_.globals.emplace_back(get_global_label_id(module_num, GlobalLabel::effective_c),
-        //                                         -BarLength / SCALE_FACTOR / 2.F / init_effective_c /
-        //                                         init_effective_c);
 
         write_to_buffer();
+        return meas;
     }
 
     void MillepedeEngine::add_spacial_local_constraint(int plane_id, const std::vector<MilleCalData>& plane_signals)
@@ -425,16 +530,7 @@ namespace R3B::Neuland::Calibration
             return;
         }
         pos_bar_vert_disp /= n_not_outlier;
-        // const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F }
-        //                                         : std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F };
-#ifdef TWO_PAR
-        // const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 1.F }
-        //                                         : std::array{ pos_z / SCALE_FACTOR, 0.F, 1.F, 0.F };
         const auto local_derivs = std::array{ pos_z / SCALE_FACTOR, 1.F };
-#else
-        const auto local_derivs = is_horizontal ? std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 1.F, 0.F }
-                                                : std::array{ pos_z / SCALE_FACTOR, 0.F, 1.F, 0.F, 0.F };
-#endif
 
         input_data_buffer_.measurement = static_cast<float>(pos_bar_vert_disp / SCALE_FACTOR);
         // input_data_buffer_.sigma =
@@ -478,16 +574,7 @@ namespace R3B::Neuland::Calibration
                                                             (init_effective_c * t_diff.value / SCALE_FACTOR / 2.));
         input_data_buffer_.sigma =
             static_cast<float>(t_error / SCALE_FACTOR / 2. * std::abs(init_effective_c) * config_.scale_factor);
-        // const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F, 0.F }
-        //                                         : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 0.F, 1.F, 0.F };
-#ifdef TWO_PAR
-        // const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 1.F, 0.F }
-        //                                         : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 1.F };
         const auto local_derivs = std::array{ pos_z / SCALE_FACTOR, 1.F };
-#else
-        const auto local_derivs = is_horizontal ? std::array{ pos_z / SCALE_FACTOR, 0.F, 1.F, 0.F, 0.F }
-                                                : std::array{ 0.F, pos_z / SCALE_FACTOR, 0.F, 1.F, 0.F };
-#endif
 #ifdef HAS_CPP_STANDARD_17
         std::copy(local_derivs.begin(), local_derivs.end(), std::back_inserter(input_data_buffer_.locals));
 #else
@@ -504,7 +591,8 @@ namespace R3B::Neuland::Calibration
         //     const auto c_val = (0.5 * (module_par.t_diff * module_par.effective_speed).value / SCALE_FACTOR) -
         //                        (module_par.effective_speed.value * t_diff.value / SCALE_FACTOR / 2.);
         //     fmt::println(
-        //         "c_value_2.append({})\na_value_2.append({})\nb_value_2.append({})", c_val, pos_z / SCALE_FACTOR, 1.);
+        //         "c_value_2.append({})\na_value_2.append({})\nb_value_2.append({})", c_val, pos_z /
+        //         SCALE_FACTOR, 1.);
         // }
         write_to_buffer();
         LOGP(debug,
@@ -513,7 +601,7 @@ namespace R3B::Neuland::Calibration
              pos_z);
     }
 
-    auto MillepedeEngine::select_t_diff_signal(const std::vector<MilleCalData>& plane_data)
+    auto MillepedeEngine::select_t_sync_signal(const std::vector<MilleCalData>& plane_data)
     {
         auto iter = ranges::min_element(plane_data, std::less{}, &MilleCalData::residual);
         if (iter != plane_data.end())
@@ -549,7 +637,8 @@ namespace R3B::Neuland::Calibration
     //     //     const auto& y_z_data = fit_data.time_data_y_z;
     //     //     fmt::println(
     //     //         "module IDs: {}",
-    //     //         fmt::join(signals | std::views::transform([](const auto& signal) { return signal.module_num; }),
+    //     //         fmt::join(signals | std::views::transform([](const auto& signal) { return signal.module_num;
+    //     }),
     //     ",
     //     //         "));
     //     //     fmt::println("x_z_data: {}", x_z_data);
@@ -558,7 +647,8 @@ namespace R3B::Neuland::Calibration
 
     //     for (const auto& [plane_id, plane_signals] :
     //          processed_data |
-    //              rng::views::filter([](const auto& planeid_signals) { return not planeid_signals.second.empty(); }))
+    //              rng::views::filter([](const auto& planeid_signals) { return not planeid_signals.second.empty();
+    //              }))
     //     {
     //         if (plane_signals.empty())
     //         {
@@ -589,57 +679,13 @@ namespace R3B::Neuland::Calibration
     //     }
     // }
 
-    void MillepedeEngine::AddSignals(const std::vector<BarCalData>& signals)
+    template <>
+    void MillepedeEngine::add_signals<MillepedeCalibrationMode::offset_effective_c>(
+        const DataBufferType& processed_data,
+        const TrackFitResult& fit_coeff)
     {
-        auto* task = GetTask();
-        if (not data_preprocessor_->process(signals, *cal_to_hit_par_))
-        {
-            task->ConditionFillToHist("preprocess_fail");
-            return;
-        }
-        task->ConditionFillToHist("preprocess_success");
-        const auto& processed_data = data_preprocessor_->get_data();
-        output_mille_track_info_ = data_preprocessor_->get_track_info();
-        const auto& fit_coeff = data_preprocessor_->get_track_info().bar_disp_data;
-        const auto x_z_slope = fit_coeff.x_z.slope;
-        const auto y_z_slope = fit_coeff.y_z.slope;
-        const auto a_z = std::sqrt(1 + (x_z_slope * x_z_slope) + (y_z_slope * y_z_slope)) / CLight;
-        namespace sv = ranges::views;
-
-        // for (const auto& [plane_id, plane_signals] :
-        //      processed_data |
-        //          rng::views::filter([](const auto& planeid_signals) { return not planeid_signals.second.empty(); }))
-        // {
-        //     if (plane_signals.empty())
-        //     {
-        //         continue;
-        //     }
-
-        //     // // filter method
-        //     // auto iter = select_t_diff_signal(plane_signals);
-
-        //     // if (iter == plane_signals.end())
-        //     // {
-        //     //     continue;
-        //     // }
-        //     // add_signal_t_sum(*iter, a_z);
-        //     // add_signal_t_diff(*iter);
-
-        //     // add_spacial_local_constraint(plane_id, plane_signals);
-
-        //     // event contains multiple entry:
-        //     add_spacial_local_constraint(plane_id, plane_signals);
-        // }
-
-        // auto add_to_constraints = [this, &processed_data]() -> void
-        // {
-        //     for (const auto& [plane_id, plane_signals] :
-        //          processed_data | rng::views::filter([](const auto& planeid_signals) -> auto
-        //                                              { return not planeid_signals.second.empty(); }))
-        //     {
-        //         add_spacial_local_constraint(plane_id, plane_signals);
-        //     }
-        // };
+        const auto is_xz_flat = std::abs(fit_coeff.x_z.slope) < std::abs(config_.max_abs_a_xz);
+        const auto is_yz_flat = std::abs(fit_coeff.y_z.slope) < std::abs(config_.max_abs_a_yz);
         auto add_to_constraints = [this, &processed_data](bool is_x_z) -> void
         {
             for (const auto& [plane_id, plane_signals] :
@@ -653,24 +699,6 @@ namespace R3B::Neuland::Calibration
                 add_spacial_local_constraint(plane_id, plane_signals);
             }
         };
-        // fmt::println("Event bar signals: >>>");
-        // for (const auto& [plane_id, plane_signals] :
-        //      processed_data |
-        //          rng::views::filter([](const auto& planeid_signals) { return not planeid_signals.second.empty(); }))
-        // {
-        //     fmt::println("horizontal: {}, module ids: {}",
-        //                  IsPlaneIDHorizontal(plane_id),
-        //                  fmt::join(plane_signals | sv::transform(&MilleCalData::module_num), ", "));
-        // }
-
-        const auto is_xz_flat = std::abs(fit_coeff.x_z.slope) < std::abs(config_.max_abs_a_xz);
-        const auto is_yz_flat = std::abs(fit_coeff.y_z.slope) < std::abs(config_.max_abs_a_yz);
-
-        if (not(is_xz_flat or is_yz_flat))
-        {
-            return;
-        }
-
         for (const auto& [plane_id, plane_signals] :
              processed_data | rng::views::filter([](const auto& planeid_signals) -> auto
                                                  { return not planeid_signals.second.empty(); }))
@@ -690,25 +718,153 @@ namespace R3B::Neuland::Calibration
                 binary_data_writer_->end();
             }
         }
-
-        // vector_zip_action(processed_data | sv::values,
-        //                   [this, add_to_constraints](auto&& vec_view) -> auto
-        //                   {
-        //                       for (const auto& bar_hit : vec_view)
-        //                       {
-        //                           add_signal_t_diff(bar_hit);
-        //                       }
-        //                       // fmt::println("one record: {}",
-        //                       //              fmt::join(vec_view | sv::transform(&MilleCalData::module_num), ", "));
-        //                       add_to_constraints();
-        //                       binary_data_writer_->end();
-        //                   });
-        add_fit_result_hist(fit_coeff);
         for (const auto& bar_signal : processed_data | sv::values | sv::join)
         {
             output_mille_data_.get().push_back(bar_signal);
             // add_signal_t_sum(bar_signal, a_z);
         }
+    }
+
+    template <>
+    void MillepedeEngine::add_signals<MillepedeCalibrationMode::tsync>(const DataBufferType& processed_data,
+                                                                       const TrackFitResult& fit_coeff)
+    {
+        for (const auto& [plane_id, plane_signals] :
+             processed_data | rng::views::filter([](const auto& planeid_signals) -> auto
+                                                 { return not planeid_signals.second.empty(); }))
+        {
+            auto iter = select_t_sync_signal(plane_signals);
+            if (iter == plane_signals.end())
+            {
+                continue;
+            }
+            auto mille_data = *iter;
+            mille_data.tsync_meas = add_signal_t_sum(mille_data, fit_coeff);
+            output_tsync_mille_data_.get().push_back(mille_data);
+            // iter->tsync_meas = tsync_meas;
+            // add_spacial_local_constraint(plane_id, plane_signals);
+        }
+
+        binary_data_writer_->end();
+    }
+
+    void MillepedeEngine::AddSignals(const std::vector<BarCalData>& signals)
+    {
+        auto* task = GetTask();
+        if (not data_preprocessor_->process(signals, *cal_to_hit_par_))
+        {
+            task->ConditionFillToHist("preprocess_fail");
+            return;
+        }
+        task->ConditionFillToHist("preprocess_success");
+        const auto& processed_data = data_preprocessor_->get_data();
+        output_mille_track_info_ = data_preprocessor_->get_track_info();
+        const auto& fit_coeff = data_preprocessor_->get_track_info().bar_disp_data;
+
+        // for (const auto& [plane_id, plane_signals] :
+        //      processed_data |
+        //          rng::views::filter([](const auto& planeid_signals) { return not planeid_signals.second.empty();
+        //          }))
+        // {
+        //     if (plane_signals.empty())
+        //     {
+        //         continue;
+        //     }
+
+        //     // filter method
+        //     auto iter = select_t_diff_signal(plane_signals);
+
+        //     if (iter == plane_signals.end())
+        //     {
+        //         continue;
+        //     }
+        //     add_signal_t_sum(*iter, a_z);
+        //     add_signal_t_diff(*iter);
+        //     add_spacial_local_constraint(plane_id, plane_signals);
+
+        // }
+
+        // auto add_to_constraints = [this, &processed_data](bool is_x_z) -> void
+        // {
+        //     for (const auto& [plane_id, plane_signals] :
+        //          processed_data | rng::views::filter(
+        //                               [is_x_z](const auto& planeid_signals) -> auto
+        //                               {
+        //                                   return (not planeid_signals.second.empty()) and
+        //                                          (IsPlaneIDHorizontal(planeid_signals.first) != is_x_z);
+        //                               }))
+        //     {
+        //         add_spacial_local_constraint(plane_id, plane_signals);
+        //     }
+        // };
+
+        const auto is_xz_flat = std::abs(fit_coeff.x_z.slope) < std::abs(config_.max_abs_a_xz);
+        const auto is_yz_flat = std::abs(fit_coeff.y_z.slope) < std::abs(config_.max_abs_a_yz);
+
+        if (not(is_xz_flat or is_yz_flat))
+        {
+            return;
+        }
+
+        switch (config_.cal_mode)
+        {
+            case MillepedeCalibrationMode::offset_effective_c:
+                add_signals<MillepedeCalibrationMode::offset_effective_c>(processed_data, fit_coeff);
+                break;
+            case MillepedeCalibrationMode::tsync:
+                add_signals<MillepedeCalibrationMode::tsync>(processed_data, fit_coeff);
+                break;
+            default:
+                throw R3B::logic_error(
+                    fmt::format("Unrecognized calibration mode: {}", magic_enum::enum_name(config_.cal_mode)));
+        }
+
+        // #ifndef TWO_PAR
+        //         for (const auto& [plane_id, plane_signals] :
+        //              processed_data | rng::views::filter([](const auto& planeid_signals) -> auto
+        //                                                  { return not planeid_signals.second.empty(); }))
+        //         {
+        //             auto iter = select_t_sync_signal(plane_signals);
+        //             if (iter == plane_signals.end())
+        //             {
+        //                 continue;
+        //             }
+        //             auto mille_data = *iter;
+        //             mille_data.tsync_meas = add_signal_t_sum(mille_data, fit_coeff);
+        //             output_tsync_mille_data_.get().push_back(mille_data);
+        //             // iter->tsync_meas = tsync_meas;
+        //             // add_spacial_local_constraint(plane_id, plane_signals);
+        //         }
+
+        //         binary_data_writer_->end();
+        // #endif
+
+        // for (const auto& [plane_id, plane_signals] :
+        //      processed_data | rng::views::filter([](const auto& planeid_signals) -> auto
+        //                                          { return not planeid_signals.second.empty(); }))
+        // {
+        //     const auto is_horizontal = IsPlaneIDHorizontal(plane_id);
+        //     if (not(is_horizontal ? is_xz_flat : is_yz_flat))
+        //     {
+        //         continue;
+        //     }
+        //     for (const auto& signal : plane_signals)
+        //     {
+        //         hist_module_residuals_->Fill(signal.module_num, signal.residual);
+        //         hist_module_residuals_bar_pos_->Fill(signal.module_num, signal.residual_bar_pos);
+        //         hist_fit_diff_time_->Fill(signal.module_num, signal.fit_diff);
+        //         add_signal_t_diff(signal);
+        //         add_to_constraints(is_horizontal);
+        //         binary_data_writer_->end();
+        //     }
+        // }
+
+        add_fit_result_hist(fit_coeff);
+        // for (const auto& bar_signal : processed_data | sv::values | sv::join)
+        // {
+        //     output_mille_data_.get().push_back(bar_signal);
+        //     // add_signal_t_sum(bar_signal, a_z);
+        // }
     }
 
     void MillepedeEngine::Calibrate(Cal2HitPar& hit_par)
@@ -870,17 +1026,36 @@ namespace R3B::Neuland::Calibration
         {
             throw R3B::runtime_error("Pointer to cal_to_hit_par is nullptr!");
         }
-        auto& module_pars = cal_to_hit_par_->GetListOfModuleParRef();
-        for (auto& [module_num, module_par] : module_pars)
+
+        if (config_.cal_mode == MillepedeCalibrationMode::tsync)
         {
-            module_par.effective_speed.value = 16.0;
+            auto& module_pars = cal_to_hit_par_->GetListOfModuleParRef();
+            auto reference_bar_value = module_pars.at(DEFAULT_TSYNC_REFERENCE_BAR_NUM).t_sync.value;
+            if (reference_bar_value != DEFAULT_TSYNC_REFERENCE_BAR_VALUE)
+            {
+                LOGP(info,
+                     "The reference bar (bar_num {}) from the input tsync parameter has the wrong value ({}, should be "
+                     "{}). Offsetting the input parameters ...",
+                     DEFAULT_TSYNC_REFERENCE_BAR_NUM,
+                     reference_bar_value,
+                     DEFAULT_TSYNC_REFERENCE_BAR_VALUE);
+                for (auto& [module_num, module_par] : module_pars)
+                {
+                    module_par.t_sync.value -= reference_bar_value;
+                }
+            }
         }
+        // for (auto& [module_num, module_par] : module_pars)
+        // {
+        //     // module_par.effective_speed.value = 16.0;
+        //     // module_par.t_sync.value += 10;
+        // }
     }
 
     void MillepedeEngine::add_fit_result_hist(const MilleDataProcessor::FitResult& fit_result)
     {
-        // fmt::println("fit: a_x_z: {}, b_x_z: {}, a_y_z: {}, b_y_z: {}", fit_result.x_z.slope, fit_result.x_z.offset,
-        // fit_result.y_z.slope, fit_result.y_z.offset);
+        // fmt::println("fit: a_x_z: {}, b_x_z: {}, a_y_z: {}, b_y_z: {}", fit_result.x_z.slope,
+        // fit_result.x_z.offset, fit_result.y_z.slope, fit_result.y_z.offset);
         hist_p_value_xz_->Fill(fit_result.x_z.p_value);
         hist_p_value_yz_->Fill(fit_result.y_z.p_value);
         hist_a_xz_->Fill(std::abs(fit_result.x_z.slope));
@@ -907,10 +1082,18 @@ namespace R3B::Neuland::Calibration
             steer_writer.add_other_options(std::vector<std::string>{
                 "threads", fmt::format("{}", config_.num_of_threads), fmt::format("{}", config_.num_of_threads) });
         }
-#ifndef TWO_PAR
-        steer_writer.add_parameter_default(get_global_label_id(DEFAULT_TSYNC_REFERENCE_BAR_NUM, GlobalLabel::tsync),
-                                           std::make_pair(0.F, -1.F));
-#endif
+        if (config_.cal_mode == MillepedeCalibrationMode::tsync)
+        {
+
+            steer_writer.add_parameter_default(get_global_label_id(DEFAULT_TSYNC_REFERENCE_BAR_NUM, GlobalLabel::tsync),
+                                               std::make_pair(DEFAULT_TSYNC_REFERENCE_BAR_VALUE / SCALE_FACTOR, -1.F));
+        }
+        // #ifndef TWO_PAR
+        //         steer_writer.add_parameter_default(get_global_label_id(DEFAULT_TSYNC_REFERENCE_BAR_NUM,
+        //         GlobalLabel::tsync),
+        //                                            std::make_pair(DEFAULT_TSYNC_REFERENCE_BAR_VALUE /
+        //                                            SCALE_FACTOR, -1.F));
+        // #endif
         // steer_writer.add_parameter_default(get_global_label_id(DEFAULT_TSYNC_REFERENCE_BAR_NUM - 1,
         // GlobalLabel::tsync),
         //                                    std::make_pair(0.F, -1.F));
@@ -929,7 +1112,8 @@ namespace R3B::Neuland::Calibration
         //     const auto offset_effective_c = module_par.t_diff * module_par.effective_speed;
         //     steer_writer.add_parameter_default(
         //         get_global_label_id(module_num, GlobalLabel::offset_effective_c),
-        //         std::make_pair(offset_effective_c.value / SCALE_FACTOR, offset_effective_c.error / SCALE_FACTOR));
+        //         std::make_pair(offset_effective_c.value / SCALE_FACTOR, offset_effective_c.error /
+        //         SCALE_FACTOR));
         // }
         steer_writer.write();
     }

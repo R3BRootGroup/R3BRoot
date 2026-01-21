@@ -7,6 +7,7 @@
 #include "R3BNeulandCalToHitTask.h"
 #include "R3BNeulandCommonFunc.h"
 #include "R3BNeulandHitCosmicMonitorTask.h"
+#include "R3BNeulandHitOnlineMonitorTask.h"
 #include "R3BNeulandMapDataConverterTask.h"
 #include "R3BNeulandMapToCalParTask.h"
 #include "R3BNeulandMapToCalTask.h"
@@ -198,17 +199,10 @@ namespace R3B::Neuland
             task->SetErrorMethod(option.error_method);
             run->AddTask(task.release());
         }
+
         if (const auto& option = task_option.neuland_map_to_cal_task; option.enable)
         {
-            parse_io_branch_names(option, read_branch_names, 4, write_branch_names, 1);
-            auto task = std::make_unique<R3B::Neuland::Map2CalTask>(read_branch_names.at(0),
-                                                                    read_branch_names.at(1),
-                                                                    read_branch_names.at(2),
-                                                                    read_branch_names.at(3),
-                                                                    write_branch_names.at(0));
-            task->SetPulserMode(option.enable_pulse_mode);
-            task->SetNhitmin(option.min_stat);
-            task->EnableWalk(option.enable_walk_effect);
+            auto task = std::make_unique<std::remove_cvref_t<decltype(option)>::Task>(option);
             run->AddTask(task.release());
         }
 
@@ -231,21 +225,7 @@ namespace R3B::Neuland
 
         if (const auto& option = task_option.neuland_cal_to_hit_par_task; option.enable)
         {
-            parse_io_branch_names(option, read_branch_names, 2, write_branch_names, 1);
-            auto task = std::make_unique<R3B::Neuland::Cal2HitParTask>(
-                option.method, read_branch_names.at(0), read_branch_names.at(1), write_branch_names.at(0));
-            if (option.method == Cal2HitParMethod::millepede)
-            {
-                auto millepede_engine = std::make_unique<Calibration::MillepedeEngine>();
-                millepede_engine->set_options(option.millepede);
-                task->SetMethod(std::move(millepede_engine));
-            }
-            else
-            {
-                task->SetMethod(option.method);
-            }
-            task->SetMinStat(option.min_stat);
-            task->SetTrigger(option.mode);
+            auto task = std::make_unique<std::remove_cvref_t<decltype(option)>::Task>(option);
             run->AddTask(task.release());
         }
 
@@ -267,6 +247,12 @@ namespace R3B::Neuland
         }
 
         if (const auto& option = task_option.neuland_cosmic_monitor_task; option.enable)
+        {
+            auto task = std::make_unique<std::remove_cvref_t<decltype(option)>::Task>(option);
+            run->AddTask(task.release());
+        }
+
+        if (const auto& option = task_option.neuland_hit_online_monitor_task; option.enable)
         {
             auto task = std::make_unique<std::remove_cvref_t<decltype(option)>::Task>(option);
             run->AddTask(task.release());

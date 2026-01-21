@@ -44,6 +44,7 @@ namespace R3B::Neuland::Calibration
         float fit_diff = 0.F;         //!< Difference value from the fitted line and position (time derived)
         float residual = -1.;         //!< residual value against the fitted line
         float residual_bar_pos = -1.; //!< residual value against the fitted line of bar positions
+        float tsync_meas = 0.F;
         ValueErrorD position;         //!< position of the hit along the bar direction
         ValueErrorD z_pos;            //!< z positions
         CalDataSignal left;

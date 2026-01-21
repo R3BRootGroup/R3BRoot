@@ -16,6 +16,7 @@
 #include "R3BNeulandCalData2.h"
 #include "R3BNeulandCalibrationTask.h"
 #include "R3BNeulandCommon.h"
+#include "R3BNeulandCommonFunc.h"
 #include "R3BNeulandMapToCalPar.h"
 #include "R3BPaddleTamexMappedData2.h"
 #include "R3BShared.h"
@@ -30,6 +31,7 @@
 #include <fairlogger/Logger.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <fmt/ranges.h>
 #include <iterator>
 #include <range/v3/view/map.hpp>
 #include <string_view>
@@ -53,19 +55,16 @@ namespace
 
 namespace R3B::Neuland
 {
-    // NOLINTNEXTLINE
-    Map2CalTask::Map2CalTask(std::string_view map_data_name,
-                             std::string_view trig_map_data_name,
-                             std::string_view par_name,
-                             std::string_view trig_par_name,
-                             std::string_view cal_data_name)
-        : CalibrationTask("NeulandMap2CalTask", 1)
-        , map_data_{ map_data_name }
-        , trig_map_data_{ trig_map_data_name }
-        , cal_data_{ cal_data_name }
-        , calibration_par_{ par_name }
-        , calibration_trig_par_{ trig_par_name }
+    Map2CalTask::Map2CalTask(const Config& config)
+        : CalibrationTask(config.name, 1)
+        , config_{ config }
+        , map_data_{ get_from_sep_string(0, config.read) }
+        , trig_map_data_{ get_from_sep_string(1, config.read) }
+        , calibration_par_{ get_from_sep_string(2, config.read) }
+        , calibration_trig_par_{ get_from_sep_string(3, config.read) }
+        , cal_data_{ get_from_sep_string(0, config.write) }
     {
+        SetTrigger(config.mode);
     }
 
     void Map2CalTask::SetExtraPar(FairRuntimeDb* /*rtdb*/)
@@ -149,7 +148,7 @@ namespace R3B::Neuland
     {
         if (auto ct_freq = calibration_par_->GetSlowClockFrequency(); ct_freq == 0)
         {
-            LOGP(warn, "Coarse time frequency obtained from parameteers is 0! Use default value.");
+            LOGP(warn, "Coarse time frequency obtained from parameters is 0! Use default value.");
             coarse_time_frequency_ = COARSE_TIME_CLOCK_FREQUENCY_MHZ;
         }
         else
@@ -160,23 +159,24 @@ namespace R3B::Neuland
         }
     }
 
-    auto Map2CalTask::CheckConditions() const -> bool
+    auto Map2CalTask::CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool
     {
 
         auto signal_size = map_data_.size();
         LOGP(debug2,
              "Minimal signal size: {}. Current signal size: {}. Number of PMTs: {}",
-             signal_min_size_,
+             config_.min_stat,
              signal_size,
              total_pmt_nums_);
-        if (signal_size < signal_min_size_)
+        if (signal_size < config_.min_stat)
         {
             LOGP(debug2,
                  "condition of the minimal size is not met with current paddle signal size. Skip the "
                  "current event.");
+            ConditionFillToHist(hist_condition, "undersized");
             return false;
         }
-        return is_pulse_mode_ ? signal_size > total_pmt_nums_ : signal_size < total_pmt_nums_ / 2;
+        return config_.enable_pulse_mode ? signal_size > total_pmt_nums_ : signal_size < total_pmt_nums_ / 2;
     }
 
     void Map2CalTask::TriggeredExec() { calibrate(); }
@@ -206,9 +206,8 @@ namespace R3B::Neuland
             return { -1., 0 };
         }
         const auto triggerID = (side == Side::left) ? triggerIDPair->second.first : triggerIDPair->second.second;
-        const auto trigData = std::find_if(trig_map_data_.begin(),
-                                           trig_map_data_.end(),
-                                           [&triggerID](const auto& ele) { return ele.first == triggerID; });
+        const auto trigData = std::ranges::find_if(
+            trig_map_data_, [&triggerID](const auto& ele) -> bool { return ele.first == triggerID; });
         if (trigData == trig_map_data_.end())
         {
             const auto eventNum = GetEventHeader()->GetEventno();
@@ -224,17 +223,16 @@ namespace R3B::Neuland
             calibration_trig_par_.get(), trigData->second.signal, FTType::trigger, trigData->first);
     }
 
-    auto Map2CalTask::get_tot(const DoubleEdgeSignal& pmtSignal,
-                              int module_num,
-                              R3B::Side module_side) const -> ValueError<double>
+    auto Map2CalTask::get_tot(const DoubleEdgeSignal& pmtSignal, int module_num, R3B::Side module_side) const
+        -> ValueError<double>
     {
         const auto leadFType = (module_side == Side::left) ? FTType::leftleading : FTType::rightleading;
         const auto trailFType = (module_side == Side::left) ? FTType::lefttrailing : FTType::righttrailing;
         const auto leadingT = convert_to_real_time(calibration_par_.get(), pmtSignal.leading, leadFType, module_num);
         const auto trailingT = convert_to_real_time(calibration_par_.get(), pmtSignal.trailing, trailFType, module_num);
-        const auto time_over_thres = trailingT - leadingT;
+        const auto time_over_thresh = trailingT - leadingT;
         LOGP(debug3, "leading :{} trailing: {}", leadingT.value, trailingT.value);
-        return (time_over_thres.value > 0) ? time_over_thres : time_over_thres + max_coarse_time_;
+        return (time_over_thresh.value > 0) ? time_over_thresh : time_over_thresh + max_coarse_time_;
     }
 
     void Map2CalTask::overflow_correct(R3B::Neuland::CalDataSignal& calSignal) const
@@ -254,7 +252,7 @@ namespace R3B::Neuland
         const auto ftType = (side == R3B::Side::left) ? FTType::leftleading : FTType::rightleading;
         calDataSignal.time_over_threshold = get_tot(double_edge_signal, module_num, side);
         const auto walk_correction =
-            (is_walk_enabled_) ? GetWalkCorrection(calDataSignal.time_over_threshold.value) : 0.;
+            (config_.enable_walk_effect) ? GetWalkCorrection(calDataSignal.time_over_threshold.value) : 0.;
         calDataSignal.leading_time =
             convert_to_real_time(calibration_par_.get(), double_edge_signal.leading, ftType, module_num) +
             walk_correction;
@@ -271,11 +269,10 @@ namespace R3B::Neuland
         const auto& signals = (side == Side::left) ? map_bar_signals.left : map_bar_signals.right;
         auto calSignals = std::vector<CalDataSignal>{};
         calSignals.reserve(signals.size());
-        std::transform(signals.begin(),
-                       signals.end(),
-                       std::back_inserter(calSignals),
-                       [module_num, side, this](const auto& dESignal)
-                       { return doubleEdgeSignal_to_calSignal(dESignal, side, module_num); });
+        std::ranges::transform(signals,
+                               std::back_inserter(calSignals),
+                               [module_num, side, this](const auto& dESignal) -> CalDataSignal
+                               { return doubleEdgeSignal_to_calSignal(dESignal, side, module_num); });
         return calSignals;
     }
 
@@ -323,22 +320,22 @@ namespace R3B::Neuland
         for (const auto& signal : calSignals)
         {
             const auto lTime = signal.leading_time.value;
-            const auto time_over_thres = signal.time_over_threshold.value;
+            const auto time_over_thresh = signal.time_over_threshold.value;
             const auto triggerTime = signal.trigger_time.value;
-            histograms.get("ToT")->Fill(time_over_thres);
+            histograms.get("ToT")->Fill(time_over_thresh);
             histograms.get("LeadingTime")->Fill(lTime);
             histograms.get("TriggerTime")->Fill(triggerTime);
             histograms.get("Leading_minus_trigger")->Fill(lTime - triggerTime);
             if (side == Side::left)
             {
                 histograms.get("TimeLVsBar")->Fill(module_num, lTime - triggerTime);
-                histograms.get("ToTLVsBar")->Fill(module_num, time_over_thres);
+                histograms.get("ToTLVsBar")->Fill(module_num, time_over_thresh);
                 histograms.get("Bar_hitNum_l")->Fill(module_num);
             }
             else
             {
                 histograms.get("TimeRVsBar")->Fill(module_num, lTime - triggerTime);
-                histograms.get("ToTRVsBar")->Fill(module_num, time_over_thres);
+                histograms.get("ToTRVsBar")->Fill(module_num, time_over_thresh);
                 histograms.get("Bar_hitNum_r")->Fill(module_num);
             }
         }

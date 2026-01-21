@@ -18,31 +18,41 @@
 #include "R3BNeulandCalToHitPar.h"
 #include "R3BNeulandCalibrationTask.h"
 #include "R3BNeulandCommon.h"
+#include "R3BNeulandCommonFunc.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
 #include <R3BLogger.h>
 #include <R3BNeulandCal2HitHistAnalysis.h>
 #include <R3BNeulandMillepede.h>
 #include <R3BNeulandMuonRecons.h>
+#include <TH1.h>
 #include <fairlogger/Logger.h>
 #include <memory>
-#include <string_view>
+#include <utility>
 
 namespace R3B::Neuland
 {
-    // NOLINTBEGIN
-    Cal2HitParTask::Cal2HitParTask(Cal2HitParMethod method,
-                                   std::string_view cal_data_name,
-                                   std::string_view base_par_name,
-                                   std::string_view hit_par_name,
-                                   std::string_view name,
-                                   int iVerbose)
-        : CalibrationTask(name, iVerbose)
-        , cal_data_{ cal_data_name }
-        , base_par_{ AddInputPar<CalibrationBasePar>(base_par_name) }
-        , hit_par_(AddOutputPar<Cal2HitPar>(hit_par_name))
-    // NOLINTEND
+    Cal2HitParTask::Cal2HitParTask(const Config& config)
+
+        : CalibrationTask(config.name, 1)
+        , config_{ config }
+        , cal_data_{ get_from_sep_string(0, config.read) }
+        , base_par_{ AddInputPar<CalibrationBasePar>(get_from_sep_string(1, config.read)) }
+        , hit_par_(AddOutputPar<Cal2HitPar>(get_from_sep_string(0, config.write)))
+
     {
+        if (config.method == Cal2HitParMethod::millepede)
+        {
+            auto millepede_engine = std::make_unique<Calibration::MillepedeEngine>();
+            millepede_engine->set_options(config.millepede);
+            SetMethod(std::move(millepede_engine));
+        }
+        else
+        {
+            SetMethod(config.method);
+        }
+        SetMinStat(config.min_stat);
+        SetTrigger(config.mode);
     }
 
     void Cal2HitParTask::SetMinStat(int min)
@@ -135,7 +145,7 @@ namespace R3B::Neuland
     }
     void Cal2HitParTask::BeginOfEvent() { engine_->BeginOfEvent(); }
 
-    auto Cal2HitParTask::CheckConditions() const -> bool
+    auto Cal2HitParTask::CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool
     {
         auto res = engine_->SignalFilter(cal_data_.get());
         return res;

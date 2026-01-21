@@ -15,6 +15,8 @@
 
 #include "R3BDataMonitor.h"
 #include "R3BNeulandCalToHitPar.h"
+#include "R3BNeulandMillepede.h"
+#include "R3BNeulandTriggerTypes.h"
 #include <FairRootManager.h>
 #include <FairRuntimeDb.h>
 #include <R3BIOConnector.h>
@@ -24,6 +26,7 @@
 #include <R3BNeulandCosmicEngine.h>
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <string_view>
 
 #ifdef HAS_CPP_STANDARD_17
@@ -31,6 +34,8 @@
 #else
 #include <concepts>
 #endif
+
+class TH1L;
 
 namespace R3B::Neuland
 {
@@ -40,16 +45,28 @@ namespace R3B::Neuland
         histogram,
         millepede
     };
+    constexpr auto DEFAULT_MIN_STAT = 10;
+
+    class Cal2HitParTask;
+
+    struct Cal2HitParTaskConfig
+    {
+        using Task = Cal2HitParTask;
+        bool enable = false;
+        int min_stat = DEFAULT_MIN_STAT;
+        CalTrigger mode = CalTrigger::offspill;
+        Cal2HitParMethod method = Cal2HitParMethod::recons;
+        Calibration::MillepedeOptions millepede;
+        std::string name = "NeulandCal2HitParTask";
+        std::string read = "NeulandCalData;NeulandCalibrationBasePar";
+        std::string write = "NeulandHitPar";
+    };
 
     class Cal2HitParTask : public CalibrationTask
     {
       public:
-        explicit Cal2HitParTask(Cal2HitParMethod method = Cal2HitParMethod::recons,
-                                std::string_view cal_data_name = "NeulandCalData",
-                                std::string_view base_par_name = "NeulandCalibrationBasePar",
-                                std::string_view hit_par_name = "NeulandHitPar",
-                                std::string_view name = "NeulandCal2HitParTask",
-                                int iVerbose = 1);
+        using Config = Cal2HitParTaskConfig;
+        explicit Cal2HitParTask(const Config& config);
         void SetMinStat(int min);
         void SetErrorScale(float scale);
         auto GetCal2HitPar() -> auto* { return hit_par_; }
@@ -67,6 +84,7 @@ namespace R3B::Neuland
         }
 
       private:
+        Config config_;
         InputVectorConnector<BarCalData> cal_data_{ "NeulandCalData" };
 
         CalibrationBasePar* base_par_ = nullptr; // input par
@@ -81,7 +99,7 @@ namespace R3B::Neuland
         void SetExtraPar(FairRuntimeDb* rtdb) override;
         void TriggeredExec() override;
         void EndOfTask() override;
-        [[nodiscard]] auto CheckConditions() const -> bool override;
+        [[nodiscard]] auto CheckConditions([[maybe_unused]] TH1L* hist_condition) const -> bool override;
 
         // private non virtual functions:
     };

@@ -22,6 +22,7 @@ namespace R3B::Neuland
     CalibrationTask::CalibrationTask(std::string_view name, int iVerbose)
         : FairTask(name.data(), iVerbose)
     {
+        LOGP(info, "Calibration task {:?} is enable!", name);
     }
 
     CalibrationTask::CalibrationTask()
@@ -79,13 +80,15 @@ namespace R3B::Neuland
 
     void CalibrationTask::execute_with_hist()
     {
+        hist_condition_check_->Fill("total", 1);
         if (!check_offspill_trigger())
         {
             hist_trig_check_->Fill(fmt::format("{:016b}", eventHeader_->GetTpat()).c_str(), 1);
             return;
         }
+        hist_condition_check_->Fill("triggered", 1);
         hist_trig_check_->Fill(fmt::format("*{:016b}", eventHeader_->GetTpat()).c_str(), 1);
-        if (!CheckConditions())
+        if (!CheckConditions(hist_condition_check_))
         {
             hist_condition_check_->Fill("failure", 1);
             return;
@@ -95,18 +98,24 @@ namespace R3B::Neuland
         TriggeredExec();
     }
 
+    void CalibrationTask::ConditionFillToHist(TH1L* hist_condition, std::string_view condition)
+    {
+        if (condition == "failure" or condition == "success" or condition == "triggered" or condition == "total")
+        {
+            LOGP(warn, R"("failure", "success", "triggered" and "total" are reserved conditions!)");
+        }
+        hist_condition->Fill(condition.data(), 1);
+    }
+
     void CalibrationTask::ConditionFillToHist(std::string_view condition)
     {
-        if (condition == "failure" or condition == "success")
-        {
-            LOGP(warn, "failure and success are reserved conditions!");
-        }
-        hist_condition_check_->Fill(condition.data(), 1);
+
+        ConditionFillToHist(hist_condition_check_, condition);
     }
 
     void CalibrationTask::execute_no_hist()
     {
-        if (check_offspill_trigger() and CheckConditions())
+        if (check_offspill_trigger() and CheckConditions(hist_condition_check_))
         {
             passed_num_of_events++;
             TriggeredExec();
