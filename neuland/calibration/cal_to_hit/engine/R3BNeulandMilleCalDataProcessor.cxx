@@ -26,6 +26,8 @@ namespace stdrng = std::ranges;
 using namespace stdrng = ranges
 #endif
 
+constexpr auto DEFAULT_LEARNING_RATE = 0.1;
+
 namespace R3B::Neuland::Calibration
 {
     using DataBufferType = std::unordered_map<int, std::vector<MilleCalData>>;
@@ -34,7 +36,7 @@ namespace R3B::Neuland::Calibration
         init_data_registers(num_of_modules);
         auto& config = huber_regressor_.get_config_ref();
         config.weight.init = 1.;
-        config.weight.learning_rate = 0.1;
+        config.weight.learning_rate = DEFAULT_LEARNING_RATE;
         config.bias.init = 0.;
         config.bias.learning_rate = 10.;
     }

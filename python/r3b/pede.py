@@ -421,13 +421,11 @@ class Pede(object):
         for fileName, maxRecord, fileType in self.__binaryFiles:
             # open binary file
             binaryFile = open(fileName, "rb")
-            nRec = 0
             try:
-                while nRec < maxRecord:
+                for nRec in tqdm(range(maxRecord)):
                     # read record
                     rec = MilleRecord()
                     rec.readRecord(binaryFile, fileType)
-                    nRec += 1
                     dataBlocks = []
                     # number of local parameters
                     numLoc = 0
@@ -601,10 +599,10 @@ class Pede(object):
         # print(" Solution")
         # print("   parameter label, #entries, correction, error")
         par_len = len(self.__parCounters)
-        labels = np.zeros(par_len)
-        entries = np.zeros(par_len)
-        corrections = np.zeros(par_len)
-        errors = np.zeros(par_len)
+        labels = np.zeros(par_len, dtype=int)
+        entries = np.zeros(par_len, dtype=int)
+        corrections = np.zeros(par_len, dtype=float)
+        errors = np.zeros(par_len, dtype=float)
         for idx, l in enumerate(sorted(self.__parCounters)):
             if l in self.__parIndices:
                 i = self.__parIndices[l]
@@ -729,7 +727,7 @@ if __name__ == "__main__":
         p.construct(args.huge_cut)
         p.solve()
 
-    p.dataframe.to_json(args.output_file)
+    p.dataframe.to_json("millepede.res.json", orient="index", indent=4)
 
     print()
     print(time.asctime())

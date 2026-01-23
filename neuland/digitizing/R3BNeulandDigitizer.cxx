@@ -88,31 +88,34 @@ namespace R3B::Neuland
             return std::map<std::pair<const std::string, const std::string>,
                             std::function<std::unique_ptr<Digitizing::EngineInterface>()>>{
                 { { "neuland", "tamex" },
-                  [&tamex_par, pileup_strategy, cal_to_hit_par, enable_sim_cal = option.enable_sim_cal]()
+                  [&tamex_par, pileup_strategy, cal_to_hit_par, enable_sim_cal = option.enable_sim_cal]() -> auto
                   {
                       return Digitizing::CreateEngine(
                           UsePaddle<NeulandPaddle>(cal_to_hit_par),
                           UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par, enable_sim_cal));
                   } },
                 { { "neuland", "tacquila" },
-                  [cal_to_hit_par]() {
+                  [cal_to_hit_par]() -> auto
+                  {
                       return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par),
                                                       UseChannel<TacquilaChannel>());
                   } },
                 { { "mock", "tamex" },
-                  [&tamex_par, pileup_strategy, cal_to_hit_par, enable_sim_cal = option.enable_sim_cal]()
+                  [&tamex_par, pileup_strategy, cal_to_hit_par, enable_sim_cal = option.enable_sim_cal]() -> auto
                   {
                       return Digitizing::CreateEngine(
                           UsePaddle<MockPaddle>(),
                           UseChannel<TamexChannel>(pileup_strategy, tamex_par, cal_to_hit_par, enable_sim_cal));
                   } },
                 { { "neuland", "mock" },
-                  [cal_to_hit_par]() {
+                  [cal_to_hit_par]() -> auto
+                  {
                       return Digitizing::CreateEngine(UsePaddle<NeulandPaddle>(cal_to_hit_par),
                                                       UseChannel<MockChannel>());
                   } },
                 { { "mock", "mock" },
-                  []() { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
+                  []() -> auto
+                  { return Digitizing::CreateEngine(UsePaddle<MockPaddle>(), UseChannel<MockChannel>()); } }
             };
         }
 
@@ -193,7 +196,7 @@ namespace R3B::Neuland
             "MultiplicityTwo", "Paddle multiplicity: both PMTs of a paddle", paddle_size, 0, paddle_size);
         auto const timeBinSize = 200;
         hist_rl_time_to_trig_ =
-            data_monitor_.add_hist<TH1F>("hRLTimeToTrig", "R/Ltime-triggerTime", timeBinSize, -100., 100.);
+            data_monitor_.add_hist<TH1F>("hRLTimeToTrig", "right/left-time-triggerTime", timeBinSize, -100., 100.);
         if (has_size_monitor_)
         {
             hist_paddle_hit_size_ = data_monitor_.add_hist<TH1D>(
@@ -229,7 +232,7 @@ namespace R3B::Neuland
 
         fill_histograms();
 
-        auto paddle_action = [this](const Digitizing::AbstractPaddle& paddle)
+        auto paddle_action = [this](const Digitizing::AbstractPaddle& paddle) -> void
         {
             if (!paddle.HasFired())
             {
@@ -250,7 +253,7 @@ namespace R3B::Neuland
 
         digitizing_engine_->DoEachPaddle(paddle_action);
 
-        LOG(debug) << fmt::format("Produced {} hits", neuland_hits_.size());
+        LOGP(debug, "Produced {} hits", neuland_hits_.size());
     }
 
     void Digitizer::fill_size_histograms(const Digitizing::AbstractPaddle& paddle)
@@ -300,7 +303,7 @@ namespace R3B::Neuland
                 {
                     ++(point_size_tracker_.at(paddle_ID));
                 }
-            } // eloss
+            } // energy loss
         } // points
     }
 
@@ -311,18 +314,20 @@ namespace R3B::Neuland
 
         hist_rl_time_to_trig_->Fill(triggerTime);
         hist_multi_one_->Fill(digitizing_engine_->DoAllPaddles(
-            [](auto paddles_view)
+            [](auto paddles_view) -> double
             {
                 return static_cast<double>(std::count_if(paddles_view.begin(),
                                                          paddles_view.end(),
-                                                         [](const auto& paddle) { return paddle.HasHalfFired(); }));
+                                                         [](const auto& paddle) -> bool
+                                                         { return paddle.HasHalfFired(); }));
             }));
 
         hist_multi_two_->Fill(digitizing_engine_->DoAllPaddles(
-            [](auto paddles_view)
+            [](auto paddles_view) -> double
             {
-                return static_cast<double>(std::count_if(
-                    paddles_view.begin(), paddles_view.end(), [](const auto& paddle) { return paddle.HasFired(); }));
+                return static_cast<double>(std::count_if(paddles_view.begin(),
+                                                         paddles_view.end(),
+                                                         [](const auto& paddle) -> bool { return paddle.HasFired(); }));
             }));
         if (has_size_monitor_)
         {

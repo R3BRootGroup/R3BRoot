@@ -45,8 +45,8 @@ namespace R3B::Neuland::Calibration
         float residual = -1.;         //!< residual value against the fitted line
         float residual_bar_pos = -1.; //!< residual value against the fitted line of bar positions
         float tsync_meas = 0.F;
-        ValueErrorD position;         //!< position of the hit along the bar direction
-        ValueErrorD z_pos;            //!< z positions
+        ValueErrorD position; //!< position of the hit along the bar direction
+        ValueErrorD z_pos;    //!< z positions
         CalDataSignal left;
         CalDataSignal right;
 
@@ -173,6 +173,7 @@ namespace R3B::Neuland::Calibration
                                FitPar& fit_par,
                                HuberRegressor& huber_regressor,
                                double p_value_cut) -> bool;
+
       private:
         double p_value_cut_ = DEFAULT_CALIBRATION_P_VALUE_CUT;
 

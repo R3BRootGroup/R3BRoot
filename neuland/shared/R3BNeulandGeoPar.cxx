@@ -87,8 +87,8 @@ auto R3BNeulandGeoPar::GetPaddleHalfLength() const -> double
 }
 
 // Convert positions of e.g. points to the local coordinate of the respective paddle [(-135,135),(-2.5,2.5),(-2.5,2.5)]
-auto R3BNeulandGeoPar::ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position,
-                                                 const int paddleID) const -> ROOT::Math::XYZVector
+auto R3BNeulandGeoPar::ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position, const int paddleID) const
+    -> ROOT::Math::XYZVector
 {
     auto pos_in = std::array{ position.X(), position.Y(), position.Z() };
     auto pos_tmp = std::array<double, 3>{};
@@ -102,8 +102,8 @@ auto R3BNeulandGeoPar::ConvertToLocalCoordinates(const ROOT::Math::XYZVector& po
     return { pos_out[0], pos_out[1], pos_out[2] };
 }
 
-auto R3BNeulandGeoPar::ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position,
-                                                  const int paddleID) const -> ROOT::Math::XYZVector
+auto R3BNeulandGeoPar::ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position, const int paddleID) const
+    -> ROOT::Math::XYZVector
 {
     auto pos_in = std::array{ position.X(), position.Y(), position.Z() };
     auto pos_tmp = std::array<double, 3>{};

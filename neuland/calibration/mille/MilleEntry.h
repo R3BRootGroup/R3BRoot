@@ -16,8 +16,6 @@
 #include <Rtypes.h>
 #include <fmt/base.h>
 #include <fmt/core.h>
-#include <nlohmann/json.hpp>
-#include <nlohmann/json_fwd.hpp>
 #include <utility>
 #include <vector>
 
@@ -38,16 +36,6 @@ namespace R3B
         }
         ClassDefNV(MilleDataPoint, 1);
     };
-
-    inline void to_json(nlohmann::json& json_obj, const MilleDataPoint& point)
-    {
-        json_obj = nlohmann::ordered_json{
-            { "measurement", point.measurement },
-            { "sigma", point.sigma },
-            { "locals", point.locals },
-            { "globals", point.globals },
-        };
-    }
 } // namespace R3B
 
 #ifndef __CLING__

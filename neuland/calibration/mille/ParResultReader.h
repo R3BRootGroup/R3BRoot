@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <fmt/base.h>
 #include <fmt/core.h>
 #include <string>
@@ -17,18 +18,35 @@ namespace R3B::Millepede
         float error = 0.F;
     };
 
+    struct JsonParResultEntry
+    {
+        int label = 0;
+        int entry = 0;
+        float correction = 0.;
+        float error = 0.;
+    };
+
     class ResultReader
     {
       public:
+        enum class Mode : uint8_t
+        {
+            res,
+            json
+        };
         ResultReader() = default;
         void set_filename(std::string_view filename) { filename_ = filename; }
+        void set_mode(Mode mode) { mode_ = mode; }
 
         void read();
         void print();
         [[nodiscard]] auto get_pars() const -> const auto& { return par_results_; }
 
       private:
+        Mode mode_ = Mode::res;
         std::string filename_;
+        void read_pede_par_file();
+        void read_json_file();
         std::unordered_map<int, ParResultEntry> par_results_;
     };
 

@@ -1,7 +1,6 @@
 name: build-steps
 description: 'steps to build R3BRoot and ucesb'
 
-
 inputs:
   build-needed:
     description: 'build process is needed'
@@ -25,7 +24,7 @@ runs:
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
         git submodule update --init --recursive
-        git clone https://github.com/R3BRootGroup/macros.git
+        # git clone https://github.com/R3BRootGroup/macros.git
         conan remote update conancenter --url="https://center2.conan.io"
         export ROOT_CXX_STANDARD=$(${SIMPATH}/bin/root-config --cxxstandard)
         export ROOT_CXX_STANDARD="${ROOT_CXX_STANDARD:-17}"

@@ -6,7 +6,6 @@
 #include "R3BNeulandMilleCalDataProcessor.h"
 #include "R3BNeulandTriggerTypes.h"
 #include <FairRootManager.h>
-#include <FairRuntimeDb.h>
 #include <TH1.h>
 #include <TH2.h>
 #include <algorithm>

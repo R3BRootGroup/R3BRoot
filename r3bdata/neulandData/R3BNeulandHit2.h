@@ -3,7 +3,7 @@
 #include "R3BValueError.h"
 #include <Rtypes.h>
 #include <fmt/base.h>
-#include <root/Math/Vector3D.h>
+#include <root/Math/Vector3D.h> // IWYU pragma: keep
 #include <root/Math/Vector3Dfwd.h>
 
 namespace R3B::Neuland

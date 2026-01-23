@@ -8,6 +8,7 @@
 #include <TH2.h>
 #include <cmath>
 #include <cstddef>
+#include <numbers>
 #include <range/v3/algorithm/for_each.hpp>
 #include <string_view>
 #include <utility>
@@ -61,7 +62,7 @@ namespace R3B::Neuland::calibration
         using ValueErrors = FTCalStrategy::ValueErrors;
         constexpr int uniform_err_divider = 12;
         constexpr auto uniform_err_divider_sqrt = SQRT_12;
-        const auto sqrt_3 = std::sqrt(3);
+        const auto sqrt_3 = std::numbers::sqrt3;
 
         struct InputInfo
         {
@@ -72,14 +73,14 @@ namespace R3B::Neuland::calibration
 
         auto calculate_meanerror_exact(const InputInfo& input) -> ValueError<double>
         {
-            const auto base_vairance = input.bin_entry * input.bin_entry / uniform_err_divider;
+            const auto base_variance = input.bin_entry * input.bin_entry / uniform_err_divider;
             const auto sum_term = input.previous_sum + (input.bin_entry / 3);
             const auto bin_prob = input.bin_entry / input.total_entry;
             const auto pre_prob = input.previous_sum / input.total_entry;
             const auto residual = ((1 - bin_prob) * sum_term) - (input.previous_sum * pre_prob);
 
             const auto mean = input.previous_sum + (input.bin_entry / 2);
-            return ValueError<double>{ mean, std::sqrt(base_vairance + residual) };
+            return ValueError<double>{ mean, std::sqrt(base_variance + residual) };
         }
 
         auto calculate_meanerror_approx(const InputInfo& input) -> ValueError<double>
@@ -113,13 +114,17 @@ namespace R3B::Neuland::calibration
             switch (methodtype)
             {
                 case FTCalErrorMethod::exact:
-                    return +[](const InputInfo& input) { return calculate_meanerror_exact(input); };
+                    return +[](const InputInfo& input) -> ValueError<double>
+                    { return calculate_meanerror_exact(input); };
                 case FTCalErrorMethod::approx:
-                    return +[](const InputInfo& input) { return calculate_meanerror_approx(input); };
+                    return +[](const InputInfo& input) -> ValueError<double>
+                    { return calculate_meanerror_approx(input); };
                 case FTCalErrorMethod::uniform_only:
-                    return +[](const InputInfo& input) { return calculate_meanerror_uniform_only(input); };
+                    return +[](const InputInfo& input) -> ValueError<double>
+                    { return calculate_meanerror_uniform_only(input); };
                 case FTCalErrorMethod::none:
-                    return +[](const InputInfo& input) { return calculate_meanerror_none(input); };
+                    return +[](const InputInfo& input) -> ValueError<double>
+                    { return calculate_meanerror_none(input); };
                 default:
                     throw R3B::logic_error("undefined enumerator for method type!");
             }
@@ -129,7 +134,7 @@ namespace R3B::Neuland::calibration
         {
             auto output = ValueErrors{};
             output.reserve(max_bin);
-            // root histrogram starts from index 1
+            // root histogram starts from index 1
             for (size_t index{ 1 }; index < max_bin + 1; ++index)
             {
                 output.emplace_back(hist->GetBinContent(static_cast<int>(index)), 0.);
@@ -140,17 +145,15 @@ namespace R3B::Neuland::calibration
         void scale_to_real_ns(ValueErrors& value_errors, double period, double total_entry)
         {
             ranges::for_each(value_errors,
-                             [&](ValueError<double>& value_error)
+                             [&](ValueError<double>& value_error) -> void
                              {
                                  value_error.value = value_error.value / total_entry * period;
                                  value_error.error = value_error.error / total_entry * period;
                              });
         }
 
-        auto calculate_value_errors(TH1* hist,
-                                    int max_bin,
-                                    double total_entry,
-                                    FTCalErrorMethod methodtype) -> std::pair<ValueErrors, int>
+        auto calculate_value_errors(TH1* hist, int max_bin, double total_entry, FTCalErrorMethod methodtype)
+            -> std::pair<ValueErrors, int>
         {
             auto output = extract_bin_data(hist, max_bin);
 

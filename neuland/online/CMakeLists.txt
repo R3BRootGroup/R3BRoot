@@ -15,11 +15,10 @@
 set(SRCS R3BNeulandOnlineSpectra.cxx R3BNeulandOnlineReconstruction.cxx)
 set(HEADERS R3BNeulandOnlineReconstruction.h R3BNeulandOnlineSpectra.h)
 
-if(CONAN_ENABLED)
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
     list(
-        APPEND
-        SRCS
-        # cmake-format: sortable
+        APPEND SRCS
+        R3BNeulandOnlineSpectra2.cxx
         canvases/R3BNeulandCalCanvas.cxx
         canvases/R3BNeulandCountRateCanvas.cxx
         canvases/R3BNeulandEventHeaderCanvas.cxx
@@ -28,14 +27,13 @@ if(CONAN_ENABLED)
         canvases/R3BNeulandHitXYCanvas.cxx
         canvases/R3BNeulandMappedCanvas.cxx
         canvases/R3BNeulandOnlineCanvas.cxx
-        canvases/R3BNeulandTimingCanvas.cxx
         canvases/R3BNeulandTJumpCanvas.cxx
-        R3BNeulandOnlineSpectra2.cxx)
+        canvases/R3BNeulandTimingCanvas.cxx
+    )
 
     list(
-        APPEND
-        HEADERS
-        # cmake-format: sortable
+        APPEND HEADERS
+        R3BNeulandOnlineSpectra2.h
         canvases/R3BNeulandCalCanvas.h
         canvases/R3BNeulandCountRateCanvas.h
         canvases/R3BNeulandEventHeaderCanvas.h
@@ -44,18 +42,25 @@ if(CONAN_ENABLED)
         canvases/R3BNeulandHitXYCanvas.h
         canvases/R3BNeulandMappedCanvas.h
         canvases/R3BNeulandOnlineCanvas.h
-        canvases/R3BNeulandTimingCanvas.h
         canvases/R3BNeulandTJumpCanvas.h
-        R3BNeulandOnlineSpectra2.h)
+        canvases/R3BNeulandTimingCanvas.h
+    )
 endif()
 
 add_library(R3BNeulandOnline SHARED ${SRCS})
-target_include_directories(R3BNeulandOnline PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} canvases)
-target_link_libraries(R3BNeulandOnline PUBLIC R3BNeulandCalibration R3BSource #[[ R3BTCal R3BNeulandShared ]])
+target_include_directories(
+    R3BNeulandOnline
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} canvases
+)
+target_link_libraries(
+    R3BNeulandOnline
+    PUBLIC R3BNeulandCalibration R3BSource #[[ R3BTCal R3BNeulandShared ]]
+)
 root_generate_dictionary(
     R3BNeulandOnline_dict
     ${HEADERS}
     MODULE
     R3BNeulandOnline
     LINKDEF
-    NeulandOnlineLinkDef.h)
+    NeulandOnlineLinkDef.h
+)

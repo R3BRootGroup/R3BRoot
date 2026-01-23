@@ -101,7 +101,8 @@ namespace R3B::Neuland
             {
                 return init + rng::accumulate(plane_signals | rng::views::values,
                                               0,
-                                              [](auto init_bar, const auto& bar_signals) -> int {
+                                              [](auto init_bar, const auto& bar_signals) -> int
+                                              {
                                                   return init_bar +
                                                          static_cast<int>(std::min(bar_signals.left.size(),
                                                                                    bar_signals.right.size()));

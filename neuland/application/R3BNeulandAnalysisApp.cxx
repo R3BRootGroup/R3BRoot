@@ -11,7 +11,6 @@
 #include "R3BNeulandMapDataConverterTask.h"
 #include "R3BNeulandMapToCalParTask.h"
 #include "R3BNeulandMapToCalTask.h"
-#include "R3BNeulandMillepede.h"
 #include "R3BNeulandSimCalToCal.h"
 #include <CLI/CLI.hpp>
 #include <FairRun.h>

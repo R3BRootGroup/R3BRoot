@@ -9,6 +9,7 @@ if(FETCH_GTEST)
     FetchContent_MakeAvailable(googletest)
 endif()
 
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
 FetchContent_Declare(
     glaze
     GIT_REPOSITORY https://github.com/stephenberry/glaze.git
@@ -17,6 +18,7 @@ FetchContent_Declare(
 )
 
 FetchContent_MakeAvailable(glaze)
+endif()
 
 # # fetch CLI11
 

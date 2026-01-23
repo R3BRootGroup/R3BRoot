@@ -17,7 +17,7 @@ namespace R3B::Digitizing::Neuland
     namespace
     {
         const uint8_t DEFAULT_ITERATION = 8U;
-        // check if a signal is matched to two or more signals. If so, discard the lastest match.
+        // check if a signal is matched to two or more signals. If so, discard the latest match.
         auto CheckMatchValidity(const std::vector<AbstractPaddle::ChannelSignalPair>& matchedPairs,
                                 const AbstractChannel::Hit& signal) -> bool
         {
@@ -56,8 +56,8 @@ namespace R3B::Digitizing::Neuland
     {
     }
 
-    auto Paddle::match_hits(const AbstractChannel::Hit& firstSignal,
-                            const AbstractChannel::Hit& secondSignal) const -> float
+    auto Paddle::match_hits(const AbstractChannel::Hit& firstSignal, const AbstractChannel::Hit& secondSignal) const
+        -> float
     {
         auto firstE = static_cast<float>(firstSignal.qdcUnSat);
         auto secondE = static_cast<float>(secondSignal.qdcUnSat);
@@ -92,13 +92,13 @@ namespace R3B::Digitizing::Neuland
         attenuation_ = 1. / module_par.light_attenuation_length.value;
         time_offset_ = module_par.t_diff.value;
         time_sync_ = module_par.t_sync.value;
-        reverse_atten_fac_ = std::exp(Paddle::HALF_BAR_LENGTH * attenuation_);
+        reverse_att_fac_ = std::exp(Paddle::HALF_BAR_LENGTH * attenuation_);
     }
 
     inline auto Paddle::compute_energy(const AbstractChannel::Hit& firstSignal,
                                        const AbstractChannel::Hit& secondSignal) const -> double
     {
-        return std::sqrt(firstSignal.qdcUnSat * secondSignal.qdcUnSat) * reverse_atten_fac_;
+        return std::sqrt(firstSignal.qdcUnSat * secondSignal.qdcUnSat) * reverse_att_fac_;
     }
 
     inline auto Paddle::compute_time(const AbstractChannel::Hit& firstSignal,

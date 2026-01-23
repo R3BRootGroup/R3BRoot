@@ -53,10 +53,10 @@ class R3BNeulandGeoPar : public FairParGenericSet
     void SetNeulandGeoNode(const TGeoNode* node);
 
     [[nodiscard]] auto GetPaddleHalfLength() const -> double;
-    [[nodiscard]] auto ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position,
-                                                 int paddleID) const -> ROOT::Math::XYZVector;
-    [[nodiscard]] auto ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position,
-                                                  int paddleID) const -> ROOT::Math::XYZVector;
+    [[nodiscard]] auto ConvertToLocalCoordinates(const ROOT::Math::XYZVector& position, int paddleID) const
+        -> ROOT::Math::XYZVector;
+    [[nodiscard]] auto ConvertToGlobalCoordinates(const ROOT::Math::XYZVector& position, int paddleID) const
+        -> ROOT::Math::XYZVector;
     [[nodiscard]] auto ConvertGlobalToPixel(const ROOT::Math::XYZVector& position) const -> ROOT::Math::XYZVector;
 
   private:

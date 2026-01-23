@@ -53,7 +53,7 @@ namespace R3B::Digitizing::Neuland
 
       private:
         double attenuation_ = DEFAULT_ATTENUATION;
-        double reverse_atten_fac_ = std::exp(HALF_BAR_LENGTH * DEFAULT_ATTENUATION);
+        double reverse_att_fac_ = std::exp(HALF_BAR_LENGTH * DEFAULT_ATTENUATION);
         double effective_speed_ = R3B::Neuland::Calibration::DEFAULT_EFFECTIVE_C;
         double time_offset_ = 0.0;
         double time_sync_ = 0.0;

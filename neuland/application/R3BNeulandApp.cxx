@@ -184,7 +184,8 @@ namespace R3B::Neuland
             ->expected(0, 1);
         program_options.add_option("-s, --severity", options.log_level, "Set the severity level");
         program_options.add_option("-v, --verbose", options.verbose_level, "Set the verbose level");
-        program_options.add_option("-n, --event-num", options.number_of_events, "Set the event number")->capture_default_str();
+        program_options.add_option("-n, --event-num", options.number_of_events, "Set the event number")
+            ->capture_default_str();
         program_options.add_option("--run-id", options.run_id, "Set the run id")->capture_default_str();
 
         program_options.add_option("-i, --input-file", options.input.data, "Set the input filenames (regex)")
@@ -375,6 +376,8 @@ namespace R3B::Neuland
         boost::algorithm::trim(buffer);
 
         auto keys = std::vector<std::string>{};
+
+        // NOLINTNEXTLINE (clang-analyzer-cplusplus.NewDeleteLeaks)
         boost::split(keys, keys_string, boost::is_any_of("."));
 
         for (const auto& key : boost::adaptors::reverse(keys))

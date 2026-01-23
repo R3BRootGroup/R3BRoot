@@ -58,6 +58,7 @@ namespace R3B::Neuland
         ClassDefNV(Common, 1);
     };
 
+#ifdef HAS_CPP_STANDARD_23
     template <typename Option>
     void parse_io_branch_names(const Option& option,
                                std::vector<std::string>& read,
@@ -66,14 +67,14 @@ namespace R3B::Neuland
                                int write_num)
     {
         LOGP(info, "Task {:?} is enabled", option.name);
-        auto resolve_branch_names = [](const std::string& input, std::vector<std::string>& output)
+        auto resolve_branch_names = [](const std::string& input, std::vector<std::string>& output) -> void
         {
             output.clear();
             boost::split(output, input, boost::is_any_of(";"));
             // trim the empty spaces
-            std::for_each(output.begin(), output.end(), [](auto& name) { boost::trim(name); });
-            // remove empty names
-            output.erase(std::remove(output.begin(), output.end(), ""), output.end());
+            std::for_each(output.begin(), output.end(), [](auto& name) -> void { boost::trim(name); });
+            // erase empty names
+            std::erase(output, "");
         };
 
         resolve_branch_names(option.read, read);
@@ -121,7 +122,7 @@ namespace R3B::Neuland
         auto idx = 0;
         auto last_string = std::string_view{};
         auto res_string = input;
-        while (idx <= target_idx)
+        while (std::cmp_less_equal(idx, target_idx))
         {
             auto pos = res_string.find_first_of(sep);
             if (pos != std::string_view::npos)
@@ -140,6 +141,7 @@ namespace R3B::Neuland
         }
         return last_string;
     }
+#endif
 
     inline auto calculate_cdf(TH1* histogram) -> TH1*
     {

@@ -13,11 +13,10 @@
 #include <fstream>
 #include <functional>
 #include <glaze/core/context.hpp>
-#include <glaze/core/istream_buffer.hpp>
 #include <glaze/core/opts.hpp>
 #include <glaze/core/ostream_buffer.hpp>
 #include <glaze/core/reflect.hpp>
-#include <glaze/json/write.hpp>
+#include <glaze/json/write.hpp> // IWYU pragma: keep
 #include <ios>
 #include <iterator>
 #include <memory>

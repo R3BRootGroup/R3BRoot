@@ -4,11 +4,15 @@
 #include <fmt/format.h>
 #include <fmt/ranges.h>
 #include <fstream>
+#include <glaze/core/context.hpp>
+#include <glaze/core/reflect.hpp>
+#include <glaze/json/read.hpp>
 #include <ios>
 #include <optional>
 #include <range/v3/view/map.hpp>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 namespace rng = ranges;
@@ -62,7 +66,6 @@ namespace
 
         return result;
     }
-
 } // namespace
 
 namespace R3B::Millepede
@@ -71,6 +74,20 @@ namespace R3B::Millepede
     void ResultReader::read()
     {
         par_results_.clear();
+
+        if (mode_ == Mode::res)
+        {
+            read_pede_par_file();
+        }
+        else
+        {
+            read_json_file();
+        }
+    }
+
+    void ResultReader::read_pede_par_file()
+    {
+
         auto ifile = std::ifstream(filename_, std::ios_base::in);
         auto buffer = std::string{};
         if (ifile.is_open())
@@ -87,7 +104,33 @@ namespace R3B::Millepede
         }
         else
         {
-            fmt::println("ERROR: parameter file {:?} cannot be read", filename_);
+            fmt::println(stderr, "ERROR: parameter file {:?} cannot be read", filename_);
+        }
+    }
+
+    void ResultReader::read_json_file()
+    {
+
+        auto obj = std::unordered_map<int, JsonParResultEntry>{};
+        auto buffer = std::string{};
+        auto error_code = glz::read_file_json(obj, filename_, buffer);
+        if (error_code == glz::error_code::file_open_failure)
+        {
+            fmt::println(stderr, "Parameter JSON file {:?} doesn't exist!", filename_);
+        }
+        else if (error_code)
+        {
+            fmt::println(stderr, "{}", glz::format_error(error_code, buffer));
+        }
+
+        for (const auto& [key, value] : obj)
+        {
+            par_results_.emplace(value.label,
+                                 ParResultEntry{ .par_num = value.label,
+                                                 .value = value.correction,
+                                                 .pre_sigma = 0.,
+                                                 .value_diff = value.correction,
+                                                 .error = value.error });
         }
     }
     void ResultReader::print() { fmt::print("{}\n", fmt::join(par_results_ | rng::views::values, "\n")); }

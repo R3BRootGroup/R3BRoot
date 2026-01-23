@@ -43,15 +43,6 @@ namespace R3B
         void set_buffer_size(std::size_t buffer_size) { max_buffer_size_ = buffer_size; }
 
         /**
-         * @brief Enable data logging. This is only for debugging purpose.
-         *
-         * Set the json filename of the logging output.
-         * @param filename Name of the file.
-         * @return boolean value to show whether the file is created and opened.
-         */
-        auto set_log_filename(std::string_view filename) -> bool;
-
-        /**
          * @brief Write the MilleDataPoint structure to the internal data buffer of the type MilleBuffer.
          *
          * The conversion of the MilleDataPoint to the MilleBuffer follows the sequence:
@@ -80,26 +71,21 @@ namespace R3B
         void end();
         void close();
 
+        auto get_n_entries() const -> uint64_t { return num_of_entries_; }
+
       private:
         bool has_special_done_ = false;                     //!< if true, special(..) already called for this record
         bool is_binary_ = true;                             //!< if false output as text
         bool is_zero_written_ = false;                      //!< if true also write out derivatives/labels ==0
         MilleBuffer<int, float> buffer_;                    //!< Data buffer to store the points of the events
         std::size_t max_buffer_size_ = DEFAULT_BUFFER_SIZE; //!< Maximum size of the data buffer
-        std::ofstream log_file_;                            //!< Logging file
         std::ofstream output_file_;                         //!< C-binary for output
-        // TODO: Recombine this with buffer_?
-        struct LOGData
-        {
-            uint64_t record_number{};
-            std::vector<MilleDataPoint> data_points;
-        } log_data_; //!< This is only for logging purpose
+        uint64_t num_of_entries_ = 0;
 
         static constexpr unsigned int max_label_size_ = (0xFFFFFFFF - (1U << 31U));
 
         void check_buffer_size(std::size_t nLocal, std::size_t nGlobal);
         void write_to_binary();
         void write_to_non_binary();
-        void log_data_points();
     };
 } // namespace R3B

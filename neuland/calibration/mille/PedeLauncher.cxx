@@ -82,15 +82,15 @@ namespace R3B::Millepede
         auto old_result_path = fs::path{ working_directory_ } / fs::path{ DEFAULT_RES_FILENAME };
         // auto new_result_path = fs::path{ working_directory_ } / fs::path{ parameter_file_ };
 
-        if (fs::exists(old_result_path))
+        if (not fs::exists(old_result_path))
+        {
+            fmt::println("Error: millepede.res doesn't exist!");
+        }
+        else
         {
             // fmt::println(
             //     "Info: copy the file {:?} to the file {:?}!", old_result_path.string(), new_result_path.string());
             // fs::copy(old_result_path, new_result_path, fs::copy_options::overwrite_existing);
-        }
-        else
-        {
-            fmt::println("Error: millepede.res doesn't exist!");
         }
     }
 

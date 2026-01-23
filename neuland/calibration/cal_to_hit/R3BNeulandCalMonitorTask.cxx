@@ -6,7 +6,6 @@
 #include <FairRootManager.h>
 #include <algorithm>
 #include <fmt/format.h>
-#include <fmt/ranges.h>
 #include <functional>
 #include <ranges>
 #include <string_view>

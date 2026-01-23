@@ -2,10 +2,7 @@
 
 #include "R3BValueError.h"
 #include <Math/Factory.h>
-#include <Math/Functor.h>
-#include <Math/GSLMinimizer.h>
 #include <Math/Minimizer.h>
-#include <Minuit2/Minuit2Minimizer.h>
 #include <cstddef>
 #include <fmt/base.h>
 #include <memory>
@@ -48,6 +45,7 @@ namespace R3B
             R3B::ValueErrorD bias;
         };
         using Config = HuberRegressorConfig;
+        static constexpr auto DEFAULT_SIGMA = 20;
 
         explicit HuberRegressor(
             Config config = Config{},
@@ -66,7 +64,7 @@ namespace R3B
 
       private:
         static constexpr auto n_pars = 2;
-        double sigma_ = 20.;
+        double sigma_ = DEFAULT_SIGMA;
         Config config_;
         Result result_;
         std::span<const double> x_vals_;

@@ -32,7 +32,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <tuple>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -60,6 +59,7 @@ namespace R3B::Neuland::Calibration
     struct MillepedeOptions
     {
         bool outdir_has_timestamp = true;
+        bool enable_data_write = false;
         int min_plane_num = DEFAULT_MINIMUM_PLANE_NUM;
         MillepedeCalibrationMode cal_mode = MillepedeCalibrationMode::offset_effective_c;
         int num_of_threads = 0;
@@ -70,7 +70,6 @@ namespace R3B::Neuland::Calibration
         double p_value_cut = DEFAULT_CALIBRATION_P_VALUE_CUT;
         std::string mille_data_filename = "neuland_cosmic_mille.bin";
         std::string pede_par_filename = "neuland_pars.txt";
-        std::string mille_log_filename;
     };
 
     class MillepedeEngine : public CosmicEngineInterface
@@ -117,11 +116,7 @@ namespace R3B::Neuland::Calibration
         TH1D* hist_b_xz_ = nullptr;
         TH1D* hist_a_yz_ = nullptr;
         TH1D* hist_b_yz_ = nullptr;
-        TH1D* hist_t_diff_module_counts_ = nullptr;
         TH1D* hist_plane_hit_num_ = nullptr;
-        TH2D* hist_module_residuals_ = nullptr;
-        TH2D* hist_module_residuals_bar_pos_ = nullptr;
-        TH2D* hist_fit_diff_time_ = nullptr;
         TH1L* barplot_filter_counts_ = nullptr;
 
         // parameter:
@@ -137,9 +132,12 @@ namespace R3B::Neuland::Calibration
         auto SignalFilter(const std::vector<BarCalData>& signals) -> bool override;
         void BeginOfEvent() override
         {
-            output_mille_data_.clear();
-            output_tsync_mille_data_.clear();
-            output_mille_track_info_.clear();
+            if (config_.enable_data_write)
+            {
+                output_mille_data_.clear();
+                output_tsync_mille_data_.clear();
+                output_mille_track_info_.clear();
+            }
             // output_mille_data_point_.clear();
         };
         void EndOfTask() override;

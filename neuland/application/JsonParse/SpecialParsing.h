@@ -6,7 +6,6 @@
 #include <glaze/core/common.hpp>
 #include <glaze/core/meta.hpp>
 #include <glaze/core/wrappers.hpp>
-#include <glaze/glaze.hpp>
 #include <magic_enum/magic_enum.hpp>
 #include <root/Math/Vector3Dfwd.h>
 

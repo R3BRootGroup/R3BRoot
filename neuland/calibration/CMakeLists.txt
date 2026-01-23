@@ -15,11 +15,22 @@
 
 add_subdirectory(legacy)
 add_subdirectory(share)
-add_subdirectory(map_to_cal)
-add_subdirectory(cal_to_hit)
-add_subdirectory(mille)
+
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    add_subdirectory(map_to_cal)
+    add_subdirectory(cal_to_hit)
+    add_subdirectory(mille)
+endif()
 
 add_library(R3BNeulandCalibration INTERFACE)
 target_link_libraries(
-    R3BNeulandCalibration INTERFACE R3BNeulandCalibrationLegacy R3BNeulandCalibrationShare
-                                    R3BNeulandMapToCal R3BNeulandCalToHit)
+    R3BNeulandCalibration
+    INTERFACE R3BNeulandCalibrationLegacy R3BNeulandCalibrationShare
+)
+
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    target_link_libraries(
+        R3BNeulandCalibration
+        INTERFACE R3BNeulandMapToCal R3BNeulandCalToHit
+    )
+endif()

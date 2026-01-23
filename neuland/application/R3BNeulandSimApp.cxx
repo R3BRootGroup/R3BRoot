@@ -37,10 +37,10 @@ namespace R3B::Neuland
     void SimulationApplication::post_init(FairRun* /*run*/)
     {
         const auto& options = options_.simulation;
-        auto* grun = G4RunManager::GetRunManager();
-        grun->SetPrintProgress(options.event_print_num);
+        auto* geant_run = G4RunManager::GetRunManager();
+        geant_run->SetPrintProgress(options.event_print_num);
         auto* event =
-            dynamic_cast<TG4EventAction*>(const_cast<G4UserEventAction*>(grun->GetUserEventAction())); // NOLINT
+            dynamic_cast<TG4EventAction*>(const_cast<G4UserEventAction*>(geant_run->GetUserEventAction())); // NOLINT
         event->VerboseLevel(0);
     }
 

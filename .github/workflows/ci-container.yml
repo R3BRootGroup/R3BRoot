@@ -1,7 +1,7 @@
 name: ci test for containers
 on:
   pull_request:
-    branches: [ edwin_dev ]
+    branches: [edwin_dev]
 
   workflow_dispatch:
 
@@ -15,7 +15,7 @@ jobs:
       matrix:
         repos: [fedora-latest, fedora-stable]
         include:
-          - url: https://github.com/R3BRootGroup/R3BFileSource.git
+          # - url: https://github.com/R3BRootGroup/R3BFileSource.git
           - preset: default
     container:
       image: yanzhaowang/r3bdev:${{ matrix.repos }}
@@ -43,7 +43,7 @@ jobs:
         id: build-cache
         uses: actions/cache/restore@v4
         with:
-          path: | 
+          path: |
             ${{ github.workspace }}/.ccache
           key: r3b-build-cache-${{ matrix.repos }}
 
@@ -51,7 +51,7 @@ jobs:
         id: conan-cache
         uses: actions/cache/restore@v4
         with:
-          path: | 
+          path: |
             ${{ github.workspace }}/.conan2
           key: r3b-conan-cache-${{ matrix.repos }}
 
@@ -82,14 +82,14 @@ jobs:
       - name: save build cache
         uses: actions/cache/save@v4
         with:
-          path: | 
+          path: |
             ${{ github.workspace }}/.ccache
           key: r3b-build-cache-${{ matrix.repos }}
 
       - name: save conan cache
         uses: actions/cache/save@v4
         with:
-          path: | 
+          path: |
             ${{ github.workspace }}/.conan2
           key: r3b-conan-cache-${{ matrix.repos }}
 
@@ -103,7 +103,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          style: 'file'  # Use .clang-format config file
+          style: 'file' # Use .clang-format config file
           tidy-checks: '-*'
           version: 21
           verbosity: debug
@@ -117,70 +117,70 @@ jobs:
       - name: Fail fast?!
         if: steps.linter.outputs.clang-format-checks-failed > 0
         run: exit 1
-        
+
   clang-tidy:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        repos: [ fedora-latest ]
+        repos: [fedora-latest]
         include:
           - preset: default
-    container: 
+    container:
       image: yanzhaowang/r3bdev:${{ matrix.repos }}
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: setup environments
-      run: |
-        echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-        echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
-        echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
-        echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
-        echo "CONAN_HOME=${GITHUB_WORKSPACE}/.conan2" >> $GITHUB_ENV
-        echo "CXX=clang++" >> $GITHUB_ENV
-        echo "CC=clang" >> $GITHUB_ENV
-        echo "CMAKE_GENERATOR=Ninja" >> $GITHUB_ENV
-        echo "NUM_THREADS=4" >> $GITHUB_ENV
-        sudo -H pip3 install -U conan
+      - name: setup environments
+        run: |
+          echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+          echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
+          echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+          echo "CONAN_HOME=${GITHUB_WORKSPACE}/.conan2" >> $GITHUB_ENV
+          echo "CXX=clang++" >> $GITHUB_ENV
+          echo "CC=clang" >> $GITHUB_ENV
+          echo "CMAKE_GENERATOR=Ninja" >> $GITHUB_ENV
+          echo "NUM_THREADS=4" >> $GITHUB_ENV
+          sudo -H pip3 install -U conan
 
-    - name: load build cache
-      id: build-cache
-      uses: actions/cache/restore@v4
-      with:
-        path: | 
-          ${{ github.workspace }}/.ccache
-        key: r3b-build-cache-${{ matrix.repos }}
+      - name: load build cache
+        id: build-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.ccache
+          key: r3b-build-cache-${{ matrix.repos }}
 
-    - name: load conan cache
-      id: conan-cache
-      uses: actions/cache/restore@v4
-      with:
-        path: | 
-          ${{ github.workspace }}/.conan2
-        key: r3b-conan-cache-${{ matrix.repos }}
+      - name: load conan cache
+        id: conan-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.conan2
+          key: r3b-conan-cache-${{ matrix.repos }}
 
-    - name: configure r3broot
-      uses: './.github/actions/r3bbuild-steps'
-      with:
-        build-needed: 'false'
+      - name: configure r3broot
+        uses: './.github/actions/r3bbuild-steps'
+        with:
+          build-needed: 'false'
 
-    - name: clang-tidy check
-      run: |
-        mkdir -p clang-tidy-result
-        git diff -U0 HEAD^ | python3 $PWD/util/clang-tidy-diff.py -p1 -path build -j4 -use-color \
-        -iregex '^(.*\/)(?!ext_)([^\/]*\.(cpp|cc|c\+\+|cxx|cl|hpp|hh|h|m|mm|inc))$' \
-        > clang-tidy-result/fixes.yml
-        cat clang-tidy-result/fixes.yml |\
-        sed -e 's/\x1b\[[0-9;]*m//g' |\
-        sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): warning:/::warning file=\1,line=\2,col=\3::/' |\
-        sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): error:/::error file=\1,line=\2,col=\3::/'
-        echo "WARN_NUM=$(sed -e 's/\x1b\[[0-9;]*m//g'  clang-tidy-result/fixes.yml | grep -w " warning:" | wc -l | xargs)" >> $GITHUB_ENV
-        echo "ERROR_NUM=$(sed -e 's/\x1b\[[0-9;]*m//g'  clang-tidy-result/fixes.yml | grep -w " error:" | wc -l | xargs)" >> $GITHUB_ENV
+      - name: clang-tidy check
+        run: |
+          mkdir -p clang-tidy-result
+          git diff -U0 HEAD^ | python3 $PWD/util/clang-tidy-diff.py -p1 -path build -j4 -use-color \
+          -iregex '^(.*\/)(?!ext_)([^\/]*\.(cpp|cc|c\+\+|cxx|cl|hpp|hh|h|m|mm|inc))$' \
+          > clang-tidy-result/fixes.yml
+          cat clang-tidy-result/fixes.yml |\
+          sed -e 's/\x1b\[[0-9;]*m//g' |\
+          sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): warning:/::warning file=\1,line=\2,col=\3::/' |\
+          sed 's/\(^.*\):\([0-9]*\):\([0-9]*\): error:/::error file=\1,line=\2,col=\3::/'
+          echo "WARN_NUM=$(sed -e 's/\x1b\[[0-9;]*m//g'  clang-tidy-result/fixes.yml | grep -w " warning:" | wc -l | xargs)" >> $GITHUB_ENV
+          echo "ERROR_NUM=$(sed -e 's/\x1b\[[0-9;]*m//g'  clang-tidy-result/fixes.yml | grep -w " error:" | wc -l | xargs)" >> $GITHUB_ENV
 
-    - name: clang-tidy results
-      run: |
+      - name: clang-tidy results
+        run: |
           if [ "${{ env.WARN_NUM }}" -eq "0" ] && [ "${{ env.ERROR_NUM }}" -eq "0" ]; then
             echo "::notice::All clean, LGTM!"
           else
@@ -188,5 +188,4 @@ jobs:
             echo "::notice::Clang-tidy generates ${{ env.WARN_NUM }} warnings and ${{ env.ERROR_NUM }} errors! Please fix them before being merged."
             exit 1
           fi
-      shell: bash
-
+        shell: bash

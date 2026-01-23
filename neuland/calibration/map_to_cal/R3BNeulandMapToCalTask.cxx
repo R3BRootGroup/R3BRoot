@@ -35,6 +35,7 @@
 #include <iterator>
 #include <range/v3/view/map.hpp>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace
@@ -168,7 +169,7 @@ namespace R3B::Neuland
              config_.min_stat,
              signal_size,
              total_pmt_nums_);
-        if (signal_size < config_.min_stat)
+        if (std::cmp_less(signal_size, config_.min_stat))
         {
             LOGP(debug2,
                  "condition of the minimal size is not met with current paddle signal size. Skip the "
