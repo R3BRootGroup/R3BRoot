@@ -182,22 +182,4 @@ namespace R3B::Digitizing::Neuland
         // step3: output pairs
         return channelPairs;
     }
-
-    // check if a signal is matched to two or more signals. If so, discard the latest match.
-    static auto CheckMatchValidity(const std::vector<Paddle::ChannelSignalPair>& matchedPairs,
-                                   const Channel::Signal& signal) -> bool
-    {
-        auto is_valid = true;
-        auto it_existed = find_if(matchedPairs.begin(),
-                                  matchedPairs.end(),
-                                  [&signal](const auto& pair) -> bool { return &(pair.right.get()) == &(signal); });
-        if (it_existed != matchedPairs.end())
-        {
-            LOG(debug) << "DigitizingPaddleNeuland.cxx::CheckMatchValidity(): one signal is matched again to another "
-                          "signal! The signal is discarded.";
-            is_valid = false;
-        }
-        return is_valid;
-    }
-
 } // namespace R3B::Digitizing::Neuland

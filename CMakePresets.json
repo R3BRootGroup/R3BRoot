@@ -33,6 +33,7 @@
         "WITH_MILLEPEDE": "ON",
         "CONAN_ENABLED": "ON",
         "BUILD_LAND_DIR": "OFF",
+        "CMAKE_CXX_STANDARD": "23",
         "CONAN_INSTALL_ARGS": "--build=missing;--settings:build=compiler.cppstd=gnu17"
       }
     },

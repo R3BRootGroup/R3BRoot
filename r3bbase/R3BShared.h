@@ -225,6 +225,7 @@ namespace R3B
         std::sort(filelist.begin(), filelist.end());
         return filelist;
     }
+#endif
 
     // batch clear and resize for STL containers
     template <typename... Containers>
