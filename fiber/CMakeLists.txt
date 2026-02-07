@@ -79,6 +79,6 @@ add_library_with_dictionary(
     R3BTracking)
     
 if(BUILD_GEOMETRY)
-#    add_subdirectory(geobase)
+    add_subdirectory(geobase)
 endif()
 add_subdirectory(test)
