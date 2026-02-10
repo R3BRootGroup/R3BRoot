@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2010 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2010-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -142,25 +142,26 @@ class R3BCALIFATestGenerator : public FairGenerator
     Int_t fPDGType; // Particle type (PDG encoding)
     Int_t fMult;    // Multiplicity
 
-    double fPDGMass;                         // Particle mass [GeV]
-    double fPtMin, fPtMax;                   // Transverse momentum range [GeV]
-    double fPhiMin = 0., fPhiMax = 360.;     // Azimuth angle range [degree]
-    double fEtaMin, fEtaMax;                 // Pseudorapidity range in lab system
-    double fYMin, fYMax;                     // Rapidity range in lab system
-    double fPMin, fPMax;                     // Momentum range in lab system
-    double fThetaMin = 0., fThetaMax = 180.; // Polar angle range in lab system [degree]
-    double fX, fY, fZ;                       // Point vertex coordinates [cm]
-    double fX1, fY1, fZ1, fX2, fY2, fZ2;     // Box vertex coords (x1,y1,z1)->(x2,y2,z2)
+    double fPDGMass = 0.;                                              // Particle mass [GeV]
+    double fPtMin = 0., fPtMax = 0.;                                   // Transverse momentum range [GeV]
+    double fPhiMin = 0., fPhiMax = 360.;                               // Azimuth angle range [degree]
+    double fEtaMin = 0., fEtaMax = 0.;                                 // Pseudorapidity range in lab system
+    double fYMin = 0., fYMax = 0.;                                     // Rapidity range in lab system
+    double fPMin = 0., fPMax = 0.;                                     // Momentum range in lab system
+    double fThetaMin = 0., fThetaMax = 180.;                           // Polar angle range in lab system [degree]
+    double fX = 0., fY = 0., fZ = 0.;                                  // Point vertex coordinates [cm]
+    double fX1 = 0., fY1 = 0., fZ1 = 0., fX2 = 0., fY2 = 0., fZ2 = 0.; // Box vertex coords (x1,y1,z1)->(x2,y2,z2)
+    double sumBranchingRatios = 0.;
 
     bool fEtaRangeIsSet = false;  // True if eta range is set
     bool fYRangeIsSet = false;    // True if rapidity range is set
     bool fThetaRangeIsSet = true; // True if theta range is set
     bool fCosThetaIsSet = false;  // True if uniform distribution in
                                   // cos(theta) is set (default -> not set)
-    bool fPtRangeIsSet;           // True if transverse momentum range is set
-    bool fPRangeIsSet;            // True if abs.momentum range is set
-    bool fPointVtxIsSet;          // True if point vertex is set
-    bool fBoxVtxIsSet;            // True if box vertex is set
+    bool fPtRangeIsSet = false;   // True if transverse momentum range is set
+    bool fPRangeIsSet = false;    // True if abs.momentum range is set
+    bool fPointVtxIsSet = false;  // True if point vertex is set
+    bool fBoxVtxIsSet = false;    // True if box vertex is set
     bool fDebug = false;          // Debug switch
 
     // SPECIFIC OF CALIFA
@@ -174,5 +175,5 @@ class R3BCALIFATestGenerator : public FairGenerator
     bool fNuclearDecayChainIsSet = false; // True if a nuclear decay chain is set
 
   public:
-    ClassDefOverride(R3BCALIFATestGenerator, 1); // NOLINT
+    ClassDefOverride(R3BCALIFATestGenerator, 2); // NOLINT
 };
