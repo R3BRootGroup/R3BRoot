@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2010 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2010-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -70,7 +70,6 @@ Bool_t R3BCALIFATestGenerator::Init()
     // CALIFA specifics
     R3BLOG_IF(fatal, fBetaOfEmittingFragment > 1, "beta of fragment larger than 1!");
 
-    double sumBranchingRatios = 0;
     for (Int_t i = 0; i < fGammaEnergies.size(); i++)
     {
         if (fGammaBranchingRatios[i] > 1)
@@ -79,7 +78,7 @@ Bool_t R3BCALIFATestGenerator::Init()
         }
         sumBranchingRatios += fGammaBranchingRatios[i];
     }
-    R3BLOG_IF(fatal, sumBranchingRatios > 1, "gamma branching ratio sum larger than 1!");
+    R3BLOG_IF(warn, sumBranchingRatios > 1, "gamma branching ratio sum larger than 1!");
 
     // Check for particle type
     TDatabasePDG* pdgBase = TDatabasePDG::Instance();
@@ -98,8 +97,6 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     // cos(theta)
 
     Double32_t pabs = 0, phi, pt = 0, theta = 0, eta, y, mt, px, py, pz = 0;
-    Double32_t br = 0;
-    bool doNotBoost = false;
 
     // Generate particles
     for (Int_t k = 0; k < fMult; k++)
@@ -154,41 +151,51 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         if (fNuclearDecayChainIsSet)
         {
             LOG_IF(fatal, fPDGType != 22) << "PDG code " << fPDGType << " is not a gamma!";
-            br = gRandom->Uniform();
-            for (Int_t i = 0; i < fGammaEnergies.size(); i++)
+            for (auto i = 0; i < fGammaEnergies.size(); i++)
             {
+                auto br = gRandom->Uniform();
                 if (br < fGammaBranchingRatios[i])
                 {
-                    Double32_t gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
+                    pabs = fGammaEnergies[i];
+                    theta =
+                        acos(gRandom->Uniform(cos(fThetaMin * TMath::DegToRad()), cos(fThetaMax * TMath::DegToRad())));
+                    pz = pabs * TMath::Cos(theta);
+                    pt = pabs * TMath::Sin(theta);
+
+                    px = pt * TMath::Cos(phi);
+                    py = pt * TMath::Sin(phi);
+
+                    auto gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
                     px = px * fGammaEnergies[i] / gammaMomentum;
                     py = py * fGammaEnergies[i] / gammaMomentum;
                     pz = pz * fGammaEnergies[i] / gammaMomentum;
-                    break;
+                    if (sumBranchingRatios <= 1)
+                        break;
+
+                    if (fLorentzBoostIsSet)
+                    {
+                        // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
+                        // As each Lorentz transformation can be performed sequentially,
+                        // we can separate the gamma factor corresponding to each direction
+                        auto gammaMom = TMath::Sqrt(px * px + py * py + pz * pz);
+                        pz = (pz + fBetaOfEmittingFragment * gammaMom) / fGammaFactor;
+                    }
+                    primGen->AddTrack(fPDGType, px, py, pz, fX, fY, fZ);
                 }
             }
-            // if Sum(branchingRatios)<1, the leftover probability (up to 1) is defined as environmental noise
-            doNotBoost = true;
+            return kTRUE;
         }
-        /*
-      if (fLorentzBoostIsSet && !doNotBoost){
 
-        //Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-        //As each Lorentz transformation can be performed sequentially,
-        //we can separate the gamma factor corresponding to each direction
-        Double32_t gammaMomentum=TMath::Sqrt(px*px+py*py+pz*pz);
-        pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
-          */
-
-        if (fPDGType == 22 && fLorentzBoostIsSet && !doNotBoost)
-        { /// for gamma-rays
+        if (fPDGType == 22 && fLorentzBoostIsSet)
+        { // for gamma-rays
             // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
             // As each Lorentz transformation can be performed sequentially,
             // we can separate the gamma factor corresponding to each direction
             Double32_t gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
             pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
         }
-        else if (fLorentzBoostIsSet && !doNotBoost)
-        { /// for any massive particle
+        else if (fLorentzBoostIsSet)
+        { // for any massive particle
             // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
             // As each Lorentz transformation can be performed sequentially,
             // we can separate the gamma factor corresponding to each direction
@@ -202,8 +209,6 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             oss << "CALIFATestGen: kf=" << fPDGType << ", p=(" << std::fixed << std::setprecision(2) << px << ", " << py
                 << ", " << pz << ") GeV"
                 << ", x=(" << std::setprecision(1) << fX << ", " << fY << ", " << fZ << ") cm";
-
-            std::cout << oss.str() << std::endl;
         }
         primGen->AddTrack(fPDGType, px, py, pz, fX, fY, fZ);
     }
@@ -221,7 +226,7 @@ void R3BCALIFATestGenerator::SetFragmentVelocity(double beta, double dispersion)
 void R3BCALIFATestGenerator::SetDecayChainPoint(double gammaEnergy, double branchingRatio)
 {
     R3BLOG(info, "Set gamma energy " << gammaEnergy << " with a branching ratio of " << branchingRatio);
-    fGammaEnergies.push_back(gammaEnergy);
+    fGammaEnergies.push_back(gammaEnergy / 1000.); // GeV
     fGammaBranchingRatios.push_back(branchingRatio);
 }
 ClassImp(R3BCALIFATestGenerator)
