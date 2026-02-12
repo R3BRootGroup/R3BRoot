@@ -295,6 +295,11 @@
       "givenName": "Manuel",
       "familyName": "Xarepe",
       "affiliation": "Faculty of Science of the University of Lisbon, 1749-016 Lisboa, Portugal"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Beatriz",
+      "familyName": "Amorim"
     }
   ],
   "contributor": [
