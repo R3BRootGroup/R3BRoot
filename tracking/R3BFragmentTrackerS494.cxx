@@ -54,6 +54,7 @@
 #include "FairRuntimeDb.h"
 #include "R3BEventHeader.h"
 #include "R3BLogger.h"
+#include "TGeoManager.h"
 
 #include "TArc.h"
 #include "TClonesArray.h"
@@ -876,6 +877,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     TVector3 pos23a;
     TVector3 pos23b;
     TVector3 postofd;
+    Int_t iplaneC, iplaneHe;
+    Int_t ibarC, ibarHe;
 
     Double_t gamma_beam = 1.0 / sqrt(1.0 - beta_beam * beta_beam);
     Double_t mass_check;
@@ -1100,7 +1103,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         }
     }
 
-    Int_t iretrack_max = 0;
+    Int_t iretrack_max = 1;
     Double_t psum_mem = -10000.;
 
     for (Int_t iretrack = 0; iretrack < iretrack_max + 1; iretrack++)
@@ -1449,7 +1452,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 Double_t y_tp =
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
-                                y0 = 0.; // pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+                                y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
@@ -1728,7 +1731,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 Double_t y_tp =
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
-                                y0 = 0.; // pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+                                y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)

@@ -272,7 +272,8 @@ void R3BTofdDigitizerHit::Exec(Option_t* opt)
                                                0.,
                                                Time[channel],
                                                qcharge, // Energy_Loss[channel],
-                                               layer_label + 1)));
+                                               layer_label + 1,
+                                               paddle_number)));
                     }
                 }
 

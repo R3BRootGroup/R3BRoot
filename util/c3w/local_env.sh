@@ -12,7 +12,7 @@ for LUSTRE in /lustre $HOME/lustre __SSHFS__ $HOME/lustre __FAIL__
 do
     if test "$LUSTRE" == __SSHFS__
     then
-    	SSHFS="sshfs lustre.hpc.gsi.de:/lustre $HOME/lustre/"
+    	SSHFS="sshfs lustre.hpc.gsi.de:/lustre $HOME/lustre"
     	echo "running $SSHFS"
     	$SSHFS
     	continue

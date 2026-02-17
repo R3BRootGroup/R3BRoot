@@ -55,9 +55,11 @@ R3BFi33DigitizerHit::R3BFi33DigitizerHit()
     esigma = 0.001;
     tsigma = 0.01;
     ysigma = 1;
+    xsigma = 1;
+    qoption = 1;
 }
 
-R3BFi33DigitizerHit::R3BFi33DigitizerHit(Double_t e, Double_t t, Double_t x, Double_t y)
+R3BFi33DigitizerHit::R3BFi33DigitizerHit(Double_t e, Double_t t, Double_t x, Double_t y, Int_t q)
     : FairTask("R3B Fi33 Digitization scheme ")
     , fFi33Points(NULL)
 {
@@ -65,6 +67,8 @@ R3BFi33DigitizerHit::R3BFi33DigitizerHit(Double_t e, Double_t t, Double_t x, Dou
     esigma = e;
     tsigma = t;
     ysigma = y;
+    xsigma = x;
+    qoption = q;
 }
 
 R3BFi33DigitizerHit::~R3BFi33DigitizerHit() {}
@@ -73,6 +77,7 @@ void R3BFi33DigitizerHit::SetEnergyResolution(Double_t e) { esigma = e; }
 void R3BFi33DigitizerHit::SetTimeResolution(Double_t t) { tsigma = t; }
 void R3BFi33DigitizerHit::SetXPositionResolution(Double_t x) { xsigma = x; }
 void R3BFi33DigitizerHit::SetYPositionResolution(Double_t y) { ysigma = y; }
+void R3BFi33DigitizerHit::SetChargeCalibrationOption(Int_t q) { qoption = q; }
 
 InitStatus R3BFi33DigitizerHit::Init()
 {
@@ -240,7 +245,11 @@ void R3BFi33DigitizerHit::Exec(Option_t* opt)
                         LOG(debug) << "x after granularity: " << x_local;
                     }
 
-                    Int_t qcharge = (int)(470.61775 * energyl + 1.5642724 + 0.5);
+                    Double_t qcharge;
+                    if (qoption == 1)
+                        qcharge = double((int)(470.61775 * energyl + 1.5642724 + 0.5));
+                    if (qoption == 0)
+                        qcharge = energyl;
 
                     new ((*Hits)[Hits->GetEntries()])
                         R3BFiberMAPMTHitData(1,

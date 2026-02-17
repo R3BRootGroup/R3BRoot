@@ -84,7 +84,8 @@ then
     export UNPACK=\$MAINDIR/upexps/UNPACK
 fi
 # here is a nice one:
-test -e $VMCWORKDIR || { mkdir -p $(dirname $VMCWORKDIR) ; ln -vs \$VMCWORKDIR $VMCWORKDIR ; }
+test -e $VMCWORKDIR || { mkdir -p $(dirname $VMCWORKDIR) ; ln -vs \$VMCWORKDIR $VMCWORKDIR ;}
+#test -d /u/kelic/lustre || ln -s /lustre/ /u/kelic/lustre
 test -x $HOME/.rootrc || { echo "Root.Stacktrace: no" >> $HOME/.rootrc ; } 
 #Put any further hacks you require into this variable:
 $TRICKERY

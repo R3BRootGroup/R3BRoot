@@ -230,6 +230,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 
 	Double_t XHe, YHe, ZHe, XC, YC, ZC, THe, TC;
 	Double_t mtrackHe, mtrackC, mtrackO;	
+	Double_t pHex0, pHey0, pHez0, pCx0, pCy0, pCz0;
 	Double_t pHex, pHey, pHez, pCx, pCy, pCz;
 	Double_t Pxf, Pyf, Pzf, Xf, Yf, Zf, Pf_tot;
 	Double_t XHe_mc, YHe_mc, ZHe_mc, XC_mc, YC_mc, ZC_mc, THe_mc, TC_mc;	
@@ -249,7 +250,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	ULong64_t timeTS ;
     ULong64_t eventTS ;
     
-    TLorentzVector alpha, carbon, oxygen, helium3;
+    TLorentzVector alpha, carbon, oxygen, helium3, alpha0, carbon0;
     TLorentzVector alphaMC, carbonMC, oxygenMC;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
     TLorentzVector alphaMC_cm, carbonMC_cm, oxygenMC_cm;
@@ -441,20 +442,33 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_Erel_vs_r;
     TH2F* fh_thetacm_vs_r;
     TH2F* fh_thetacm_vs_phibc;  
+    
+    TH2F* fh_theta16_vs_theta26;
+	TH2F* fh_theta26_vs_r;
+	TH2F* fh_theta16_vs_r;
+	TH2F* fh_psum_vs_r;
+	TH2F* fh_theta16_vs_thetacm;
+	TH2F* fh_theta26_vs_thetacm;
+	TH2F* fh_angle_correl;
+	TH1F* fh_psum_wobckgr;
+	TH1F* fh_Erel_wobckgr;
                 
-    TH2F* fh_thetacm_vs_Erel_ag;   		  
-	TH2F* fh_pt_vs_theta16_ag;     
+    TH2F* fh_thetacm_vs_Erel_ag;    
 	TH2F* fh_phi_vs_r_ag;
     TH2F* fh_Erel_vs_r_ag;
     TH2F* fh_thetacm_vs_r_ag;
     TH2F* fh_thetacm_vs_phibc_ag;  
     
-    TH2F* fh_thetacm_vs_Erel_bg;   		  
-	TH2F* fh_pt_vs_theta16_bg;     
+    TH2F* fh_thetacm_vs_Erel_bg;   
 	TH2F* fh_phi_vs_r_bg;
     TH2F* fh_Erel_vs_r_bg;
     TH2F* fh_thetacm_vs_r_bg;
-    TH2F* fh_thetacm_vs_phibc_bg;  	
+    TH2F* fh_thetacm_vs_phibc_bg; 
+    TH2F* fh_phibccm_vs_dxtofd; 	
+    TH2F* fh_phibccm_vs_xtofd; 		
+    TH2F* fh_phibccm_vs_ytofd; 	
+    TH2F* fh_phibccm_vs_xfi23; 	
+    TH2F* fh_phibccm_vs_yfi23; 		
     
     TH2F* fh_xx_fib23_bckgr;
 	TH2F* fh_yy_fib23_bckgr;
@@ -550,6 +564,23 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_phibccm_vs_theta16O_withcalifa;
 	TH2F* fh_phibccm_vs_Erel_withcalifa_bg_rand;
 	TH2F* fh_phibccm_vs_Erel_withcalifa_bg;
+	TH2F* fh_phibccm_vs_Erel_withcalifa_ag_rand;
+	TH2F* fh_phibccm_vs_Erel_withcalifa_ag;
+	TH2F* fh_Erel_vs_r_ag_withcalifa;
+	TH2F* fh_Erel_vs_r_bg_withcalifa;
+	TH2F* fh_Erel_vs_r_withcalifa;
+	TH2F* fh_Erel_vs_r_withcalifa_rand;
+	TH2F* fh_phi_vs_r_withcalifa;
+	TH2F* fh_phi_vs_r_withcalifa_rand;
+	TH2F* fh_phibccm_vs_theta16O;
+	TH2F* fh_phi_vs_r_bg_withcalifa;
+	TH2F* fh_phi_vs_r_bg_withcalifa_rand;
+	TH2F* fh_phi_vs_r_ag_withcalifa;
+	TH2F* fh_phi_vs_r_ag_withcalifa_rand;
+	TH2F* fh_Erel_vs_r_ag_withcalifa_rand;
+	TH2F* fh_Erel_vs_r_bg_withcalifa_rand;
+	
+	
 	TH2F* fh_Nf_vs_Ns;
 	
 	TH1F* fh_minv_simu;

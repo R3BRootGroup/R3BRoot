@@ -33,7 +33,7 @@ class R3BFi33DigitizerHit : public FairTask
     /** Default constructor **/
     R3BFi33DigitizerHit();
 
-    R3BFi33DigitizerHit(Double_t esigma, Double_t tsigma, Double_t xsigma, Double_t ysigma);
+    R3BFi33DigitizerHit(Double_t esigma, Double_t tsigma, Double_t xsigma, Double_t ysigma, Int_t qoption);
 
     /** Destructor **/
     ~R3BFi33DigitizerHit();
@@ -51,6 +51,7 @@ class R3BFi33DigitizerHit : public FairTask
     void SetTimeResolution(Double_t t);
     void SetXPositionResolution(Double_t x);
     void SetYPositionResolution(Double_t y);
+    void SetChargeCalibrationOption(Int_t q);
 
   protected:
     TClonesArray* fFi33Points;
@@ -65,6 +66,7 @@ class R3BFi33DigitizerHit : public FairTask
     Double_t tsigma;
     Double_t ysigma;
     Double_t xsigma;
+    Int_t qoption;
 	 Float_t detector_height = 50.000000 ;
   Float_t fiber_thickness = 0.1025 ; 
   Int_t fiber_nbr = 512;

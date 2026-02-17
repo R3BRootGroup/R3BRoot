@@ -239,6 +239,10 @@ class R3BPreTrackS494 : public FairTask
 	TCutG *cut_qfi30;
 	TCutG *cut_qfi33;
 	TCutG *cut_qfi32;
+	TCutG *cut_qfi30_qfi32_z2;
+	TCutG *cut_qfi30_qfi32_z6;
+	TCutG *cut_qfi31_qfi33_z2;
+	TCutG *cut_qfi31_qfi33_z6;
 	TCutG *cut_qtofi_bar14;	
 	
     unsigned long long time_start = 0, time = 0;
@@ -456,8 +460,8 @@ class R3BPreTrackS494 : public FairTask
 	TH2F* fh_qsum_mult_fi23a;
 	TH2F* fh_qsum_mult_fi23b;
 	TH2F* fh_qtofi_vs_qtofd;
-
-
+	TH2F* fh_mult_vs_x_fi23a;
+    TH2F* fh_mult_vs_y_fi23b;
 	
   public:
     ClassDef(R3BPreTrackS494, 1)
