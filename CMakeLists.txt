@@ -209,7 +209,6 @@ if("${FairRoot_VERSION}" VERSION_GREATER 18.6.4)
         APPEND
         boost_dependencies
         thread
-        system
         timer
         program_options
         random
