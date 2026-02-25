@@ -23,7 +23,7 @@ file(
     ./geo/*.cxx
     ./online/*.cxx
     ./calibration/*.cxx
-#    ./ana/*.cxx
+    ./utils/*.cxx
     )
 
 change_file_extension(*.cxx *.h HEADERS "${SRCS}")
@@ -44,7 +44,7 @@ add_library_with_dictionary(
     geo
     online
     calibration
-    ana
+    utils
     DEPENDENCIES
     R3BBase 
     R3BTracking

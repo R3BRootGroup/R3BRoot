@@ -75,7 +75,6 @@ class R3BActafMapped2Cal : public FairTask
 
   private:
     void SetParameter();
-    void ApplySGFilter(std::array<double, ACTAF_BINS>& signal, std::vector<double> coeffs);
 
     static constexpr int fPad = 128;
     bool fOnline = false; // Don't store data for online

@@ -19,11 +19,8 @@
 // ROOT headers
 #include <TClonesArray.h>
 #include <TMath.h>
-#include <array>
 #include <fstream>
 #include <iostream>
-#include <numeric>
-#include <utility>
 #include <vector>
 
 // FAIR headers
@@ -35,57 +32,8 @@
 #include "R3BActafCalData.h"
 #include "R3BActafCalPar.h"
 #include "R3BActafMapped2Cal.h"
+#include "R3BActafUtils.h"
 #include "R3BLogger.h"
-
-template <class Cont>
-int FindMaxPosition(const Cont& signal)
-{
-    return std::distance(signal.begin(), std::max_element(signal.begin(), signal.end()));
-}
-
-template <class Cont>
-double IntegratePulse(const Cont& signal, int maxIdx, double baseline = 0.)
-{
-    int left = maxIdx, right = maxIdx;
-    const int size = static_cast<int>(signal.size());
-
-    while (left > 0 && signal[left] > baseline)
-        --left;
-
-    while (right < size - 1 && signal[right] > baseline)
-        ++right;
-
-    return std::accumulate(signal.begin() + left, signal.begin() + right, 0.0) - (right - left) * baseline;
-}
-
-template <class Cont>
-double ComputeBaselineMean(const Cont& signal, int numBins, bool returnMean = 1)
-{
-    numBins = std::min(static_cast<int>(numBins * 0.8), static_cast<int>(signal.size()));
-    if (numBins <= 0)
-        return 0.0;
-
-    double mean = 0;
-
-    mean = std::accumulate(signal.begin(), signal.begin() + numBins, 0.0) / numBins;
-
-    if (returnMean)
-        return mean;
-
-    else
-    {
-        double variance = 0.0;
-        for (int i = 0; i < numBins; ++i)
-        {
-            double diff = signal[i] - mean;
-            variance += diff * diff;
-        }
-        variance /= numBins;
-
-        double stddev = std::sqrt(variance);
-        return stddev;
-    }
-}
 
 // R3BActafMapped2Cal::Default Constructor --------------------------
 R3BActafMapped2Cal::R3BActafMapped2Cal()
@@ -158,19 +106,11 @@ InitStatus R3BActafMapped2Cal::Init()
 {
     R3BLOG(info, "");
     auto* mgr = FairRootManager::Instance();
-    if (!mgr)
-    {
-        R3BLOG(fatal, "FairRootManager not found");
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, !mgr, "FairRootManager not found");
 
     // INPUT DATA
     fActafMappedData = dynamic_cast<TClonesArray*>(mgr->GetObject("ActafMappedData"));
-    if (!fActafMappedData)
-    {
-        R3BLOG(fatal, "ActafMappedData not found");
-        return kFATAL;
-    }
+    R3BLOG_IF(fatal, !fActafMappedData, "ActafMappedData not found");
 
     // OUTPUT DATA
     fActafCalData = new TClonesArray("R3BActafCalData");
@@ -188,32 +128,6 @@ InitStatus R3BActafMapped2Cal::ReInit()
     SetParContainers();
     SetParameter();
     return kSUCCESS;
-}
-
-void R3BActafMapped2Cal::ApplySGFilter(std::array<double, ACTAF_BINS>& signal, std::vector<double> coeffs)
-{
-    auto n = signal.size(), m = coeffs.size();
-    int half = m / 2;
-
-    std::vector<double> output(n), ext(n + 2 * half);
-
-    for (int i = 0; i < half; i++)
-        ext[i] = signal[0];
-    for (int i = 0; i < n; i++)
-        ext[i + half] = signal[i];
-    for (int i = 0; i < half; i++)
-        ext[n + half + i] = signal[n - 1];
-
-    for (int i = 0; i < n; i++)
-    {
-        double sum = 0.0;
-        for (int j = 0; j < m; j++)
-            sum += coeffs[j] * ext[i + j];
-        output[i] = sum;
-    }
-
-    for (int i = 0; i < n; i++)
-        signal[i] = output[i];
 }
 
 // -----   Public method Execution   --------------------------------------------
@@ -246,44 +160,45 @@ void R3BActafMapped2Cal::Exec(Option_t*)
             continue;
 
         std::array<double, ACTAF_BINS> waveform = mappedData->GetTrace();
-        int maxPos = FindMaxPosition(waveform);
-
-        // Calculate rms before filtering
-
-        double rmsRaw = ComputeBaselineMean(waveform, maxPos, 0);
-        double meanRaw = ComputeBaselineMean(waveform, maxPos, 1) + mappedData->GetBaseline();
-
-        // create baseline-subtracted copy and write it to file (temporary tool)
-        std::array<double, ACTAF_BINS> waveform_bs = waveform;
-        double baseline = meanRaw;
-        for (auto& x : waveform_bs)
-            x -= baseline;
 
         // Apply the SG filter to the waveform (on baseline-subtracted data)
         if (fApplySGFilter)
-            ApplySGFilter(waveform, fSgCoeffs);
-
-        // Use baseline-subtracted waveform for further processing
-        // waveform = waveform_bs;
-
-        auto integral = IntegratePulse(waveform, mappedData->GetMaxpos());
-        auto energy = integral * fEGain[pad - 1];
-        auto energyMaxAmpl = mappedData->GetMaxampl() * fEGain[pad - 1];
+            R3BActafUtils::ApplySGFilter(waveform, fSgCoeffs);
 
         auto drift = mappedData->GetLeadingEdgeTime() * fConversionCh2ns; // in ns
         auto zpos = drift * fVelocity;                                    // in cm
-        auto syntime = drift - synTagTime;                                // in ns
+        auto syntime = drift - synTagTime * fConversionCh2ns;             // in ns
 
-        // Calculation of RMS from the waveform after filtering
-        maxPos = FindMaxPosition(waveform);
-        double rms = ComputeBaselineMean(waveform, maxPos, 0);
-        double mean = ComputeBaselineMean(waveform, maxPos, 1) + mappedData->GetBaseline();
+        auto maxPos = R3BActafUtils::FindMaxPosition(waveform);
+        double rms = R3BActafUtils::ComputeBaselineMean(waveform, maxPos, 0);
+        double mean = R3BActafUtils::ComputeBaselineMean(waveform, maxPos, 1);
 
         // MAW parameter value
         double maw = mappedData->GetMaw();
 
+        for (auto& x : waveform)
+            x -= mean; // baseline
+
+        auto integral = R3BActafUtils::IntegratePulse(waveform, maxPos);
+        auto energy = integral * fEGain[pad - 1];
+        auto MaxAmpl = R3BActafUtils::FindMaxAmplitude(waveform);
+        auto energyMaxAmpl = MaxAmpl * fEGain[pad - 1];
+
         if (energyMaxAmpl >= fEThr[pad - 1] && energy < fMaxE)
-            AddCalData(pad, energy, energyMaxAmpl, drift, zpos, syntime, waveform, rmsRaw, rms, meanRaw, mean, maw);
+        {
+            AddCalData(pad,
+                       energy,
+                       energyMaxAmpl,
+                       drift,
+                       zpos,
+                       syntime,
+                       waveform,
+                       mappedData->GetRms(),
+                       rms,
+                       mappedData->GetBaseline(),
+                       mean,
+                       maw);
+        }
     }
     return;
 }
