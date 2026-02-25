@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,16 @@
  ******************************************************************************/
 
 #include "R3BActafMappedData.h"
+
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <fmt/core.h>
+#include <iostream>
+#include <ostream>
+#include <string>
 
 R3BActafMappedData::R3BActafMappedData(UInt_t pad,
                                        const std::array<double, ACTAF_BINS>& trace,
@@ -41,11 +50,13 @@ R3BActafMappedData::R3BActafMappedData(UInt_t pad,
 {
 }
 
-R3BActafMappedData::R3BActafMappedData(UInt_t pad, int det_mask, int timetag, int spill_nb)
+// NOLINTNEXTLINE
+R3BActafMappedData::R3BActafMappedData(UInt_t pad, int det_mask, uint64_t timetag, int spill_nb, uint64_t rawtimetag)
     : fPad(pad)
     , fDetMask(det_mask)
     , fTimeTag(timetag)
     , fSpillNb(spill_nb)
+    , fRawTimeTag(rawtimetag)
 {
 }
 
@@ -73,12 +84,12 @@ std::string R3BActafMappedData::toString() const
                        GetRms());
 }
 
-void R3BActafMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+void R3BActafMappedData::Print(const Option_t* /*option*/) const { std::cout << *this << '\n'; }
 
-std::ostream& operator<<(std::ostream& os, const R3BActafMappedData& data)
+std::ostream& operator<<(std::ostream& output, const R3BActafMappedData& data)
 {
-    os << data.toString();
-    return os;
+    output << data.toString();
+    return output;
 }
 
 ClassImp(R3BActafMappedData)

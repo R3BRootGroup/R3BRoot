@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -163,11 +163,12 @@ class R3BActafOnlineSpectra : public FairTask
     TClonesArray* fMappedItems = nullptr;
     TClonesArray* fCalItems = nullptr;
     TClonesArray* fHitItems = nullptr;
+    TClonesArray* fClusterItems = nullptr;
     TClonesArray* fWrItems = nullptr;
 
-    R3BEventHeader* header = nullptr;       /** Event header */
-    R3BActafMappingPar* fMap_Par = nullptr; /** Parameter container */
-    int fTrigger = -1;                      /** Trigger value */
+    R3BEventHeader* fEventHeader = nullptr; // Event header
+    R3BActafMappingPar* fMap_Par = nullptr; // Parameter container
+    int fTrigger = -1;                      // Trigger value
     int fTpat1 = 0, fTpat2 = 0;
     unsigned long fNEvents = 0;
     static constexpr int fChn = 16;
@@ -177,6 +178,11 @@ class R3BActafOnlineSpectra : public FairTask
     bool fDisplaytraces = true;
     int countTracesDump = 0;
 
+    // DAQ and Spill histograms
+    TH1F* fh1_spillnb = nullptr;
+    TH1F* fh1_spillrate = nullptr;
+
+    // Map histograms
     std::vector<TH2F*> fh2_RawTraces;
     std::vector<TGraph*> g_CorrectedTraces_4pads_highestAmp_auto;
     std::vector<TGraph*> g_CorrectedTraces_4pads_highestAmp;
@@ -184,7 +190,6 @@ class R3BActafOnlineSpectra : public FairTask
     std::vector<TH1F*> fh1_Baseline;
     std::vector<TH2F*> fh2_mawVsEMap;
 
-    // Map histograms
     TH2F* fh2_ERaw_map = nullptr;
     TH2F* fh2_Baseline_map = nullptr;
     TH2F* fh2_MaxPos_map = nullptr;
@@ -197,6 +202,8 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_meanInitVsPad = nullptr;
     TH2F* fh2_meanFiltVsPad = nullptr;
     TH2F* fh2_RmsMapVsPad = nullptr;
+    TH2F* fh2_RmsMapVsModChn = nullptr;
+    TH2F* fh2_BaselineMapVsModChn = nullptr;
 
     // Cal histograms
     TH2F* fh2_Ecal_cal = nullptr;
@@ -211,7 +218,7 @@ class R3BActafOnlineSpectra : public FairTask
     int nEcalMin = 0;
     int nEcalMax = 500000;
 
-    int nBinsTrace = 500;
+    int nBinsTrace = 200;
     int nTraceMin = -100;
     int nTraceMax = 2000;
 
@@ -236,6 +243,7 @@ class R3BActafOnlineSpectra : public FairTask
     size_t nbWrs = 9;
 
     uint64_t pre_timetag = 0;
+    uint64_t init_timetag = 0;
     uint64_t first_timestamp = 0;
     uint64_t overall_rate = 0;
     uint64_t fsec_rate = 0; // upstream section rates
@@ -264,6 +272,26 @@ class R3BActafOnlineSpectra : public FairTask
     TH2F* fh2_timetag_signal = nullptr;
     TCanvas* cRates = nullptr;
 
+    // Cluster histograms
+    std::vector<TH1F*> fh1_Cluster_mul;
+    std::vector<TH1F*> fh1_Cluster_pad_mul;
+    std::vector<TH1F*> fh1_Cluster_theta;
+    std::vector<TH1F*> fh1_Cluster_phi;
+    std::vector<TH1F*> fh1_Cluster_energy;
+    std::vector<TH1F*> fh1_Cluster_eff;
+    std::vector<TH1F*> fh1_Cluster_eff_small;
+    TH1F* fh1_Cluster_eff_summary_up = nullptr;
+    TH1F* fh1_Cluster_eff_summary_down = nullptr;
+    TH1F* fh1_Cluster_eff_summary_small_up = nullptr;
+    TH1F* fh1_Cluster_eff_summary_small_down = nullptr;
+    std::vector<TH2Poly*> fh2_XYPos_clusters;
+
+    // Gas quality
+    std::vector<TH2F*> fh2_gasquality;
+    std::vector<TH1F*> fh1_alpharate;
+    std::vector<TH1F*> fh1_alphaenergy;
+    std::vector<TH2F*> fh2_RawAlphaTraces;
+
     // Params for the event viewer
     int eventViewerNb = 0;
     int firstBufferEvent = 0;
@@ -274,7 +302,17 @@ class R3BActafOnlineSpectra : public FairTask
     std::array<std::array<double, fPads>, maxEventViewerBatch> eventCountsE;
     std::array<std::array<std::vector<double>, fPads>, maxEventViewerBatch> eventCountsTrace;
     bool saveHistos = true;
+    int fSpill_number = 0;
+    int fAlphaSourceGridUp = 100e3; // 200e3
+    int fAlphaSourceGridLow = 40e3; // 100e3
+    int fAlphaSourceCathodeUp = 100e3;
+    int fAlphaSourceCathodeLow = 40e3;
+
+    int fEventCounter = 0;
+    std::vector<double> fClusterCounter{ 0.0, 0.0 };
+    double fEventSpillCounter = 0;
+    int fPrevSpillNb = 0;
 
   public:
-    ClassDefOverride(R3BActafOnlineSpectra, 1);
+    ClassDefOverride(R3BActafOnlineSpectra, 2);
 };

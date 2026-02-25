@@ -19,10 +19,14 @@
 
 #pragma once
 
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TObject.h>
+
 #include <array>
+#include <cmath>
 #include <cstdint>
-#include <iostream>
+#include <iosfwd>
 #include <string>
 
 constexpr int ACTAF_ECHN = 16;
@@ -67,9 +71,11 @@ class R3BActafMappedData : public TObject
      *@param timetag       AMBER timestamp
      *@param spill_nb      Spill on/off
      **/
-    explicit R3BActafMappedData(UInt_t pad, int det_mask, int timetag, int spill_nb);
-
-    virtual ~R3BActafMappedData() = default;
+    explicit R3BActafMappedData(UInt_t pad,
+                                int det_mask,
+                                uint64_t timetag,
+                                int spill_nb,
+                                uint64_t rawtimetag); // NOLINT
 
     [[nodiscard]] UInt_t GetPad() const { return fPad; }
     [[nodiscard]] const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
@@ -80,14 +86,17 @@ class R3BActafMappedData : public TObject
     [[nodiscard]] double GetMaxampl() const { return fMaxamplitude; }
     [[nodiscard]] double GetLeadingEdgeTime() const { return fLeadingEdge10; }
     [[nodiscard]] double GetRms() const { return fRms; }
-    [[nodiscard]] int GetTimeTag() const { return fTimeTag; }
+    [[nodiscard]] uint64_t GetTimeTag() const { return fTimeTag; }
+    [[nodiscard]] uint64_t GetRawTimeTag() const { return fRawTimeTag; }
     [[nodiscard]] int GetDetMask() const { return fDetMask; }
+    [[nodiscard]] int GetSpillNb() const { return fSpillNb; }
     [[nodiscard]] double GetMaw() const { return fMaw; }
 
+    // Support for printing
     [[nodiscard]] std::string toString() const;
-    void Print(const Option_t*) const override;
+    void Print(const Option_t* /*option*/) const override;
 
-  protected:
+  private:
     UInt_t fPad = 0;
     double fE = 0., fBaseline = 0., fRisetime = 0.; // Energy, baseline, risetime
     int fMaxpos = 0;
@@ -95,11 +104,14 @@ class R3BActafMappedData : public TObject
     std::array<double, ACTAF_BINS> fTrace{};
     double fLeadingEdge10 = 0;
     double fRms = 0, fRmsFilt = 0, fBaselineFilt = 0;
-    int fDetMask = 0, fTimeTag = 0, fSpillNb = 0;
+    int fDetMask = 0, fSpillNb = 0;
+    uint64_t fTimeTag = 0;
+    uint64_t fRawTimeTag = 0;
     double fMaw = 0.;
 
   public:
-    ClassDefOverride(R3BActafMappedData, 6);
+    ClassDefOverride(R3BActafMappedData, 7);
 };
 
-std::ostream& operator<<(std::ostream& os, const R3BActafMappedData& data);
+// Operator overloading for printing R3BActafMappedData
+std::ostream& operator<<(std::ostream& output, const R3BActafMappedData& data);

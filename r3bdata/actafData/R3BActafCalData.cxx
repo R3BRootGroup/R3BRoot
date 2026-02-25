@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -12,7 +12,12 @@
  ******************************************************************************/
 
 #include "R3BActafCalData.h"
+#include <RtypesCore.h>
+#include <array>
 #include <fmt/core.h>
+#include <iostream>
+#include <ostream>
+#include <string>
 
 R3BActafCalData::R3BActafCalData(UInt_t pad,
                                  double energy,
@@ -62,12 +67,12 @@ std::string R3BActafCalData::toString() const
                        trace_str);
 }
 
-void R3BActafCalData::Print(const Option_t*) const { std::cout << *this << std::endl; }
+void R3BActafCalData::Print(const Option_t* /*option*/) const { std::cout << *this << '\n'; }
 
-std::ostream& operator<<(std::ostream& os, const R3BActafCalData& data)
+std::ostream& operator<<(std::ostream& output, const R3BActafCalData& data)
 {
-    os << data.toString();
-    return os;
+    output << data.toString();
+    return output;
 }
 
 ClassImp(R3BActafCalData)

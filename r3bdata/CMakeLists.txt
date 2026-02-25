@@ -21,6 +21,7 @@ set(SRCS
     actafData/R3BActafMappedData.cxx
     actafData/R3BActafCalData.cxx
     actafData/R3BActafHitData.cxx
+    actafData/R3BActafClusterData.cxx
     alpideData/R3BAlpideCalData.cxx
     alpideData/R3BAlpideHitData.cxx
     alpideData/R3BAlpideMappedData.cxx
@@ -157,6 +158,7 @@ set(HEADERS
     actafData/R3BActafMappedData.h
     actafData/R3BActafCalData.h
     actafData/R3BActafHitData.h
+    actafData/R3BActafClusterData.h
     alpideData/R3BAlpideCalData.h
     alpideData/R3BAlpideHitData.h
     alpideData/R3BAlpideMappedData.h

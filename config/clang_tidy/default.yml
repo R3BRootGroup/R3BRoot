@@ -3,6 +3,5 @@ Checks: >
  cppcoreguidelines-pro-type-cstyle-cast,
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
-AnalyzeTemporaryDtors: false
 FormatStyle:     none
 User:            land
