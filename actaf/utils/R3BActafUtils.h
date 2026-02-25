@@ -55,7 +55,7 @@ namespace R3BActafUtils
     template <class Cont>
     double ComputeBaselineMean(const Cont& signal, int numBins, bool returnMean = 1)
     {
-        numBins = std::min(static_cast<int>(numBins * 0.8), static_cast<int>(signal.size()));
+        numBins = std::min(static_cast<int>(numBins * 0.5), static_cast<int>(signal.size()));
         if (numBins <= 0)
             return 0.0;
 

@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -160,16 +160,17 @@ void R3BActafMapped2Cal::Exec(Option_t*)
             continue;
 
         std::array<double, ACTAF_BINS> waveform = mappedData->GetTrace();
+        int maxPos = R3BActafUtils::FindMaxPosition(waveform);
 
         // Apply the SG filter to the waveform (on baseline-subtracted data)
         if (fApplySGFilter)
             R3BActafUtils::ApplySGFilter(waveform, fSgCoeffs);
 
-        auto drift = mappedData->GetLeadingEdgeTime() * fConversionCh2ns; // in ns
-        auto zpos = drift * fVelocity;                                    // in cm
-        auto syntime = drift - synTagTime * fConversionCh2ns;             // in ns
-
-        auto maxPos = R3BActafUtils::FindMaxPosition(waveform);
+        // auto drift = mappedData->GetLeadingEdgeTime() * fConversionCh2ns; // in ns
+        auto drift = maxPos * fConversionCh2ns;               // in ns
+        auto zpos = drift * fVelocity;                        // in cm
+        auto syntime = drift - synTagTime * fConversionCh2ns; // in ns
+        maxPos = R3BActafUtils::FindMaxPosition(waveform);
         double rms = R3BActafUtils::ComputeBaselineMean(waveform, maxPos, 0);
         double mean = R3BActafUtils::ComputeBaselineMean(waveform, maxPos, 1);
 

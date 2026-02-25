@@ -1,8 +1,8 @@
 // clang-format off
 
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2016 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2016-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -30,6 +30,7 @@
 
 #pragma link C++ class R3BActafMapped2Cal+;
 #pragma link C++ class R3BActafCal2Hit+;
+#pragma link C++ class R3BActafHit2Cluster+;
 
 #endif
 

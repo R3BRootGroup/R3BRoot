@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -82,7 +82,7 @@ class R3BActafMapped2Cal : public FairTask
     int fPulserCh = 62;
     int fMaxE = 300000;
     double fConversionCh2ns = 51.44; // in ns/bin
-    double fVelocity = 0.02888;      // in cm/ns
+    double fVelocity = 0.000394;     // in cm/ns for H2 at 20 bars
 
     TClonesArray* fActafMappedData = nullptr; // Array with Actaf Mapped input data
     TClonesArray* fActafCalData = nullptr;    // Array with Actaf Cal output data

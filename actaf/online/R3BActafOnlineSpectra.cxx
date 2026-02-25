@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -30,6 +30,7 @@
 #include <TLegend.h>
 #include <TLegendEntry.h>
 #include <TMath.h>
+#include <TPaveText.h>
 #include <TROOT.h>
 #include <TStyle.h>
 
@@ -41,6 +42,7 @@
 
 // R3B headers
 #include "R3BActafCalData.h"
+#include "R3BActafClusterData.h"
 #include "R3BActafGeometry.h"
 #include "R3BActafHitData.h"
 #include "R3BActafMappedData.h"
@@ -50,6 +52,45 @@
 #include "R3BLogger.h"
 #include "R3BShared.h"
 #include "R3BWRData.h"
+
+double IntegrateTrace(const std::array<double, ACTAF_BINS>& signal)
+{
+    int endSignal = 1100;
+
+    int startBackground = 1500;
+    int endBackground = ACTAF_BINS;
+
+    // ==============================
+    // 1. Baseline
+    // ==============================
+    double sumBaseline = 0.0;
+    int nBaselineBins = 0;
+
+    for (int i = startBackground; i <= endBackground && i < ACTAF_BINS; ++i)
+    {
+        double value = signal[i];
+
+        sumBaseline += value;
+
+        nBaselineBins++;
+    }
+
+    double baselineMean = 0.0;
+
+    if (nBaselineBins > 0)
+    {
+        baselineMean = sumBaseline / nBaselineBins;
+    }
+
+    double integral = 0.0;
+
+    for (int i = 0; i <= endSignal && i < ACTAF_BINS; ++i)
+    {
+        integral += (signal[i] - baselineMean);
+    }
+
+    return integral;
+}
 
 // R3BActafOnlineSpectra::Default Constructor --------------------------
 R3BActafOnlineSpectra::R3BActafOnlineSpectra()
@@ -96,6 +137,7 @@ void R3BActafOnlineSpectra::SetParameter()
     }
 
     nBinsSample = fMap_Par->GetNBinsSample();
+    std::cout << fMap_Par->GetFADCChannelByPad(121) << std::endl;
 }
 
 InitStatus R3BActafOnlineSpectra::Init()
@@ -104,9 +146,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     auto* mgr = FairRootManager::Instance();
     R3BLOG_IF(fatal, nullptr == mgr, "FairRootManager not found");
 
-    header = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
-    R3BLOG_IF(error, header == nullptr, "EventHeader. not found");
-    R3BLOG_IF(info, header, "EventHeader. found");
+    fEventHeader = dynamic_cast<R3BEventHeader*>(mgr->GetObject("EventHeader."));
+    R3BLOG_IF(error, fEventHeader == nullptr, "EventHeader. not found");
+    R3BLOG_IF(info, fEventHeader, "EventHeader. found");
 
     auto* run = FairRunOnline::Instance();
     run->GetHttpServer()->Register("", this);
@@ -120,6 +162,9 @@ InitStatus R3BActafOnlineSpectra::Init()
     fHitItems = dynamic_cast<TClonesArray*>(mgr->GetObject("ActafHitData"));
     R3BLOG_IF(warn, fHitItems == nullptr, "ActafHitData not found");
 
+    fClusterItems = dynamic_cast<TClonesArray*>(mgr->GetObject("ActafClusterData"));
+    R3BLOG_IF(warn, fClusterItems == nullptr, "ActafClusterData not found");
+
     fWrItems = dynamic_cast<TClonesArray*>(mgr->GetObject("WRActafData"));
     R3BLOG_IF(warn, fWrItems == nullptr, "WRActafData not found");
 
@@ -128,14 +173,22 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     // MAIN FOLDER-Actaf
     auto* mainfol = new TFolder("Actaf", "Actaf info");
+    // Folder for DAQ
+    auto* daqfol = new TFolder("DAQ", "DAQ info");
     // Folder for mapped data
     auto* mapfol = new TFolder("Map", "Map Actaf info");
     // Folder for cal data
     auto* calfol = new TFolder("Cal", "Cal Actaf info");
     // Folder for hit data
     auto* hitfol = new TFolder("Hit", "Hit Actaf info");
+    // Folder for cluster data
+    auto* clusterfol = new TFolder("Clusters", "Cluster Actaf info");
     // Folder for sync data
     auto* syncfol = new TFolder("Sync", "Sync Actaf info");
+    // Folder for gas quality
+    auto* gasfol = new TFolder("Gas", "Gas quality info");
+    // Folder with canvases for shifters
+    auto* shifterfol = new TFolder("shifters", "Shifter canvases");
 
     //
     // Create histograms
@@ -143,15 +196,60 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     SetParameter();
 
+    int runNumber = fEventHeader->GetRunIdR3B();
+    auto addRunLabel = [runNumber](TPad* pad)
+    {
+        if (!pad)
+            return;
+        pad->cd();
+        auto* runLabel = new TPaveText(0.72, 0.90, 0.985, 0.995, "NDC");
+        runLabel->SetFillStyle(0);
+        runLabel->SetBorderSize(0);
+        runLabel->SetTextAlign(32);
+        runLabel->SetTextFont(42);
+        runLabel->SetTextSize(0.05);
+        runLabel->AddText(Form("Run %d", runNumber));
+        runLabel->Draw("same");
+    };
+
+    // ********* DAQ HISTOGRAMS ********* //
+
+    auto* cSpill = new TCanvas("Spill_summary", "Spill info", 10, 10, 800, 500);
+    cSpill->Divide(2, 1);
+
+    fh1_spillnb = R3B::root_owned<TH1F>("fh1_spillnb", "Rate per Spill", 500, 0.5, 500.5);
+    fh1_spillnb->GetXaxis()->SetTitle("Spill number");
+    fh1_spillnb->GetYaxis()->SetTitle("Counts");
+    fh1_spillnb->GetYaxis()->SetTitleOffset(1.1);
+    fh1_spillnb->GetXaxis()->CenterTitle(true);
+    fh1_spillnb->GetYaxis()->CenterTitle(true);
+    fh1_spillnb->SetFillColor(31);
+    cSpill->cd(1);
+    fh1_spillnb->Draw();
+
+    fh1_spillrate = R3B::root_owned<TH1F>("fh1_spillrate", "Rate per Second", 7201, -0.5, 7200.5);
+    fh1_spillrate->GetXaxis()->SetTitle("Seconds");
+    fh1_spillrate->GetYaxis()->SetTitle("Counts");
+    fh1_spillrate->GetYaxis()->SetTitleOffset(1.1);
+    fh1_spillrate->GetXaxis()->CenterTitle(true);
+    fh1_spillrate->GetYaxis()->CenterTitle(true);
+    fh1_spillrate->SetFillColor(31);
+    cSpill->cd(2);
+    fh1_spillrate->Draw();
+    addRunLabel(static_cast<TPad*>(cSpill->cd(1)));
+
+    daqfol->Add(cSpill);
+    shifterfol->Add(cSpill);
+
     // ********* MAP HISTOGRAMS ********* //
 
-    auto* cSum = new TCanvas("Summary_map", "mapped info", 10, 10, 500, 500);
-    cSum->Divide(3, 2);
+    auto* cSum = new TCanvas("Summary_map", "mapped info", 10, 10, 1200, 600);
+    cSum->Divide(4, 2);
 
     cSum->cd(1);
     fh2_ERaw_map = R3B::root_owned<TH2F>("fh2_ERaw_vs_pad_map", "ERaw vs Pad", fPads, 0.5, 0.5 + fPads, 500, 0, 30000);
     fh2_ERaw_map->GetXaxis()->SetTitle("Pad");
-    fh2_ERaw_map->GetYaxis()->SetTitle("Energy [chn]");
+    fh2_ERaw_map->GetYaxis()->SetTitle("Energy [ADC chn]");
     fh2_ERaw_map->GetYaxis()->SetTitleOffset(1.1);
     fh2_ERaw_map->GetXaxis()->CenterTitle(true);
     fh2_ERaw_map->GetYaxis()->CenterTitle(true);
@@ -161,8 +259,10 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_Baseline_map =
         R3B::root_owned<TH2F>("fh2_Baseline_vs_pad_map", "Baseline vs Pad", fPads, 0.5, 0.5 + fPads, 300, 7000, 10000);
     fh2_Baseline_map->GetXaxis()->SetTitle("Pad");
-    fh2_Baseline_map->GetYaxis()->SetTitle("Baseline [chn]");
+    fh2_Baseline_map->GetYaxis()->SetTitle("Baseline [ADC chn]");
     fh2_Baseline_map->GetYaxis()->SetTitleOffset(1.1);
+    fh2_Baseline_map->GetYaxis()->SetMaxDigits(2);
+    // fh2_Baseline_map->GetYaxis()->SetNoExponent(kFALSE);
     fh2_Baseline_map->GetXaxis()->CenterTitle(true);
     fh2_Baseline_map->GetYaxis()->CenterTitle(true);
     fh2_Baseline_map->Draw("colz");
@@ -179,7 +279,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     cSum->cd(4);
     fh2_Risetime_map =
-        R3B::root_owned<TH2F>("fh2_Risetime_vs_pad_map", "Risetime vs Pad", fPads, 0.5, 0.5 + fPads, 100, 0, 100);
+        R3B::root_owned<TH2F>("fh2_Risetime_vs_pad_map", "Risetime vs Pad", fPads, 0.5, 0.5 + fPads, 100, 0, 300);
     fh2_Risetime_map->GetXaxis()->SetTitle("Pad");
     fh2_Risetime_map->GetYaxis()->SetTitle("Risetime [chn]");
     fh2_Risetime_map->GetYaxis()->SetTitleOffset(1.1);
@@ -197,7 +297,186 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_RmsMapVsPad->GetYaxis()->CenterTitle(true);
     fh2_RmsMapVsPad->Draw("colz");
 
+    cSum->cd(6);
+    fh2_RmsMapVsModChn = R3B::root_owned<TH2F>("fh2_RmsMapVsModChn",
+                                               "Baseline RMS per FADC Module/Channel",
+                                               fFadcs * fChn,
+                                               0.5,
+                                               0.5 + fFadcs * fChn,
+                                               100,
+                                               0,
+                                               50);
+    fh2_RmsMapVsModChn->GetXaxis()->SetTitle("(Module-1) #times 16 + Channel");
+    fh2_RmsMapVsModChn->GetYaxis()->SetTitle("RMS [ADC Chn]");
+    fh2_RmsMapVsModChn->GetYaxis()->SetTitleOffset(1.1);
+    fh2_RmsMapVsModChn->GetXaxis()->CenterTitle(true);
+    fh2_RmsMapVsModChn->GetYaxis()->CenterTitle(true);
+    fh2_RmsMapVsModChn->Draw("colz");
+    for (int imod = 1; imod < fFadcs; ++imod)
+    {
+        auto* modlineRms = new TLine(imod * fChn + 0.5, 0, imod * fChn + 0.5, 50);
+        modlineRms->SetLineStyle(2);
+        modlineRms->SetLineColor(kOrange);
+        modlineRms->SetLineWidth(2);
+        modlineRms->Draw("same");
+    }
+
+    cSum->cd(7);
+    fh2_BaselineMapVsModChn = R3B::root_owned<TH2F>("fh2_BaselineMapVsModChn",
+                                                    "Baseline per FADC Module/Channel",
+                                                    fFadcs * fChn,
+                                                    0.5,
+                                                    0.5 + fFadcs * fChn,
+                                                    300,
+                                                    7000,
+                                                    10000);
+    fh2_BaselineMapVsModChn->GetXaxis()->SetTitle("(Module-1) #times 16 + Channel");
+    fh2_BaselineMapVsModChn->GetYaxis()->SetTitle("Baseline [ADC chn]");
+    fh2_BaselineMapVsModChn->GetYaxis()->SetTitleOffset(1.1);
+    fh2_BaselineMapVsModChn->GetYaxis()->SetMaxDigits(2);
+    fh2_BaselineMapVsModChn->GetXaxis()->CenterTitle(true);
+    fh2_BaselineMapVsModChn->GetYaxis()->CenterTitle(true);
+    fh2_BaselineMapVsModChn->Draw("colz");
+    for (int imod = 1; imod < fFadcs; ++imod)
+    {
+        auto* modlineBase = new TLine(imod * fChn + 0.5, 7000, imod * fChn + 0.5, 10000);
+        modlineBase->SetLineStyle(2);
+        modlineBase->SetLineColor(kOrange);
+        modlineBase->SetLineWidth(2);
+        modlineBase->Draw("same");
+    }
+    addRunLabel(static_cast<TPad*>(cSum->cd(1)));
+
     mapfol->Add(cSum);
+    shifterfol->Add(cSum);
+
+    // Canvas for gas quality
+    auto* cGas = new TCanvas("Gas_quality", "Gas quality info", 10, 10, 800, 500);
+
+    // Canvas for alpha rates
+    auto* cAlphaRate = new TCanvas("Alpha_rates", "Alpha rate info", 10, 10, 800, 500);
+
+    // Canvas for alpha energy
+    auto* cAlphaEnergy = new TCanvas("Alpha_energy", "Alpha energy info", 10, 10, 800, 500);
+
+    // Canvas for alpha waveforms
+    auto* cAlphaTraces = new TCanvas("Alpha_traces", "Alpha traces info", 10, 10, 800, 500);
+
+    std::vector<TString> alpha_source;
+
+    if (fEventHeader->GetExpId() == 2025)
+    {
+        alpha_source = { "Alpha-1 Cathode, Down, Pads 115,122",
+                         "Alpha-2 Grid, Down, Pads 112,119",
+                         "Alpha-3 Grid, Up, Pads 46,51,52" };
+        cGas->Divide(3, 1);
+        cAlphaRate->Divide(3, 1);
+        cAlphaEnergy->Divide(3, 1);
+        cAlphaTraces->Divide(3, 1);
+    }
+    else if (fEventHeader->GetExpId() == 2026)
+    {
+        alpha_source = { "Alpha-1 Cathode, Down, Pads 115,122",
+                         "Alpha-2 Middle, Down, Pads 102,103,110",
+                         "Alpha-3 Grid, Down, Pads 112,119",
+                         "Alpha-1 Grid, Up, Pads 46,51,52",
+                         "Alpha-2 Cathode, Up, Pads 48,55" };
+        cGas->Divide(3, 2);
+        cAlphaRate->Divide(3, 2);
+        cAlphaEnergy->Divide(3, 2);
+        cAlphaTraces->Divide(3, 2);
+    }
+
+    for (auto index = 0; index < alpha_source.size(); index++)
+    {
+        cGas->cd(index + 1);
+        fh2_gasquality.push_back(R3B::root_owned<TH2F>(Form("fh2_gasquality_%d", index + 1),
+                                                       alpha_source[index].Data(),
+                                                       100,
+                                                       0,
+                                                       400000,
+                                                       300,
+                                                       -50e3 - (300e3 / 600.),
+                                                       250e3 - (300e3 / 600.)));
+        fh2_gasquality[index]->GetXaxis()->SetTitle("Event number");
+        fh2_gasquality[index]->GetYaxis()->SetTitle("Integral [ADC chn]");
+        fh2_gasquality[index]->GetYaxis()->SetTitleOffset(1.);
+        fh2_gasquality[index]->GetXaxis()->CenterTitle(true);
+        fh2_gasquality[index]->GetYaxis()->CenterTitle(true);
+        gPad->SetLogz();
+        fh2_gasquality[index]->Draw("colz");
+
+        TLine* l1 = new TLine(0,
+                              (index == 0 || index == 4 ? fAlphaSourceCathodeLow : fAlphaSourceGridLow),
+                              400000,
+                              (index == 0 || index == 4 ? fAlphaSourceCathodeLow : fAlphaSourceGridLow));
+        l1->SetLineColor(kRed);
+        l1->SetLineWidth(2);
+        l1->SetLineStyle(9);
+
+        TLine* l2 = new TLine(0,
+                              (index == 0 || index == 4 ? fAlphaSourceCathodeUp : fAlphaSourceGridUp),
+                              400000,
+                              (index == 0 || index == 4 ? fAlphaSourceCathodeUp : fAlphaSourceGridUp));
+        l2->SetLineColor(kRed);
+        l2->SetLineWidth(2);
+        l2->SetLineStyle(9);
+        l1->Draw("same");
+        l2->Draw("same");
+    }
+    addRunLabel(static_cast<TPad*>(cGas->cd(1)));
+    gasfol->Add(cGas);
+    shifterfol->Add(cGas);
+
+    for (auto index = 0; index < alpha_source.size(); index++)
+    {
+        cAlphaRate->cd(index + 1);
+        fh1_alpharate.push_back(
+            R3B::root_owned<TH1F>(Form("fh1_alpharate_%d", index + 1), alpha_source[index].Data(), 500, 0.5, 500.5));
+        fh1_alpharate[index]->GetXaxis()->SetTitle("Spill number");
+        fh1_alpharate[index]->GetYaxis()->SetTitle("Counts");
+        fh1_alpharate[index]->GetYaxis()->SetTitleOffset(1.);
+        fh1_alpharate[index]->GetXaxis()->CenterTitle(true);
+        fh1_alpharate[index]->GetYaxis()->CenterTitle(true);
+        fh1_alpharate[index]->SetFillColor(31);
+        fh1_alpharate[index]->Draw("");
+    }
+    gasfol->Add(cAlphaRate);
+
+    for (auto index = 0; index < alpha_source.size(); index++)
+    {
+        cAlphaEnergy->cd(index + 1);
+        fh1_alphaenergy.push_back(
+            R3B::root_owned<TH1F>(Form("fh1_alphaenergy_%d", index + 1), alpha_source[index].Data(), 250, 0., 250e3));
+        fh1_alphaenergy[index]->GetXaxis()->SetTitle("Integral [ADC chn]");
+        fh1_alphaenergy[index]->GetYaxis()->SetTitle("Counts");
+        fh1_alphaenergy[index]->GetYaxis()->SetTitleOffset(1.);
+        fh1_alphaenergy[index]->GetXaxis()->CenterTitle(true);
+        fh1_alphaenergy[index]->GetYaxis()->CenterTitle(true);
+        fh1_alphaenergy[index]->SetFillColor(31);
+        fh1_alphaenergy[index]->Draw("");
+    }
+    gasfol->Add(cAlphaEnergy);
+
+    for (auto index = 0; index < alpha_source.size(); index++)
+    {
+        cAlphaTraces->cd(index + 1);
+        fh2_RawAlphaTraces.push_back(R3B::root_owned<TH2F>(Form("fh2_RawAlphaTraces_%d", index + 1),
+                                                           alpha_source[index].Data(),
+                                                           nBinsSample / 2,
+                                                           1,
+                                                           nBinsSample,
+                                                           400,
+                                                           6500,
+                                                           10500));
+        fh2_RawAlphaTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
+        fh2_RawAlphaTraces[index]->GetYaxis()->SetTitle("Ampl. [ADC Chn]");
+        fh2_RawAlphaTraces[index]->GetYaxis()->SetTitleOffset(1.);
+        fh2_RawAlphaTraces[index]->GetXaxis()->CenterTitle(true);
+        fh2_RawAlphaTraces[index]->GetYaxis()->CenterTitle(true);
+        fh2_RawAlphaTraces[index]->Draw("colz");
+    }
+    gasfol->Add(cAlphaTraces);
 
     // Canvas for ring and side
     std::vector<std::vector<std::vector<TCanvas*>>> cMap_perRing(2);
@@ -235,7 +514,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     {
         // Canvas per FADC Module
         std::string nameCanvas = "FADC_" + std::to_string(adc + 1) + "_traces_map";
-        auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
+        auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 800, 500);
         cMap->Divide(4, 4);
 
         std::string nameCanvasE = "FADC_" + std::to_string(adc + 1) + "_ERaw";
@@ -247,7 +526,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         cMapB->Divide(4, 4);
 
         std::string canvasFilteredTraces = "FADC_" + std::to_string(adc + 1) + "_Filtered";
-        auto* cCalFilt = new TCanvas(canvasFilteredTraces.c_str(), "Filtered Signals info", 10, 10, 500, 500);
+        auto* cCalFilt = new TCanvas(canvasFilteredTraces.c_str(), "Filtered Signals info", 10, 10, 800, 500);
         cCalFilt->Divide(4, 4);
 
         int chn = 0;
@@ -272,8 +551,8 @@ InitStatus R3BActafOnlineSpectra::Init()
             else
                 chn++;
 
-            fh2_RawTraces[index] =
-                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, 1000, 0, 20000);
+            fh2_RawTraces[index] = R3B::root_owned<TH2F>(
+                nameHist.c_str(), titleHist.c_str(), nBinsSample / 2, 1, nBinsSample, 400, 6000, 10000);
 
             fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_RawTraces[index]->GetYaxis()->SetTitle("A");
@@ -289,8 +568,14 @@ InitStatus R3BActafOnlineSpectra::Init()
 
             // Filtered traces (CAL LEVEL!)
             std::string nameFiltHist = "fh2_Pad_" + std::to_string(index + 1) + "filtered_trace";
-            fh2_FilteredTraces[index] = R3B::root_owned<TH2F>(
-                nameFiltHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, nBinsTrace, nTraceMin, nTraceMax);
+            fh2_FilteredTraces[index] = R3B::root_owned<TH2F>(nameFiltHist.c_str(),
+                                                              titleHist.c_str(),
+                                                              nBinsSample / 2,
+                                                              0,
+                                                              nBinsSample,
+                                                              nBinsTrace,
+                                                              nTraceMin,
+                                                              nTraceMax);
             fh2_FilteredTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_FilteredTraces[index]->GetYaxis()->SetTitle("A");
             fh2_FilteredTraces[index]->GetYaxis()->SetTitleOffset(1.1);
@@ -358,7 +643,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_ModVsCh_map->GetXaxis()->CenterTitle(true);
     fh2_ModVsCh_map->GetYaxis()->CenterTitle(true);
     fh2_ModVsCh_map->Draw("colz");
-    mapfol->Add(cModVsCh);
+    daqfol->Add(cModVsCh);
 
     auto* cdetmask = new TCanvas("Det_mask", "Detector mask", 10, 10, 500, 500);
     fh1_DetMask = R3B::root_owned<TH1F>("fh1_detmask", "Detector mask", 513, -0.5, 512.5);
@@ -371,7 +656,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     gPad->SetLogy();
     fh1_DetMask->Draw();
 
-    mapfol->Add(cdetmask);
+    daqfol->Add(cdetmask);
 
     auto* ctimetag = new TCanvas("TimeTag_signal", "TimeTag Signal", 10, 10, 500, 500);
     fh2_timetag_signal = R3B::root_owned<TH2F>(
@@ -382,7 +667,7 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_timetag_signal->GetXaxis()->CenterTitle(true);
     fh2_timetag_signal->GetYaxis()->CenterTitle(true);
     fh2_timetag_signal->Draw("colz");
-    mapfol->Add(ctimetag);
+    daqfol->Add(ctimetag);
 
     // Mean value of the baseline after and before filtering
     auto* cmawMap = new TCanvas("Maw_map", "Maw (Map) Vs Integrated Energy", 10, 10, 500, 500);
@@ -405,6 +690,8 @@ InitStatus R3BActafOnlineSpectra::Init()
     }
 
     mapfol->Add(cmawMap);
+
+    mainfol->Add(daqfol);
 
     mainfol->Add(mapfol);
 
@@ -527,7 +814,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     cmean->cd(2);
     fh2_meanFiltVsPad = R3B::root_owned<TH2F>(
-        "fh2_meanFiltVsPad", "Baseline mean (filtered) per pad", fPads, 0.5, 0.5 + fPads, 200, 5000, 10000);
+        "fh2_meanFiltVsPad", "Baseline mean (filtered) per pad", fPads, 0.5, 0.5 + fPads, 200, 0, 9000);
     fh2_meanFiltVsPad->GetXaxis()->SetTitle("Pad");
     fh2_meanFiltVsPad->GetYaxis()->SetTitle("Baseline [ADC Chn]");
     fh2_meanFiltVsPad->GetYaxis()->SetTitleOffset(1.1);
@@ -543,7 +830,6 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (int iside = 0; iside < 2; iside++)
     {
-
         TString name = iside == 1 ? "fh2_mawVsECal_Down" : "fh2_mawVsECal_Up";
         TString tit =
             iside == 1 ? "Maw Vs Integrated Energy (Downstream side)" : "Maw Vs Integrated Energy (Upstream side)";
@@ -586,6 +872,7 @@ InitStatus R3BActafOnlineSpectra::Init()
         TString tit;
         i == 0 ? tit = "Counts per ring (upstream)" : tit = "Counts per ring (downstream)";
         cCounts->cd(i + 2);
+        gPad->SetLogy();
         fh1_RingCounts[i] = R3B::root_owned<TH1F>(Form("fh1_RingCounts_side%d", i + 1), tit, 8, 0.5, 8.5);
         fh1_RingCounts[i]->GetXaxis()->SetTitle("Ring");
         fh1_RingCounts[i]->GetYaxis()->SetTitle("Counts");
@@ -613,7 +900,6 @@ InitStatus R3BActafOnlineSpectra::Init()
 
         for (int iPad = 1 + 64 * i; iPad <= 65 + 64 * i; iPad++)
         {
-
             const std::vector<double> padParams = fActafGeo->GetPadParams(iPad);
             TVector3 padPos = fActafGeo->GetPosition(iPad);
             padPos.SetZ(0);
@@ -724,15 +1010,17 @@ InitStatus R3BActafOnlineSpectra::Init()
         fh2_XYPos_Evts_Automatic[i]->Draw("colz ]");
         fh2_XYPos_Evts_Automatic[i]->Draw("same L");
     }
+    addRunLabel(static_cast<TPad*>(cXY_nevents_auto->cd(1)));
 
     hitfol->Add(cXY_nevents_auto);
+    shifterfol->Add(cXY_nevents_auto);
 
     // Canvas with XY positions (one per ring) and waveforms of the 4 pads with highest amplitude
     auto* cXY_nevents_waveform = new TCanvas("X_Y_events_waveform", "XY positions per event", 10, 10, 500, 500);
     cXY_nevents_waveform->Divide(2, 2);
     cXY_nevents_waveform->cd(1);
-    fh2_XYPos_Evts[0]->SetMaximum(2e3);
-    fh2_XYPos_Evts[1]->SetMaximum(2e3);
+    fh2_XYPos_Evts[0]->SetMaximum(1e3);
+    fh2_XYPos_Evts[1]->SetMaximum(1e3);
     fh2_XYPos_Evts[0]->Draw("colz ]");
     fh2_XYPos_Evts[0]->Draw("same L");
     cXY_nevents_waveform->cd(2);
@@ -768,8 +1056,8 @@ InitStatus R3BActafOnlineSpectra::Init()
         new TCanvas("X_Y_events_waveform auto", "XY positions per event auto", 10, 10, 500, 500);
     cXY_nevents_waveform_auto->Divide(2, 2);
     cXY_nevents_waveform_auto->cd(1);
-    fh2_XYPos_Evts_Automatic[0]->SetMaximum(2e3);
-    fh2_XYPos_Evts_Automatic[1]->SetMaximum(2e3);
+    fh2_XYPos_Evts_Automatic[0]->SetMaximum(1e3);
+    fh2_XYPos_Evts_Automatic[1]->SetMaximum(1e3);
     fh2_XYPos_Evts_Automatic[0]->Draw("colz ]");
     fh2_XYPos_Evts_Automatic[0]->Draw("same L");
     cXY_nevents_waveform_auto->cd(2);
@@ -798,11 +1086,13 @@ InitStatus R3BActafOnlineSpectra::Init()
         g_CorrectedTraces_4pads_highestAmp_auto[iPad]->Draw("AL");
         g_CorrectedTraces_4pads_highestAmp_auto[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
     }
+    addRunLabel(static_cast<TPad*>(cXY_nevents_waveform_auto->cd(1)));
 
     hitfol->Add(cXY_nevents_waveform_auto);
+    shifterfol->Add(cXY_nevents_waveform_auto);
 
     // Canvas with phi angle -> 3 histograms
-    auto* cPhi = new TCanvas("Phi_correlations", "Phi angles", 10, 10, 500, 500);
+    /*auto* cPhi = new TCanvas("Phi_correlations", "Phi angles", 10, 10, 500, 500);
     cPhi->Divide(1, 3);
 
     // phi counts for side up and down
@@ -829,10 +1119,237 @@ InitStatus R3BActafOnlineSpectra::Init()
     fh2_Phi1VsPhi2->GetXaxis()->CenterTitle(true);
     fh2_Phi1VsPhi2->GetYaxis()->CenterTitle(true);
     fh2_Phi1VsPhi2->Draw("colz");
-    hitfol->Add(cPhi);
+    hitfol->Add(cPhi);*/
 
     if (fHitItems != nullptr)
         mainfol->Add(hitfol);
+
+    if (fClusterItems != nullptr)
+    {
+        auto* cClusterUp = new TCanvas("ClusterUp", "Summary of clusters in UP", 10, 10, 800, 500);
+        cClusterUp->Divide(3, 2);
+
+        cClusterUp->cd(1);
+        fh1_Cluster_mul.push_back(R3B::root_owned<TH1F>("fh1_Cluster_mul_up", "", 11, -0.5, 10.5));
+        fh1_Cluster_mul[0]->GetXaxis()->SetTitle("Cluster multiplicity-UP");
+        fh1_Cluster_mul[0]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_mul[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_mul[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_mul[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_mul[0]->SetFillColor(31);
+        fh1_Cluster_mul[0]->Draw();
+
+        cClusterUp->cd(2);
+        fh1_Cluster_pad_mul.push_back(R3B::root_owned<TH1F>("fh1_Cluster_pad_mul_up", "", 16, -0.5, 15.5));
+        fh1_Cluster_pad_mul[0]->GetXaxis()->SetTitle("Pad multiplicity per cluster-UP");
+        fh1_Cluster_pad_mul[0]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_pad_mul[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_pad_mul[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_pad_mul[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_pad_mul[0]->SetFillColor(31);
+        fh1_Cluster_pad_mul[0]->Draw();
+
+        cClusterUp->cd(3);
+        fh1_Cluster_theta.push_back(R3B::root_owned<TH1F>("fh1_Cluster_theta_up", "", 90, 0., 180.));
+        fh1_Cluster_theta[0]->GetXaxis()->SetTitle("Polar angle theta-UP [deg]");
+        fh1_Cluster_theta[0]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_theta[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_theta[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_theta[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_theta[0]->SetFillColor(31);
+        fh1_Cluster_theta[0]->Draw();
+
+        cClusterUp->cd(4);
+        fh1_Cluster_phi.push_back(R3B::root_owned<TH1F>("fh1_Cluster_phi_up", "", 90, 0., 360.));
+        fh1_Cluster_phi[0]->GetXaxis()->SetTitle("Phi-UP [deg]");
+        fh1_Cluster_phi[0]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_phi[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_phi[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_phi[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_phi[0]->SetFillColor(31);
+        fh1_Cluster_phi[0]->Draw();
+
+        cClusterUp->cd(5);
+        fh1_Cluster_energy.push_back(R3B::root_owned<TH1F>("fh1_Cluster_energy_up", "", 250, 0, 300000));
+        fh1_Cluster_energy[0]->GetXaxis()->SetTitle("Energy-UP [ADC chn]");
+        fh1_Cluster_energy[0]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_energy[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_energy[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_energy[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_energy[0]->SetFillColor(31);
+        fh1_Cluster_energy[0]->Draw();
+
+        cClusterUp->cd(6);
+        fh2_XYPos_clusters.push_back(
+            static_cast<TH2Poly*>(fh2_XYPos[0]->Clone((fh2_XYPos[0]->GetTitle() + TString("_clusters)")).Data())));
+        fh2_XYPos_clusters[0]->SetTitle(fh2_XYPos[0]->GetTitle() + TString(" per event"));
+        fh2_XYPos_clusters[0]->SetLineColor(kBlack);
+        fh2_XYPos_clusters[0]->SetLineWidth(1);
+        fh2_XYPos_clusters[0]->SetMaximum(11);
+        fh2_XYPos_clusters[0]->Draw("colz ]");
+        fh2_XYPos_clusters[0]->Draw("same L");
+        addRunLabel(static_cast<TPad*>(cClusterUp->cd(1)));
+
+        clusterfol->Add(cClusterUp);
+        shifterfol->Add(cClusterUp);
+
+        auto* cClusterDown = new TCanvas("ClusterDown", "Summary of clusters in DOWN", 10, 10, 800, 500);
+        cClusterDown->Divide(3, 2);
+
+        cClusterDown->cd(1);
+        fh1_Cluster_mul.push_back(R3B::root_owned<TH1F>("fh1_Cluster_mul_down", "", 11, -0.5, 10.5));
+        fh1_Cluster_mul[1]->GetXaxis()->SetTitle("Cluster multiplicity-DOWN");
+        fh1_Cluster_mul[1]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_mul[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_mul[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_mul[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_mul[1]->SetFillColor(31);
+        fh1_Cluster_mul[1]->Draw();
+
+        cClusterDown->cd(2);
+        fh1_Cluster_pad_mul.push_back(R3B::root_owned<TH1F>("fh1_Cluster_pad_mul_down", "", 16, -0.5, 15.5));
+        fh1_Cluster_pad_mul[1]->GetXaxis()->SetTitle("Pad multiplicity per cluster-DOWN");
+        fh1_Cluster_pad_mul[1]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_pad_mul[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_pad_mul[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_pad_mul[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_pad_mul[1]->SetFillColor(31);
+        fh1_Cluster_pad_mul[1]->Draw();
+
+        cClusterDown->cd(3);
+        fh1_Cluster_theta.push_back(R3B::root_owned<TH1F>("fh1_Cluster_theta_down", "", 90, 0., 180.));
+        fh1_Cluster_theta[1]->GetXaxis()->SetTitle("Polar angle theta-DOWN [deg]");
+        fh1_Cluster_theta[1]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_theta[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_theta[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_theta[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_theta[1]->SetFillColor(31);
+        fh1_Cluster_theta[1]->Draw();
+
+        cClusterDown->cd(4);
+        fh1_Cluster_phi.push_back(R3B::root_owned<TH1F>("fh1_Cluster_phi_down", "", 90, 0., 360.));
+        fh1_Cluster_phi[1]->GetXaxis()->SetTitle("Phi-DOWN [deg]");
+        fh1_Cluster_phi[1]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_phi[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_phi[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_phi[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_phi[1]->SetFillColor(31);
+        fh1_Cluster_phi[1]->Draw();
+
+        cClusterDown->cd(5);
+        fh1_Cluster_energy.push_back(R3B::root_owned<TH1F>("fh1_Cluster_energy_down", "", 250, 0, 300000));
+        fh1_Cluster_energy[1]->GetXaxis()->SetTitle("Energy-DOWN [ADC chn]");
+        fh1_Cluster_energy[1]->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_energy[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_energy[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_energy[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_energy[1]->SetFillColor(31);
+        fh1_Cluster_energy[1]->Draw();
+
+        cClusterDown->cd(6);
+
+        fh2_XYPos_clusters.push_back(
+            static_cast<TH2Poly*>(fh2_XYPos[1]->Clone((fh2_XYPos[1]->GetTitle() + TString("_clusters)")).Data())));
+        fh2_XYPos_clusters[1]->SetTitle(fh2_XYPos[1]->GetTitle() + TString(" per event"));
+        fh2_XYPos_clusters[1]->SetLineColor(kBlack);
+        fh2_XYPos_clusters[1]->SetLineWidth(1);
+        fh2_XYPos_clusters[1]->SetMaximum(11);
+        fh2_XYPos_clusters[1]->Draw("colz ]");
+        fh2_XYPos_clusters[1]->Draw("same L");
+        addRunLabel(static_cast<TPad*>(cClusterDown->cd(1)));
+
+        clusterfol->Add(cClusterDown);
+        shifterfol->Add(cClusterDown);
+
+        auto* cClusterEff = new TCanvas("Cluster_efficiency", "Summary of clusters efficiency", 10, 10, 1350, 600);
+        cClusterEff->Divide(3, 2);
+
+        cClusterEff->cd(1);
+        fh1_Cluster_eff.push_back(R3B::root_owned<TH1F>("fh1_Cluster_efficiency_up", "Size > 4 - UP", 500, 0.5, 500.5));
+        fh1_Cluster_eff[0]->GetXaxis()->SetTitle("Spill number");
+        fh1_Cluster_eff[0]->GetYaxis()->SetTitle("Cluster reconstruction eff.");
+        fh1_Cluster_eff[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_eff[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_eff[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_eff[0]->SetFillColor(31);
+        fh1_Cluster_eff[0]->Draw();
+
+        cClusterEff->cd(2);
+        fh1_Cluster_eff.push_back(
+            R3B::root_owned<TH1F>("fh1_Cluster_efficiency_down", "Size > 4 - DOWN", 500, 0.5, 500.5));
+        fh1_Cluster_eff[1]->GetXaxis()->SetTitle("Spill number");
+        fh1_Cluster_eff[1]->GetYaxis()->SetTitle("Cluster reconstruction eff.");
+        fh1_Cluster_eff[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_eff[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_eff[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_eff[1]->SetFillColor(31);
+        fh1_Cluster_eff[1]->Draw();
+
+        cClusterEff->cd(3);
+        fh1_Cluster_eff_small.push_back(
+            R3B::root_owned<TH1F>("fh1_Cluster_efficiency_small_up", "2 < Size < 4 - UP", 500, 0.5, 500.5));
+        fh1_Cluster_eff_small[0]->GetXaxis()->SetTitle("Spill number");
+        fh1_Cluster_eff_small[0]->GetYaxis()->SetTitle("Cluster reconstruction eff.");
+        fh1_Cluster_eff_small[0]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_eff_small[0]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_eff_small[0]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_eff_small[0]->SetFillColor(kOrange);
+        fh1_Cluster_eff_small[0]->Draw();
+
+        cClusterEff->cd(4);
+        fh1_Cluster_eff_small.push_back(
+            R3B::root_owned<TH1F>("fh1_Cluster_efficiency_small_down", "2 < Size < 4 - DOWN", 500, 0.5, 500.5));
+        fh1_Cluster_eff_small[1]->GetXaxis()->SetTitle("Spill number");
+        fh1_Cluster_eff_small[1]->GetYaxis()->SetTitle("Cluster reconstruction eff.");
+        fh1_Cluster_eff_small[1]->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_eff_small[1]->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_eff_small[1]->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_eff_small[1]->SetFillColor(kOrange);
+        fh1_Cluster_eff_small[1]->Draw();
+
+        cClusterEff->cd(5);
+        fh1_Cluster_eff_summary_up =
+            R3B::root_owned<TH1F>("fh1_Cluster_eff_summary_up", "Cluster summary UP", 3, 0.5, 3.5);
+        fh1_Cluster_eff_summary_up->GetXaxis()->SetBinLabel(1, "Total events");
+        fh1_Cluster_eff_summary_up->GetXaxis()->SetBinLabel(2, "Size > 4");
+        fh1_Cluster_eff_summary_up->GetXaxis()->SetBinLabel(3, "2 < Size < 4");
+        fh1_Cluster_eff_summary_up->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_eff_summary_up->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_eff_summary_up->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_eff_summary_up->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_eff_summary_up->SetFillColor(38);
+        fh1_Cluster_eff_summary_small_up =
+            R3B::root_owned<TH1F>("fh1_Cluster_eff_summary_small_up", "Cluster summary UP", 3, 0.5, 3.5);
+        fh1_Cluster_eff_summary_small_up->SetFillColor(kOrange);
+        gPad->SetLogy();
+        fh1_Cluster_eff_summary_up->Draw();
+        fh1_Cluster_eff_summary_small_up->Draw("same");
+
+        cClusterEff->cd(6);
+        fh1_Cluster_eff_summary_down =
+            R3B::root_owned<TH1F>("fh1_Cluster_eff_summary_down", "Cluster summary DOWN", 3, 0.5, 3.5);
+        fh1_Cluster_eff_summary_down->GetXaxis()->SetBinLabel(1, "Total events");
+        fh1_Cluster_eff_summary_down->GetXaxis()->SetBinLabel(2, "Size > 4");
+        fh1_Cluster_eff_summary_down->GetXaxis()->SetBinLabel(3, "2 < Size < 4");
+        fh1_Cluster_eff_summary_down->GetYaxis()->SetTitle("Counts");
+        fh1_Cluster_eff_summary_down->GetYaxis()->SetTitleOffset(1.1);
+        fh1_Cluster_eff_summary_down->GetXaxis()->CenterTitle(true);
+        fh1_Cluster_eff_summary_down->GetYaxis()->CenterTitle(true);
+        fh1_Cluster_eff_summary_down->SetFillColor(46);
+        fh1_Cluster_eff_summary_small_down =
+            R3B::root_owned<TH1F>("fh1_Cluster_eff_summary_small_down", "Cluster summary DOWN", 3, 0.5, 3.5);
+        fh1_Cluster_eff_summary_small_down->SetFillColor(kOrange);
+        gPad->SetLogy();
+        fh1_Cluster_eff_summary_down->Draw();
+        fh1_Cluster_eff_summary_small_down->Draw("same");
+
+        addRunLabel(static_cast<TPad*>(cClusterEff->cd(1)));
+
+        clusterfol->Add(cClusterEff);
+        shifterfol->Add(cClusterEff);
+
+        mainfol->Add(clusterfol);
+    }
 
     auto* cSync = new TCanvas("Sync", "", 10, 10, 500, 500);
     cSync->Divide(3, 3);
@@ -881,7 +1398,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     auto fh1_rates = R3B::root_owned<TH1F>("fh1_rates", "Rates [Hz]", max_second_for_rate, 0, max_second_for_rate);
     fh1_rates->GetXaxis()->SetTitle("Time [s]");
-    fh1_rates->GetYaxis()->SetTitle("Rate of good signals [Hz]");
+    fh1_rates->GetYaxis()->SetTitle("Rate of good pads [Hz]");
     fh1_rates->GetYaxis()->SetTitleOffset(1.1);
     fh1_rates->GetXaxis()->CenterTitle(true);
     fh1_rates->GetYaxis()->CenterTitle(true);
@@ -931,6 +1448,9 @@ InitStatus R3BActafOnlineSpectra::Init()
         mainfol->Add(syncfol);
     }
 
+    mainfol->Add(gasfol);
+    mainfol->Add(shifterfol);
+
     run->AddObject(mainfol);
 
     // Register command to reset histograms
@@ -955,7 +1475,6 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
 {
     if (eventViewerNb >= maxEventViewerBatch)
     {
-
         fh2_XYPos_Evts[0]->Reset("");
         fh2_XYPos_Evts[1]->Reset("");
         for (auto& graph : g_CorrectedTraces_4pads_highestAmp)
@@ -1178,12 +1697,10 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh2_Risetime_map->Reset();
         fh2_ModVsCh_map->Reset();
         fh1_sigmaInit->Reset();
-        fh1_sigmaFilt->Reset();
         fh2_sigmaInitVsPad->Reset();
         fh2_RmsMapVsPad->Reset();
-        fh2_sigmaFiltVsPad->Reset();
-        fh2_meanInitVsPad->Reset();
-        fh2_meanFiltVsPad->Reset();
+        fh2_RmsMapVsModChn->Reset();
+        fh2_BaselineMapVsModChn->Reset();
         fh1_DetMask->Reset();
         fh2_timetag_signal->Reset();
         for (const auto& hist : fh2_RawTraces)
@@ -1222,6 +1739,14 @@ void R3BActafOnlineSpectra::Reset_Histo()
             if (gr)
                 gr->Set(0); // Clear
         }
+        for (const auto& hist : fh1_alpharate)
+        {
+            hist->Reset();
+        }
+        for (const auto& hist : fh1_alphaenergy)
+        {
+            hist->Reset();
+        }
     }
 
     if (fCalItems)
@@ -1231,6 +1756,10 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh2_tLeading_cal->Reset();
         fh2_maxAmp_cal->Reset();
         fh2_tSync_cal->Reset();
+        fh1_sigmaFilt->Reset();
+        fh2_sigmaFiltVsPad->Reset();
+        fh2_meanInitVsPad->Reset();
+        fh2_meanFiltVsPad->Reset();
         for (const auto& hist : fh2_FilteredTraces)
         {
             hist->Reset();
@@ -1256,11 +1785,37 @@ void R3BActafOnlineSpectra::Reset_Histo()
         for (auto& h : fh2_XYPos_Evts_Automatic)
             h->Reset("");
 
-        for (auto& h : fh1_PhiCounts)
-            h->Reset();
+        // for (auto& h : fh1_PhiCounts)
+        //     h->Reset();
 
         fh1_CountsPerSide->Reset();
-        fh2_Phi1VsPhi2->Reset();
+        // fh2_Phi1VsPhi2->Reset();
+    }
+
+    if (fClusterItems)
+    {
+        for (auto& h : fh1_Cluster_mul)
+            h->Reset();
+        for (auto& h : fh1_Cluster_pad_mul)
+            h->Reset();
+        for (auto& h : fh1_Cluster_theta)
+            h->Reset();
+        for (auto& h : fh1_Cluster_phi)
+            h->Reset();
+        for (auto& h : fh1_Cluster_energy)
+            h->Reset();
+        for (auto& h : fh1_Cluster_eff)
+            h->Reset();
+        for (auto& h : fh1_Cluster_eff_small)
+            h->Reset();
+        if (fh1_Cluster_eff_summary_up)
+            fh1_Cluster_eff_summary_up->Reset();
+        if (fh1_Cluster_eff_summary_down)
+            fh1_Cluster_eff_summary_down->Reset();
+        if (fh1_Cluster_eff_summary_small_up)
+            fh1_Cluster_eff_summary_small_up->Reset();
+        if (fh1_Cluster_eff_summary_small_down)
+            fh1_Cluster_eff_summary_small_down->Reset();
     }
 
     return;
@@ -1268,10 +1823,12 @@ void R3BActafOnlineSpectra::Reset_Histo()
 
 void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 {
-    if ((fTrigger >= 0) && (header) && (header->GetTrigger() != fTrigger))
+    fEventCounter = (fEventCounter + 1) % 40001;
+
+    if ((fTrigger >= 0) && (fEventHeader) && (fEventHeader->GetTrigger() != fTrigger))
         return;
 
-    if (fTpat1 > 0 && fTpat2 > 0 && (header))
+    if (fTpat1 > 0 && fTpat2 > 0 && (fEventHeader))
     {
         // fTpat = 1-16; fTpat_bit = 0-15
         Int_t fTpat_bit1 = fTpat1 - 1;
@@ -1279,7 +1836,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         Int_t tpatbin = 0;
         for (int i = 0; i < 16; i++)
         {
-            tpatbin = (header->GetTpat() & (1 << i));
+            tpatbin = (fEventHeader->GetTpat() & (1 << i));
             if (tpatbin != 0 && (i < fTpat_bit1 || i > fTpat_bit2))
             {
                 return;
@@ -1304,6 +1861,36 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             {
                 fh1_DetMask->Fill(hit->GetDetMask());
                 timetag = hit->GetTimeTag();
+
+                if (timetag < pre_timetag || pre_timetag == 0)
+                {
+                    pre_timetag = timetag;
+                }
+
+                if (init_timetag == 0)
+                {
+                    init_timetag = timetag;
+                }
+
+                fSpill_number = hit->GetSpillNb();
+                fh1_spillnb->Fill(fSpill_number);
+
+                if (fPrevSpillNb == 0)
+                {
+                    fPrevSpillNb = fSpill_number;
+                }
+                else if (fSpill_number != fPrevSpillNb)
+                {
+                    fEventSpillCounter = 0;
+                    fClusterCounter[0] = 0.;
+                    fClusterCounter[1] = 0.;
+                    fPrevSpillNb = fSpill_number;
+                }
+
+                // std::cout<<hit->GetSpillNb()<<" "<<init_timetag<<" "<<timetag<<" "<< (timetag-init_timetag)
+                // <<std::endl;
+
+                fh1_spillrate->Fill((timetag - init_timetag) * 25.72 * 2. * 1.e-9);
             }
 
             if (pad == 128)
@@ -1319,8 +1906,7 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                         if (value == 0)
                             continue;
 
-                        if (hit->GetBaseline() > 0)
-                            fh2_timetag_signal->Fill(index++, value + hit->GetBaseline());
+                        fh2_timetag_signal->Fill(index++, value);
                     }
                 }
             }
@@ -1351,8 +1937,170 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 fh2_Baseline_map->Fill(pad + 1, hit->GetBaseline());
                 fh2_RmsMapVsPad->Fill(pad + 1, hit->GetRms());
 
+                int FADCmod = fMap_Par->GetFADCModuleByPad(pad + 1);
+                int FADCchn = fMap_Par->GetFADCChannelByPad(pad + 1);
+                fh2_RmsMapVsModChn->Fill((FADCmod - 1) * fChn + FADCchn, hit->GetRms());
+                fh2_BaselineMapVsModChn->Fill((FADCmod - 1) * fChn + FADCchn, hit->GetBaseline());
+
                 int indexside = pad < 65 ? 0 : 1;
                 fh2_mawVsEMap[indexside]->Fill(hit->GetE(), hit->GetMaw());
+            }
+
+            if (fEventHeader->GetExpId() == 2025)
+            {
+                // (pad-1) base for alpha-1
+                if (pad == 114 || pad == 121)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[0]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[0]->Fill(integral);
+
+                    if (integral > fAlphaSourceCathodeLow && integral < fAlphaSourceCathodeUp)
+                    {
+                        fh1_alpharate[0]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[0]->Fill(index++, value);
+                        }
+                    }
+                }
+
+                // (pad-1) base for alpha-2
+                if (pad == 111 || pad == 118)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[1]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[1]->Fill(integral);
+
+                    if (integral > fAlphaSourceGridLow && integral < fAlphaSourceGridUp)
+                    {
+                        fh1_alpharate[1]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[1]->Fill(index++, value);
+                        }
+                    }
+                }
+
+                // (pad-1) base for alpha-3
+                if (pad == 45 || pad == 50 || pad == 51)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[2]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[2]->Fill(integral);
+
+                    if (integral > fAlphaSourceGridLow && integral < fAlphaSourceGridUp)
+                    {
+                        fh1_alpharate[2]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[2]->Fill(index++, value);
+                        }
+                    }
+                }
+            }
+            else if (fEventHeader->GetExpId() == 2026)
+            {
+                // (pad-1) base for alpha-1 DOWN
+                if (pad == 114 || pad == 121)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[0]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[0]->Fill(integral);
+
+                    if (integral > fAlphaSourceCathodeLow && integral < fAlphaSourceCathodeUp)
+                    {
+                        fh1_alpharate[0]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[0]->Fill(index++, value);
+                        }
+                    }
+                }
+
+                // (pad-1) base for alpha-2 DOWN
+                if (pad == 101 || pad == 102 || pad == 109)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[1]->Fill(fEventCounter, integral);
+
+                    if (integral > fAlphaSourceGridLow && integral < fAlphaSourceGridUp)
+                    {
+                        fh1_alpharate[1]->Fill(fSpill_number);
+                        fh1_alphaenergy[1]->Fill(integral);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[1]->Fill(index++, value);
+                        }
+                    }
+                }
+
+                // (pad-1) base for alpha-3 DOWN
+                if (pad == 111 || pad == 118)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[2]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[2]->Fill(integral);
+
+                    if (integral > fAlphaSourceGridLow && integral < fAlphaSourceGridUp)
+                    {
+                        fh1_alpharate[2]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[2]->Fill(index++, value);
+                        }
+                    }
+                }
+
+                // (pad-1) base for alpha-1 UP
+                if (pad == 45 || pad == 50 || pad == 51)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[3]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[3]->Fill(integral);
+
+                    if (integral > fAlphaSourceGridLow && integral < fAlphaSourceGridUp)
+                    {
+                        fh1_alpharate[3]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[3]->Fill(index++, value);
+                        }
+                    }
+                }
+
+                // (pad-1) base for alpha-2 UP
+                if (pad == 47 || pad == 54)
+                {
+                    auto integral = IntegrateTrace(hit->GetTrace());
+                    fh2_gasquality[4]->Fill(fEventCounter, integral);
+                    fh1_alphaenergy[4]->Fill(integral);
+
+                    if (integral > fAlphaSourceCathodeLow && integral < fAlphaSourceCathodeUp)
+                    {
+                        fh1_alpharate[4]->Fill(fSpill_number);
+                        std::size_t index = 0;
+                        for (const auto& value : hit->GetTrace())
+                        {
+                            if (hit->GetBaseline() > 0)
+                                fh2_RawAlphaTraces[4]->Fill(index++, value);
+                        }
+                    }
+                }
             }
 
             if (fDisplaytraces)
@@ -1366,12 +2114,14 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
                     if (hit->GetBaseline() > 0)
                     {
-                        fh2_RawTraces[pad]->Fill(index++, value + hit->GetBaseline());
+                        fh2_RawTraces[pad]->Fill(index++, value);
                     }
                 }
             }
         }
     }
+
+    fEventSpillCounter++;
 
     // For overall rates
     overall_rate += fCalItems->GetEntriesFast();
@@ -1457,11 +2207,11 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
                 fh1_sigmaInit->Fill(hit->GetRmsRaw());
                 fh1_sigmaFilt->Fill(hit->GetRms());
 
-                fh2_sigmaFiltVsPad->Fill(pad + 1, hit->GetRms());
-                fh2_sigmaInitVsPad->Fill(pad + 1, hit->GetRmsRaw());
+                fh2_sigmaFiltVsPad->Fill(pad, hit->GetRms());
+                fh2_sigmaInitVsPad->Fill(pad, hit->GetRmsRaw());
 
-                fh2_meanFiltVsPad->Fill(pad + 1, hit->GetMean());
-                fh2_meanInitVsPad->Fill(pad + 1, hit->GetMeanRaw());
+                fh2_meanFiltVsPad->Fill(pad, hit->GetMean());
+                fh2_meanInitVsPad->Fill(pad, hit->GetMeanRaw());
 
                 int indexside = pad < 65 ? 0 : 1;
 
@@ -1570,6 +2320,9 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto energy = hit->GetEnergy();
             auto maxAmp = hit->GetMaxAmpl();
 
+            if (maxAmp < 30)
+                continue;
+
             auto track = hit->GetTrack();
             auto phi = track.Phi() * TMath::RadToDeg();
 
@@ -1578,9 +2331,6 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
             if (eventViewerNb < maxEventViewerBatch)
             {
-                if (maxAmp < 200)
-                    continue;
-
                 goodEventForView = true;
                 eventCountsX[eventViewerNb][pad - 1] = x;
                 eventCountsY[eventViewerNb][pad - 1] = y;
@@ -1590,21 +2340,90 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             maxAmp ? 0 : maxAmp = 0.1; // to avoid zeroing bin content for visualization
             fh2_XYPos_Evts_Automatic[side]->SetBinContent(bin, maxAmp);
 
-            fh1_PhiCounts[side]->Fill(phi);
+            // fh1_PhiCounts[side]->Fill(phi);
             fh1_CountsPerSide->Fill(side + 1);
         }
+    }
+
+    // Fill cluster data
+    if (fClusterItems)
+    {
+        if (fh1_Cluster_eff_summary_up)
+            fh1_Cluster_eff_summary_up->AddBinContent(1, 1.);
+        if (fh1_Cluster_eff_summary_down)
+            fh1_Cluster_eff_summary_down->AddBinContent(1, 1.);
+
+        if (fClusterItems->GetEntriesFast() > 0)
+        {
+            for (auto& h : fh2_XYPos_clusters)
+                h->Reset("");
+
+            auto nHits = fClusterItems->GetEntriesFast();
+            std::vector<int> clustermul(2, 0);
+            std::vector<int> clustermul_small(2, 0);
+            for (size_t ihit = 0; ihit < nHits; ihit++)
+            {
+                auto* hit = dynamic_cast<R3BActafClusterData*>(fClusterItems->At(ihit));
+                if (!hit)
+                    continue;
+
+                int side = hit->GetSide() - 1;
+                auto theta = hit->GetTheta();
+                auto phi = hit->GetPhi();
+                auto energy = hit->GetEnergy();
+                auto padmul = hit->GetNbOfPads();
+
+                if (padmul > 4)
+                {
+                    clustermul[side]++;
+
+                    for (auto padID : hit->GetPadList())
+                    {
+                        TVector3 padPos = fActafGeo->GetPosition(padID);
+                        for (int iev = 0; iev < 10; iev++)
+                            fh2_XYPos_clusters[side]->Fill(padPos.X(), padPos.Y());
+                    }
+
+                    fh1_Cluster_pad_mul[side]->Fill(padmul);
+                    fh1_Cluster_theta[side]->Fill(theta);
+                    fh1_Cluster_phi[side]->Fill((phi >= 0. ? phi : phi + 360.));
+                    fh1_Cluster_energy[side]->Fill(energy);
+                }
+                else if (padmul > 2 && padmul < 4)
+                {
+                    clustermul_small[side]++;
+                }
+            }
+            for (size_t i = 0; i < clustermul.size(); ++i)
+            {
+                fh1_Cluster_mul[i]->Fill(clustermul[i]);
+
+                // if (clustermul[i]>0)fClusterCounter[i]++;
+                if (clustermul[i] > 0)
+                    fh1_Cluster_eff[i]->Fill(fSpill_number);
+
+                if (clustermul_small[i] > 0)
+                    fh1_Cluster_eff_small[i]->Fill(fSpill_number);
+            }
+
+            if (fh1_Cluster_eff_summary_up)
+                fh1_Cluster_eff_summary_up->AddBinContent(2, clustermul[0]);
+            if (fh1_Cluster_eff_summary_down)
+                fh1_Cluster_eff_summary_down->AddBinContent(2, clustermul[1]);
+            if (fh1_Cluster_eff_summary_small_up)
+                fh1_Cluster_eff_summary_small_up->AddBinContent(3, clustermul_small[0]);
+            if (fh1_Cluster_eff_summary_small_down)
+                fh1_Cluster_eff_summary_small_down->AddBinContent(3, clustermul_small[1]);
+        }
+
+        // fh1_Cluster_eff[0]->SetBinContent(fSpill_number, fClusterCounter[0]/fEventSpillCounter);
+        // fh1_Cluster_eff[1]->SetBinContent(fSpill_number, fClusterCounter[1]/fEventSpillCounter);
     }
 
     // R3BLOG(info,"wr: "<<fWrItems->GetEntriesFast());
 
     if (fWrItems && fWrItems->GetEntriesFast() > 0)
     {
-
-        if (timetag < pre_timetag)
-        {
-            pre_timetag = timetag;
-        }
-
         auto nHits = fWrItems->GetEntriesFast();
         std::vector<uint64_t> timestamps{ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         for (int ihit = 0; ihit < nHits; ihit++)
@@ -1612,10 +2431,13 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
             auto* hit = dynamic_cast<R3BWRData*>(fWrItems->At(ihit));
             if (!hit)
                 continue;
+            if (hit->GetId() == 0)
+                continue;
 
             auto id = hit->GetId() > 0 ? hit->GetId() - 1 : 0;
 
-            timestamps[id] = hit->GetTimeStamp();
+            if (hit->GetTimeStamp() > 0)
+                timestamps[id] = hit->GetTimeStamp();
 
             fh1_Sync[id]->Fill(hit->GetTimeStamp() - pre_timestamp[id] - 2 * (timetag - pre_timetag));
 
@@ -1623,11 +2445,10 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
         }
         pre_timetag = timetag;
 
-        if (first_timestamp == 0 || first_timestamp > timestamps[0])
+        if (first_timestamp == 0 /*|| first_timestamp > timestamps[0]*/)
             first_timestamp = timestamps[0];
 
-        auto time_s = (timestamps[0] - first_timestamp) * 1e-9; // in seconds
-        int sec = static_cast<int>(time_s);
+        int sec = static_cast<int>((timetag - init_timetag) * 25.72 * 2. * 1.e-9);
 
         if (sec > last_second)
         {
@@ -1676,6 +2497,7 @@ void R3BActafOnlineSpectra::FinishEvent()
     r3b::util::ClearIfNotNull(fMappedItems);
     r3b::util::ClearIfNotNull(fCalItems);
     r3b::util::ClearIfNotNull(fHitItems);
+    r3b::util::ClearIfNotNull(fClusterItems);
     r3b::util::ClearIfNotNull(fWrItems);
 }
 
@@ -1685,6 +2507,8 @@ void R3BActafOnlineSpectra::FinishTask()
     {
         if (fMappedItems)
         {
+            fh1_spillnb->Write();
+            fh1_spillrate->Write();
             fh2_ERaw_map->Write();
             fh2_Baseline_map->Write();
             fh2_MaxPos_map->Write();
@@ -1694,6 +2518,8 @@ void R3BActafOnlineSpectra::FinishTask()
             fh1_sigmaFilt->Write();
             fh2_sigmaInitVsPad->Write();
             fh2_RmsMapVsPad->Write();
+            fh2_RmsMapVsModChn->Write();
+            fh2_BaselineMapVsModChn->Write();
             fh2_sigmaFiltVsPad->Write();
             fh2_meanInitVsPad->Write();
             fh2_meanFiltVsPad->Write();
@@ -1723,6 +2549,18 @@ void R3BActafOnlineSpectra::FinishTask()
             {
                 hist->Write();
             }
+            for (const auto& hist : fh1_alpharate)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh1_alphaenergy)
+            {
+                hist->Write();
+            }
+            for (const auto& hist : fh2_RawAlphaTraces)
+            {
+                hist->Write();
+            }
         }
 
         if (fCalItems)
@@ -1742,20 +2580,50 @@ void R3BActafOnlineSpectra::FinishTask()
         {
             for (auto& h : fh1_RingCounts)
                 h->Write();
-
             for (auto& h : fh2_XYPos)
                 h->Write();
-
             for (auto& h : fh2_XYPos_Evts_Automatic)
                 h->Write();
-
-            for (auto& h : fh1_PhiCounts)
-                h->Write();
-
+            // for (auto& h : fh1_PhiCounts)
+            //     h->Write();
             fh1_CountsPerSide->Write();
-
-            fh2_Phi1VsPhi2->Write();
+            // fh2_Phi1VsPhi2->Write();
         }
+
+        if (fClusterItems)
+        {
+            for (auto& h : fh1_Cluster_mul)
+                h->Write();
+            for (auto& h : fh1_Cluster_pad_mul)
+                h->Write();
+            for (auto& h : fh1_Cluster_theta)
+                h->Write();
+            for (auto& h : fh1_Cluster_phi)
+                h->Write();
+            for (auto& h : fh1_Cluster_energy)
+                h->Write();
+            for (auto& h : fh1_Cluster_eff)
+                h->Write();
+            for (auto& h : fh1_Cluster_eff_small)
+                h->Write();
+            if (fh1_Cluster_eff_summary_up)
+                fh1_Cluster_eff_summary_up->Write();
+            if (fh1_Cluster_eff_summary_down)
+                fh1_Cluster_eff_summary_down->Write();
+            if (fh1_Cluster_eff_summary_small_up)
+                fh1_Cluster_eff_summary_small_up->Write();
+            if (fh1_Cluster_eff_summary_small_down)
+                fh1_Cluster_eff_summary_small_down->Write();
+        }
+
+        for (auto& h : fh2_gasquality)
+            h->Write();
+        for (auto& h : fh1_alpharate)
+            h->Write();
+        for (auto& h : fh1_alphaenergy)
+            h->Write();
+        for (auto& h : fh2_RawAlphaTraces)
+            h->Write();
     }
 }
 ClassImp(R3BActafOnlineSpectra)

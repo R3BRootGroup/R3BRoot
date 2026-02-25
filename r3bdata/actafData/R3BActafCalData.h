@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -19,7 +19,10 @@
 #pragma once
 
 #include <R3BActafMappedData.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TObject.h>
+#include <array>
 #include <cmath>
 #include <cstdint>
 #include <iostream>
@@ -58,28 +61,25 @@ class R3BActafCalData : public TObject
                              double mean = 0,
                              double maw = 0);
 
-    // Destructor
-    virtual ~R3BActafCalData() = default;
-
     // Accessors with [[nodiscard]]
-    [[nodiscard]] inline const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
-    [[nodiscard]] inline const UInt_t& GetPad() const { return fPad; }
-    [[nodiscard]] inline const double& GetEnergy() const { return fEnergy; }
-    [[nodiscard]] inline const double& GetEMaxAmpl() const { return fEMaxAmpl; }
-    [[nodiscard]] inline const double& GetLeadingEdgeTime() const { return fLeadingEdge; }
-    [[nodiscard]] inline const double& GetZpos() const { return fZPos; }
-    [[nodiscard]] inline const double& GetSynTime() const { return fSynTime; }
-    [[nodiscard]] inline const double GetRms() const { return fRms; }
-    [[nodiscard]] inline const double GetRmsRaw() const { return fRmsRaw; }
-    [[nodiscard]] inline const double GetMean() const { return fMean; }
-    [[nodiscard]] inline const double GetMeanRaw() const { return fMeanRaw; }
-    [[nodiscard]] inline const double GetMaw() const { return fMaw; }
+    [[nodiscard]] const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
+    [[nodiscard]] UInt_t GetPad() const { return fPad; }
+    [[nodiscard]] double GetEnergy() const { return fEnergy; }
+    [[nodiscard]] double GetEMaxAmpl() const { return fEMaxAmpl; }
+    [[nodiscard]] double GetLeadingEdgeTime() const { return fLeadingEdge; }
+    [[nodiscard]] double GetZpos() const { return fZPos; }
+    [[nodiscard]] double GetSynTime() const { return fSynTime; }
+    [[nodiscard]] double GetRms() const { return fRms; }
+    [[nodiscard]] double GetRmsRaw() const { return fRmsRaw; }
+    [[nodiscard]] double GetMean() const { return fMean; }
+    [[nodiscard]] double GetMeanRaw() const { return fMeanRaw; }
+    [[nodiscard]] double GetMaw() const { return fMaw; }
 
     // Support for printing
     [[nodiscard]] std::string toString() const;
-    void Print(const Option_t*) const override;
+    void Print(const Option_t* /*option*/) const override;
 
-  protected:
+  private:
     UInt_t fPad = 0;                 // Pad number
     double fEnergy = std::nan("");   // Energy
     double fEMaxAmpl = std::nan(""); // Energy for the max. of the signal
@@ -98,4 +98,4 @@ class R3BActafCalData : public TObject
 };
 
 // Operator overloading for printing R3BActafCalData
-std::ostream& operator<<(std::ostream& os, const R3BActafCalData& data);
+std::ostream& operator<<(std::ostream& output, const R3BActafCalData& data);
