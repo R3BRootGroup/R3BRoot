@@ -178,7 +178,6 @@ class R3BActafOnlineSpectra : public FairTask
     int countTracesDump = 0;
 
     std::vector<TH2F*> fh2_RawTraces;
-    std::vector<TH2F*> fh2_CorrectedTraces;
     std::vector<TGraph*> g_CorrectedTraces_4pads_highestAmp_auto;
     std::vector<TGraph*> g_CorrectedTraces_4pads_highestAmp;
     std::vector<TH1F*> fh1_RawE;

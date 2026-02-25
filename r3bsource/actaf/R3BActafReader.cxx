@@ -18,6 +18,7 @@
 #include "R3BActafMappedData.h"
 #include "R3BActafMappingPar.h"
 #include "R3BActafReader.h"
+#include "R3BActafUtils.h"
 #include "R3BLogger.h"
 
 #include <TClonesArray.h>
@@ -25,8 +26,6 @@
 #include <array>
 #include <ext_data_struct_info.hh>
 #include <iostream>
-#include <numeric>
-#include <utility>
 #include <vector>
 
 /**
@@ -43,168 +42,6 @@ extern "C"
 
 #define MAX_MODULES2023 (sizeof data->ACTAF / sizeof data->ACTAF[0])
 #define MAX_MODULES2025 (sizeof data->ACTAF_ADC_MOD / sizeof data->ACTAF_ADC_MOD[0])
-
-template <class Cont>
-int FindMaxPosition(const Cont& signal)
-{
-    return std::distance(signal.begin(), std::max_element(signal.begin(), signal.end()));
-}
-
-template <class Cont>
-int FindMaxAmplitude(const Cont& signal)
-{
-    return *std::max_element(signal.begin(), signal.end());
-}
-
-template <class Cont>
-double ComputeBaselineMean(const Cont& signal, int numBins, bool returnMean = 1)
-{
-    numBins = std::min(static_cast<int>(numBins * 0.8), static_cast<int>(signal.size()));
-    if (numBins <= 0)
-        return 0.0;
-
-    double mean = 0;
-
-    mean = std::accumulate(signal.begin(), signal.begin() + numBins, 0.0) / numBins;
-
-    if (returnMean)
-        return mean;
-
-    else
-    {
-        double variance = 0.0;
-        for (int i = 0; i < numBins; ++i)
-        {
-            double diff = signal[i] - mean;
-            variance += diff * diff;
-        }
-        variance /= numBins;
-
-        double stddev = std::sqrt(variance);
-        return stddev;
-    }
-}
-
-template <class Cont>
-double IntegratePulse(const Cont& signal, int maxIdx, double baseline)
-{
-    int left = maxIdx, right = maxIdx;
-    const int size = static_cast<int>(signal.size());
-
-    while (left > 0 && signal[left] > baseline)
-        --left;
-
-    while (right < size - 1 && signal[right] > baseline)
-        ++right;
-
-    return std::accumulate(signal.begin() + left, signal.begin() + right, 0.0) - (right - left) * baseline;
-}
-
-inline void SubtractBaseline(const std::array<double, ACTAF_BINS>& signal,
-                             double baseline,
-                             std::array<double, ACTAF_BINS>& out)
-{
-    for (size_t i = 0; i < signal.size(); ++i)
-        out[i] = signal[i] - baseline;
-}
-
-inline double ComputeLeadingEdge10(const std::array<double, ACTAF_BINS>& x, int maxIdx, double frac = 0.1)
-{
-    if (x.empty() || maxIdx <= 0 || maxIdx >= static_cast<int>(x.size()))
-        return -1.0;
-
-    const double xmax = *std::max_element(x.begin(), x.begin() + maxIdx + 1);
-    const double thr = frac * xmax;
-
-    if (frac > 0)
-    {
-        for (int i = 1; i <= maxIdx; ++i)
-        {
-            if (x[i - 1] < thr && x[i] >= thr)
-            {
-                const double y0 = x[i - 1], y1 = x[i];
-                const double dy = y1 - y0;
-                if (dy <= 0)
-                    return static_cast<double>(i);
-                const double alpha = (thr - y0) / dy;
-                return static_cast<double>(i - 1) + alpha;
-            }
-        }
-    }
-    else
-    {
-        double t90 = ComputeLeadingEdge10(x, maxIdx, 0.9);
-        double t10 = ComputeLeadingEdge10(x, maxIdx, 0.1);
-
-        if (t10 < 0.0 || t90 < 0.0 || t90 <= t10)
-            return -1.0;
-
-        const double T10 = 0.1 * xmax;
-        const double T90 = 0.9 * xmax;
-
-        const double m = (T90 - T10) / (t90 - t10);
-        const double b = T10 - m * t10;
-
-        return -b / m;
-    }
-
-    return -1.0;
-}
-
-inline double ComputeRiseTime(const std::array<double, ACTAF_BINS>& signal, double maxIdx, bool useT0 = true)
-{
-
-    if (maxIdx <= 0 || maxIdx >= static_cast<int>(signal.size()))
-        return -1.0;
-
-    double t90 = ComputeLeadingEdge10(signal, maxIdx, 0.9);
-
-    double t0 = -1;
-
-    if (useT0)
-        t0 = ComputeLeadingEdge10(signal, maxIdx, 0);
-    else
-        t0 = ComputeLeadingEdge10(signal, maxIdx, 0.1);
-
-    return t90 - t0;
-}
-
-template <class Cont>
-double CalculateMAW(const Cont& signal, int averaging = 4, int peakTimeNs = 200, int gapTimeNs = 200)
-{
-    const int binsPeakingTime = peakTimeNs / averaging;
-    const int binsGapTime = gapTimeNs / averaging;
-
-    const int nBins = static_cast<int>(signal.size());
-
-    if (nBins < binsPeakingTime + binsGapTime)
-        return 0;
-
-    double maxDiff = -1.0;
-    // int binMaxDiff = -1;
-
-    for (int i = 2 * binsPeakingTime + binsGapTime; i < nBins; ++i)
-    {
-        double sumPeaking = 0.0;
-        for (int j = i - binsPeakingTime; j < i; ++j)
-            sumPeaking += signal[j];
-
-        double sumGap = 0.0;
-        for (int j = i - 2 * binsPeakingTime - binsGapTime; j < i - binsPeakingTime - binsGapTime; ++j)
-            sumGap += signal[j];
-
-        const double diff = sumPeaking - sumGap;
-
-        if (diff > maxDiff)
-        {
-            maxDiff = diff;
-            // binMaxDiff = i;
-        }
-    }
-
-    const double mawmax = (maxDiff == -1.0) ? 0.0 : maxDiff * averaging;
-    return mawmax;
-}
 
 // ------------------------------ Reader impl ----------------------------------
 
@@ -329,17 +166,14 @@ bool R3BActafReader::R3BRead2023()
 
         for (int chn = 0; chn < ACTAF_ECHN; ++chn)
         {
-            maxPos[chn] = FindMaxPosition(trace[chn]);
-            maxAmplitude[chn] = FindMaxAmplitude(trace[chn]);
-            baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
-            integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
+            maxPos[chn] = R3BActafUtils::FindMaxPosition(trace[chn]);
+            maxAmplitude[chn] = R3BActafUtils::FindMaxAmplitude(trace[chn]);
+            baselineMean[chn] = R3BActafUtils::ComputeBaselineMean(trace[chn], maxPos[chn]);
+            integral[chn] = R3BActafUtils::IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
 
-            SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
-            riseTime[chn] = ComputeRiseTime(correctedtrace, maxPos[chn], true);
-            leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0.);
-
-            // Store corrected trace
-            trace[chn] = correctedtrace;
+            R3BActafUtils::SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
+            riseTime[chn] = R3BActafUtils::ComputeRiseTime(correctedtrace);
+            leadingEdge10[chn] = R3BActafUtils::ComputeLeadingEdge10(correctedtrace);
         }
 
         const int nChToWrite = data->ACTAF[mod].CH;
@@ -388,28 +222,26 @@ bool R3BActafReader::R3BRead2025()
 
         for (int chn = 0; chn < ACTAF_ECHN; ++chn)
         {
-            maxPos[chn] = FindMaxPosition(trace[chn]);
-            maxAmplitude[chn] = FindMaxAmplitude(trace[chn]);
+            maxPos[chn] = R3BActafUtils::FindMaxPosition(trace[chn]);
+            maxAmplitude[chn] = R3BActafUtils::FindMaxAmplitude(trace[chn]);
             if (maxPos[chn] > 0)
             {
-                baselineMean[chn] = ComputeBaselineMean(trace[chn], maxPos[chn]);
-                baselineStdOld[chn] = ComputeBaselineMean(trace[chn], maxPos[chn], 0);
+                baselineMean[chn] = R3BActafUtils::ComputeBaselineMean(trace[chn], maxPos[chn]);
+                baselineStdOld[chn] = R3BActafUtils::ComputeBaselineMean(trace[chn], maxPos[chn], 0);
             }
             else
             {
-                baselineMean[chn] = ComputeBaselineMean(trace[chn], 400);
-                baselineStdOld[chn] = ComputeBaselineMean(trace[chn], 400, 0);
+                baselineMean[chn] = R3BActafUtils::ComputeBaselineMean(trace[chn], 400);
+                baselineStdOld[chn] = R3BActafUtils::ComputeBaselineMean(trace[chn], 400, 0);
             }
-            integral[chn] = IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
+            integral[chn] = R3BActafUtils::IntegratePulse(trace[chn], maxPos[chn], baselineMean[chn]);
 
-            SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
-            baselineStdNew[chn] = ComputeBaselineMean(correctedtrace, maxPos[chn], 0);
-            riseTime[chn] = ComputeRiseTime(correctedtrace, maxPos[chn], true);
-            leadingEdge10[chn] = ComputeLeadingEdge10(correctedtrace, maxPos[chn], 0);
-            baselineMeanNew[chn] = ComputeBaselineMean(correctedtrace, maxPos[chn]) + baselineMean[chn];
-            maw[chn] = CalculateMAW(correctedtrace);
-            // Store corrected trace
-            trace[chn] = correctedtrace;
+            R3BActafUtils::SubtractBaseline(trace[chn], baselineMean[chn], correctedtrace);
+            baselineStdNew[chn] = R3BActafUtils::ComputeBaselineMean(correctedtrace, maxPos[chn], 0);
+            riseTime[chn] = R3BActafUtils::ComputeRiseTime(correctedtrace);
+            leadingEdge10[chn] = R3BActafUtils::ComputeLeadingEdge10(correctedtrace);
+            baselineMeanNew[chn] = R3BActafUtils::ComputeBaselineMean(correctedtrace, maxPos[chn]) + baselineMean[chn];
+            maw[chn] = R3BActafUtils::CalculateMAW(correctedtrace);
         }
 
         const int nChToWrite = (mod < 8 ? ACTAF_ECHN : 1);

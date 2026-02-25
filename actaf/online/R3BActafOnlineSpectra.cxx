@@ -68,7 +68,6 @@ R3BActafOnlineSpectra::R3BActafOnlineSpectra(const TString& name, Int_t iVerbose
     fh2_XYPos_Evts_Automatic.resize(2);
     fh1_PhiCounts.resize(2);
     fh2_RawTraces.resize(fPads);
-    fh2_CorrectedTraces.resize(fPads);
     g_CorrectedTraces_4pads_highestAmp_auto.resize(4 * 2); // 4 pads per side
     g_CorrectedTraces_4pads_highestAmp.resize(4 * 2);      // ensure main vector has room
     fh2_FilteredTraces.resize(fPads);
@@ -206,13 +205,11 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (int iside = 0; iside < 2; iside++)
     {
-
         cMap_perRing[iside].resize(fRings);
         countsPerRing[iside].resize(fRings);
 
         for (int iring = 0; iring < fRings; iring++)
         {
-
             countsPerRing[iside][iring] = 0;
 
             std::string sideName = iside == 0 ? "UP" : "DOWN";
@@ -221,11 +218,6 @@ InitStatus R3BActafOnlineSpectra::Init()
             auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
             cMap->Divide(4, 4);
             cMap_perRing[iside][iring].push_back(cMap);
-
-            std::string nameCanvasC = sideName + "_RING_" + std::to_string(iring + 1) + "_corrected_traces_map";
-            auto* cMapC = new TCanvas(nameCanvasC.c_str(), "mapped info", 10, 10, 500, 500);
-            cMapC->Divide(4, 4);
-            cMap_perRing[iside][iring].push_back(cMapC);
 
             std::string nameCanvasE = sideName + "_RING_" + std::to_string(iring + 1) + "_ERaw";
             auto* cMapE = new TCanvas(nameCanvasE.c_str(), "ERaw info", 10, 10, 500, 500);
@@ -245,10 +237,6 @@ InitStatus R3BActafOnlineSpectra::Init()
         std::string nameCanvas = "FADC_" + std::to_string(adc + 1) + "_traces_map";
         auto* cMap = new TCanvas(nameCanvas.c_str(), "mapped info", 10, 10, 500, 500);
         cMap->Divide(4, 4);
-
-        std::string nameCanvasC = "FADC_" + std::to_string(adc + 1) + "_corrected_traces_map";
-        auto* cMapC = new TCanvas(nameCanvasC.c_str(), "mapped info", 10, 10, 500, 500);
-        cMapC->Divide(4, 4);
 
         std::string nameCanvasE = "FADC_" + std::to_string(adc + 1) + "_ERaw";
         auto* cMapE = new TCanvas(nameCanvasE.c_str(), "ERaw info", 10, 10, 500, 500);
@@ -285,7 +273,7 @@ InitStatus R3BActafOnlineSpectra::Init()
                 chn++;
 
             fh2_RawTraces[index] =
-                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, 2000, 0, 20000);
+                R3B::root_owned<TH2F>(nameHist.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, 1000, 0, 20000);
 
             fh2_RawTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
             fh2_RawTraces[index]->GetYaxis()->SetTitle("A");
@@ -298,23 +286,6 @@ InitStatus R3BActafOnlineSpectra::Init()
             // Draw the per-ring canvas
             cMap_perRing[sideNb][ringNb - 1][0]->cd(++countsPerRing[sideNb][ringNb - 1]);
             fh2_RawTraces[index]->Draw("colz");
-
-            std::string nameHistC = "fh2_Pad_" + std::to_string(index + 1) + "corrected_trace";
-
-            fh2_CorrectedTraces[index] = R3B::root_owned<TH2F>(
-                nameHistC.c_str(), titleHist.c_str(), nBinsSample, 1, nBinsSample, nBinsTrace, nTraceMin, nTraceMax);
-
-            fh2_CorrectedTraces[index]->GetXaxis()->SetTitle("Time [Chn]");
-            fh2_CorrectedTraces[index]->GetYaxis()->SetTitle("A");
-            fh2_CorrectedTraces[index]->GetYaxis()->SetTitleOffset(1.1);
-            fh2_CorrectedTraces[index]->GetXaxis()->CenterTitle(true);
-            fh2_CorrectedTraces[index]->GetYaxis()->CenterTitle(true);
-            cMapC->cd(chn);
-            fh2_CorrectedTraces[index]->Draw("colz");
-
-            // Draw the per-ring canvas
-            cMap_perRing[sideNb][ringNb - 1][1]->cd(countsPerRing[sideNb][ringNb - 1]);
-            fh2_CorrectedTraces[index]->Draw("colz");
 
             // Filtered traces (CAL LEVEL!)
             std::string nameFiltHist = "fh2_Pad_" + std::to_string(index + 1) + "filtered_trace";
@@ -331,7 +302,7 @@ InitStatus R3BActafOnlineSpectra::Init()
             std::string nameHistE = "fh1_Pad_" + std::to_string(index + 1) + "_Eraw";
             std::string titleHistE = "ERaw: Pad " + std::to_string(index + 1 - padOff) + " (Mod " +
                                      std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
-            fh1_RawE[index] = R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 100, 0, 300000);
+            fh1_RawE[index] = R3B::root_owned<TH1F>(nameHistE.c_str(), titleHistE.c_str(), 1000, 0, 30000);
             fh1_RawE[index]->GetXaxis()->SetTitle("E [ADC Chn]");
             fh1_RawE[index]->GetYaxis()->SetTitle("Counts");
             fh1_RawE[index]->GetYaxis()->SetTitleOffset(1.1);
@@ -342,13 +313,13 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh1_RawE[index]->Draw();
 
             // Draw the per-ring canvas
-            cMap_perRing[sideNb][ringNb - 1][2]->cd(countsPerRing[sideNb][ringNb - 1]);
+            cMap_perRing[sideNb][ringNb - 1][1]->cd(countsPerRing[sideNb][ringNb - 1]);
             fh1_RawE[index]->Draw("colz");
 
             std::string nameHistB = "fh1_Pad_" + std::to_string(index + 1) + "_Baseline";
             std::string titleHistB = "Baseline: Pad " + std::to_string(index + 1 - padOff) + " (Mod " +
                                      std::to_string(FADCnum) + " Chn " + std::to_string(FADCchn) + ")";
-            fh1_Baseline[index] = R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 10000);
+            fh1_Baseline[index] = R3B::root_owned<TH1F>(nameHistB.c_str(), titleHistB.c_str(), 300, 7000, 9000);
             fh1_Baseline[index]->GetXaxis()->SetTitle("Baseline [ADC Chn]");
             fh1_Baseline[index]->GetYaxis()->SetTitle("Counts");
             fh1_Baseline[index]->GetYaxis()->SetTitleOffset(1.1);
@@ -359,14 +330,13 @@ InitStatus R3BActafOnlineSpectra::Init()
             fh1_Baseline[index]->Draw();
 
             // Draw the per-ring canvas
-            cMap_perRing[sideNb][ringNb - 1][3]->cd(countsPerRing[sideNb][ringNb - 1]);
+            cMap_perRing[sideNb][ringNb - 1][2]->cd(countsPerRing[sideNb][ringNb - 1]);
             fh1_Baseline[index]->Draw("colz");
         }
 
         if (fDisplaytraces)
         {
             mapfol->Add(cMap);
-            mapfol->Add(cMapC);
         }
 
         mapfol->Add(cMapE);
@@ -376,7 +346,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (auto const& vecSide : cMap_perRing)
         for (auto const& vecSideRing : vecSide)
-            for (int iCanvasSideRing = 2 * (1 - fDisplaytraces); iCanvasSideRing < 4; iCanvasSideRing++)
+            for (int iCanvasSideRing = 2 * (1 - fDisplaytraces); iCanvasSideRing < 3; iCanvasSideRing++)
                 mapfol->Add(vecSideRing[iCanvasSideRing]);
 
     // FADC Channel [1 - 16] vs Module [1 - 9] (8 modules + 1 for AMBER signal)
@@ -420,7 +390,6 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     for (int iside = 0; iside < 2; iside++)
     {
-
         TString name = iside == 1 ? "fh2_mawVsEMap_Down" : "fh2_mawVsEMap_Up";
         TString tit = iside == 1 ? "Maw (Map) Vs Integrated Energy (Downstream side)"
                                  : "Maw (Map) Vs Integrated Energy (Upstream side)";
@@ -614,10 +583,8 @@ InitStatus R3BActafOnlineSpectra::Init()
     // Counts vs ring per side
     for (auto i = 0; i < fh1_RingCounts.size(); i++)
     {
-
         TString tit;
         i == 0 ? tit = "Counts per ring (upstream)" : tit = "Counts per ring (downstream)";
-
         cCounts->cd(i + 2);
         fh1_RingCounts[i] = R3B::root_owned<TH1F>(Form("fh1_RingCounts_side%d", i + 1), tit, 8, 0.5, 8.5);
         fh1_RingCounts[i]->GetXaxis()->SetTitle("Ring");
@@ -784,15 +751,14 @@ InitStatus R3BActafOnlineSpectra::Init()
         g_CorrectedTraces_4pads_highestAmp[iPad]->SetName(Form("g_CorrectedTraces_4pads_highestAmp_%d", iPad));
         g_CorrectedTraces_4pads_highestAmp[iPad]->SetTitle(
             Form("Corrected Trace of pad with highest amplitude %d;Time [Chn];A", iPad + 1));
-        g_CorrectedTraces_4pads_highestAmp[iPad]->SetLineColor(kBlack);
-        g_CorrectedTraces_4pads_highestAmp[iPad]->SetMarkerStyle(20);
-        g_CorrectedTraces_4pads_highestAmp[iPad]->SetMarkerSize(0.5);
+        g_CorrectedTraces_4pads_highestAmp[iPad]->SetLineColor(kBlue);
         if (iPad < 4)
             p3->cd(iPad + 1);
         else
             p4->cd(iPad - 4 + 1);
         g_CorrectedTraces_4pads_highestAmp[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
-        g_CorrectedTraces_4pads_highestAmp[iPad]->Draw("AP");
+        g_CorrectedTraces_4pads_highestAmp[iPad]->Draw("AL");
+        g_CorrectedTraces_4pads_highestAmp[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
     }
 
     hitfol->Add(cXY_nevents_waveform);
@@ -823,15 +789,14 @@ InitStatus R3BActafOnlineSpectra::Init()
             Form("g_CorrectedTraces_4pads_highestAmp_auto_%d", iPad));
         g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetTitle(
             Form("Corrected Trace of pad with highest amplitude %d;Time [Chn];A", iPad + 1));
-        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetLineColor(kBlack);
-        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetMarkerStyle(20);
-        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetMarkerSize(0.5);
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->SetLineColor(kBlue);
         if (iPad < 4)
             p3_auto->cd(iPad + 1);
         else
             p4_auto->cd(iPad - 4 + 1);
         g_CorrectedTraces_4pads_highestAmp_auto[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
-        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->Draw("AP");
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->Draw("AL");
+        g_CorrectedTraces_4pads_highestAmp_auto[iPad]->GetYaxis()->SetRangeUser(-200, 1000);
     }
 
     hitfol->Add(cXY_nevents_waveform_auto);
@@ -916,7 +881,7 @@ InitStatus R3BActafOnlineSpectra::Init()
 
     auto fh1_rates = R3B::root_owned<TH1F>("fh1_rates", "Rates [Hz]", max_second_for_rate, 0, max_second_for_rate);
     fh1_rates->GetXaxis()->SetTitle("Time [s]");
-    fh1_rates->GetYaxis()->SetTitle("Rate [Hz]");
+    fh1_rates->GetYaxis()->SetTitle("Rate of good signals [Hz]");
     fh1_rates->GetYaxis()->SetTitleOffset(1.1);
     fh1_rates->GetXaxis()->CenterTitle(true);
     fh1_rates->GetYaxis()->CenterTitle(true);
@@ -1096,6 +1061,8 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
             int pad = topUp[i];
             auto* g = g_CorrectedTraces_4pads_highestAmp[i];
             g->GetYaxis()->SetRangeUser(-200, 1000);
+            g->GetHistogram()->SetMinimum(-200);
+            g->GetHistogram()->SetMaximum(1000);
             if (g)
             {
                 g->Set(0);
@@ -1116,6 +1083,9 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
                     cWave->cd(3);
                     p3->cd(i + 1);
                     g->Draw("AL");
+                    g->GetYaxis()->SetRangeUser(-200, 1000);
+                    g->GetHistogram()->SetMinimum(-200);
+                    g->GetHistogram()->SetMaximum(1000);
                 }
             }
         }
@@ -1125,6 +1095,8 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
             int pad = topDown[i];
             auto* g = g_CorrectedTraces_4pads_highestAmp[i + 4];
             g->GetYaxis()->SetRangeUser(-200, 1000);
+            g->GetHistogram()->SetMinimum(-200);
+            g->GetHistogram()->SetMaximum(1000);
             if (g)
             {
                 g->Set(0);
@@ -1145,6 +1117,9 @@ void R3BActafOnlineSpectra::plotSingleEventCanvas()
                     cWave->cd(4);
                     p4->cd(i + 1);
                     g->Draw("AL");
+                    g->GetYaxis()->SetRangeUser(-200, 1000);
+                    g->GetHistogram()->SetMinimum(-200);
+                    g->GetHistogram()->SetMaximum(1000);
                 }
             }
         }
@@ -1215,10 +1190,6 @@ void R3BActafOnlineSpectra::Reset_Histo()
         {
             hist->Reset();
         }
-        for (const auto& hist : fh2_CorrectedTraces)
-        {
-            hist->Reset();
-        }
 
         for (const auto& hist : fh2_mawVsECal)
         {
@@ -1226,11 +1197,6 @@ void R3BActafOnlineSpectra::Reset_Histo()
         }
 
         for (const auto& hist : fh2_mawVsEMap)
-        {
-            hist->Reset();
-        }
-
-        for (const auto& hist : fh2_FilteredTraces)
         {
             hist->Reset();
         }
@@ -1265,6 +1231,10 @@ void R3BActafOnlineSpectra::Reset_Histo()
         fh2_tLeading_cal->Reset();
         fh2_maxAmp_cal->Reset();
         fh2_tSync_cal->Reset();
+        for (const auto& hist : fh2_FilteredTraces)
+        {
+            hist->Reset();
+        }
         for (const auto& hist : g_CorrectedTraces_4pads_highestAmp_auto)
         {
             if (hist)
@@ -1396,8 +1366,6 @@ void R3BActafOnlineSpectra::Exec(Option_t* /*option*/)
 
                     if (hit->GetBaseline() > 0)
                     {
-                        fh2_CorrectedTraces[pad]->Fill(index, value /*- hit->GetBaseline()*/);
-
                         fh2_RawTraces[pad]->Fill(index++, value + hit->GetBaseline());
                     }
                 }
@@ -1735,14 +1703,6 @@ void R3BActafOnlineSpectra::FinishTask()
             {
                 hist->Write();
             }
-            for (const auto& hist : fh2_CorrectedTraces)
-            {
-                hist->Write();
-            }
-            for (const auto& hist : fh2_FilteredTraces)
-            {
-                hist->Write();
-            }
             for (const auto& hist : fh2_mawVsECal)
             {
                 hist->Write();
@@ -1763,11 +1723,6 @@ void R3BActafOnlineSpectra::FinishTask()
             {
                 hist->Write();
             }
-            for (auto* gr : fgraph_rates)
-            {
-                if (gr)
-                    gr->Write();
-            }
         }
 
         if (fCalItems)
@@ -1777,6 +1732,10 @@ void R3BActafOnlineSpectra::FinishTask()
             fh2_tLeading_cal->Write();
             fh2_maxAmp_cal->Write();
             fh2_tSync_cal->Write();
+            for (const auto& hist : fh2_FilteredTraces)
+            {
+                hist->Write();
+            }
         }
 
         if (fHitItems)

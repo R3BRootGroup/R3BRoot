@@ -80,8 +80,6 @@ class R3BActafMappedData : public TObject
     [[nodiscard]] inline double GetMaxampl() const { return fMaxamplitude; }
     [[nodiscard]] inline double GetLeadingEdgeTime() const { return fLeadingEdge10; }
     [[nodiscard]] inline double GetRms() const { return fRms; }
-    [[nodiscard]] inline double GetRmsFilt() const { return fRmsFilt; }
-    [[nodiscard]] inline double GetBaselineFilt() const { return fBaselineFilt; }
     [[nodiscard]] inline int GetTimeTag() const { return fTimeTag; }
     [[nodiscard]] inline int GetDetMask() const { return fDetMask; }
     [[nodiscard]] inline double GetMaw() const { return fMaw; }

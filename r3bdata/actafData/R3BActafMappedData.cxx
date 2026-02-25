@@ -60,20 +60,17 @@ std::string R3BActafMappedData::toString() const
     }
     trace_str += "]";
 
-    return fmt::format(
-        "Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, "
-        "Max-position: {}, Max-amplitude: {}, Leading-Time: {}, Rms: {}, Rms Filtered: {}, Baseline Filtered {}",
-        GetPad(),
-        trace_str,
-        GetE(),
-        GetBaseline(),
-        GetRisetime(),
-        GetMaxpos(),
-        GetMaxampl(),
-        GetLeadingEdgeTime(),
-        GetRms(),
-        GetRmsFilt(),
-        GetBaselineFilt());
+    return fmt::format("Pad: {}, Trace: {}, Energy : {}, Baseline: {}, Risetime: {}, "
+                       "Max-position: {}, Max-amplitude: {}, Leading-Time: {}, Rms: {}",
+                       GetPad(),
+                       trace_str,
+                       GetE(),
+                       GetBaseline(),
+                       GetRisetime(),
+                       GetMaxpos(),
+                       GetMaxampl(),
+                       GetLeadingEdgeTime(),
+                       GetRms());
 }
 
 void R3BActafMappedData::Print(const Option_t*) const { std::cout << *this << std::endl; }

@@ -92,7 +92,6 @@ class R3BActafReader : public R3BReader
     R3BActafMappingPar* fMapping_Par = nullptr;
     R3BActafCalPar* fCal_Par = nullptr;
     std::vector<std::vector<int>> mapping;
-    bool fApplyFilter = true;
 
   public:
     ClassDefOverride(R3BActafReader, 1);
