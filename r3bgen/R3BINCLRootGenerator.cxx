@@ -86,6 +86,7 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             if (!validevent)
             {
                 fEvt++;
+                continue;
             }
         }
         else if (fOnlySpallation)
@@ -96,17 +97,20 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             if (!validevent)
             {
                 fEvt++;
+                continue;
             }
         }
-        else if (fOnlyP2pFission)
+
+        else if (fOnlyP2pSpallation)
         {
             Int_t nbp = 0;
             for (Int_t j = 0; j < fParticles; j++)
-                if (fOrigin[j] == 1 || fOrigin[j] == 101)
+                if (fOrigin[j] == 0)
                     validevent = true;
             if (!validevent)
             {
                 fEvt++;
+                continue;
             }
 
             for (Int_t j = 0; j < fParticles; j++)
@@ -117,14 +121,69 @@ bool R3BINCLRootGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             {
                 fEvt++;
                 validevent = false;
+                continue;
             }
         }
+
+        else if (fOnlyP2pFission)
+        {
+            Int_t nbp = 0;
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fOrigin[j] == 1 || fOrigin[j] == 101)
+                    validevent = true;
+            if (!validevent)
+            {
+                fEvt++;
+                continue;
+            }
+
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fPdgCode[j] == 2212)
+                    nbp++;
+
+            if (nbp != 2 && validevent)
+            {
+                fEvt++;
+                validevent = false;
+                continue;
+            }
+        }
+
+        else if (fOnlyPpnSpallation)
+        {
+            Int_t nbp = 0;
+            Int_t nbn = 0;
+            for (Int_t j = 0; j < fParticles; j++)
+                if (fOrigin[j] == 0)
+                    validevent = true;
+            if (!validevent)
+            {
+                fEvt++;
+                continue;
+            }
+
+            for (Int_t j = 0; j < fParticles; j++)
+            {
+                if (fPdgCode[j] == 2212)
+                    nbp++;
+                if (fPdgCode[j] == 2112)
+                    nbn++;
+            }
+
+            if ((nbp != 1 || nbn != 1) && validevent)
+            {
+                fEvt++;
+                validevent = false;
+                continue;
+            }
+        }
+
         else
         {
             validevent = true;
         }
 
-        if (fEvt > fEvtRoot)
+        if (fEvt >= fEvtRoot)
         {
             LOG(error)
                 << "\033[5m\033[31m R3BINCLRootGenerator: Number of simulated events larger than the ones contained "

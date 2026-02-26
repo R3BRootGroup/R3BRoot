@@ -76,6 +76,16 @@ class R3BINCLRootGenerator : public FairGenerator
     void SetOnlyP2pFission(bool Opt = true) { fOnlyP2pFission = Opt; }
 
     /**
+     **  Method to simulate only p2p-spallation events
+     **/
+    void SetOnlyP2pSpallation(bool Opt = true) { fOnlyP2pSpallation = Opt; }
+
+    /**
+     **  Method to simulate only ppn-spallation events
+     **/
+    void SetOnlyPpnSpallation(bool Opt = true) { fOnlyPpnSpallation = Opt; }
+
+    /**
      **  Method to simulate only fragments (changed with SetMinPdgCode)
      **/
     void SetOnlyfragments(bool Opt = true) { fOnlyFragments = Opt; }
@@ -90,11 +100,13 @@ class R3BINCLRootGenerator : public FairGenerator
   private:
     TString fFileName; // Input file name
     TFile* fInput;
-    bool fOnlyFission = false;    // True if we want to simulate only fission events
-    bool fOnlyP2pFission = false; // True if we want to simulate only p2p-fission events
-    bool fOnlySpallation = false; // True if we want to simulate only spallation events
-    bool fOnlyFragments = false;  // True if we want to simulate only fragments
-    int fPdgCodeMin = 1000050070; // Limit in Boro-7
+    bool fOnlyFission = false;       // True if we want to simulate only fission events
+    bool fOnlyP2pFission = false;    // True if we want to simulate only p2p-fission events
+    bool fOnlyP2pSpallation = false; // True if we want to simulate only p2p-spallation events
+    bool fOnlyPpnSpallation = false; // True if we want to simulate only ppn-spallation events
+    bool fOnlySpallation = false;    // True if we want to simulate only spallation events
+    bool fOnlyFragments = false;     // True if we want to simulate only fragments
+    int fPdgCodeMin = 1000050070;    // Limit in Boro-7
     double fRotXBeam = 0.;
     double fRotYBeam = 0.;
 
