@@ -160,6 +160,12 @@
             "affiliation": "Technische Universität Darmstadt, Fachbereich Physik, Institut für Kernphysik, 64289 Darmstadt, Germany"
         },
         {
+            "name": "Jena, Mrunmoy",
+            "orcid": "0000-0003-1199-5181",
+            "email": "mrunmoy.jena@tum.de",
+            "affiliation": "Technische Universität München, 85748 Garching, Germany"
+        },
+        {
             "name": "Johansson, Håkan",
             "orcid": "0000-0001-7978-8336",
             "affiliation": "Institutionen för Fysik, Chalmers Tekniska Högskola, 412 96 Göteborg, Sweden"
@@ -333,11 +339,6 @@
             "type": "Other",
             "name": "Jelavic-Malenica, Deša",
             "affiliation": "RBI Zagreb, HR10000 Zagreb, Croatia"
-        },
-        {
-            "type": "Other",
-            "name": "Jena, Mrunmoy",
-            "affiliation": "Technische Universität München, 85748 Garching, Germany"
         },
         {
             "type": "Other",
