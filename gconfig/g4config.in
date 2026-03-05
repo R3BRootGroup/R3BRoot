@@ -38,6 +38,10 @@
 #/stepping/verbose 0
 #/control/verbose 0
 
+# Set the limit density for low density materials
+# to include air (use for correct stepping).
+/mcDet/setLimitDensity 2.e-3 g/cm3
+
 # Store secondaries
 #/mcTracking/saveSecondaries DoNotSave
 #/mcTracking/saveSecondaries SaveInStep
