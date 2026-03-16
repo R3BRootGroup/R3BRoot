@@ -11,7 +11,7 @@ TRANSFORM=""
 INPUTS=""
 EXPORTS=""
 
-mkdir -p $(dirname $C3WTAR )
+#mkdir -p $(dirname $C3WTAR )
 
 # within the wrapper script, always use the real lustre location
 function real()
@@ -22,11 +22,13 @@ function real()
 C3WTARREAL=$(real $C3WTAR )
 OUTPUTREAL=$(real $OUTPUT )
 
-mkdir -p $OUTPUT/logs/
+#mkdir -p $OUTPUT/logs/
 # reverse shell
 #/lustre/r3b/pklenze/lustretar/socat TCP:lxbk0598:6666 EXEC:"bash -i",pty,stderr,setsid,sigint,sane &
 
-SCRIPT=$(echo $C3WTAR | sed 's/.tar$/.sh/' )
+
+#SCRIPT=$(echo $C3WTAR | sed 's/.tar$/.sh/' )
+SCRIPT='/data.local1/kelic/c3w.sh'
 cat >$SCRIPT <<EOF
 #!/bin/bash
 #SBATCH --output $OUTPUTREAL/logs/%j_%N.out
@@ -84,7 +86,8 @@ then
     export UNPACK=\$MAINDIR/upexps/UNPACK
 fi
 # here is a nice one:
-test -e $VMCWORKDIR || { mkdir -p $(dirname $VMCWORKDIR) ; ln -vs \$VMCWORKDIR $VMCWORKDIR ;}
+test -d $VMCWORKDIR || { mkdir -p $(dirname $VMCWORKDIR) ; ln -vs \$VMCWORKDIR $VMCWORKDIR ; }
+#test -e $VMCWORKDIR/field/magField/R3B/R3BGladMap_Bxyz_X-3to3_Y-1to1_Z-3to5_step10mm.root || { rm -r $VMCWORKDIR/field/magField/R3B ; mkdir -p $VMCWORKDIR/field/magField/R3B ; cd $VMCWORKDIR/field/magField/R3B ; ln -s /lustre/land/glad_field_maps/2021/R3BGladMap_Bxyz_X-3to3_Y-1to1_Z-3to5_step10mm.root R3BGladMap_Bxyz_X-3to3_Y-1to1_Z-3to5_step10mm.root ; }
 #test -d /u/kelic/lustre || ln -s /lustre/ /u/kelic/lustre
 test -x $HOME/.rootrc || { echo "Root.Stacktrace: no" >> $HOME/.rootrc ; } 
 #Put any further hacks you require into this variable:
@@ -101,14 +104,21 @@ done
 echo "All done!"
 EOF
 
+
 # we need to have something after --exclude, so lets copy and tar the shell script as well
 chmod a+x $SCRIPT
 cp $SCRIPT .
 INPUTS+=" $(basename $SCRIPT)"
 
 
-TARCMD="tar cf ${C3WTAR}  --exclude \*.o --exclude \*.d --exclude-vcs --exclude $VMCWORKDIR/macros -P ${TRANSFORM} ${INPUTS}"
+#TARCMD="tar cf ${C3WTAR}  --exclude \*.o --exclude \*.d --exclude-vcs --exclude $VMCWORKDIR/macros -P ${TRANSFORM} ${INPUTS}"
+TARCMD="tar cf /data.local1/kelic/c3w.tar --exclude \*.o --exclude \*.d --exclude-vcs --exclude $VMCWORKDIR/macros -P ${TRANSFORM} ${INPUTS}"
 echo will run $TARCMD
 time $TARCMD || die "tar failed."
+rsync /data.local1/kelic/c3w.tar lustre.hpc.gsi.de:${C3WTARREAL}
+SCRIPT1=$(echo $C3WTAR | sed 's/.tar$/.sh/' )
+rsync $SCRIPT lustre.hpc.gsi.de:${SCRIPT1}
+rm -f /data.local1/kelic/c3w.tar
+rm -f $SCRIPT
 
-echo "wrapper script is now located at $SCRIPT"
+echo "wrapper script is now located at $C3WTAR"

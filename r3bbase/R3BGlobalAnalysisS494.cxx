@@ -702,6 +702,10 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_chi2 = new TH1F("chi2", "chi2 ", 1000, 0., 1000);
     fh_chi2->GetXaxis()->SetTitle("Chi2");
     fh_chi2->GetYaxis()->SetTitle("counts");
+    
+    fh_chi2_vs_yfi23 = new TH2F("chi2_vs_yfi23","chi2 vs yfi23b",215,-6.02,6.02,100,0.,100.);
+    fh_chi2_vs_yfi23->GetXaxis()->SetTitle("yfi23 / cm");
+    fh_chi2_vs_yfi23->GetYaxis()->SetTitle("chi2");
 
     fh_theta26 = new TH1F("theta26", "theta between alpha and carbon ", 125, 0., 5);
     fh_theta26->GetXaxis()->SetTitle("angle / degree");
@@ -1258,13 +1262,21 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_phibccm_vs_ytofd->GetXaxis()->SetTitle("yTofd(4He) / cm");
     fh_phibccm_vs_ytofd->GetYaxis()->SetTitle("phibccm / deg");
 
-    fh_phibccm_vs_xfi23 = new TH2F("phibccm_vs_xfi23", " phibccm vs xfi23 ", 430, -6.02, 6.02, 400, 0, 400);
-    fh_phibccm_vs_xfi23->GetXaxis()->SetTitle("xfi23(4He) / cm");
-    fh_phibccm_vs_xfi23->GetYaxis()->SetTitle("phibccm / deg");
+    fh_phibccm_vs_xfi23_bg = new TH2F("phibccm_vs_xfi23_bg", " phibccm vs xfi23 below grazing", 430, -6.02, 6.02, 400, 0, 400);
+    fh_phibccm_vs_xfi23_bg->GetXaxis()->SetTitle("xfi23(4He) / cm");
+    fh_phibccm_vs_xfi23_bg->GetYaxis()->SetTitle("phibccm / deg");
 
-    fh_phibccm_vs_yfi23 = new TH2F("phibccm_vs_yfi23", " phibccm vs yfi23 ", 430, -6.02, 6.02, 400, 0, 400);
-    fh_phibccm_vs_yfi23->GetXaxis()->SetTitle("yfi23(4He) / cm");
-    fh_phibccm_vs_yfi23->GetYaxis()->SetTitle("phibccm / deg");
+    fh_phibccm_vs_yfi23_bg = new TH2F("phibccm_vs_yfi23_bg", " phibccm vs yfi23 below grazing", 430, -6.02, 6.02, 400, 0, 400);
+    fh_phibccm_vs_yfi23_bg->GetXaxis()->SetTitle("yfi23(4He) / cm");
+    fh_phibccm_vs_yfi23_bg->GetYaxis()->SetTitle("phibccm / deg");
+
+    fh_phibccm_vs_xfi23_ag = new TH2F("phibccm_vs_xfi23_ag", " phibccm vs xfi23 above grazing", 430, -6.02, 6.02, 400, 0, 400);
+    fh_phibccm_vs_xfi23_ag->GetXaxis()->SetTitle("xfi23(4He) / cm");
+    fh_phibccm_vs_xfi23_ag->GetYaxis()->SetTitle("phibccm / deg");
+
+    fh_phibccm_vs_yfi23_ag = new TH2F("phibccm_vs_yfi23_ag", " phibccm vs yfi23 above grazing", 430, -6.02, 6.02, 400, 0, 400);
+    fh_phibccm_vs_yfi23_ag->GetXaxis()->SetTitle("yfi23(4He) / cm");
+    fh_phibccm_vs_yfi23_ag->GetYaxis()->SetTitle("phibccm / deg");
 
     if (fHitItemsCalifa)
     {
@@ -1670,32 +1682,32 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     }
     //  cout<<"header time eventnum and time: "<<eventTS<<", "<<timeTS<<endl;
 
-    pHex = -100.;
-    pHey = -100.;
-    pHez = -100.;
-    pCx = -100.;
-    pCy = -100.;
-    pCz = -100.;
-    XHe = -100;
-    YHe = -100;
-    ZHe = -100;
-    XC = -100;
-    YC = -100;
-    ZC = -100;
-    mtrackHe = -100;
-    mtrackC = -100;
-    pHex_mc = -100.;
-    pHey_mc = -100.;
-    pHez_mc = -100.;
-    pCx_mc = -100.;
-    pCy_mc = -100.;
-    pCz_mc = -100.;
-    XHe_mc = -100;
-    YHe_mc = -100;
-    ZHe_mc = -100;
-    XC_mc = -100;
-    YC_mc = -100;
-    ZC_mc = -100;
+    pHex = -10000.;
+    pHey = -10000.;
+    pHez = -10000.;
+    pCx = -10000.;
+    pCy = -10000.;
+    pCz = -10000.;
+    XHe = -10000;
+    YHe = -10000;
+    ZHe = -10000;
+    XC = -10000;
+    YC = -10000;
+    ZC = -10000;
+    mtrackHe = -10000;
+    mtrackC = -10000;
+    pHex_mc = -10000.;
+    pHey_mc = -10000.;
+    pHez_mc = -10000.;
+    pCx_mc = -10000.;
+    pCy_mc = -10000.;
+    pCz_mc = -10000.;
+    XHe_mc = -10000;
+    YHe_mc = -10000;
+    ZHe_mc = -10000;
+    XC_mc = -10000;
+    YC_mc = -10000;
+    ZC_mc = -10000;
     Double_t px, py, pz;
     Double_t theta_16O = 0., theta_26 = 0.;
     Double_t costh26 = 0.;
@@ -1734,8 +1746,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     vector<Double_t> posdetC;
     vector<Double_t> posdetO;
 
-    Double_t rot_thetay = 0.; // 1.155e-3;  //rad
-    Double_t rot_thetaz = 0.; //-2.356;  //rad
+    Double_t rot_thetay = 2.427e-3;  //rad
+    Double_t rot_thetaz = 1.571; //-2.356;  //rad
 
     Double_t tHetofd = -10000., tCtofd = -10000., tOtofd = -10000.;
 
@@ -1959,6 +1971,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
         Double_t sq_chi = sqrt(chiHex * chiHex + chiCx * chiCx);
         fh_chi2->Fill(sq_chi);
+        
+        fh_chi2_vs_yfi23->Fill(posdetHe.at(3),sq_chi);
 
         LOG(debug) << "Entering Pair analysis***" << endl;
         // if (chiHex < fcut_chiX && chiHey < fcut_chiY && chiCx < fcut_chiX && chiCy < fcut_chiY)
@@ -2642,10 +2656,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                     fh_py_py->Fill(alpha.Py(), carbon.Py());
                     fh_pz_pz->Fill(alpha.Pz(), carbon.Pz());
                     fh_p_p->Fill(pa.Mag(), pc.Mag());
-                    fh_px_xfi23->Fill(posdetC.at(0), pCx);
-                    fh_px_xfi23->Fill(posdetHe.at(0), pHex);
-                    fh_py_yfi23->Fill(posdetC.at(3), pCx);
-                    fh_py_yfi23->Fill(posdetHe.at(3), pHex);
+                    fh_px_xfi23->Fill(posdetC.at(0), carbon.Px());
+                    fh_px_xfi23->Fill(posdetHe.at(0), alpha.Px());
+                    fh_py_yfi23->Fill(posdetC.at(3), carbon.Py());
+                    fh_py_yfi23->Fill(posdetHe.at(3), alpha.Py());
                 }
 
                 fh_psum->Fill((pa + pc).Mag());
@@ -2682,8 +2696,6 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_phibccm_vs_dxtofd->Fill((posdetC.at(12) - posdetHe.at(12)), phi_bc_cm);
                 fh_phibccm_vs_xtofd->Fill(posdetHe.at(12), phi_bc_cm);
                 fh_phibccm_vs_ytofd->Fill(posdetHe.at(13), phi_bc_cm);
-                fh_phibccm_vs_xfi23->Fill(posdetHe.at(0), phi_bc_cm);
-                fh_phibccm_vs_yfi23->Fill(posdetHe.at(3), phi_bc_cm);
 
                 fh_pHe_vs_theta26->Fill(pa.Mag(), theta_26 * TMath::DegToRad() * 1000.);
                 fh_psum_vs_theta26->Fill(theta_26, (pa + pc).Mag());
@@ -2771,6 +2783,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                         fh_phiB_4He_cm_bg->Fill(alpha_cm_Phi, Erel);
                         fh_thetaB_12C_cm_bg->Fill(carbon_cm.CosTheta(), Erel);
                         fh_phiB_12C_cm_bg->Fill(carbon_cm_Phi, Erel);
+						fh_phibccm_vs_xfi23_bg->Fill(posdetHe.at(0), phi_bc_cm);
+						fh_phibccm_vs_yfi23_bg->Fill(posdetHe.at(3), phi_bc_cm);
                     }
                     else
                     {
@@ -2782,6 +2796,8 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                         fh_phiB_4He_cm_ag->Fill(alpha_cm_Phi, Erel);
                         fh_thetaB_12C_cm_ag->Fill(carbon_cm.CosTheta(), Erel);
                         fh_phiB_12C_cm_ag->Fill(carbon_cm_Phi, Erel);
+						fh_phibccm_vs_xfi23_ag->Fill(posdetHe.at(0), phi_bc_cm);
+						fh_phibccm_vs_yfi23_ag->Fill(posdetHe.at(3), phi_bc_cm);
                     }
                 }
 
@@ -3050,14 +3066,10 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_thetay_dpx->Fill((pCx_mc - pCx), thetayC_simu);
 
                 fh_px_xfi23_MC->Fill(posdetC.at(0), pCx_mc);
-                fh_px_xfi23->Fill(posdetC.at(0), pCx);
                 fh_px_xfi23_MC->Fill(posdetHe.at(0), pHex_mc);
-                fh_px_xfi23->Fill(posdetHe.at(0), pHex);
 
-                fh_py_yfi23_MC->Fill(posdetC.at(3), pCx_mc);
-                fh_py_yfi23->Fill(posdetC.at(3), pCx);
-                fh_py_yfi23_MC->Fill(posdetHe.at(3), pHex_mc);
-                fh_py_yfi23->Fill(posdetHe.at(3), pHex);
+                fh_py_yfi23_MC->Fill(posdetC.at(3), pCy_mc);
+                fh_py_yfi23_MC->Fill(posdetHe.at(3), pHey_mc);
             }
         }
         else
@@ -3282,6 +3294,7 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_target_xy_nc->Write();
 
     fh_chi2->Write();
+    fh_chi2_vs_yfi23->Write();
     fh_psum_vs_chi->Write();
     fh_Erel_vs_chi->Write();
     fh_phibccm_vs_phi16O->Write();
@@ -3376,8 +3389,10 @@ void R3BGlobalAnalysisS494::FinishTask()
     fh_phibccm_vs_dxtofd->Write();
     fh_phibccm_vs_xtofd->Write();
     fh_phibccm_vs_ytofd->Write();
-    fh_phibccm_vs_xfi23->Write();
-    fh_phibccm_vs_yfi23->Write();
+    fh_phibccm_vs_xfi23_bg->Write();
+    fh_phibccm_vs_yfi23_bg->Write();
+    fh_phibccm_vs_xfi23_ag->Write();
+    fh_phibccm_vs_yfi23_ag->Write();
 
     fh_Erel_vs_r->Write();
     fh_Erel_vs_r_ag->Write();

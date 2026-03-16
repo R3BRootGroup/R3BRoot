@@ -64,8 +64,9 @@ R3BGladFieldMap::R3BGladFieldMap(const char* mapName, const char* fileType)
     fScale = 1.;
     fBx = fBy = fBz = NULL;
     fName = mapName;
-    TString dir = getenv("VMCWORKDIR");
-    fFileName = dir + "/field/magField/R3B/" + mapName;
+    //TString dir = getenv("VMCWORKDIR");
+   // fFileName = dir + "/field/magField/R3B/" + mapName;
+    fFileName =  mapName;
     if (fileType[0] == 'R')
         fFileName += ".root";
     else

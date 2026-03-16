@@ -190,47 +190,50 @@ void R3BFi23aDigitizerHit::Exec(Option_t* opt)
             }
         }
 
-        // creating the final hits
+        // creating the final hits 
 
         for (Int_t i = 0; i < NumOfFibers; ++i)
         {
-            for (Double_t& energyl : energy[i])
+            if(i <= 187 || i>= 197)   // to incorporate hole
             {
-                if (energyl > 1.e-12)
-                {
-                    Double_t fiber_id = i;
-                    LOG(debug) << "Hit Fi23a out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
-                               << " y: " << (y[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
-                               << " t: " << time[i].at(&energyl - energy[i].data());
+				for (Double_t& energyl : energy[i])
+				{
+					if (energyl > 1.e-12)
+					{
+						Double_t fiber_id = i;
+						LOG(debug) << "Hit Fi23a out: fiber: " << i << " x: " << (x[i].at(&energyl - energy[i].data()))
+								   << " y: " << (y[i].at(&energyl - energy[i].data())) << " Eloss: " << energyl
+								   << " t: " << time[i].at(&energyl - energy[i].data());
 
-                    Double_t xx = x[i].at(&energyl - energy[i].data());
+						Double_t xx = x[i].at(&energyl - energy[i].data());
 
-                    Bool_t granularity = true;
+						Bool_t granularity = true;
 
-                    if (granularity)
-                    {
-                        LOG(debug) << "x before granularity: " << xx;
-                        xx = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
-                             double(fiber_id) * (1 + air_layer) * fiber_thickness;
+						if (granularity)
+						{
+							LOG(debug) << "x before granularity: " << xx;
+							xx = -detector_width / 2. + fiber_thickness * (1 + air_layer) / 2. +
+								 double(fiber_id) * (1 + air_layer) * fiber_thickness;
 
-                        // Double_t fiber_width = 0.1; // cm
-                        // xx = (int)((xx + fiber_width / 2.) / fiber_width) * fiber_width;
-                        LOG(debug) << "x after granularity: " << xx;
-                    }
+							// Double_t fiber_width = 0.1; // cm
+							// xx = (int)((xx + fiber_width / 2.) / fiber_width) * fiber_width;
+							LOG(debug) << "x after granularity: " << xx;
+						}
 
-                    new ((*Hits)[Hits->GetEntries()])
-                        R3BFiberMAPMTHitData(1,
-                                             prnd->Gaus(xx, xsigma),
-                                             prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma),
-                                             prnd->Gaus(energyl, esigma),
-                                             prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma),
-                                             i + 1,
-                                             0.,
-                                             0.,
-                                             0.,
-                                             0.);
-                }
-            }
+						new ((*Hits)[Hits->GetEntries()])
+							R3BFiberMAPMTHitData(1,
+												 prnd->Gaus(xx, xsigma),
+												 prnd->Gaus((y[i].at(&energyl - energy[i].data())), ysigma),
+												 prnd->Gaus(energyl, esigma),
+												 prnd->Gaus(time[i].at(&energyl - energy[i].data()), tsigma),
+												 i + 1,
+												 0.,
+												 0.,
+												 0.,
+												 0.);
+					}
+				}
+			}
         }
 
         delete[] energy;

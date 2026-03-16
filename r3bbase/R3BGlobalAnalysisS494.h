@@ -467,8 +467,10 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_phibccm_vs_dxtofd; 	
     TH2F* fh_phibccm_vs_xtofd; 		
     TH2F* fh_phibccm_vs_ytofd; 	
-    TH2F* fh_phibccm_vs_xfi23; 	
-    TH2F* fh_phibccm_vs_yfi23; 		
+    TH2F* fh_phibccm_vs_xfi23_bg; 	
+    TH2F* fh_phibccm_vs_yfi23_bg; 	
+    TH2F* fh_phibccm_vs_xfi23_ag; 	
+    TH2F* fh_phibccm_vs_yfi23_ag; 		
     
     TH2F* fh_xx_fib23_bckgr;
 	TH2F* fh_yy_fib23_bckgr;
@@ -579,7 +581,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_phi_vs_r_ag_withcalifa_rand;
 	TH2F* fh_Erel_vs_r_ag_withcalifa_rand;
 	TH2F* fh_Erel_vs_r_bg_withcalifa_rand;
-	
+	TH2F* fh_chi2_vs_yfi23;
 	
 	TH2F* fh_Nf_vs_Ns;
 	

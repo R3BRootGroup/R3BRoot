@@ -705,6 +705,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     R3BTrackingDetector* fi33 = fDetectorsRight->GetByName("fi33");
     R3BTrackingDetector* tof = fDetectorsLeft->GetByName("tofd");
 
+
     if (fPairs)
     {
         if (tof->hits.size() < 2)
@@ -722,9 +723,6 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     }
 
-    if (debug_loopout)
-        cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
-
     if (tof->hits.size() > 0 && debug_loopout)
     {
         cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
@@ -741,7 +739,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         }
         for (Int_t i = 0; i < fi23b->hits.size(); i++)
         {
-            cout << "Fib23b hits: " << i << ", " << fi23b->hits.at(i)->GetY() << endl;
+            cout << "Fib23b hits: " << i << ", " << fi23b->hits.at(i)->GetY() <<", mult: "<< fi23b->hits.size()<<endl;
         }
         for (Int_t i = 0; i < fi30->hits.size(); i++)
         {
@@ -856,8 +854,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t masmem = -1000.0;
     Double_t chargemem = -1000.0;
     Double_t AoverZmem = -1000.0;
-    Double_t pCx = -1000.0, pCy = -1000.0, pCz = -10000.0;
-    Double_t pHex = -1000.0, pHey = -1000.0, pHez = -10000.0;
+    Double_t pCx = -10000.0, pCy = -10000.0, pCz = -10000.0;
+    Double_t pHex = -10000.0, pHey = -10000.0, pHez = -10000.0;
     Double_t Erel = -10.0;
     Double_t theta_26 = -10.0;
     Double_t psum = -10.0;
@@ -1434,7 +1432,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                     (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                                 abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
-                                                    dfib))) // if the hit was used already, continue
+                                                    dfib)) || abs(fi23b->hits.at(ifi23b)->GetY()) > 4.) // if the hit was used already, continue
                                 {
                                     if (debug_loopin)
                                         cout << "left - Fi23b hit : " << l << "; " << fi23b->hits.at(ifi23b)->GetY()
@@ -1713,7 +1711,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                     (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                                 abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
-                                                    dfib))) // if the hit was used already, continue
+                                                    dfib)) || abs(fi23b->hits.at(ifi23b)->GetY()) > 4.) // if the hit was used already, continue
                                 {
                                     if (debug_loopin)
                                         cout << "right - Fi23b hit : " << l << "; " << fi23b->hits.at(ifi23b)->GetY()

@@ -946,6 +946,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     gSetup = setup;
     Double_t pbeam = 17.3915;
     Double_t theta0 = 0.0;
+    Double_t phi0 = 0.0;
     Double_t dy_tof = 0.0, dy_fi23b = 0.0;
 
     TVector3 pos0;

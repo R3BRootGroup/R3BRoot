@@ -8,25 +8,25 @@ function die()
 test "$0" == "${BASH_SOURCE}" \
     && die "Please source ${BASH_SOURCE} instead of running it."
 
-for LUSTRE in /lustre $HOME/lustre __SSHFS__ $HOME/lustre __FAIL__
-do
-    if test "$LUSTRE" == __SSHFS__
-    then
-    	SSHFS="sshfs lustre.hpc.gsi.de:/lustre $HOME/lustre"
-    	echo "running $SSHFS"
-    	$SSHFS
-    	continue
-    elif test "$LUSTRE" == __FAIL__
-    then
-    	die "Could not access lustre"
-    elif test -d "$LUSTRE/r3b" &>/dev/null
-    then
-    	echo "Using LUSTRE=$LUSTRE for building"
-    	break
-    else
-    	echo "$LUSTRE not available, trying next option"
-    fi
-done
+#for LUSTRE in /lustre $HOME/lustre __SSHFS__ $HOME/lustre __FAIL__
+#do
+#    if test "$LUSTRE" == __SSHFS__
+#    then
+#    	SSHFS="sshfs lustre.hpc.gsi.de:/lustre $HOME/lustre/"
+#    	echo "running $SSHFS"
+#    	$SSHFS
+#    	continue
+#    elif test "$LUSTRE" == __FAIL__
+#    then
+#    	die "Could not access lustre"
+#    elif test -d "$LUSTRE/r3b" &>/dev/null
+#    then
+#    	echo "Using LUSTRE=$LUSTRE for building"
+#    	break
+#    else
+#    	echo "$LUSTRE not available, trying next option"
+#    fi
+#done
 
 export BUILD=$(dirname ${BASH_SOURCE})
 test -f "${BUILD}/CMakeCache.txt" \
@@ -46,7 +46,7 @@ export HBOOK=${UCESB_DIR}/hbook/
 
 . $CONF || die "$CONF missing"
 
-for i in $(echo $LOCATIONS | sed 's/:/ /g') LUSTRE OUTPUT
-do
-    export ${i}
-done
+#for i in $(echo $LOCATIONS | sed 's/:/ /g') LUSTRE OUTPUT
+#do
+#    export ${i}
+#done
