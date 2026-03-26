@@ -13,9 +13,6 @@
 
 #pragma once
 
-#ifndef R3BCALIFADIGITIZER_H
-#define R3BCALIFADIGITIZER_H 1
-
 #include <FairTask.h>
 #include <R3BCalifa.h>
 #include <R3BCalifaCrystalCalData.h>
@@ -154,7 +151,5 @@ class R3BCalifaDigitizer : public FairTask
                                            double tot_energy = 0.);
 
   public:
-    ClassDefOverride(R3BCalifaDigitizer, 1);
+    ClassDefOverride(R3BCalifaDigitizer, 2);
 };
-
-#endif /* R3BCALIFADIGITIZER_H */
