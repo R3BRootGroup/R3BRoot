@@ -1,5 +1,4 @@
-#ifndef R3BCALIFACRYSTALPARS4SIM_H
-#define R3BCALIFACRYSTALPARS4SIM_H
+#pragma once
 
 #include "FairParGenericSet.h"
 
@@ -42,7 +41,8 @@ class R3BCalifaCrystalPars4Sim : public FairParGenericSet
     const Int_t GetNumParameters4Sim() { return fNumParams4Sim; }
 
     const Float_t GetResolution(Int_t crystal) { return fResolutionArray->GetAt(crystal - 1); }
-    const Int_t GetThreshold(Int_t crystal) { return fThresholdArray->GetAt(crystal - 1); }
+    const Float_t GetThreshold(Int_t crystal) { return fThresholdArray->GetAt(crystal - 1); }
+    const Float_t GetTotEff(Int_t crystal) { return fEffToTArray->GetAt(crystal - 1); }
 
     const Bool_t GetInUse(Int_t crystal)
     {
@@ -60,8 +60,9 @@ class R3BCalifaCrystalPars4Sim : public FairParGenericSet
   private:
     /* Simulation Parameters of Crystals */
     TArrayI* fCrystalIDArray;
-    TArrayI* fThresholdArray;
+    TArrayF* fThresholdArray;
     TArrayF* fResolutionArray;
+    TArrayF* fEffToTArray;
 
     Int_t fNumCrystals;   /* Number of crystals */
     Int_t fNumParams4Sim; /* Number of Simulation parameters in the Sim (CrystalID, Resolution, Threshold, NonUni...) */
@@ -70,7 +71,5 @@ class R3BCalifaCrystalPars4Sim : public FairParGenericSet
 
     R3BCalifaCrystalPars4Sim(const R3BCalifaCrystalPars4Sim&); /*  a copy constructor  */
 
-    ClassDef(R3BCalifaCrystalPars4Sim, 1);
+    ClassDef(R3BCalifaCrystalPars4Sim, 2);
 };
-
-#endif

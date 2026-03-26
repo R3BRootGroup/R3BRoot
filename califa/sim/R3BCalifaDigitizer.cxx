@@ -246,19 +246,26 @@ void R3BCalifaDigitizer::FillRealConfig(int nCrystalCals)
     double tempNf = 0;
     double tempNs = 0;
     int tempCryID = 0;
-    int parThres = 0;
+    double parThres = 0;
     bool inUse = false;
+    double ToTeff = 0;
 
     for (int i = 0; i < nCrystalCals; i++)
     {
         tempCryID = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetCrystalId();
         tempE = (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->GetEnergy();
 
-        inUse = fSim_Par->GetInUse(tempCryID - 1);
-        fResolution = fSim_Par->GetResolution(tempCryID - 1);
-        parThres = fSim_Par->GetThreshold(tempCryID - 1);
+        inUse = fSim_Par->GetInUse(tempCryID);
+        fResolution = fSim_Par->GetResolution(tempCryID);
+        parThres = fSim_Par->GetThreshold(tempCryID);
+        ToTeff = fSim_Par->GetTotEff(tempCryID);
 
-        if (inUse && parThres < tempE * 1000.)
+        // Metropolis-like algorithm to apply ToT efficiencies
+        // (if no ToT efficiencies are provided, default values are
+        // set to 1 so no correction due to these inefficiencies is performed).
+        double randValue = gRandom->Uniform(0, 1);
+
+        if (inUse && parThres < tempE * 1000. && randValue < ToTeff)
         { // Thresholds are in KeV!!
 
             (dynamic_cast<R3BCalifaCrystalCalData*>(fCalifaCryCalDataCA->At(i)))->SetEnergy(ExpResSmearing(tempE));
