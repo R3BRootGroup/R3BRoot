@@ -36,6 +36,7 @@ set(INCLUDE_DIRECTORIES
     pspx
     rolu
     rpc
+    pw
     sci2
     sci8
     sync_check
@@ -105,6 +106,8 @@ set(SRCS
     alpide/R3BHmpReader.cxx
     music/R3BMusicReader.cxx
     rpc/R3BRpcReader.cxx
+    pw/R3BPWReader.cxx
+    pw/R3BWhiterabbitPWReader.cxx
     twim/R3BTwimReader.cxx
     tttx/R3BTttxReader.cxx
     musli/R3BMusliReader.cxx
@@ -183,6 +186,8 @@ set(STRUCT_HEADERS
     trloii/ext_h101_samplosms.h
     pdc/ext_h101_pdc.h
     rpc/ext_h101_rpc.h
+    pw/ext_h101_pw.h
+    pw/ext_h101_wrpw.h
     sync_check/ext_h101_sync_check.h
     actaf/ext_h101_actaf2023.h
     actaf/ext_h101_actaf2025.h
@@ -250,6 +255,8 @@ set(HEADERS
     alpide/R3BHmpReader.h
     music/R3BMusicReader.h
     rpc/R3BRpcReader.h
+    pw/R3BPWReader.h
+    pw/R3BWhiterabbitPWReader.h
     tttx/R3BTttxReader.h
     twim/R3BTwimReader.h
     musli/R3BMusliReader.h
@@ -278,6 +285,7 @@ set(DIRS
     pspx
     rolu
     rpc
+    pw
     sci2
     sci8
     sync_check
