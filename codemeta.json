@@ -308,6 +308,12 @@
       "email": "mrunmoy.jena@tum.de",
       "affiliation": "Technische Universit\u00e4t M\u00fcnchen, 85748 Garching, Germany",
       "identifier": "https://orcid.org/0000-0003-1199-5181"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Meytal",
+      "familyName": "Duer",
+      "affiliation": "GSI Helmholtzzentrum f\u00fcr Schwerionenforschung, 64291 Darmstadt, Germany"
     }
   ],
   "contributor": [

@@ -76,6 +76,8 @@
 #pragma link C++ class R3BHmpReader+;
 #pragma link C++ class R3BCalifaJulichReader+;
 #pragma link C++ class R3BRpcReader+;
+#pragma link C++ class R3BPWReader+;
+#pragma link C++ class R3BWhiterabbitPWReader+;
 #pragma link C++ class R3BTwimReader+;
 #pragma link C++ class R3BTttxReader+;
 #pragma link C++ class R3BMusliReader+;
@@ -145,6 +147,8 @@
 #pragma link C++ class EXT_STR_h101_PDC_onion_t;
 #pragma link C++ class EXT_STR_h101_LOS_t;
 #pragma link C++ class EXT_STR_h101_RPC_t;
+#pragma link C++ class EXT_STR_h101_PW_t;
+#pragma link C++ class EXT_STR_h101_WRPW_t;
 #pragma link C++ class EXT_STR_h101_SYNC_CHECK_t;
 #pragma link C++ class EXT_STR_h101_MOSAIC202402_onion_t;
 #pragma link C++ class EXT_STR_h101_MOSAIC202506_onion_t;
