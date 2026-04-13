@@ -57,6 +57,10 @@
 #pragma link C++ class R3BRpcCalData+;
 #pragma link C++ class R3BRpcHitData+;
 #pragma link C++ class R3BRpcPoint+;
+#pragma link C++ class R3BPWMappedData+;
+#pragma link C++ class R3BPWPreCalData+;
+#pragma link C++ class R3BPWCalData+;
+#pragma link C++ class R3BPWHitData+;
 
 #pragma link C++ class R3BWRData+;
 #pragma link C++ class R3BTrloiiData+;

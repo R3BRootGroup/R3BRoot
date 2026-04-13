@@ -106,6 +106,10 @@ set(SRCS
     rpcData/R3BRpcMappedData.cxx
     rpcData/R3BRpcPoint.cxx
     rpcData/R3BRpcPreCalData.cxx
+    pwData/R3BPWCalData.cxx
+    pwData/R3BPWHitData.cxx
+    pwData/R3BPWMappedData.cxx
+    pwData/R3BPWPreCalData.cxx
     sampData/R3BSamplerMappedData.cxx
     sampData/R3BSampLosMappedData.cxx
     sci2Data/R3BSci2CalData.cxx
@@ -242,6 +246,10 @@ set(HEADERS
     rpcData/R3BRpcMappedData.h
     rpcData/R3BRpcPoint.h
     rpcData/R3BRpcPreCalData.h
+    pwData/R3BPWCalData.h
+    pwData/R3BPWHitData.h
+    pwData/R3BPWMappedData.h
+    pwData/R3BPWPreCalData.h
     sampData/R3BSamplerMappedData.h
     sampData/R3BSampLosMappedData.h
     sci2Data/R3BSci2CalData.h
@@ -308,6 +316,7 @@ set(DIRS
     pspData
     roluData
     rpcData
+    pwData
     sampData
     sci2Data
     sci8Data
