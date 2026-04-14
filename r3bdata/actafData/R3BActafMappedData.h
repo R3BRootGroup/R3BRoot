@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2025 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2025 Members of R3B Collaboration                          *
+ *   Copyright (C) 2025-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -71,18 +71,18 @@ class R3BActafMappedData : public TObject
 
     virtual ~R3BActafMappedData() = default;
 
-    [[nodiscard]] inline UInt_t GetPad() const { return fPad; }
-    [[nodiscard]] inline const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
-    [[nodiscard]] inline double GetE() const { return fE; }
-    [[nodiscard]] inline double GetBaseline() const { return fBaseline; }
-    [[nodiscard]] inline double GetRisetime() const { return fRisetime; }
-    [[nodiscard]] inline int GetMaxpos() const { return fMaxpos; }
-    [[nodiscard]] inline double GetMaxampl() const { return fMaxamplitude; }
-    [[nodiscard]] inline double GetLeadingEdgeTime() const { return fLeadingEdge10; }
-    [[nodiscard]] inline double GetRms() const { return fRms; }
-    [[nodiscard]] inline int GetTimeTag() const { return fTimeTag; }
-    [[nodiscard]] inline int GetDetMask() const { return fDetMask; }
-    [[nodiscard]] inline double GetMaw() const { return fMaw; }
+    [[nodiscard]] UInt_t GetPad() const { return fPad; }
+    [[nodiscard]] const std::array<double, ACTAF_BINS>& GetTrace() const { return fTrace; }
+    [[nodiscard]] double GetE() const { return fE; }
+    [[nodiscard]] double GetBaseline() const { return fBaseline; }
+    [[nodiscard]] double GetRisetime() const { return fRisetime; }
+    [[nodiscard]] int GetMaxpos() const { return fMaxpos; }
+    [[nodiscard]] double GetMaxampl() const { return fMaxamplitude; }
+    [[nodiscard]] double GetLeadingEdgeTime() const { return fLeadingEdge10; }
+    [[nodiscard]] double GetRms() const { return fRms; }
+    [[nodiscard]] int GetTimeTag() const { return fTimeTag; }
+    [[nodiscard]] int GetDetMask() const { return fDetMask; }
+    [[nodiscard]] double GetMaw() const { return fMaw; }
 
     [[nodiscard]] std::string toString() const;
     void Print(const Option_t*) const override;
