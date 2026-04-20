@@ -20,6 +20,7 @@
 #include <TMath.h>
 #include <TParticlePDG.h>
 #include <TRandom.h>
+
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -33,31 +34,13 @@ R3BCALIFATestGenerator::R3BCALIFATestGenerator()
 R3BCALIFATestGenerator::R3BCALIFATestGenerator(Int_t pdgid, Int_t mult)
     : fPDGType(pdgid)
     , fMult(mult)
-    , fPDGMass(0)
-    , fPtMin(0)
-    , fPtMax(0)
-    , fEtaMin(0)
-    , fEtaMax(0)
-    , fYMin(0)
-    , fYMax(0)
-    , fPMin(0)
-    , fPMax(0)
-    , fX(0)
-    , fY(0)
-    , fZ(0)
-    , fX1(0)
-    , fY1(0)
-    , fZ1(0)
-    , fX2(0)
-    , fY2(0)
-    , fZ2(0)
 {
 }
 
 Bool_t R3BCALIFATestGenerator::Init()
 {
     // Initialize generator
-    R3BLOG_IF(fatal, fPhiMax - fPhiMin > 360, "phi range is too wide: " << fPhiMin << "<phi<" << fPhiMax);
+    R3BLOG_IF(fatal, fPhiMax - fPhiMin > 360., "phi range is too wide: " << fPhiMin << "<phi<" << fPhiMax);
     R3BLOG_IF(fatal, fPRangeIsSet && fPtRangeIsSet, "Cannot set P and Pt ranges simultaneously");
     R3BLOG_IF(fatal, fPRangeIsSet && fYRangeIsSet, "Cannot set P and Y ranges simultaneously");
 
@@ -65,27 +48,115 @@ Bool_t R3BCALIFATestGenerator::Init()
     {
         R3BLOG(fatal, "Cannot set Y, Theta or Eta ranges simultaneously");
     }
-    R3BLOG_IF(fatal, fPointVtxIsSet && fBoxVtxIsSet, "Cannot set point and box vertices simultaneously");
+
+    R3BLOG_IF(fatal,
+              fBoxVtxIsSet && (fPointVtxIsSet || fDispersionVtxIsSet),
+              "Cannot set explicit box vertex together with SetXYZ/SetDxDyDz vertex conventions");
+    R3BLOG_IF(fatal,
+              fDispersionVtxIsSet && !fPointVtxIsSet,
+              "SetDxDyDz requires a central vertex to be defined first via SetXYZ");
 
     // CALIFA specifics
-    R3BLOG_IF(fatal, fBetaOfEmittingFragment > 1, "beta of fragment larger than 1!");
+    R3BLOG_IF(fatal, fBetaOfEmittingFragment > 1., "beta of fragment larger than 1!");
+    R3BLOG_IF(fatal,
+              fBeamAngularDivIsSet && !fLorentzBoostIsSet,
+              "SetBeamAngularDivergence has no effect without SetLorentzBoost");
 
-    for (Int_t i = 0; i < fGammaEnergies.size(); i++)
+    sumBranchingRatios = 0.;
+    for (size_t i = 0; i < fGammaEnergies.size(); ++i)
     {
-        if (fGammaBranchingRatios[i] > 1)
+        if (fGammaBranchingRatios[i] > 1.)
         {
             R3BLOG(fatal, "gamma branching ratio in position " << i << " larger than 1!");
         }
         sumBranchingRatios += fGammaBranchingRatios[i];
     }
-    R3BLOG_IF(warn, sumBranchingRatios > 1, "gamma branching ratio sum larger than 1!");
+    R3BLOG_IF(warn, sumBranchingRatios > 1., "gamma branching ratio sum larger than 1!");
 
-    // Check for particle type
     TDatabasePDG* pdgBase = TDatabasePDG::Instance();
     TParticlePDG* particle = pdgBase->GetParticle(fPDGType);
     R3BLOG_IF(fatal, !particle, "PDG code " << fPDGType << " not defined.");
     fPDGMass = particle->Mass();
     return kTRUE;
+}
+
+void R3BCALIFATestGenerator::SampleVertex(Double_t& vx, Double_t& vy, Double_t& vz) const
+{
+    vx = 0.;
+    vy = 0.;
+    vz = 0.;
+
+    if (fBoxVtxIsSet)
+    {
+        vx = gRandom->Uniform(fX1, fX2);
+        vy = gRandom->Uniform(fY1, fY2);
+        vz = gRandom->Uniform(fZ1, fZ2);
+        return;
+    }
+
+    if (fPointVtxIsSet)
+    {
+        if (fDispersionVtxIsSet)
+        {
+            vx = gRandom->Gaus(fX, fDX);
+            vy = gRandom->Gaus(fY, fDY);
+            vz = gRandom->Uniform(fZ - fDZ, fZ + fDZ);
+        }
+        else
+        {
+            vx = fX;
+            vy = fY;
+            vz = fZ;
+        }
+    }
+}
+
+void R3BCALIFATestGenerator::SampleBeamDirection(Double_t& nx, Double_t& ny, Double_t& nz) const
+{
+    nx = 0.;
+    ny = 0.;
+    nz = 1.;
+
+    if (!fBeamAngularDivIsSet)
+        return;
+
+    // Sample projected angles in the x-z and y-z planes from a Gaussian
+    // centered on zero (nominal beam axis)
+    const Double_t thetaX = gRandom->Gaus(0., fBeamDivX);
+    const Double_t thetaY = gRandom->Gaus(0., fBeamDivY);
+    nx = TMath::Sin(thetaX);
+    ny = TMath::Sin(thetaY);
+    // Ensure unit vector; clamp argument to avoid sqrt of negative from
+    // floating-point rounding when divergence angles are very large.
+    const Double_t nz2 = 1. - nx * nx - ny * ny;
+    nz = (nz2 > 0.) ? TMath::Sqrt(nz2) : 0.;
+}
+
+void R3BCALIFATestGenerator::ApplyLorentzBoost(Double_t& px,
+                                               Double_t& py,
+                                               Double_t& pz,
+                                               Double_t nx,
+                                               Double_t ny,
+                                               Double_t nz) const
+{
+    // General Lorentz boost along unit vector n = (nx, ny, nz):
+    //   E'  = gamma * (E  + beta * (n . p))
+    //   p'  = p  +  n * [(gamma - 1) * (n . p)  +  gamma * beta * E]
+    //
+    // fGammaFactor stores sqrt(1 - beta^2) = 1/gamma, matching the
+    // convention used in SetFragmentVelocity.
+
+    const Double_t E = (fPDGType == 22) ? TMath::Sqrt(px * px + py * py + pz * pz)
+                                        : TMath::Sqrt(px * px + py * py + pz * pz + fPDGMass * fPDGMass);
+
+    const Double_t gamma = 1. / fGammaFactor;
+    const Double_t beta = fBetaOfEmittingFragment;
+    const Double_t pDotN = px * nx + py * ny + pz * nz;
+    const Double_t coeff = (gamma - 1.) * pDotN + gamma * beta * E;
+
+    px += nx * coeff;
+    py += ny * coeff;
+    pz += nz * coeff;
 }
 
 Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
@@ -96,11 +167,21 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
     // if SetCosTheta() function is used, the distribution will be uniform in
     // cos(theta)
 
-    Double32_t pabs = 0, phi, pt = 0, theta = 0, eta, y, mt, px, py, pz = 0;
+    Double32_t pabs = 0., phi = 0., pt = 0., theta = 0., eta = 0., y = 0., mt = 0.;
+    Double32_t px = 0., py = 0., pz = 0.;
+
+    // Sample the boost direction once for the whole event: all de-excitation
+    // photons from a single fragment share the same beam direction.
+    Double_t beamNx = 0., beamNy = 0., beamNz = 1.;
+    if (fLorentzBoostIsSet)
+        SampleBeamDirection(beamNx, beamNy, beamNz);
 
     // Generate particles
-    for (Int_t k = 0; k < fMult; k++)
+    for (Int_t k = 0; k < fMult; ++k)
     {
+        Double_t vx = 0., vy = 0., vz = 0.;
+        SampleVertex(vx, vy, vz);
+
         phi = gRandom->Uniform(fPhiMin, fPhiMax) * TMath::DegToRad();
 
         if (fPRangeIsSet)
@@ -118,7 +199,7 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         else if (fEtaRangeIsSet)
         {
             eta = gRandom->Uniform(fEtaMin, fEtaMax);
-            theta = 2 * TMath::ATan(TMath::Exp(-eta));
+            theta = 2. * TMath::ATan(TMath::Exp(-eta));
         }
         else if (fYRangeIsSet)
         {
@@ -135,7 +216,9 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
                 pt = pabs * TMath::Sin(theta);
             }
             else if (fPtRangeIsSet)
+            {
                 pz = pt / TMath::Tan(theta);
+            }
         }
 
         px = pt * TMath::Cos(phi);
@@ -151,56 +234,42 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
         if (fNuclearDecayChainIsSet)
         {
             LOG_IF(fatal, fPDGType != 22) << "PDG code " << fPDGType << " is not a gamma!";
-            for (auto i = 0; i < fGammaEnergies.size(); i++)
+            for (size_t i = 0; i < fGammaEnergies.size(); ++i)
             {
-                auto br = gRandom->Uniform();
+                const auto br = gRandom->Uniform();
                 if (br < fGammaBranchingRatios[i])
                 {
                     pabs = fGammaEnergies[i];
+                    phi = gRandom->Uniform(fPhiMin, fPhiMax) * TMath::DegToRad();
                     theta =
                         acos(gRandom->Uniform(cos(fThetaMin * TMath::DegToRad()), cos(fThetaMax * TMath::DegToRad())));
                     pz = pabs * TMath::Cos(theta);
                     pt = pabs * TMath::Sin(theta);
-
                     px = pt * TMath::Cos(phi);
                     py = pt * TMath::Sin(phi);
 
-                    auto gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
+                    const auto gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
                     px = px * fGammaEnergies[i] / gammaMomentum;
                     py = py * fGammaEnergies[i] / gammaMomentum;
                     pz = pz * fGammaEnergies[i] / gammaMomentum;
-                    if (sumBranchingRatios <= 1)
-                        break;
 
                     if (fLorentzBoostIsSet)
                     {
-                        // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-                        // As each Lorentz transformation can be performed sequentially,
-                        // we can separate the gamma factor corresponding to each direction
-                        auto gammaMom = TMath::Sqrt(px * px + py * py + pz * pz);
-                        pz = (pz + fBetaOfEmittingFragment * gammaMom) / fGammaFactor;
+                        ApplyLorentzBoost(px, py, pz, beamNx, beamNy, beamNz);
                     }
-                    primGen->AddTrack(fPDGType, px, py, pz, fX, fY, fZ);
+
+                    primGen->AddTrack(fPDGType, px, py, pz, vx, vy, vz);
+
+                    if (sumBranchingRatios <= 1.)
+                        break;
                 }
             }
-            return kTRUE;
+            continue;
         }
 
-        if (fPDGType == 22 && fLorentzBoostIsSet)
-        { // for gamma-rays
-            // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-            // As each Lorentz transformation can be performed sequentially,
-            // we can separate the gamma factor corresponding to each direction
-            Double32_t gammaMomentum = TMath::Sqrt(px * px + py * py + pz * pz);
-            pz = (pz + fBetaOfEmittingFragment * gammaMomentum) / fGammaFactor;
-        }
-        else if (fLorentzBoostIsSet)
-        { // for any massive particle
-            // Lorentz transformation Pz(lab) = gamma * Pz(cm) + gamma * beta * E
-            // As each Lorentz transformation can be performed sequentially,
-            // we can separate the gamma factor corresponding to each direction
-            Double32_t particleEnergy = TMath::Sqrt(px * px + py * py + pz * pz + fPDGMass * fPDGMass);
-            pz = (pz + fBetaOfEmittingFragment * particleEnergy) / fGammaFactor;
+        if (fLorentzBoostIsSet)
+        {
+            ApplyLorentzBoost(px, py, pz, beamNx, beamNy, beamNz);
         }
 
         if (fDebug)
@@ -208,19 +277,27 @@ Bool_t R3BCALIFATestGenerator::ReadEvent(FairPrimaryGenerator* primGen)
             std::ostringstream oss;
             oss << "CALIFATestGen: kf=" << fPDGType << ", p=(" << std::fixed << std::setprecision(2) << px << ", " << py
                 << ", " << pz << ") GeV"
-                << ", x=(" << std::setprecision(1) << fX << ", " << fY << ", " << fZ << ") cm";
+                << ", x=(" << std::setprecision(2) << vx << ", " << vy << ", " << vz << ") cm";
+            if (fLorentzBoostIsSet && fBeamAngularDivIsSet)
+            {
+                oss << ", beam_n=(" << std::setprecision(4) << beamNx << ", " << beamNy << ", " << beamNz << ")";
+            }
+            R3BLOG(info, oss.str());
         }
-        primGen->AddTrack(fPDGType, px, py, pz, fX, fY, fZ);
+
+        primGen->AddTrack(fPDGType, px, py, pz, vx, vy, vz);
     }
+
     return kTRUE;
 }
 
 void R3BCALIFATestGenerator::SetFragmentVelocity(double beta, double dispersion)
 {
-    // Sets the velocity and gamma factor of the fragment emitting the gammas
+    // Keep original convention: sample once when the setter is called.
+    // This matches the current class behavior and avoids unexpected API changes.
     R3BLOG(info, "Set a beta of " << beta << " with a sigma dispersion of " << dispersion);
     fBetaOfEmittingFragment = gRandom->Gaus(beta, dispersion);
-    fGammaFactor = TMath::Sqrt(1 - fBetaOfEmittingFragment * fBetaOfEmittingFragment);
+    fGammaFactor = TMath::Sqrt(1. - fBetaOfEmittingFragment * fBetaOfEmittingFragment);
 }
 
 void R3BCALIFATestGenerator::SetDecayChainPoint(double gammaEnergy, double branchingRatio)
@@ -229,4 +306,5 @@ void R3BCALIFATestGenerator::SetDecayChainPoint(double gammaEnergy, double branc
     fGammaEnergies.push_back(gammaEnergy / 1000.); // GeV
     fGammaBranchingRatios.push_back(branchingRatio);
 }
+
 ClassImp(R3BCALIFATestGenerator)
