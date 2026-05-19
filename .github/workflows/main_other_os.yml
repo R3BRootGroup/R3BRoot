@@ -58,10 +58,44 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy ] # exclude r3broot-conan
-        os: [ ubuntu2404, ubuntu2504] # fedora42 is with C++23
+        os: [ ubuntu2404, ubuntu2504 , ubuntu2604 ]
         cpp: [ 17 ]
-        fsv: [ jan24p5 ]
-        frv: [ v18.8.2 ]
+        fsv: [ jan24p5, jan24p6 ]
+        frv: [ v18.8.2, v19.0.1 ]
+        exclude:
+          - os: ubuntu2404
+            fsv: jan24p6
+            frv: v19.0.1
+          - os: ubuntu2404
+            fsv: jan24p5
+            frv: v19.0.1
+          - os: ubuntu2404
+            fsv: jan24p6
+            frv: v18.8.2
+          - os: ubuntu2404
+            fsv: jan24p5
+            frv: v19.0.1
+          - os: ubuntu2504
+            fsv: jan24p6
+            frv: v19.0.1
+          - os: ubuntu2504
+            fsv: jan24p6
+            frv: v18.8.2
+          - os: ubuntu2504
+            fsv: jan24p5
+            frv: v19.0.1
+          - os: ubuntu2404
+            fsv: jan24p5
+            frv: v19.0.1
+          - os: ubuntu2604
+            fsv: jan24p5
+            frv: v18.8.2
+          - os: ubuntu2604
+            fsv: jan24p6
+            frv: v18.8.2
+          - os: ubuntu2604
+            fsv: jan24p5
+            frv: v19.0.1
 
         # The list under "include" defines some properties for each group:
         #
@@ -135,7 +169,7 @@ jobs:
           
       # Restore ccache
       - name: Restore cache
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ~/.ccache
           key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
@@ -162,7 +196,7 @@ jobs:
       # cache restoring step.
       - name: Save-cache
         if: github.event_name == 'push' && matrix.skip-save != true
-        uses: actions/cache@v3
+        uses: actions/cache@v5
         with:
           path: ~/.ccache
           key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
