@@ -3,7 +3,22 @@ include(FetchContent)
 if(FETCH_GTEST)
     fetchcontent_declare(
         googletest
-        URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+        URL https://github.com/google/googletest/archive/refs/tags/v1.15.0.zip
     )
     fetchcontent_makeavailable(googletest)
+
+    message(STATUS "googletest_SOURCE_DIR = ${googletest_SOURCE_DIR}")
+
+    if(EXISTS "${googletest_SOURCE_DIR}/CMakeLists.txt")
+       file(STRINGS
+         "${googletest_SOURCE_DIR}/CMakeLists.txt"
+         GOOGLETEST_VERSION_LINE
+         REGEX "set\\(GOOGLETEST_VERSION")
+
+       message(STATUS "GOOGLETEST_VERSION line = ${GOOGLETEST_VERSION_LINE}")
+    endif()
+
+    if(TARGET gtest)
+       message(STATUS "Target gtest FOUND")
+    endif()
 endif()

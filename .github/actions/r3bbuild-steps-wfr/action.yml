@@ -37,11 +37,16 @@ runs:
         echo "cacheSHA=$([[ ${{github.event_name}} = 'push' ]] && git rev-parse --short HEAD || git rev-parse --short HEAD^)" >> $GITHUB_ENV
         git submodule update --init --recursive
         git clone https://github.com/R3BRootGroup/macros.git
-        if [[ "${{ matrix.os }}" == "fedora42" || "${{ matrix.os }}" == "ubuntu2504" ]]; then
+        if [[ "${{ matrix.os }}" == "fedora42" || "${{ matrix.os }}" == "ubuntu2504" || "${{ matrix.os }}" == "ubuntu2604" ]]; then
           unset UCESB_DIR
           echo "UCESB_DIR=" >> $GITHUB_ENV
         fi
-        cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake" -DCMAKE_CXX_STANDARD=${{ matrix.cpp }}
+        
+        if [[ "${{ matrix.os }}" == "ubuntu2404" || "${{ matrix.os }}" == "ubuntu2504" ]]; then
+          cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake" -DCMAKE_CXX_STANDARD=${{ matrix.cpp }} -DFETCH_GTEST=OFF
+        else
+          cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake" -DCMAKE_CXX_STANDARD=${{ matrix.cpp }} -DFETCH_GTEST=ON
+        fi
       shell: bash
 
     - name: Build

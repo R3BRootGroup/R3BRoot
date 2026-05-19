@@ -24,7 +24,7 @@ endif()
 cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 # set cmake policies
-cmake_policy(VERSION 3.27...4.2)
+cmake_policy(VERSION 3.27...4.3)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
@@ -285,7 +285,12 @@ if(CONAN_ENABLED)
         CACHE BOOL "disable implicit conversion of JSON" FORCE)
 endif()
 
-find_package2(PRIVATE GTest)
+include(cmake/modules/FetchAllContents.cmake)
+
+if(NOT FETCH_GTEST)
+    find_package2(PRIVATE GTest)
+endif()
+
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 find_package2(PUBLIC Protobuf)
