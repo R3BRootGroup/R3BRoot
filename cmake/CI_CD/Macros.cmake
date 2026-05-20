@@ -60,7 +60,6 @@ macro(cdash_start)
         # ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
     endif()
 
-    execute_process(COMMAND "make" "clean" WORKING_DIRECTORY ${CTEST_BINARY_DIRECTORY})
     ctest_read_custom_files("${CTEST_SOURCE_DIRECTORY}")
 
     # ctest_start(${ctest_model} GROUP ${ctest_model})
@@ -69,14 +68,12 @@ endmacro()
 
 macro(cdash_configure)
     # set(ENV{WERROR} TRUE)
-    set(configure_options "${configure_options};-DDISABLE_COLOR=ON")
-    if(DEFINED ${EXTRA_FLAGS})
+    if(DEFINED EXTRA_FLAGS)
         set(configure_options "${configure_options};${EXTRA_FLAGS}")
     endif()
 
-    # set(CTEST_CONFIGURE_COMMAND
-    #     "${CMAKE_COMMAND} -C ${CTEST_SOURCE_DIRECTORY}/cmake/CI_CD/configure_options.cmake -B ${CTEST_BINARY_DIRECTORY} -S ${CTEST_SOURCE_DIRECTORY}")
     ctest_configure(OPTIONS "${configure_options}" RETURN_VALUE _ctest_configure_ret_val)
+    ctest_submit(PARTS Start Configure)
 endmacro()
 
 macro(cdash_build)
@@ -84,7 +81,7 @@ macro(cdash_build)
         BUILD "${CTEST_BINARY_DIRECTORY}"
         PARALLEL_LEVEL ${number_of_processors}
         RETURN_VALUE _ctest_build_ret_val)
-
+    ctest_submit(PARTS Build)
 endmacro()
 
 macro(cdash_test)
@@ -130,7 +127,11 @@ macro(print_error)
 endmacro()
 
 macro(cdash_submit)
-    ctest_submit(RETURN_VALUE _ctest_submit_ret_val BUILD_ID cdash_build_id RETRY_COUNT 3 RETRY_DELAY 2)
+    ctest_submit(
+        RETURN_VALUE _ctest_submit_ret_val
+        BUILD_ID cdash_build_id
+        RETRY_COUNT 3
+        RETRY_DELAY 2)
     if(_ctest_submit_ret_val)
         message(WARNING " ctest_submit() failed. Continuing")
     endif()

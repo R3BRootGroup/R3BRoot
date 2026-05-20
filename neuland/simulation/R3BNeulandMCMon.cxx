@@ -12,19 +12,29 @@
  ******************************************************************************/
 
 #include "R3BNeulandMCMon.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRun.h"
-#include "Math/Vector4D.h"
+#include "R3BMCTrack.h"
+#include "R3BNeulandCommon.h"
 #include "TDirectory.h"
 #include "TFile.h"
-#include "TH1D.h"
-#include "TH2D.h"
-#include "TH3D.h"
-#include <algorithm>
+#include <FairTask.h>
+#include <Math/Vector4Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TH2.h>
+#include <TH3.h>
+#include <TString.h>
+#include <array>
+#include <cmath>
+#include <cstddef>
+#include <fairlogger/Logger.h>
+#include <fstream>
 #include <iostream>
+#include <map>
 #include <numeric>
 #include <string>
+#include <vector>
 
 inline Bool_t IsPrimaryNeutron(const R3BMCTrack* mcTrack)
 {
@@ -124,9 +134,9 @@ R3BNeulandMCMon::R3BNeulandMCMon(const Option_t* option)
 
 InitStatus R3BNeulandMCMon::Init()
 {
-    fPrimaryNeutronInteractionPoints.Init();
+    fPrimaryNeutronInteractionPoints.init();
     fMCTracks.Init();
-    fNeulandPoints.Init();
+    fNeulandPoints.init();
 
     fhNPNIPsEToFVSTime = new TH2D("NPNIPEToFVSTime", "NPNIP E_{ToF} vs. NPNIP Time", 100, 0, 1000, 500, 0, 500);
     fhNPNIPsEToFVSTime->GetXaxis()->SetTitle("NPNIP E_{ToF} [MeV]");
@@ -232,13 +242,13 @@ InitStatus R3BNeulandMCMon::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandMCMon::Exec(Option_t*)
+void R3BNeulandMCMon::Exec(Option_t*) // NOLINT: restructure later
 {
     nEvents++;
 
-    const auto npnips = fPrimaryNeutronInteractionPoints.Retrieve();
-    const auto mcTracks = fMCTracks.Retrieve();
-    const auto points = fNeulandPoints.Retrieve();
+    const auto& npnips = fPrimaryNeutronInteractionPoints.get();
+    const auto& mcTracks = fMCTracks.Retrieve();
+    const auto& points = fNeulandPoints.get();
 
     for (const auto& mcTrack : mcTracks)
     {
@@ -269,18 +279,18 @@ void R3BNeulandMCMon::Exec(Option_t*)
     for (const auto& npnip : npnips)
     {
         // WIP: ToF Calculation -> Should respect other origin than 0,0,0,0.
-        const Double_t s2 = std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2) + std::pow(npnip->GetZ(), 2); // cm²
-        const Double_t v2 = s2 / std::pow(npnip->GetTime(), 2); // ns²
+        const Double_t point_mag2 =
+            std::pow(npnip.GetX(), 2) + std::pow(npnip.GetY(), 2) + std::pow(npnip.GetZ(), 2); // cm²
+        const Double_t velocity_sq = point_mag2 / std::pow(npnip.GetTime(), 2);                // ns²
 
-        const Double_t c2 = 898.75517873681758374898; // cm²/ns²
-        const Double_t massNeutron = 939.565379;      // MeV/c²
-        const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (v2 / c2))) - 1);
+        const Double_t massNeutron = 939.565379; // MeV/c²
+        const Double_t ETimeOfFlight = massNeutron * ((1. / std::sqrt(1 - (velocity_sq / R3B::Neuland::CLight2))) - 1);
 
-        auto mcTrack = mcTracks.at(npnip->GetTrackID());
-        fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip->GetTime());
+        auto* mcTrack = mcTracks.at(npnip.GetTrackID());
+        fhNPNIPsEToFVSTime->Fill(ETimeOfFlight, npnip.GetTime());
         fhMCToF->Fill(GetKineticEnergy(mcTrack) - ETimeOfFlight);
-        fhNPNIPSrvsz->Fill(npnip->GetZ(), std::sqrt(std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2)));
-        fhNPNIPSxy->Fill(npnip->GetX(), npnip->GetY());
+        fhNPNIPSrvsz->Fill(npnip.GetZ(), std::sqrt(std::pow(npnip.GetX(), 2) + std::pow(npnip.GetY(), 2)));
+        fhNPNIPSxy->Fill(npnip.GetX(), npnip.GetY());
     }
 
     {
@@ -290,9 +300,9 @@ void R3BNeulandMCMon::Exec(Option_t*)
 
         for (const auto& point : points)
         {
-            const R3BMCTrack* mcTrack = mcTracks.at(point->GetTrackID());
+            const R3BMCTrack* mcTrack = mcTracks.at(point.GetTrackID());
 
-            Etot += point->GetLightYield() * 1000.;
+            Etot += point.GetLightYield() * 1000.;
 
             // Select tracks with a primary neutron mother
             if (IsMotherPrimaryNeutron(mcTrack, mcTracks))
@@ -301,12 +311,12 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 // Total energy of non-neutron secondary particles where mother is a primary neutron
                 if (mcTrack->GetPdgCode() != 2112)
                 {
-                    EtotPrim += point->GetLightYield() * 1000.;
+                    EtotPrim += point.GetLightYield() * 1000.;
                 }
 
                 // Distribution of secondary particles
                 fhPDG->Fill(mcTrack->GetPdgCode());
-                fhPrimaryDaughterIDs->Fill(point->GetTrackID());
+                fhPrimaryDaughterIDs->Fill(point.GetTrackID());
 
                 // Build Histograms for each particle PDG if it doesn't exist
                 if (!fhmEPdg[mcTrack->GetPdgCode()])
@@ -317,19 +327,19 @@ void R3BNeulandMCMon::Exec(Option_t*)
                         new TH1D("hE_PDG_" + TString::Itoa(mcTrack->GetPdgCode(), 10), name, 3000, 0, 3000);
                 }
                 // Get Energy py particle where the mother is a primary neutron
-                fhmEPdg[mcTrack->GetPdgCode()]->Fill(point->GetLightYield() * 1000.); // point->GetEnergyLoss()*1000.);
-            }                                                                         // end primary neutron mother
+                fhmEPdg[mcTrack->GetPdgCode()]->Fill(point.GetLightYield() * 1000.); // point.GetEnergyLoss()*1000.);
+            } // end primary neutron mother
 
             // Sum energy per particle type per event
             if (!EtotPDG[mcTrack->GetPdgCode()])
             {
                 EtotPDG[mcTrack->GetPdgCode()] = 0.;
             }
-            EtotPDG[mcTrack->GetPdgCode()] += point->GetLightYield() * 1000.; // point->GetEnergyLoss()*1000.;
+            EtotPDG[mcTrack->GetPdgCode()] += point.GetLightYield() * 1000.; // point.GetEnergyLoss()*1000.;
 
-            fhElossVSLight->Fill(point->GetEnergyLoss() * 1000., point->GetLightYield() * 1000.);
-            fhElossVSLightLog->Fill(std::log10(point->GetEnergyLoss() * 1000.),
-                                    std::log10(point->GetLightYield() * 1000.));
+            fhElossVSLight->Fill(point.GetEnergyLoss() * 1000., point.GetLightYield() * 1000.);
+            fhElossVSLightLog->Fill(std::log10(point.GetEnergyLoss() * 1000.),
+                                    std::log10(point.GetLightYield() * 1000.));
 
             if (!fhmElossVSLightLogPdg[mcTrack->GetPdgCode()])
             {
@@ -343,10 +353,10 @@ void R3BNeulandMCMon::Exec(Option_t*)
                              -3,
                              3);
             }
-            fhmElossVSLightLogPdg[mcTrack->GetPdgCode()]->Fill(std::log10(point->GetEnergyLoss() * 1000.),
-                                                               std::log10(point->GetLightYield() * 1000.));
+            fhmElossVSLightLogPdg[mcTrack->GetPdgCode()]->Fill(std::log10(point.GetEnergyLoss() * 1000.),
+                                                               std::log10(point.GetLightYield() * 1000.));
 
-            fhThetaLight->Fill(GetTheta(mcTrack), point->GetLightYield() * 1000.);
+            fhThetaLight->Fill(GetTheta(mcTrack), point.GetLightYield() * 1000.);
         }
 
         fhEtot->Fill(Etot);
@@ -574,17 +584,17 @@ void R3BNeulandMCMon::Exec(Option_t*)
         fh3->Reset("ICES");
         for (const auto& point : points)
         {
-            if (point->GetLightYield() > 0)
+            if (point.GetLightYield() > 0)
             {
-                const auto pos = point->GetPosition();
-                fh3->Fill(pos.Z(), pos.X(), pos.Y(), point->GetEnergyLoss() * 1000.);
+                const auto pos = point.GetPosition();
+                fh3->Fill(pos.Z(), pos.X(), pos.Y(), point.GetEnergyLoss() * 1000.);
             }
         }
 
         fh3PNIP->Reset("ICES");
         for (const auto& npnip : npnips)
         {
-            fh3PNIP->Fill(npnip->GetZ(), npnip->GetX(), npnip->GetY(), npnip->GetTime());
+            fh3PNIP->Fill(npnip.GetZ(), npnip.GetX(), npnip.GetY(), npnip.GetTime());
         }
     }
 }

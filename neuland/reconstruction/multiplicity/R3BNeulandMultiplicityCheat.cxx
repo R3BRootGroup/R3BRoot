@@ -1,38 +1,42 @@
 #include "R3BNeulandMultiplicityCheat.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
+#include "R3BException.h"
+#include "R3BNeulandMultiplicity.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <memory>
+#include <string_view>
 
-R3BNeulandMultiplicityCheat::R3BNeulandMultiplicityCheat(TString input, TString output)
+R3BNeulandMultiplicityCheat::R3BNeulandMultiplicityCheat(std::string_view input, std::string_view output)
     : FairTask("R3BNeulandMultiplicityCheat")
-    , fPrimaryHits(std::move(input))
-    , fMultiplicity(new R3BNeulandMultiplicity())
-    , fOutputName(std::move(output))
+    , fPrimaryHits(input)
+    , fMultiplicity(std::make_unique<R3BNeulandMultiplicity>())
+    , multiplicity_ptr_{ fMultiplicity.get() }
+    , fOutputName(output)
 {
 }
 
-R3BNeulandMultiplicityCheat::~R3BNeulandMultiplicityCheat() { delete fMultiplicity; }
-
-InitStatus R3BNeulandMultiplicityCheat::Init()
+auto R3BNeulandMultiplicityCheat::Init() -> InitStatus
 {
     // Input
-    fPrimaryHits.Init();
+    fPrimaryHits.init();
 
     // Output
-    auto ioman = FairRootManager::Instance();
+    auto* ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
-        LOG(fatal) << "TCAInputConnector: No FairRootManager";
-        return kFATAL;
+        throw R3B::runtime_error("TCAInputConnector: No FairRootManager");
     }
-    ioman->RegisterAny(fOutputName, fMultiplicity, true);
+    ioman->RegisterAny(fOutputName.c_str(), multiplicity_ptr_, true);
 
     return kSUCCESS;
 }
 
-void R3BNeulandMultiplicityCheat::Exec(Option_t*)
+void R3BNeulandMultiplicityCheat::Exec(Option_t* /*option*/)
 {
     fMultiplicity->m.fill(0.);
-    fMultiplicity->m[fPrimaryHits.Retrieve().size()] = 1.;
+    fMultiplicity->m.at(fPrimaryHits.size()) = 1.;
 }
 
 ClassImp(R3BNeulandMultiplicityCheat)

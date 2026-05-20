@@ -21,21 +21,32 @@
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TH3D.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TFile.h>
+#include <TH1.h>
+#include <TString.h>
 #include <algorithm>
-#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <fairlogger/Logger.h>
 #include <numeric>
 #include <utility>
 
-constexpr double rad2deg = 180. / 3.141592653589793238463;
-
-inline Double_t GetTheta(const R3BNeulandCluster* cluster)
+namespace
 {
-    const auto direction = cluster->GetLastHit().GetPosition() - cluster->GetFirstHit().GetPosition();
-    const auto x = std::acos(direction.Y() / direction.Mag()) * rad2deg;
-    // Not sure, but Kondos Theta is -90:90
-    return x - 90.;
-}
+    constexpr double rad2deg = 180. / 3.141592653589793238463;
+
+    inline auto GetTheta(const R3BNeulandCluster& cluster) -> double
+    {
+        const auto direction = cluster.GetLastHit().GetPosition() - cluster.GetFirstHit().GetPosition();
+        const auto degree = std::acos(direction.Y() / direction.r()) * rad2deg;
+        // Not sure, but Kondos Theta is -90:90
+        static constexpr auto retate_angle = 90.;
+        return degree - retate_angle;
+    }
+} // namespace
 
 R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const Option_t* option)
     : FairTask("R3B NeuLAND NeulandCluster Monitor")
@@ -61,7 +72,7 @@ R3BNeulandClusterMon::R3BNeulandClusterMon(TString input, TString output, const 
 
 InitStatus R3BNeulandClusterMon::Init()
 {
-    fNeulandClusters.Init();
+    fNeulandClusters.init();
 
     FairRootManager* ioman = FairRootManager::Instance();
     if (!ioman)
@@ -248,89 +259,91 @@ InitStatus R3BNeulandClusterMon::Init()
 
 void R3BNeulandClusterMon::Exec(Option_t*)
 {
-    auto clusters = fNeulandClusters.Retrieve();
-    clusters.erase(
-        std::remove_if(
-            clusters.begin(), clusters.end(), [&](R3BNeulandCluster* c) { return !(fClusterFilters.IsValid(c)); }),
-        clusters.end());
+    fNeulandClustersBuffer = fNeulandClusters.get();
+    fNeulandClustersBuffer.erase(
+        std::remove_if(fNeulandClustersBuffer.begin(),
+                       fNeulandClustersBuffer.end(),
+                       [&](R3BNeulandCluster& cluster) { return !(fClusterFilters.IsValid(&cluster)); }),
+        fNeulandClustersBuffer.end());
 
-    const auto nClusters = clusters.size();
+    const auto nClusters = fNeulandClustersBuffer.size();
 
     if (fIs3DTrackEnabled)
     {
         fh3->Reset("ICES");
-        for (const auto& cluster : clusters)
+        for (const auto& cluster : fNeulandClustersBuffer)
         {
-            const auto start = cluster->GetFirstHit().GetPosition();
+            const auto start = cluster.GetFirstHit().GetPosition();
             // XYZ -> ZXY (side view)
-            fh3->Fill(start.Z(), start.X(), start.Y(), cluster->GetE());
+            fh3->Fill(start.Z(), start.X(), start.Y(), cluster.GetE());
         }
     }
 
-    const Double_t etot = std::accumulate(
-        clusters.begin(), clusters.end(), 0., [](Double_t sum, const R3BNeulandCluster* c) { return sum + c->GetE(); });
+    const Double_t etot =
+        std::accumulate(fNeulandClustersBuffer.begin(),
+                        fNeulandClustersBuffer.end(),
+                        0.,
+                        [](Double_t sum, const R3BNeulandCluster& cluster) { return sum + cluster.GetE(); });
 
     fhClusterNumberVSEnergy->Fill(etot, nClusters);
 
     fhClusters->Fill(nClusters);
-    for (const auto cluster : clusters)
+    for (const auto& cluster : fNeulandClustersBuffer)
     {
-        fhClusterTime->Fill(cluster->GetT());
-        fhClusterSize->Fill(cluster->GetSize());
-        fhClusterEnergy->Fill(cluster->GetE());
-        fhClusterRValue->Fill(std::log10(cluster->GetRCluster(fBeta)));
-        fhClusterEnergyVSSize->Fill(cluster->GetE(), cluster->GetSize());
-        fhClusterEToF->Fill(cluster->GetFirstHit().GetEToF());
-        fhClusterEToFVSEnergy->Fill(cluster->GetFirstHit().GetEToF(), cluster->GetE());
-        fhClusterEToFVSTime->Fill(cluster->GetFirstHit().GetEToF(), cluster->GetT());
-        fhClusterEVSTime->Fill(cluster->GetFirstHit().GetE(), cluster->GetT());
+        fhClusterTime->Fill(cluster.GetT());
+        fhClusterSize->Fill(cluster.GetSize());
+        fhClusterEnergy->Fill(cluster.GetE());
+        fhClusterRValue->Fill(std::log10(cluster.GetRCluster(fBeta)));
+        fhClusterEnergyVSSize->Fill(cluster.GetE(), cluster.GetSize());
+        fhClusterEToF->Fill(cluster.GetFirstHit().GetEToF());
+        fhClusterEToFVSEnergy->Fill(cluster.GetFirstHit().GetEToF(), cluster.GetE());
+        fhClusterEToFVSTime->Fill(cluster.GetFirstHit().GetEToF(), cluster.GetT());
+        fhClusterEVSTime->Fill(cluster.GetFirstHit().GetE(), cluster.GetT());
 
-        fhClusterEnergyVSEToF->Fill(cluster->GetE(), cluster->GetFirstHit().GetEToF());
-        fhClusterSizeVSEToF->Fill(cluster->GetSize(), cluster->GetFirstHit().GetEToF());
-        fhClusterEnergyVSSizeVSEToF->Fill(cluster->GetE(), cluster->GetSize(), cluster->GetFirstHit().GetEToF());
-        if (cluster->GetSize() > 2)
+        fhClusterEnergyVSEToF->Fill(cluster.GetE(), cluster.GetFirstHit().GetEToF());
+        fhClusterSizeVSEToF->Fill(cluster.GetSize(), cluster.GetFirstHit().GetEToF());
+        fhClusterEnergyVSSizeVSEToF->Fill(cluster.GetE(), cluster.GetSize(), cluster.GetFirstHit().GetEToF());
+        if (cluster.GetSize() > 2)
         {
             fhClusterForemostMinusCentroidVSEnergy->Fill(
-                (cluster->GetForemostHit().GetPosition() - cluster->GetEnergyCentroid()).Mag(), cluster->GetE());
+                (cluster.GetForemostHit().GetPosition() - cluster.GetEnergyCentroid()).r(), cluster.GetE());
 
             fhClusterForemostMinusMaxEnergyDigiPosVSEnergy->Fill(
-                (cluster->GetForemostHit().GetPosition() - cluster->GetMaxEnergyHit().GetPosition()).Mag(),
-                cluster->GetE());
+                (cluster.GetForemostHit().GetPosition() - cluster.GetMaxEnergyHit().GetPosition()).r(), cluster.GetE());
 
             fhClusterCentroidMinusFirstDigiPosVSEnergy->Fill(
-                (cluster->GetEnergyCentroid() - cluster->GetFirstHit().GetPosition()).Mag(), cluster->GetE());
+                (cluster.GetEnergyCentroid() - cluster.GetFirstHit().GetPosition()).r(), cluster.GetE());
 
             fhClusterMaxEnergyDigiMinusFirstDigiPosVSEnergy->Fill(
-                (cluster->GetMaxEnergyHit().GetPosition() - cluster->GetFirstHit().GetPosition()).Mag(),
-                cluster->GetE());
+                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetFirstHit().GetPosition()).r(), cluster.GetE());
             fhClusterMaxEnergyDigiMinusCentroidVSEnergy->Fill(
-                (cluster->GetMaxEnergyHit().GetPosition() - cluster->GetEnergyCentroid()).Mag(), cluster->GetE());
-            fhClusterEnergyMomentVSEnergy->Fill(cluster->GetEnergyMoment(), cluster->GetE());
-            fhClusterEnergyMomentVSClusterSize->Fill(cluster->GetEnergyMoment(), cluster->GetSize());
+                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetEnergyCentroid()).r(), cluster.GetE());
+            fhClusterEnergyMomentVSEnergy->Fill(cluster.GetEnergyMoment(), cluster.GetE());
+            fhClusterEnergyMomentVSClusterSize->Fill(cluster.GetEnergyMoment(), cluster.GetSize());
 
             fhClusterLastMinusFirstDigiMagVSEnergy->Fill(
-                (cluster->GetLastHit().GetPosition() - cluster->GetFirstHit().GetPosition()).Mag(), cluster->GetE());
+                (cluster.GetLastHit().GetPosition() - cluster.GetFirstHit().GetPosition()).r(), cluster.GetE());
 
-            fhClusterEnergyMoment->Fill(cluster->GetEnergyMoment());
+            fhClusterEnergyMoment->Fill(cluster.GetEnergyMoment());
             fhClusterMaxEnergyDigiMinusFirstDigiMag->Fill(
-                (cluster->GetMaxEnergyHit().GetPosition() - cluster->GetFirstHit().GetPosition()).Mag());
+                (cluster.GetMaxEnergyHit().GetPosition() - cluster.GetFirstHit().GetPosition()).r());
         }
 
-        fhZ->Fill(cluster->GetFirstHit().GetPosition().Z());
-        fhZVSEToF->Fill(cluster->GetFirstHit().GetPosition().Z(), cluster->GetEToF());
-        fhDistFromCenter->Fill(std::sqrt(std::pow(cluster->GetFirstHit().GetPosition().X(), 2) +
-                                         std::pow(cluster->GetFirstHit().GetPosition().Y(), 2)));
-        fhDistFromCenterVSEToF->Fill(std::sqrt(std::pow(cluster->GetFirstHit().GetPosition().X(), 2) +
-                                               std::pow(cluster->GetFirstHit().GetPosition().Y(), 2)),
-                                     cluster->GetEToF());
-        fhDeltaT->Fill(cluster->GetLastHit().GetT() - cluster->GetFirstHit().GetT());
+        fhZ->Fill(cluster.GetFirstHit().GetPosition().Z());
+        fhZVSEToF->Fill(cluster.GetFirstHit().GetPosition().Z(), cluster.GetEToF());
+        fhDistFromCenter->Fill(std::sqrt(std::pow(cluster.GetFirstHit().GetPosition().X(), 2) +
+                                         std::pow(cluster.GetFirstHit().GetPosition().Y(), 2)));
+        fhDistFromCenterVSEToF->Fill(std::sqrt(std::pow(cluster.GetFirstHit().GetPosition().X(), 2) +
+                                               std::pow(cluster.GetFirstHit().GetPosition().Y(), 2)),
+                                     cluster.GetEToF());
+        fhDeltaT->Fill(cluster.GetLastHit().GetT() - cluster.GetFirstHit().GetT());
 
-        fhForemostMinusFirstDigiTime->Fill(cluster->GetForemostHit().GetT() - cluster->GetFirstHit().GetT());
+        fhForemostMinusFirstDigiTime->Fill(cluster.GetForemostHit().GetT() - cluster.GetFirstHit().GetT());
 
-        if (cluster->GetSize() > 4)
+        if (cluster.GetSize() > 4)
         {
             const auto theta = GetTheta(cluster);
-            for (const auto& digi : cluster->GetHits())
+            for (const auto& digi : cluster.GetHits())
             {
                 fhThetaEDigi->Fill(theta, digi.GetE());
                 fhThetaEDigiCosTheta->Fill(theta, digi.GetE() * std::cos(theta / rad2deg));
@@ -338,58 +351,58 @@ void R3BNeulandClusterMon::Exec(Option_t*)
         }
     }
 
-    std::sort(clusters.begin(),
-              clusters.end(),
-              [](const R3BNeulandCluster* a, const R3BNeulandCluster* b) { return a->GetT() < b->GetT(); });
+    std::sort(fNeulandClustersBuffer.begin(),
+              fNeulandClustersBuffer.end(),
+              [](const R3BNeulandCluster& left, const R3BNeulandCluster& right) { return left.GetT() < right.GetT(); });
 
-    for (auto cluster : clusters)
+    for (const auto& cluster : fNeulandClustersBuffer)
     {
-        if (cluster->GetSize() >= 3)
+        if (cluster.GetSize() >= 3)
         {
-            fhENFromScatterVSEToF->Fill(Neuland::NeutronEnergyFromElasticProtonScattering(cluster), cluster->GetEToF());
+            fhENFromScatterVSEToF->Fill(Neuland::NeutronEnergyFromElasticProtonScattering(cluster), cluster.GetEToF());
 
-            fhClusterEnergyVSScatteredRecoilAngle->Fill(cluster->GetE(),
+            fhClusterEnergyVSScatteredRecoilAngle->Fill(cluster.GetE(),
                                                         std::acos(Neuland::RecoilScatteringAngle(cluster)));
         }
     }
 
-    for (auto ita = clusters.cbegin(); ita != clusters.cend(); ita++)
+    for (auto ita = fNeulandClustersBuffer.cbegin(); ita != fNeulandClustersBuffer.cend(); ita++)
     {
-        for (auto itb = ita + 1; itb != clusters.cend(); itb++)
+        for (auto itb = ita + 1; itb != fNeulandClustersBuffer.cend(); itb++)
         {
 
             fhScatteredNEnergyVSAngle->Fill(Neuland::ScatteredNeutronEnergy(*ita, *itb),
                                             std::acos(Neuland::ScatteredNeutronAngle(*ita, *itb)));
 
-            fhScatteredNEnergyVSEdep->Fill(Neuland::ScatteredNeutronEnergy(*ita, *itb), (*ita)->GetE());
+            fhScatteredNEnergyVSEdep->Fill(Neuland::ScatteredNeutronEnergy(*ita, *itb), (*ita).GetE());
 
             const Double_t EelasticHeavy = Neuland::NeutronEnergyFromElasticScattering(*ita, *itb, 11000);
-            fhEToFVSEelastic->Fill((*ita)->GetFirstHit().GetEToF(), EelasticHeavy);
+            fhEToFVSEelastic->Fill((*ita).GetFirstHit().GetEToF(), EelasticHeavy);
             // const Double_t EelasticProton = Neuland::NeutronEnergyFromElasticScattering(*ita, *itb, 1000);
             // fhEToFVSEelastic->Fill((*ita)->GetFirstHit().GetEToF(), EelasticProton);
 
             if (Neuland::ScatteredNeutronEnergy(*ita, *itb) > 10.)
             {
-                fhElasticTargetMass->Fill(Neuland::ElasticScatteringTargetMass(*ita, *itb), (*ita)->GetE());
-                fhClusterEnergyVSScatteredNeutronAngle->Fill((*ita)->GetE(),
+                fhElasticTargetMass->Fill(Neuland::ElasticScatteringTargetMass(*ita, *itb), (*ita).GetE());
+                fhClusterEnergyVSScatteredNeutronAngle->Fill((*ita).GetE(),
                                                              std::acos(Neuland::ScatteredNeutronAngle(*ita, *itb)));
 
-                if ((*ita)->GetSize() >= 3)
+                if ((*ita).GetSize() >= 3)
                 {
                     fhScatterAngleVSRecoilAngle->Fill(std::acos(Neuland::ScatteredNeutronAngle(*ita, *itb)),
                                                       std::acos(Neuland::RecoilScatteringAngle(*ita)));
                     fhSumAngleVSRatioErecoEtof->Fill(
                         std::acos(Neuland::ScatteredNeutronAngle(*ita, *itb)) +
                             std::acos(Neuland::RecoilScatteringAngle(*ita)),
-                        Neuland::NeutronEnergyFromElasticProtonScattering(*ita) / (*ita)->GetFirstHit().GetEToF());
+                        Neuland::NeutronEnergyFromElasticProtonScattering(*ita) / (*ita).GetFirstHit().GetEToF());
                 }
             }
         }
     }
 
-    for (const auto& cluster : clusters)
+    for (const auto& cluster : fNeulandClustersBuffer)
     {
-        const auto& digis = cluster->GetHits();
+        const auto& digis = cluster.GetHits();
         for (auto it1 = digis.begin(); it1 != digis.end(); it1++)
         {
             for (auto it2 = it1 + 1; it2 != digis.end(); it2++)

@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
@@ -10,15 +11,39 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+# cmake-format: on
 
-set(SRCS R3BNeuland.cxx R3BNeulandMCMon.cxx R3BNeulandPrimaryClusterFinder.cxx
-         R3BNeulandPrimaryInteractionFinder.cxx)
+set(SRCS
+    # cmake-format: sortable
+    generator/CosmicMuon.cxx
+    generator/R3BNeulandGeneratorFactory.cxx
+    R3BNeuland.cxx
+    R3BNeulandMCMon.cxx
+    R3BNeulandPrimaryClusterFinder.cxx
+    R3BNeulandPrimaryInteractionFinder.cxx)
 
-set(HEADERS R3BNeuland.h R3BNeulandMCMon.h R3BNeulandPrimaryClusterFinder.h
-            R3BNeulandPrimaryInteractionFinder.h)
+set(HEADERS
+    # cmake-format: sortable
+    CosmicMuonDistributions.h
+    generator/CosmicMuon.h
+    generator/R3BNeulandGeneratorFactory.h
+    R3BNeuland.h
+    R3BNeulandMCMon.h
+    R3BNeulandPrimaryClusterFinder.h
+    R3BNeulandPrimaryInteractionFinder.h)
 
 add_library(R3BNeulandSimulation SHARED ${SRCS})
-target_include_directories(R3BNeulandSimulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandSimulation PUBLIC R3BNeulandShared R3BPassive)
-root_generate_dictionary(R3BNeulandSimulation_dict ${HEADERS} MODULE R3BNeulandSimulation LINKDEF
-                         NeulandSimulationLinkDef.h)
+target_include_directories(R3BNeulandSimulation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/generator
+                                                       ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(
+    R3BNeulandSimulation
+    PRIVATE magic_enum::magic_enum
+    PUBLIC R3BNeulandShared R3BPassive R3BNeulandGeoBase)
+
+root_generate_dictionary(
+    R3BNeulandSimulation_dict
+    ${HEADERS}
+    MODULE
+    R3BNeulandSimulation
+    LINKDEF
+    NeulandSimulationLinkDef.h)

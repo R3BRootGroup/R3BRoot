@@ -20,6 +20,8 @@
 #define R3BNEULANDTCALFILL_H
 
 #include "FairTask.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
 
 class R3BTCalPar;
 class TClonesArray;
@@ -50,13 +52,13 @@ class R3BNeulandTcalFill : public FairTask
      * @param name a name of the task.
      * @param iVerbose a verbosity level.
      */
-    R3BNeulandTcalFill(const char* name, Int_t iVerbose = 1);
+    explicit R3BNeulandTcalFill(const char* name, Int_t iVerbose = 1);
 
     /**
      * Destructor.
      * Frees the memory used by the object.
      */
-    virtual ~R3BNeulandTcalFill();
+    ~R3BNeulandTcalFill() override;
 
     /**
      * Method for task initialization.
@@ -64,33 +66,33 @@ class R3BNeulandTcalFill : public FairTask
      * the event loop.
      * @return Initialization status. kSUCCESS, kERROR or kFATAL.
      */
-    virtual InitStatus Init();
+    auto Init() -> InitStatus override;
 
     /**
      * Method for event loop implementation.
      * Is called by the framework every time a new event is read.
      * @param option an execution option.
      */
-    virtual void Exec(Option_t* option);
+    void Exec(Option_t* option) override;
 
     /**
      * A method for finish of processing of an event.
      * Is called by the framework for each event after executing
      * the tasks.
      */
-    virtual void FinishEvent();
+    void FinishEvent() override;
 
     /**
      * Method for finish of the task execution.
      * Is called by the framework after processing the event loop.
      */
-    virtual void FinishTask();
+    void FinishTask() override;
 
     /**
      * Method for setting the update rate.
      * @param rate an update rate value (events).
      */
-    inline void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
+    void SetUpdateRate(Int_t rate) { fUpdateRate = rate; }
 
     /**
      * Method for setting minimum required statistics per module.
@@ -99,13 +101,13 @@ class R3BNeulandTcalFill : public FairTask
      * calibrated.
      * @param minStats a value of minimum statistics required.
      */
-    inline void SetMinStats(Int_t minStats) { fMinStats = minStats; }
+    void SetMinStats(Int_t minStats) { fMinStats = minStats; }
 
     /**
      * Method for selecting events with certain trigger value.
      * @param trigger 1 - onspill, 2 - offspill, -1 - all events.
      */
-    inline void SetTrigger(Int_t trigger) { fTrigger = trigger; }
+    void SetTrigger(Int_t trigger) { fTrigger = trigger; }
 
     /**
      * Method for setting number of modules in NeuLAND setup.
@@ -113,7 +115,7 @@ class R3BNeulandTcalFill : public FairTask
      * @param nBars number of bars per plane.
      * @param n17 a number of channels with stop signal (17-th channel).
      */
-    inline void SetNofModules(Int_t nPlanes, Int_t nBars, Int_t n17)
+    void SetNofModules(Int_t nPlanes, Int_t nBars, Int_t n17)
     {
         fNofPlanes = nPlanes;
         fNofBars = nBars;
@@ -137,7 +139,7 @@ class R3BNeulandTcalFill : public FairTask
     R3BTCalEngine* fEngine; /**< Instance of the TCAL engine. */
 
   public:
-    ClassDef(R3BNeulandTcalFill, 1)
+    ClassDefOverride(R3BNeulandTcalFill, 1)
 };
 
 #endif // Test 1

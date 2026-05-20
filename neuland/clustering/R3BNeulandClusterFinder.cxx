@@ -12,53 +12,62 @@
  ******************************************************************************/
 
 #include "R3BNeulandClusterFinder.h"
-#include "FairLogger.h"
-#include <algorithm>
-#include <iostream>
+#include "R3BLogger.h"
+#include "R3BNeulandHit.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cstdlib>
+#include <fmt/core.h>
+#include <string_view>
+#include <utility>
 #include <vector>
 
-R3BNeulandClusterFinder::R3BNeulandClusterFinder(const Double_t dx,
-                                                 const Double_t dy,
-                                                 const Double_t dz,
-                                                 const Double_t dt,
-                                                 const TString input,
-                                                 const TString output)
+R3BNeulandClusterFinder::R3BNeulandClusterFinder(const double dist_x,
+                                                 const double dist_y,
+                                                 const double dist_z,
+                                                 const double dist_t,
+                                                 const std::string_view input,
+                                                 const std::string_view output)
     : FairTask("R3BNeulandClusterFinder")
     , fDigis(input)
     , fClusters(output)
 {
     fClusteringEngine.SetClusteringCondition(
-        [=](const R3BNeulandHit& a, const R3BNeulandHit& b)
+        [=](const R3BNeulandHit& one, const R3BNeulandHit& other)
         {
-            return std::abs(a.GetPosition().X() - b.GetPosition().X()) < dx &&
-                   std::abs(a.GetPosition().Y() - b.GetPosition().Y()) < dy &&
-                   std::abs(a.GetPosition().Z() - b.GetPosition().Z()) < dz && std::abs(a.GetT() - b.GetT()) < dt;
+            return std::abs(one.GetPosition().X() - other.GetPosition().X()) < dist_x &&
+                   std::abs(one.GetPosition().Y() - other.GetPosition().Y()) < dist_y &&
+                   std::abs(one.GetPosition().Z() - other.GetPosition().Z()) < dist_z &&
+                   std::abs(one.GetT() - other.GetT()) < dist_t;
         });
 }
 
-InitStatus R3BNeulandClusterFinder::Init()
+auto R3BNeulandClusterFinder::Init() -> InitStatus
 {
-    fDigis.Init();
-    fClusters.Init();
+    fDigis.init();
+    fClusters.init();
     return kSUCCESS;
 }
 
-void R3BNeulandClusterFinder::Exec(Option_t*)
+void R3BNeulandClusterFinder::Exec(Option_t* /*option*/)
 {
-    fClusters.Reset();
+    fClusters.clear();
+    neuland_hits_buffer_.clear();
+    clustered_hits_buffer_.clear();
 
-    auto digis = fDigis.RetrieveObjects();
-    const auto nDigis = digis.size();
+    neuland_hits_buffer_ = fDigis.get();
+    const auto nDigis = neuland_hits_buffer_.size();
 
     // Group them using the clustering condition set above: vector of digis -> vector of vector of digis
-    auto clusteredDigis = fClusteringEngine.Clusterize(digis);
-    const auto nClusters = clusteredDigis.size();
+    clustered_hits_buffer_ = fClusteringEngine.Clusterize(neuland_hits_buffer_);
+    const auto nClusters = clustered_hits_buffer_.size();
 
-    LOG(debug) << "R3BNeulandClusterFinder - nDigis nCluster:" << nDigis << " " << nClusters;
+    R3BLOG(debug, fmt::format("R3BNeulandClusterFinder - nDigis nCluster: {} {}", nDigis, nClusters));
 
-    for (auto& cluster : clusteredDigis)
+    for (auto& cluster : clustered_hits_buffer_)
     {
-        fClusters.Insert(R3BNeulandCluster{ std::move(cluster) });
+        fClusters.get().emplace_back(std::move(cluster));
     }
 }
 

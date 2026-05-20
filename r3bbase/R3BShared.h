@@ -12,16 +12,23 @@
  ******************************************************************************/
 
 #pragma once
-
-#include "R3BLogger.h"
-#include <FairLogger.h>
 #include <R3BValueError.h>
+#include <Rtypes.h>
 #include <TFile.h>
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <fairlogger/Logger.h>
 #include <filesystem>
+#include <fmt/core.h>
 #include <fmt/std.h>
+#include <memory>
 #include <regex>
+#include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 class TF1;
 class TH1;
@@ -89,8 +96,9 @@ namespace R3B
     }
 
     // -------------------------------------------------------------------------
-    // Get the length of a C array:
+    // sides enum class:
     // clang-format off
+    // Get the length of a C array:
     template <typename DataType, std::size_t size>
     constexpr std::size_t GetSize(const DataType (&/*unused*/)[size]) // NOLINT
     {
@@ -138,19 +146,21 @@ namespace R3B
         {
         }
 
-        auto& left() { return data_.first; }
-        auto& right() { return data_.second; }
-        auto& left() const { return data_.first; }
-        auto& right() const { return data_.second; }
-        auto get(Side side) const -> const auto& { return (side == Side::left) ? data_.first : data_.second; }
-        auto get(Side side) -> auto& { return (side == Side::left) ? data_.first : data_.second; }
+        auto left() -> DataType& { return data_.first; }
+        auto right() -> DataType& { return data_.second; }
+        auto left() const -> const DataType& { return data_.first; }
+        auto right() const -> const DataType& { return data_.second; }
+        auto get(Side side) const -> const DataType& { return (side == Side::left) ? data_.first : data_.second; }
+        auto get(Side side) -> DataType& { return (side == Side::left) ? data_.first : data_.second; }
+        void set_left(const DataType& value) { data_.first = value; }
+        void set_right(const DataType& value) { data_.second = value; }
 
       private:
         std::pair<DataType, DataType> data_;
         bool is_valid = false;
 
       public:
-        ClassDefNV(LRPair, 1);
+        ClassDefNV(LRPair, 2);
     };
 
     // -------------------------------------------------------------------------
@@ -159,7 +169,7 @@ namespace R3B
     template <uint8_t iterations = DEFAULT_ITERATION>
     auto FastExp(const float val) -> float
     {
-        auto exp = 1.F + val / (1U << iterations);
+        auto exp = 1.F + (val / (1U << iterations));
         for (auto i = 0; i < iterations; ++i)
         {
             exp *= exp;
@@ -167,6 +177,7 @@ namespace R3B
         return exp;
     }
 
+#ifndef __CLING__
     // -------------------------------------------------------------------------
     // File handling
     namespace fs = std::filesystem;
@@ -181,10 +192,9 @@ namespace R3B
 
         if (not fs::exists(parent_folder))
         {
-            R3BLOG(
-                error,
-                fmt::format(R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)",
-                            filename));
+            LOGP(error,
+                 R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)",
+                 filename);
             return ".";
         }
 
@@ -210,11 +220,12 @@ namespace R3B
         }
         if (filelist.empty())
         {
-            R3BLOG(error, fmt::format(R"(Cannot find any files with regex "{}")", regex_string));
+            LOGP(error, R"(Cannot find any files with regex "{}")", regex_string);
         }
         std::sort(filelist.begin(), filelist.end());
         return filelist;
     }
+#endif
 
     // batch clear and resize for STL containers
     template <typename... Containers>

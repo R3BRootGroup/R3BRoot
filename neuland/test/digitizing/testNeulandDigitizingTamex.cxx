@@ -13,57 +13,69 @@
 
 #include "R3BDigitizingChannel.h"
 #include "R3BDigitizingTamex.h"
+#include "R3BShared.h"
 #include "gtest/gtest.h"
+#include <memory>
+#include <vector>
 
+// NOLINTBEGIN(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)
 namespace
 {
     namespace Digitizing = R3B::Digitizing;
     using TmxChannel = Digitizing::Neuland::Tamex::Channel;
     using FQTPeak = Digitizing::Neuland::Tamex::FQTPeak;
     using PMTPeak = Digitizing::Neuland::Tamex::PMTPeak;
-    using Channel = Digitizing::Channel;
+    using Channel = Digitizing::AbstractChannel;
     using TmxPar = Digitizing::Neuland::Tamex::Params;
 
     class testNeulandTamexChannel : public ::testing::Test
     {
       protected:
         testNeulandTamexChannel()
-            : fChannel{ std::make_unique<TmxChannel>(Digitizing::ChannelSide::left) }
+            : channel_{ std::make_unique<TmxChannel>(R3B::Side::left) }
         {
-            SetChannelPar(fChannel->GetPar());
+            auto par = channel_->GetPar();
+            SetChannelPar(par);
+            channel_->SetPar(par);
         }
 
         void SetUp() override {}
 
-        [[nodiscard]] auto GetChannel() const -> TmxChannel* { return fChannel.get(); }
+        void SetPar(const TmxPar& par) { channel_->SetPar(par); }
 
-        [[nodiscard]] auto GetPar() const -> TmxPar& { return fChannel->GetPar(); }
+        void Construct() { channel_->Construct(); }
+
+        [[nodiscard]] auto GetChannel() const -> TmxChannel* { return channel_.get(); }
+
+        [[nodiscard]] auto GetPar() const -> const TmxPar& { return channel_->GetPar(); }
 
         static void SetChannelPar(TmxPar& par)
         {
-            par.fPMTThresh = 1.;
-            par.fSaturationCoefficient = 0.012;
-            par.fExperimentalDataIsCorrectedForSaturation = true;
-            par.fEnergyGain = 15.0;
-            par.fPedestal = 14.0;
-            par.fTimeMax = 1000.;
-            par.fTimeMin = 1.;
-            par.fQdcMin = 0.67;
+            par.pmt_thresh = 1.;
+            par.saturation_coefficient = 0.012;
+            par.experimental_data_is_corrected_for_saturation = true;
+            par.energy_gain = 15.0;
+            par.pedestal = 14.0;
+            par.max_time = 1000.;
+            par.min_time = 1.;
+            par.min_energy = 0.67;
         }
 
-        void AddHit(double time, double light) { fChannel->AddHit({ time, light }); }
+        void AddSignal(double time, double light) { channel_->add_signal({ time, light }); }
 
-        [[nodiscard]] auto GetSignals() const -> const Channel::Signals& { return fChannel->GetSignals(); }
-        [[nodiscard]] auto GetPMTPeaks() const -> const std::vector<PMTPeak>& { return fChannel->GetPMTPeaks(); }
-        [[nodiscard]] auto GetPeaks() const -> const std::vector<FQTPeak>& { return fChannel->GetFQTPeaks(); }
+        [[nodiscard]] auto GetSignals() const -> const Channel::Hits& { return channel_->GetHits(); }
+        [[nodiscard]] auto GetPMTPeaks() const -> const std::vector<PMTPeak>& { return channel_->GetPMTPeaks(); }
+        [[nodiscard]] auto GetPeaks() const -> const std::vector<FQTPeak>& { return channel_->GetFQTPeaks(); }
 
       private:
-        std::unique_ptr<TmxChannel> fChannel = nullptr;
+        std::unique_ptr<TmxChannel> channel_ = nullptr;
     };
 
     TEST_F(testNeulandTamexChannel, basic_hit_processing) // NOLINT
     {
-        AddHit(20., 20.);
+        AddSignal(20., 20.);
+        Construct();
+
         auto signals = GetSignals();
         auto peaks = GetPeaks();
 
@@ -72,13 +84,14 @@ namespace
         ASSERT_EQ(signals.size(), 1) << "No channel signal is outputted!";
 
         // check PMT saturation
-        ASSERT_LT(peaks[0].GetQDC(), 20.) << "PMT saturation is not implemented!";
+        ASSERT_LT(peaks[0].GetEnergy(), 20.) << "PMT saturation is not implemented!";
         ASSERT_NE(signals[0].tdc, 20.) << "tdc value is not smeared!";
     }
 
     TEST_F(testNeulandTamexChannel, pmt_threshold_check) // NOLINT
     {
-        AddHit(20., 0.5);
+        AddSignal(20., 0.5);
+        Construct();
         auto signals = GetSignals();
         auto peaks = GetPeaks();
         ASSERT_EQ(signals.size(), 0) << "PMT threshold doesn't filter out low energy signals!";
@@ -86,10 +99,11 @@ namespace
 
     TEST_F(testNeulandTamexChannel, pmt_threshold_overlap) // NOLINT
     {
-        AddHit(20., 0.5);
-        AddHit(20., 0.5);
-        AddHit(20., 0.5);
-        AddHit(20., 0.5);
+        AddSignal(20., 0.5);
+        AddSignal(20., 0.5);
+        AddSignal(20., 0.5);
+        AddSignal(20., 0.5);
+        Construct();
         auto signals = GetSignals();
         auto peaks = GetPeaks();
         ASSERT_EQ(signals.size(), 1) << "overlapped signals cannot pass PMT threshold!";
@@ -97,22 +111,26 @@ namespace
 
     TEST_F(testNeulandTamexChannel, ifno_timeRes_check) // NOLINT
     {
-        decltype(auto) par = GetPar();
-        par.fTimeRes = 0.0;
+        auto par = GetPar();
+        par.time_res = 0.0;
+        SetPar(par);
 
-        AddHit(20., 20.);
+        AddSignal(20., 20.);
+        Construct();
         const auto& signals = GetSignals();
         ASSERT_DOUBLE_EQ(signals[0].tdc, 20.) << "tdc value is not correctly passed on!";
     }
 
     TEST_F(testNeulandTamexChannel, signal_pileup_check) // NOLINT
     {
-        AddHit(20., 20.);
-        AddHit(20., 1.5);
+        AddSignal(20., 20.);
+        AddSignal(20., 1.5);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 1) << "overlapping failed!";
 
-        auto width = GetPeaks().back().GetWidth();
-        AddHit(width + 21., 1.5);
+        auto width = GetPeaks().back().GetToT();
+        AddSignal(width + 21., 1.5);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 2) << "should not be overlapped!";
     }
 
@@ -120,20 +138,26 @@ namespace
     // for different pileup strategy.
     TEST_F(testNeulandTamexChannel, signal_multiPileup_check) // NOLINT
     {
-        AddHit(20., 5.);
+        AddSignal(20., 5.);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 1);
-        AddHit(GetPeaks().back().GetTETime() + 5., 5.);
+        AddSignal(GetPeaks().back().GetTETime() + 5., 5.);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 2);
-        AddHit(GetPeaks().back().GetTETime() + 5., 5.);
+        AddSignal(GetPeaks().back().GetTETime() + 5., 5.);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 3);
-        AddHit(GetPeaks().back().GetTETime() + 5., 5.);
+        AddSignal(GetPeaks().back().GetTETime() + 5., 5.);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 4);
-        AddHit(GetPeaks().back().GetTETime() + 5., 5.);
+        AddSignal(GetPeaks().back().GetTETime() + 5., 5.);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 5);
         auto minTime = GetPeaks().front().GetLETime();
         auto maxTime = GetPeaks().back().GetTETime();
-        auto qdc_test = FQTPeak::WidthToQdc(maxTime - minTime + 10., GetPar());
-        AddHit(minTime - 5., qdc_test);
+        auto qdc_test = FQTPeak::ToT2Energy(maxTime - minTime + 10., GetPar());
+        AddSignal(minTime - 5., qdc_test);
+        Construct();
         ASSERT_EQ(GetSignals().size(), 1);
     }
 
@@ -144,12 +168,14 @@ namespace
         const auto lowE = 10.;
         const auto highE = 40.;
 
-        AddHit(20., lowE);
-        AddHit(200., highE);
+        AddSignal(20., lowE);
+        AddSignal(200., highE);
+        Construct();
         const auto& pmtSignals = GetPMTPeaks();
         ASSERT_EQ(pmtSignals.size(), 2);
-        const auto lowE_out = pmtSignals[0].GetQDC();
-        const auto highE_out = pmtSignals[1].GetQDC();
+        const auto lowE_out = pmtSignals[0].GetHeight();
+        const auto highE_out = pmtSignals[1].GetHeight();
         ASSERT_LT(AssessReduction(lowE, lowE_out), AssessReduction(highE, highE_out)) << "PMT saturation not applied!";
     }
 } // namespace
+// NOLINTEND(cppcoreguidelines-avoid-magic-numbers, readability-magic-numbers)

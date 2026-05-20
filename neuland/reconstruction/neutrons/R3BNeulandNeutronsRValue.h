@@ -1,39 +1,41 @@
-#ifndef R3BROOT_R3BNEULANDNEUTRONSRVALUE_H
-#define R3BROOT_R3BNEULANDNEUTRONSRVALUE_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandCluster.h"
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandNeutron.h"
-#include "TCAConnector.h"
+#include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string>
+#include <string_view>
+#include <vector>
 
 class R3BNeulandNeutronsRValue : public FairTask
 {
   public:
-    R3BNeulandNeutronsRValue(double EkinRefMeV,
-                             TString inputMult = "NeulandMultiplicity",
-                             TString inputCluster = "NeulandClusters",
-                             TString output = "NeulandNeutrons");
-    ~R3BNeulandNeutronsRValue() override = default;
-    void Exec(Option_t*) override;
-
-  protected:
-    InitStatus Init() override;
+    explicit R3BNeulandNeutronsRValue(double EkinRefMeV,
+                                      std::string_view inputMult = "NeulandMultiplicity",
+                                      std::string_view inputCluster = "NeulandClusters",
+                                      std::string_view output = "NeulandNeutrons");
 
   private:
-    const double fEkinRefMeV;
-    const TString fInputMultName;
-    const R3BNeulandMultiplicity* fMultiplicity;     //!
-    TCAInputConnector<R3BNeulandCluster> fClusters;  //!
-    TCAOutputConnector<R3BNeulandNeutron> fNeutrons; //!
+    double fEkinRefMeV;
+    std::string fInputMultName;
+    const R3BNeulandMultiplicity* fMultiplicity;             //!
+    R3B::InputVectorConnector<R3BNeulandCluster> fClusters;  //!
+    R3B::OutputVectorConnector<R3BNeulandNeutron> fNeutrons; //!
+    std::vector<R3BNeulandCluster> cluster_buffer_;
 
-    void SortClustersByRValue(std::vector<R3BNeulandCluster*>&) const;
-    void PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster*>&) const;
-    void FilterClustersByEnergyDeposit(std::vector<R3BNeulandCluster*>&) const;
-    void FilterClustersByKineticEnergy(std::vector<R3BNeulandCluster*>&) const;
-    void FilterClustersByElasticScattering(std::vector<R3BNeulandCluster*>&) const;
+    auto Init() -> InitStatus override;
+    void Exec(Option_t* /*option*/) override;
 
-    ClassDefOverride(R3BNeulandNeutronsRValue, 0)
+    void SortClustersByRValue(std::vector<R3BNeulandCluster>&) const;
+    void FilterClustersByKineticEnergy(std::vector<R3BNeulandCluster>&) const;
+
+    static void PrioritizeTimeWiseFirstCluster(std::vector<R3BNeulandCluster>&);
+    static void FilterClustersByEnergyDeposit(std::vector<R3BNeulandCluster>&);
+    static void FilterClustersByElasticScattering(std::vector<R3BNeulandCluster>&);
+
+    ClassDefOverride(R3BNeulandNeutronsRValue, 1);
 };
-
-#endif // R3BROOT_R3BNEULANDNEUTRONSRVALUE_H

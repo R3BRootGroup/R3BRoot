@@ -36,17 +36,23 @@ runs:
         echo "SOURCEDIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
         echo "BUILDDIR=$GITHUB_WORKSPACE/build" >> $GITHUB_ENV
         echo "cacheSHA=$([[ ${{github.event_name}} = "push" ]] && git rev-parse --short HEAD || git rev-parse --short HEAD^)" >> $GITHUB_ENV
+        # Remove the following two lines when Geant4 is fixed in gsi cvmfs
+        export LD_LIBRARY_PATH="${SIMPATH}/lib:${LD_LIBRARY_PATH}"
+        echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}" >> $GITHUB_ENV
       shell: bash
 
     - name: mount cvmfs
       run: |
         apt-get update
-        apt-get install --fix-missing -y sudo wget gnupg lsb-release
-        sudo -H pip3 install --ignore-installed -U conan
+        apt-get install --fix-missing -y sudo
+        if [ "${{ matrix.os }}" == "debian10" ]; then
+          sudo apt upgrade libc6
+        fi
         wget https://cernbox.cern.ch/remote.php/dav/public-files/RmnTeeOZpYjCJQb/masterkey.gsi.de.pub
         mkdir -p /etc/cvmfs/keys
         mv masterkey.gsi.de.pub /etc/cvmfs/keys
         cp .github/config/fairsoft.gsi.de.conf /etc/cvmfs/config.d
+        sudo -H pip3 install -U conan
         echo "CVMFS_USER=$(whoami)" >> /etc/cvmfs/config.d/fairsoft.gsi.de.conf
         mkdir -p ${CVMDIR}
         mount -t cvmfs fairsoft.gsi.de ${CVMDIR}

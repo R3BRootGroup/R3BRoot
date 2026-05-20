@@ -1,32 +1,32 @@
 #include "R3BNeulandMultiplicityBayesTrain.h"
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRtdbRun.h"
 #include "FairRuntimeDb.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicityBayesPar.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cstddef>
+#include <fairlogger/Logger.h>
 #include <numeric>
-#include <utility>
+#include <string_view>
 
-R3BNeulandMultiplicityBayesTrain::R3BNeulandMultiplicityBayesTrain(TString clusters, TString tracks)
+R3BNeulandMultiplicityBayesTrain::R3BNeulandMultiplicityBayesTrain(std::string_view clusters, std::string_view tracks)
     : FairTask("R3BNeulandMultiplicityBayesTrain")
-    , fClusters(std::move(clusters))
-    , fTracks(std::move(tracks))
-    , fPar(nullptr)
-//, fPar(new R3BNeulandMultiplicityBayesPar())
+    , fClusters{ clusters }
+    , fTracks(tracks)
 {
 }
 
-R3BNeulandMultiplicityBayesTrain::~R3BNeulandMultiplicityBayesTrain() {}
-
-InitStatus R3BNeulandMultiplicityBayesTrain::Init()
+auto R3BNeulandMultiplicityBayesTrain::Init() -> InitStatus
 {
-    fClusters.Init();
-    fTracks.Init();
+    fClusters.init();
+    fTracks.init();
     return kSUCCESS;
 }
 
 void R3BNeulandMultiplicityBayesTrain::SetParContainers()
 {
-    auto rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityBayesTrain::Init: No FairRuntimeDb!";
@@ -41,30 +41,35 @@ void R3BNeulandMultiplicityBayesTrain::SetParContainers()
     }
 }
 
-void R3BNeulandMultiplicityBayesTrain::Exec(Option_t*)
+void R3BNeulandMultiplicityBayesTrain::Exec(Option_t* /*option*/)
 {
-    const int nPN = fTracks.Retrieve().size();
+    const auto nPN = fTracks.size();
 
-    const auto clusters = fClusters.Retrieve();
-    const int nClusters = clusters.size();
+    const auto& clusters = fClusters.get();
+    const auto nClusters = clusters.size();
 
     if (nClusters == 0)
     {
         return;
     }
 
-    const int nHits = std::accumulate(
-        clusters.cbegin(), clusters.cend(), 0, [](size_t s, const R3BNeulandCluster* c) { return s + c->GetSize(); });
-    const int Edep = (int)std::accumulate(
-        clusters.cbegin(), clusters.cend(), 0., [](Double_t s, const R3BNeulandCluster* c) { return s + c->GetE(); });
+    const auto nHits =
+        std::accumulate(clusters.cbegin(),
+                        clusters.cend(),
+                        std::size_t{},
+                        [](auto sum, const R3BNeulandCluster& cluster) { return sum + cluster.GetSize(); });
+    const auto Edep = std::accumulate(clusters.cbegin(),
+                                      clusters.cend(),
+                                      double{},
+                                      [](auto sum, const R3BNeulandCluster& cluster) { return sum + cluster.GetE(); });
 
-    fPar->Fill(nPN, nHits, nClusters, Edep);
+    fPar->Fill(static_cast<int>(nPN), static_cast<int>(nHits), static_cast<int>(nClusters), Edep);
 }
 
 void R3BNeulandMultiplicityBayesTrain::FinishTask()
 {
     fPar->Finish();
-    auto rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     rtdb->addRun(1);
     fPar->setChanged();
     rtdb->writeContainer(fPar, rtdb->getRun(1), nullptr);

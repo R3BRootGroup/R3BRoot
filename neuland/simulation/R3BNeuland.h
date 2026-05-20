@@ -11,11 +11,20 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BNEULAND_H
-#define R3BNEULAND_H
+#pragma once
 
-#include "R3BDetector.h"
+#include "R3BNeulandPoint.h"
 #include "TLorentzVector.h"
+#include <FairDetector.h>
+#include <R3BIOConnector.h>
+#include <R3BNeulandCommon.h>
+#include <R3BNeulandGeoCreator.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TClonesArray.h>
+#include <TGeoMatrix.h>
+#include <TString.h>
+#include <map>
 #include <memory>
 #include <string>
 
@@ -24,15 +33,17 @@ class TClonesArray;
 class R3BNeulandGeoPar;
 
 /**
- * NeuLAND detector simulation class
- * @author Jan Mayer
+ * \brief NeuLAND detector simulation class
+ * @author Jan Mayer, Yanzhao Wang
  * @since 12.01.2016
- * For each simulated event, TClonesArrays are filled:
- * - NeulandPoints (R3BNeulandPoint), each representing energy deposition and light yield of a track in a paddle
- * Suitable geometry files require proper naming of the active volume (see CheckIfSensitive) and copy numbers.
+ *
+ * For each simulated event, a vector data with name "NeulandPoints" is filled:
+ * - NeulandPoints (R3BNeulandPoint), each representing energy deposition and light yield of a track in a paddle.
+ *
+ * Suitable geometry files require proper naming of the active volume (see CheckIfSensitive()) and copy numbers.
  */
 
-class R3BNeuland : public R3BDetector
+class R3BNeuland : public FairDetector
 {
   public:
     /** Default constructor */
@@ -53,58 +64,101 @@ class R3BNeuland : public R3BDetector
      *@param nDP     number of double planes
      *@param trans   position
      *@param rot     rotation */
-    R3BNeuland(Int_t nDP, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
+    R3BNeuland(int nDP, const TGeoTranslation& trans, const TGeoRotation& rot = TGeoRotation());
 
     /** Standard constructor.
      *@param nDP     number of double planes
      *@param combi   position + rotation */
-    explicit R3BNeuland(Int_t nDP, const TGeoCombiTrans& combi = TGeoCombiTrans());
+    explicit R3BNeuland(int nDP, const TGeoCombiTrans& combi = TGeoCombiTrans());
 
-    /** Default Destructor */
-    ~R3BNeuland() override;
+    /**
+     * \brief Enable the automatic geometry build for NeuLAND.
+     *
+     * Automatically build the NeuLAND geometry without a geometry file. The geometry build is done in the class
+     * R3B::Neuland::Geometry::Creator. If this is disabled, an geometry file corresponding to the number of double
+     * plane must be present.
+     * @param is_enabled Whether the geometry build should be enabled or not.
+     */
+    void EnableAutoGeoBuild(bool is_enabled = true) { is_geo_auto_built = is_enabled; }
 
-    void Initialize() override;
+    /**
+     * \brief Set the translation and rotation of the NeuLAND detector
+     *
+     * Set the translation and rotation of the NeuLAND detector using parameter with the type `TGeoCombiTrans`. This
+     * will override the value specified by the constructors.
+     * @param pos Input translation and rotation matrix.
+     * @see <a href="https://root.cern/doc/master/classTGeoCombiTrans.html">TGeoCombiTrans</a>
+     */
+    void SetLocationDirection(const TGeoCombiTrans& pos) { rot_trans_ = pos; }
 
-    Bool_t ProcessHits(FairVolume* = nullptr) override;
+  private:
+    bool is_geo_auto_built = false;                       //!< Flag to check if geo-build is needed.
+    bool is_last_hit_done_ = false;                       //!< Flag to check if last hit finished.
+    int num_of_planes_ = R3B::Neuland::MaxNumberOfPlanes; //!< The number of planes.
+
+    // Track information to be stored until the track leaves the active volume.
+    int track_id_ = 0;           //!< A buffer for the track IDs.
+    int paddle_id_ = 0;          //!< A buffer for the paddle ids.
+    int particle_id_ = 0;        //!< A buffer for the particle IDs.
+    int parent_particle_id_ = 0; //!< A buffer for the parent particle IDs.
+    double time_ = 0.;           //!< A buffer for time values.
+    double length_ = 0.;         //!< A buffer for track lengths.
+    double energy_loss_ = 0.;    //!< A buffer for the energy losses.
+    double light_yield_ = 0.;    //!< A buffer for the light yields.
+    TLorentzVector pos_in_;      //!< A buffer for the position where the track goes into the volume.
+    TLorentzVector pos_out_;     //!< A buffer for the position where the track goes out of the volume.
+    TLorentzVector mom_in_;      //!< A buffer for the momentum when the track goes into the volume.
+    TLorentzVector mom_out_;     //!< A buffer for the position when the track goes out of the volume.
+
+    /// The TCA data buffer used to be returned by virtual method GetCollection(int iColl).
+    std::unique_ptr<TClonesArray> tca_points_buffer_ = std::make_unique<TClonesArray>(R3BNeulandPoint::Class()); //!
+    /// Output data written to the ROOT file.
+    R3B::OutputVectorConnector<R3BNeulandPoint> neuland_points_{ "NeulandPoints" }; //!
+    /// Output parameter containing the geometry information.
+    R3BNeulandGeoPar* neuland_geo_par_ = nullptr; //!
+    /// Creating NeuLAND geometry if EnableAutoGeoBuild() is enabled.
+    R3B::Neuland::Geometry::Creator geo_creator_; //!
+    /// Rotation and translation of NeuLAND detector.
+    TGeoCombiTrans rot_trans_;
+    /// Geometry file name. The file must be present if EnableAutoGeoBuild() is disabled
+    std::string geo_file_;
+    /// A map with the track ID as the key and the particle ID as the value. Used to find the parent particle ID of the
+    /// current track,
+    std::map<int, int> track_pid_map_;
+
+    // private virtual functions:
+
+    auto ProcessHits(FairVolume* /*v*/ = nullptr) -> bool override;
 
     void EndOfEvent() override;
 
-    void Register() override;
+    void FinishEvent() override;
 
-    TClonesArray* GetCollection(Int_t iColl) const override;
-
-    void Print(Option_t* = "") const override;
+    void Print(Option_t* /*unused*/ = "") const override;
 
     void Reset() override;
 
-    Bool_t CheckIfSensitive(std::string name) override;
+    auto CheckIfSensitive(std::string name) -> bool override;
 
-    // No copy and no move is allowed (Rule of three/five)
-    R3BNeuland(const R3BNeuland&) = delete;            // copy constructor
-    R3BNeuland(R3BNeuland&&) = delete;                 // move constructor
-    R3BNeuland& operator=(const R3BNeuland&) = delete; // copy assignment
-    R3BNeuland& operator=(R3BNeuland&&) = delete;      // move assignment
+    [[nodiscard]] auto GetCollection(int iColl) const -> TClonesArray* override;
 
-  private:
-    TClonesArray* fNeulandPoints;     //!
-    R3BNeulandGeoPar* fNeulandGeoPar; //!
+    void Register() override;
 
-    /** Track information to be stored until the track leaves the active volume. */
-    Int_t fTrackID;
-    Int_t fPaddleID;
-    TLorentzVector fPosIn, fPosOut;
-    TLorentzVector fMomIn, fMomOut;
-    Double_t fTime;
-    Double_t fLength;
-    Double_t fELoss;
-    Double_t fLightYield;
-    Bool_t fLastHitDone;
+    // private non-virtual member functions:
 
-    void ResetValues();
+    void reset_values();
 
-    void WriteParameterFile();
+    void write_parameter_file();
 
-    ClassDefOverride(R3BNeuland, 3);
+    void ConstructGeometry() override;
+
+    void Initialize() override;
+
+    // non-virtual functions:
+
+    void create_geo();
+
+    void create_geo_from_root_file();
+
+    ClassDefOverride(R3BNeuland, 4);
 };
-
-#endif // R3BNEULAND_H

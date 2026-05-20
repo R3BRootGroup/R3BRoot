@@ -173,7 +173,7 @@ void R3BNeulandOnlineReconstruction::Exec(Option_t*)
         hHitY->Fill(hit->GetPosition().Y());
         hHitZ->Fill(hit->GetPosition().Z());
         hHitT->Fill(hit->GetT());
-        hHitTadj->Fill(fDistanceToTarget / hit->GetPosition().Mag() * hit->GetT());
+        hHitTadj->Fill(fDistanceToTarget / hit->GetPosition().r() * hit->GetT());
         hHitE->Fill(hit->GetE());
     }
 

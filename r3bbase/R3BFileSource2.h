@@ -13,11 +13,25 @@
 
 #pragma once
 
+#include "R3BEventHeader.h"
 #include "R3BShared.h"
 #include <FairFileSourceBase.h>
+#include <FairMCEventHeader.h>
+#include <FairSource.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TDirectory.h>
+#include <TFile.h>
 #include <TObjString.h>
+#include <TObject.h>
 #include <chrono>
+#include <cstdint>
 #include <optional>
+#include <string>
+#include <string_view>
+#include <sys/types.h>
+#include <typeinfo>
+#include <vector>
 
 class FairRootManager;
 class TChain;
@@ -26,6 +40,11 @@ class TFolder;
 class R3BEventProgressPrinter
 {
   public:
+    enum class Mode : uint8_t
+    {
+        piecewise,
+        total,
+    };
     R3BEventProgressPrinter() = default;
     void SetRunID(unsigned int runID) { run_id_ = runID; }
     void SetMaxEventNum(unsigned int max_event_num) { max_event_num_ = max_event_num; }
@@ -33,10 +52,12 @@ class R3BEventProgressPrinter
     void ShowProgress(uint64_t event_num);
 
   private:
+    Mode mode_ = Mode::total;
     uint64_t max_event_num_ = 0;
     float refresh_rate_ = 2.; // Hz
     std::chrono::milliseconds refresh_period_{ static_cast<int>(1000. / refresh_rate_) };
     unsigned int run_id_ = 0;
+    std::chrono::time_point<std::chrono::steady_clock> begin_t_ = std::chrono::steady_clock::now();
     std::chrono::time_point<std::chrono::steady_clock> previous_t_ = std::chrono::steady_clock::now();
     uint64_t previous_event_num_ = 0;
 
@@ -70,7 +91,7 @@ class R3BInputRootFiles
     void SetTreeName(std::string_view treeName) { treeName_ = treeName; }
     void SetTitle(std::string_view title) { title_ = title; }
     void SetFileHeaderName(std::string_view fileHeader) { fileHeader_ = fileHeader; }
-    void SetRunID(uint run_id) { initial_RunID_ = run_id; }
+    void SetRunID(int run_id) { initial_RunID_ = run_id; }
 
     // rule of five:
     ~R3BInputRootFiles() = default;
@@ -81,7 +102,7 @@ class R3BInputRootFiles
 
   private:
     bool is_friend_ = false;
-    uint initial_RunID_ = 0;
+    int initial_RunID_ = 0;
     // TODO: title of each file group seems not necessary. Consider to remove it in the future.
     std::string title_;
     std::string treeName_ = "evt";
@@ -97,7 +118,7 @@ class R3BInputRootFiles
     void Initialize(std::string_view filename, bool is_tree_file = false);
     auto ValidateFile(const std::string& filename, bool is_tree_file = false) -> bool;
     static auto ExtractMainFolder(TFile*) -> std::optional<TKey*>;
-    auto ExtractRunId(TFile* rootFile) -> std::optional<uint>;
+    auto ExtractRunId(TFile* rootFile) -> std::optional<int>;
     void register_branch_name();
 };
 
@@ -115,6 +136,7 @@ class R3BFileSource2 : public FairFileSourceBase
     void AddFriend(std::vector<std::string> file_names, bool is_tree_file = false);
 
     [[nodiscard]] auto GetEventEnd() const { return event_end_; }
+    [[nodiscard]] auto IsEmpty() const -> bool { return inputDataFiles_.is_empty(); }
 
     // setters:
     void SetFileHeaderName(std::string_view fileHeaderName) { inputDataFiles_.SetFileHeaderName(fileHeaderName); }
@@ -130,7 +152,8 @@ class R3BFileSource2 : public FairFileSourceBase
     int event_end_ = 0;
     R3BInputRootFiles inputDataFiles_;
     R3BEventProgressPrinter event_progress_;
-    FairEventHeader* evtHeader_ = nullptr;
+    R3BEventHeader* r3b_event_header_ = nullptr;
+    FairMCEventHeader* mc_event_header_ = nullptr;
     std::vector<R3BInputRootFiles> inputFriendFiles_;
     std::vector<std::string> dataFileNames_;
     std::vector<std::string> friendFileNames_;

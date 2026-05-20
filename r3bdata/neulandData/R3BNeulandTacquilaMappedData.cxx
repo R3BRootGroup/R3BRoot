@@ -32,10 +32,10 @@ R3BNeulandTacquilaMappedData::R3BNeulandTacquilaMappedData(UShort_t clock,
 
 std::ostream& operator<<(std::ostream& os, const R3BNeulandTacquilaMappedData& mappedData)
 {
-    os << "R3BNeulandTacquilaMappedData:"
-       << "    Clock " << mappedData.GetClock() << "    TacData " << mappedData.GetTacData() << "    StopT "
-       << mappedData.GetStopT() << "    QdcData " << mappedData.GetQdcData() << "    Plane " << mappedData.GetPlane()
-       << "    Paddle " << mappedData.GetPaddle() << "    Side " << mappedData.GetSide() << std::endl;
+    os << "R3BNeulandTacquilaMappedData:" << "    Clock " << mappedData.GetClock() << "    TacData "
+       << mappedData.GetTacData() << "    StopT " << mappedData.GetStopT() << "    QdcData " << mappedData.GetQdcData()
+       << "    Plane " << mappedData.GetPlane() << "    Paddle " << mappedData.GetPaddle() << "    Side "
+       << mappedData.GetSide() << "\n";
     return os;
 }
 

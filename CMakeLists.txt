@@ -29,10 +29,33 @@ cmake_policy(VERSION 3.27...4.2)
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
 
+set(CMAKE_CXX_EXTENSIONS ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+
 # use default gnu install convention:
 include(GNUInstallDirs)
 
 option(BUILD_LAND_DIR "Build old land module" ON)
+option(WITH_DOX "Generate doxygen documentation" OFF)
+option(NO_BUILD "Don't build anything except documentation" OFF)
+option(BUILD_LAND_DIR "Build old land module" ON)
+
+if(WITH_DOX)
+    add_subdirectory(doc)
+endif()
+
+if(NO_BUILD)
+    return()
+endif()
+
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
+    message(STATUS "  ")
+    message(
+        ERROR
+        " macros repository is missing in the R3BRoot source directory\ncd ${CMAKE_SOURCE_DIR}\ngit clone -b dev https://github.com/R3BRootGroup/macros.git"
+    )
+    message(STATUS "  ")
+endif(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
 
 # Check for needed environment variables
 if(NOT DEFINED ENV{SIMPATH})
@@ -74,6 +97,7 @@ set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
 # Set option(s)
 option(BUILD_GEOMETRY "Build all ROOT geometries" ON)
 option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used." OFF)
+option(USE_LD_LIBRARY_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used." ON)
 option(WITH_UCESB "Build UCESB" OFF)
 option(WITH_EPICS "Build EPICS" OFF)
 option(WITH_ATIMA "Build ATIMA" OFF)
@@ -81,6 +105,7 @@ option(WITH_SOFIA "Build SOFIA" OFF)
 option(WITH_GTPC "Build GTPC" OFF)
 option(WITH_FRS "Build FRS" OFF)
 option(WITH_ASYEOS "Build ASYEOS" OFF)
+option(WITH_MILLEPEDE "Build millepede" OFF)
 option(BUILD_C3W "Build C3W" OFF)
 option(CONAN_ENABLED "conan package is enabled. (Use CMakePreset to set it)" OFF)
 option(FETCH_GTEST "Fetch GTest from CMake" OFF)
@@ -107,9 +132,6 @@ if("${FairRoot_VERSION}" VERSION_LESS 18.2.1)
             "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later"
     )
 endif()
-
-# added a variable to point to r3broot path in the system
-set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
 # Load some basic macros which are needed later on
 include(FairMacros)
@@ -277,15 +299,19 @@ else()
 endif()
 
 if(CONAN_ENABLED)
-    find_package(range-v3 REQUIRED)
-    find_package(Microsoft.GSL REQUIRED)
-    find_package(nlohmann_json REQUIRED)
+    find_package2(PUBLIC CLI11)
+    find_package2(PUBLIC Microsoft.GSL)
+    find_package2(PUBLIC nlohmann_json)
+    find_package2(PUBLIC range-v3)
+    find_package2(PUBLIC re2)
     set(JSON_ImplicitConversions
         OFF
         CACHE BOOL "disable implicit conversion of JSON" FORCE)
 endif()
 
-find_package2(PRIVATE GTest)
+include(${CMAKE_SOURCE_DIR}/cmake/modules/FetchAllContents.cmake)
+
+find_package(GTest)
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
 find_package2(PUBLIC Protobuf)
@@ -297,11 +323,13 @@ find_package2(PUBLIC Geant4)
 
 find_package2(PUBLIC VGM)
 
+set(R3B_PYTHON_LIB "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/r3b")
 find_package2(PUBLIC Geant4VMC)
 
 find_package2(PUBLIC IWYU)
 
 find_package2(PUBLIC GSL)
+find_package2(PUBLIC nlohmann_json)
 
 find_package2(PUBLIC Git)
 set(Git_VERSION ${GIT_VERSION_STRING})
@@ -413,6 +441,7 @@ set(R3BROOT_MAJOR_VERSION 0)
 set(R3BROOT_MINOR_VERSION 0)
 set(R3BROOT_PATCH_VERSION 0)
 set(R3BROOT_VERSION "${FairRoot_VERSION}")
+set(R3BROOTPATH ${CMAKE_BINARY_DIR})
 
 if(NOT DEFINED ROOT_FOUND_VERSION)
     set(ROOT_FOUND_VERSION "${found_vers}")
@@ -518,7 +547,7 @@ endif(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in
                "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
 
-r3b_generate_version_info()
+# r3b_generate_version_info()
 
 # Recurse into the given subdirectories. This does not actually cause another cmake executable to
 # run. The same process will walk through the project's entire directory structure.
@@ -545,6 +574,7 @@ if(NOT MODULE)
             "${BRed} NO${CR}        (enable with ${BMagenta}-DBUILD_GEOMETRY=ON${CR})")
     endif()
     message(STATUS "  ${BWhite}ROOT geometries${CR}          ${unitgeo_summary}")
+    add_subdirectory(python)
     add_subdirectory(r3bbase)
     add_subdirectory(r3bdata)
     add_subdirectory(field)
@@ -555,7 +585,9 @@ if(NOT MODULE)
         add_subdirectory(r3bsource)
 	add_subdirectory(pdc)
     endif()
-    add_subdirectory(neuland)
+    if(CONAN_ENABLED)
+        add_subdirectory(neuland)
+    endif()
     add_subdirectory(glad)
     add_subdirectory(fiber)
     if(BUILD_LAND_DIR)
@@ -600,6 +632,21 @@ if(NOT MODULE)
     if(WITH_ASYEOS)
         add_subdirectory(asyeos)
     endif(WITH_ASYEOS)
+    if(WITH_MILLEPEDE)
+        if(EXISTS "${CMAKE_SOURCE_DIR}/util/millepede2/CMakeLists.txt")
+            if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+                add_subdirectory(util/millepede2)
+            endif()
+        else()
+            message(
+                FATAL_ERROR
+                    "WITH_MILLEPEDE is enabled but util/millepede2/CMakeLists.txt doens't exist!\n"
+                    "If you forgot to init the git submodule, please do:\n"
+                    "\tgit submodule update --init")
+        endif()
+    endif()
+
+    add_subdirectory(test)
 
     #================================================================================
     # TODO: Since other dependencies still use the old cmake configurations, include(ROOTMacros) has to be used. Please change them using CMake targets ASAP.

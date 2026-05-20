@@ -1,13 +1,13 @@
-## Quick look
+# Quick look {#quick_look}
 
-### Dependency graph of R3BRoot
+## Dependency graph of R3BRoot
 
 ![r3bbase](pics/r3bbase_dependers.png)
 
 > [!NOTE]
 > This dependency graph should be generated and updated by a CI pipeline.
 
-### Adding a library with a ROOT dictionary
+## Adding a library with a ROOT dictionary
 
 ```cmake
 add_library_with_dictionary(

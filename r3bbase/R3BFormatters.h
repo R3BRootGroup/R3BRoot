@@ -13,11 +13,12 @@
 
 #pragma once
 
+#ifndef __CLING__
 #include "R3BShared.h"
 #include "R3BValueError.h"
-
 #include <Math/Vector3Dfwd.h>
 #include <TVector3.h>
+#include <fmt/base.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -33,19 +34,6 @@ class fmt::formatter<TVector3>
     constexpr auto format(const TVector3& vec, FmtContent& ctn) const
     {
         return fmt::format_to(ctn.out(), "[x: {}, y: {}, z: {}]", vec.X(), vec.Y(), vec.Z());
-    }
-};
-
-template <typename DataType>
-class fmt::formatter<R3B::ValueError<DataType>>
-{
-  public:
-    // TODO: add more options
-    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
-    template <typename FmtContent>
-    constexpr auto format(const R3B::ValueError<DataType>& value_error, FmtContent& ctn) const
-    {
-        return fmt::format_to(ctn.out(), "{}+/-{}", value_error.value, value_error.error);
     }
 };
 
@@ -88,3 +76,4 @@ class fmt::formatter<R3B::Side>
         return fmt::format_to(ctn.out(), "{}", "right");
     }
 };
+#endif

@@ -17,6 +17,14 @@ The R3BRoot software is based on the [FairRoot](https://github.com/FairRootGroup
 
 For the software-related user support you can post a new topic on our [forum](https://forum.gsi.de/index.php?t=index&cat=40&).
 
+## Documentation
+
+Please visit the [Doxygen documentation](https://yanzhaow.github.io/R3BRoot/) for the code implementation details.
+
+Detector specifics:
+
+- [NeuLAND detector](https://yanzhaow.github.io/R3BRoot/neuland.html)
+
 ## License
 
 R3BRoot is distributed under the terms of the GNU General Public Licence version 3 ([GPLv3](https://github.com/R3BRootGroup/R3BRoot/blob/dev/LICENSE)).
@@ -27,7 +35,7 @@ We are committed to fostering a welcoming and inclusive environment in the R3BRo
 
 ## Release Information
 
-Please visit [releases](https://github.com/R3BRootGroup/R3BRoot/releases)
+Please visit [releases](https://github.com/R3BRootGroup/R3BRoot/releases).
 
 ## Download
 
@@ -133,4 +141,4 @@ Thank you for helping us keep R3BRoot secure and reliable!
 
 * [Static analyzer using Clang-tidy](config/clang_tidy/README.md)
 * [CMake build system for R3BRoot](doc/cmake_usage.md)
-* [How to use an unmerged pull request](doc/git_usage.md#fetch-the-update-from-an-unmerged-pull-request-pr)
+* [How to use an unmerged pull request](doc/git_usage.md)

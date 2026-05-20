@@ -40,6 +40,7 @@
 #include "R3BMCTrack.h"
 #include "R3BNeulandPoint.h"
 #include "TCAConnector.h"
+#include <R3BIOConnector.h>
 #include <map>
 
 class TH1D;
@@ -70,9 +71,9 @@ class R3BNeulandMCMon : public FairTask
     Bool_t fIs3DTrackEnabled;
     Bool_t fIsFullSimAnaEnabled;
 
-    TCAInputConnector<R3BNeulandPoint> fPrimaryNeutronInteractionPoints;
+    R3B::InputVectorConnector<R3BNeulandPoint> fPrimaryNeutronInteractionPoints;
     TCAInputConnector<R3BMCTrack> fMCTracks;
-    TCAInputConnector<R3BNeulandPoint> fNeulandPoints;
+    R3B::InputVectorConnector<R3BNeulandPoint> fNeulandPoints;
 
     int nEvents;
 

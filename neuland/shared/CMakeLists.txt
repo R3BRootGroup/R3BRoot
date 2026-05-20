@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
@@ -10,9 +11,21 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+# cmake-format: on
 
-set(SRCS ElasticScattering.cxx IsElastic.cxx R3BNeulandGeoPar.cxx R3BNeulandContFact.cxx
-         R3BProgramOptions.cxx R3BNeulandVisualizer.cxx)
+set(SRCS
+    ElasticScattering.cxx
+    IsElastic.cxx
+    R3BNeulandContFact.cxx
+    R3BNeulandGeoPar.cxx
+    R3BNeulandSignalMatcher.cxx
+    R3BNeulandVisualizer.cxx
+    R3BProgramOptions.cxx
+)
+
+if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
+    list(APPEND SRCS R3BHuberRegression.cxx)
+endif()
 
 set(HEADERS
     ClusteringEngine.h
@@ -20,19 +33,33 @@ set(HEADERS
     Filterable.h
     Validated.h
     IsElastic.h
-    R3BProgramOptions.h
-    R3BNeulandGeoPar.h
+    R3BNeulandCommon.h
+    R3BNeulandCommonFunc.h
     R3BNeulandContFact.h
+    R3BNeulandGeoPar.h
+    R3BNeulandSignalMatcher.h
     R3BNeulandVisualizer.h
-    R3BNeulandCommon.h)
-
-# find_package(Protobuf REQUIRED) protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS neuland.proto)
-# protobuf_generate_python(PROTO_PY neuland.proto) set(SRCS ${SRCS} ${PROTO_SRCS}) set(HEADERS
-# ${HEADERS} ${PROTO_HDRS}) Include directory such that protoc generated headers are found
-# include_directories(${CMAKE_CURRENT_BINARY_DIR}) ${PROTOBUF_LIBRARY}
+    R3BProgramOptions.h
+    Validated.h
+)
 
 add_library(R3BNeulandShared SHARED ${SRCS})
 target_include_directories(R3BNeulandShared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandShared PUBLIC R3BData Boost::program_options)
-root_generate_dictionary(R3BNeulandShared_dict ${HEADERS} MODULE R3BNeulandShared LINKDEF
-                         NeulandSharedLinkDef.h)
+target_link_libraries(
+    R3BNeulandShared
+    PUBLIC
+        R3BData
+        Boost::program_options
+        Microsoft.GSL::GSL
+        range-v3::range-v3
+        nlohmann_json::nlohmann_json
+)
+
+root_generate_dictionary(
+    R3BNeulandShared_dict
+    ${HEADERS}
+    MODULE
+    R3BNeulandShared
+    LINKDEF
+    NeulandSharedLinkDef.h
+)

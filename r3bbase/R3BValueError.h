@@ -12,14 +12,31 @@
  ******************************************************************************/
 
 #pragma once
+#include <Math/GenVector/Cartesian3D.h>
+#include <Math/GenVector/CoordinateSystemTags.h>
+#include <Math/GenVector/DisplacementVector3D.h>
 #include <Rtypes.h>
 #include <TObject.h>
 #include <cmath>
+#ifndef __CLING__
+#include <fmt/base.h>
+#include <fmt/core.h>
+#endif
 #include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
+#ifndef HAS_CPP_STANDARD_17
+#else
 #include <type_traits>
+#endif
 
 namespace R3B
 {
+
+#ifndef HAS_CPP_STANDARD_17
+    template <typename T>
+    concept Arithmetic = std::is_arithmetic_v<T>;
+#endif
+
     template <typename DataType>
     struct ValueError
     {
@@ -33,6 +50,10 @@ namespace R3B
         {
         }
 
+        constexpr explicit ValueError(DataType val)
+            : ValueError{ val, DataType{} }
+        {
+        }
         // ValueError(const DataType& val, const DataType& err)
         //     : value{ val }
         //     , error{ err }
@@ -46,34 +67,74 @@ namespace R3B
 
         auto operator-() const -> ValueError<DataType> { return { -value, error }; }
 
+#ifndef HAS_CPP_STANDARD_17
+        auto operator+(Arithmetic auto other) const -> ValueError<DataType>
+#else
         template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
         auto operator+(OtherType other) const -> ValueError<DataType>
+#endif
         {
             return { value + other, error };
         }
 
+#ifndef HAS_CPP_STANDARD_17
+        auto operator*(Arithmetic auto other) const -> ValueError<DataType>
+#else
         template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
         auto operator*(OtherType other) const -> ValueError<DataType>
+#endif
         {
             return { value * other, error * other };
         }
 
+#ifndef HAS_CPP_STANDARD_17
+        auto operator/(Arithmetic auto other) const -> ValueError<DataType>
+#else
         template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
         auto operator/(OtherType other) const -> ValueError<DataType>
+#endif
         {
             return { value / other, error / other };
         }
 
+#ifndef HAS_CPP_STANDARD_17
+        auto operator-(Arithmetic auto val) const -> ValueError<DataType>
+#else
         template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
         auto operator-(OtherType val) const -> ValueError<DataType>
+#endif
         {
             return { value - val, error };
         }
 
+#ifndef HAS_CPP_STANDARD_17
+        void operator-=(Arithmetic auto val)
+#else
         template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
-        void operator-=(OtherType other)
+        void operator-=(OtherType val)
+#endif
         {
-            value -= other;
+            value -= val;
+        }
+
+#ifndef HAS_CPP_STANDARD_17
+        auto operator>(Arithmetic auto val) -> bool
+#else
+        template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
+        auto operator>(OtherType val) -> bool
+#endif
+        {
+            return value > val;
+        }
+
+#ifndef HAS_CPP_STANDARD_17
+        auto operator<(Arithmetic auto val) -> bool
+#else
+        template <typename OtherType, typename = std::enable_if_t<std::is_arithmetic_v<OtherType>>>
+        auto operator<(OtherType val) -> bool
+#endif
+        {
+            return value < val;
         }
 
       public:
@@ -83,6 +144,8 @@ namespace R3B
     using ValueErrorD = ValueError<double>;
     using ValueErrorF = ValueError<float>;
     using ValueErrorI = ValueError<int>;
+    using XYZVectorValueErrorD =
+        ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<ValueErrorD>, ROOT::Math::DefaultCoordinateSystemTag>;
 
     template <typename DataType>
     auto operator*(ValueError<DataType> left, ValueError<DataType> right) -> ValueError<DataType>
@@ -136,6 +199,18 @@ namespace R3B
     }
 
     template <typename DataType>
+    auto operator>(ValueError<DataType>& left, const ValueError<DataType>& right) -> bool
+    {
+        return left.value > right.value;
+    }
+
+    template <typename DataType>
+    auto operator<(ValueError<DataType>& left, const ValueError<DataType>& right) -> bool
+    {
+        return left.value < right.value;
+    }
+
+    template <typename DataType>
     void to_json(nlohmann::ordered_json& json_obj, const ValueError<DataType>& value)
     {
         json_obj = nlohmann::ordered_json{
@@ -151,3 +226,30 @@ namespace R3B
         json_obj.at("error").get_to(value.error);
     }
 } // namespace R3B
+
+#ifndef __CLING__
+template <typename DataType>
+class fmt::formatter<R3B::ValueError<DataType>>
+{
+  public:
+    // TODO: add more options
+    static constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::ValueError<DataType>& value_error, FmtContent& ctn) const
+    {
+        return fmt::format_to(ctn.out(), "{}+/-{}", value_error.value, value_error.error);
+    }
+};
+
+template <>
+class fmt::formatter<R3B::XYZVectorValueErrorD>
+{
+  public:
+    static constexpr auto parse(fmt::format_parse_context& ctx) { return ctx.end(); }
+    template <typename FmtContent>
+    constexpr auto format(const R3B::XYZVectorValueErrorD& hit, FmtContent& ctn) const
+    {
+        return fmt::format_to(ctn.out(), "[x: {}, y: {}, z: {}]", hit.X(), hit.Y(), hit.Z());
+    }
+};
+#endif

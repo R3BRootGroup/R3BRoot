@@ -1,31 +1,30 @@
-#ifndef R3BROOT_R3BNEULANDNEUTRONSCHEAT_H
-#define R3BROOT_R3BNEULANDNEUTRONSCHEAT_H
+#pragma once
 
 #include "FairTask.h"
 #include "R3BNeulandHit.h"
 #include "R3BNeulandMultiplicity.h"
 #include "R3BNeulandNeutron.h"
-#include "TCAConnector.h"
+#include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <string>
+#include <string_view>
 
 class R3BNeulandNeutronsCheat : public FairTask
 {
   public:
-    R3BNeulandNeutronsCheat(TString inputMult = "NeulandMultiplicity",
-                            TString inputHit = "NeulandPrimaryHits",
-                            TString output = "NeulandNeutrons");
-    ~R3BNeulandNeutronsCheat() override = default;
-    void Exec(Option_t*) override;
+    explicit R3BNeulandNeutronsCheat(std::string_view inputMult = "NeulandMultiplicity",
+                                     std::string_view inputHit = "NeulandPrimaryHits",
+                                     std::string_view output = "NeulandNeutrons");
 
   protected:
-    InitStatus Init() override;
-
   private:
-    const TString fInputMultName;
-    const R3BNeulandMultiplicity* fMultiplicity;     //!
-    TCAInputConnector<R3BNeulandHit> fHits;          //!
-    TCAOutputConnector<R3BNeulandNeutron> fNeutrons; //!
+    std::string fInputMultName;
+    const R3BNeulandMultiplicity* fMultiplicity;             //!
+    R3B::InputVectorConnector<R3BNeulandHit> fHits;          //!
+    R3B::OutputVectorConnector<R3BNeulandNeutron> fNeutrons; //!
 
-    ClassDefOverride(R3BNeulandNeutronsCheat, 0)
+    auto Init() -> InitStatus override;
+    void Exec(Option_t* /*option*/) override;
+    ClassDefOverride(R3BNeulandNeutronsCheat, 1)
 };
-
-#endif // R3BROOT_R3BNEULANDNEUTRONSCHEAT_H

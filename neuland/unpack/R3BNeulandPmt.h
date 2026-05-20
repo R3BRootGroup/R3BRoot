@@ -20,6 +20,8 @@
 #define R3BNEULANDPMT
 
 #include "TObject.h"
+#include <Rtypes.h>
+#include <RtypesCore.h>
 
 class R3BNeulandPmt : public TObject
 {
@@ -42,7 +44,7 @@ class R3BNeulandPmt : public TObject
     Double_t fCharge;
 
   public:
-    ClassDef(R3BNeulandPmt, 1)
+    ClassDefOverride(R3BNeulandPmt, 1)
 };
 
 #endif

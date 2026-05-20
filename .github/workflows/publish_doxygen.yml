@@ -1,0 +1,45 @@
+name: publish-doc
+on:
+  push:
+    branches:
+      - edwin_dev
+  workflow_dispatch:
+
+jobs:
+  artifact-gen:
+    runs-on: macos-15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+      - name: run doxygen
+        run: |
+          brew upgrade
+          brew install doxygen graphviz ninja ghostscript
+          export PATH="/opt/homebrew/bin:$PATH"
+          export FC="gfortran-14"
+
+          cmake --workflow --preset doxygen
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/doc/html
+          retention-days: 1
+
+  publish-doxygen:
+    runs-on: ubuntu-latest
+    needs: artifact-gen
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

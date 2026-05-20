@@ -12,11 +12,23 @@
  ******************************************************************************/
 
 #include "R3BDataMonitor.h"
+#include "R3BDataMonitorCanvas.h"
+#include "R3BException.h"
 #include <FairRootFileSink.h>
 #include <FairRunOnline.h>
 #include <FairRuntimeDb.h>
+#include <FairSink.h>
+#include <TDirectory.h>
+#include <TFile.h>
+#include <TH1.h>
+#include <chrono>
+#include <fairlogger/Logger.h>
 #include <fmt/chrono.h>
+#include <fmt/core.h>
 #include <fmt/format.h>
+#include <memory>
+#include <string>
+#include <string_view>
 
 namespace
 {
@@ -32,6 +44,24 @@ namespace
 
 namespace R3B
 {
+    auto DataMonitor::get(const std::string& histName) -> TH1*
+    {
+        if (auto hist = histograms_.find(histName); hist != histograms_.end())
+        {
+            return hist->second.get();
+        }
+        throw R3B::logic_error(fmt::format("Histogram with the name {} doesn't exist!", histName));
+    }
+
+    auto DataMonitor::get_canvas(const std::string& histName) -> DataMonitorCanvas&
+    {
+        if (auto canvas = canvases_.find(histName); canvas != canvases_.end())
+        {
+            return canvas->second;
+        }
+        throw R3B::logic_error(fmt::format("Canvas with the name {} doesn't exist!", histName));
+    }
+
     void DataMonitor::save_to_sink(std::string_view folderName, FairSink* sinkFile)
     {
         auto* hist_dir = get_hist_dir(sinkFile);
@@ -39,12 +69,12 @@ namespace R3B
         if (new_dir == nullptr)
         {
             throw R3B::runtime_error(
-                fmt::format("Failed to create a sub directory {} for the histrogams!", folderName));
+                fmt::format("Failed to create a sub directory {} for the histograms!", folderName));
         }
-        R3BLOG(info,
-               fmt::format("Saving figures to the directory {:?} in the root file {:?}",
-                           folderName,
-                           new_dir->GetFile()->GetName()));
+        LOGP(info,
+             "Saving figures to the directory {:?} in the root file {:?}",
+             new_dir->GetName(),
+             new_dir->GetFile()->GetName());
 
         write_all(new_dir);
         // old_dir->cd();
@@ -61,7 +91,7 @@ namespace R3B
         auto* hist_dir = rootFile->mkdir(DEFAULT_HIST_MONITOR_DIR, "", true);
         if (hist_dir == nullptr)
         {
-            throw R3B::runtime_error("Cannot create a directory for the histrogams!");
+            throw R3B::runtime_error("Cannot create a directory for the histograms!");
         }
         return hist_dir;
     }
@@ -100,7 +130,7 @@ namespace R3B
             filename = save_filename_;
         }
         auto rootfile = create_datatime_rootfile(filename);
-        R3BLOG(info, fmt::format("Saving histograms to {}", rootfile->GetName()));
+        LOGP(info, "Saving histograms to {}", rootfile->GetName());
         write_all(rootfile.get());
     }
 
@@ -110,13 +140,13 @@ namespace R3B
         {
             if (hist->GetEntries() == 0)
             {
-                R3BLOG(warn, fmt::format("Histogram {} is empty while written to the file!", hist->GetName()));
+                LOGP(warn, "Histogram {} is empty while written to the file!", hist->GetName());
             }
-            dir->WriteObject(hist.get(), hist->GetName());
+            dir->WriteObject(hist.get(), hist->GetName(), "update");
         }
         for (auto& [name, graph] : graphs_)
         {
-            dir->WriteObject(graph.get(), graph->GetName(), "overwrite");
+            dir->WriteObject(graph.get(), graph->GetName(), "update");
         }
     }
 } // namespace R3B

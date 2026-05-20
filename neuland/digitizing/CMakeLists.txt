@@ -1,3 +1,4 @@
+# cmake-format: off
 ##############################################################################
 #   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
 #   Copyright (C) 2019-2025 Members of R3B Collaboration                     #
@@ -10,28 +11,36 @@
 # granted to it by virtue of its status as an Intergovernmental Organization #
 # or submit itself to any jurisdiction.                                      #
 ##############################################################################
+# cmake-format: on
+
 set(SRCS
+    NeulandParticleFilter.cxx
     R3BDigitizingChannel.cxx
+    R3BDigitizingChannelMock.h
+    R3BDigitizingEngine.cxx
     R3BDigitizingPaddle.cxx
+    R3BDigitizingPaddleMock.h
+    R3BDigitizingPaddleNeuland.cxx
     R3BDigitizingTacQuila.cxx
     R3BDigitizingTamex.cxx
-    R3BDigitizingPaddleNeuland.cxx
-    R3BNeulandHitMon.cxx
     R3BNeulandDigitizer.cxx
-    R3BDigitizingPaddleMock.h
-    R3BDigitizingChannelMock.h)
+    R3BNeulandHitMon.cxx
+    R3BNeulandSimCalToCal.cxx
+)
 
 set(HEADERS
+    NeulandParticleFilter.h
     R3BDigitizingChannel.h
     R3BDigitizingChannelMock.h
-    R3BDigitizingEngine.h
     R3BDigitizingPaddle.h
     R3BDigitizingPaddleMock.h
     R3BDigitizingPaddleNeuland.h
     R3BDigitizingTacQuila.h
     R3BDigitizingTamex.h
     R3BNeulandDigitizer.h
-    R3BNeulandHitMon.h)
+    R3BNeulandHitMon.h
+    R3BNeulandSimCalToCal.h
+)
 
 add_library_with_dictionary(
     LIBNAME
@@ -42,7 +51,10 @@ add_library_with_dictionary(
     ${SRCS}
     INCLUDEDIRS
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/Muon
     HEADERS
     ${HEADERS}
     DEPENDENCIES
-    R3BNeulandCalibration)
+    magic_enum::magic_enum
+    R3BNeulandCalibration
+)

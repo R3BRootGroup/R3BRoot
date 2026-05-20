@@ -257,6 +257,11 @@ set(HEADERS
     sync_check/R3BSyncCheckReader.h
     actaf/R3BActafReader.h)
 
+if(CONAN_ENABLED)
+    list(APPEND SRCS neuland/R3BNeulandTamexReader2.cxx)
+    list(APPEND HEADERS neuland/R3BNeulandTamexReader2.h)
+endif()
+
 set(HEADERS ${STRUCT_HEADERS} ${HEADERS})
 
 set(DIRS
@@ -307,3 +312,8 @@ if("${FairRoot_VERSION}" VERSION_GREATER_EQUAL 19.0.0)
     target_compile_definitions(R3BSource PUBLIC FAIRROOT_GE_19)
 endif()
 
+if(CONAN_ENABLED)
+    target_link_libraries(R3BSource PRIVATE Microsoft.GSL::GSL range-v3::range-v3)
+    list(APPEND SRCS neuland/R3BNeulandTamexReader2.cxx)
+    list(APPEND HEADERS neuland/R3BNeulandTamexReader2.h)
+endif()

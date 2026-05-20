@@ -27,8 +27,11 @@ runs:
     - name: running ctest
       run: |
         source $GITHUB_WORKSPACE/util/generate_geo_test.sh
+        export ROOT_CXX_STANDARD=$(${SIMPATH}/bin/root-config --cxxstandard)
+        export ROOT_CXX_STANDARD="${ROOT_CXX_STANDARD:-17}"
         ctest -S cmake/CI_CD/CDash.cmake -DBUILD_J=${NUM_THREADS}\
               -DTEST_MODEL=${TEST_MODEL}\
+              -DEXTRA_FLAGS="--preset=${{ matrix.preset }};-DCMAKE_CXX_STANDARD=${ROOT_CXX_STANDARD};-C$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"\
               -DTEST_NAME=${{ env.TEST_NAME }}\
               -DSITE_NAME="Github hosted (${{ github.repository }})"\
               --force-new-ctest-process \

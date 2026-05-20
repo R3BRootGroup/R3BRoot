@@ -11,14 +11,15 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef DIGITIZING_PADDLE_H
-#define DIGITIZING_PADDLE_H
+#pragma once
 
 #include "R3BDigitizingChannel.h"
+#include "R3BShared.h"
 #include <R3BLogger.h>
 #include <RtypesCore.h>
 #include <functional>
 #include <memory>
+#include <vector>
 
 namespace R3B::Digitizing
 {
@@ -30,89 +31,126 @@ namespace R3B::Digitizing
         Type right{};
         LRPair(Type p_left, Type p_right)
             : left(p_left)
-            , right(p_right){};
-        LRPair() = default;
-    };
-
-    struct PaddleSignal
-    {
-        double energy{};
-        double time{};
-        double position{};
-        const Channel::Signal& leftChannel;
-        const Channel::Signal& rightChannel;
-        explicit PaddleSignal(LRPair<const Channel::Signal&> p_signals)
-            : leftChannel{ p_signals.left }
-            , rightChannel{ p_signals.right }
+            , right(p_right)
         {
         }
+        LRPair() = default;
     };
 
     struct PaddleHit
     {
-        double time;               // ns
-        double LightDep;           // MeV
-        double DistToPaddleCenter; // cm
+        double energy{};   //!< The energy of the paddle hit [MeV].
+        double time{};     //!< The time of the paddle hit [ns].
+        double position{}; //!< The distance to the center point of the paddle [cm].
+        const AbstractChannel::Hit* left_channel_hit = nullptr;        //!< Reference to the left channel hit.
+        const AbstractChannel::Hit* right_channel_hit = nullptr;       //!< Reference to the right channel hit.
+        const AbstractChannel::CalSignal* left_channel_cal = nullptr;  //!< Reference to the left channel cal.
+        const AbstractChannel::CalSignal* right_channel_cal = nullptr; //!< Reference to the right channel cal.
+
+        PaddleHit() = default;
+
+        explicit PaddleHit(LRPair<const AbstractChannel::CalSignal*> p_signals)
+            : left_channel_cal{ p_signals.left }
+            , right_channel_cal{ p_signals.right }
+        {
+        }
+
+        explicit PaddleHit(LRPair<const AbstractChannel::Hit*> p_signals)
+            : left_channel_hit{ p_signals.left }
+            , right_channel_hit{ p_signals.right }
+        {
+        }
     };
 
-    class Paddle
+    struct PaddleSignal
+    {
+        double time;               //<! Time of the energy depostion [ns]
+        double energy_dep;         //<! Energy depostion [MeV]
+        double distance_to_center; //<! Distance to the center point of the paddle [cm]
+    };
+
+    class AbstractPaddle
     {
       public:
         template <typename Type>
         using Pair = LRPair<Type>;
-        using Signal = PaddleSignal;
         using Hit = PaddleHit;
-        using Signals = std::vector<Signal>;
-        using ChannelSignalPair = Pair<std::reference_wrapper<const Channel::Signal>>;
-        using SignalCouplingStrategy =
-            std::function<std::vector<ChannelSignalPair>(const Channel::Signals&, const Channel::Signals&)>;
+        using Signal = PaddleSignal;
+        using Hits = std::vector<Hit>;
+        using ChannelSignalPair = Pair<std::reference_wrapper<const AbstractChannel::Hit>>;
+        using SignalCouplingStrategy = std::function<std::vector<ChannelSignalPair>(const AbstractPaddle&,
+                                                                                    const AbstractChannel::Hits&,
+                                                                                    const AbstractChannel::Hits&)>;
 
-        explicit Paddle(int paddleID, SignalCouplingStrategy strategy = SignalCouplingByTime);
-        auto HasFired() const -> bool;
-        auto HasHalfFired() const -> bool;
+        explicit AbstractPaddle(int paddleID, SignalCouplingStrategy strategy = SignalCouplingByTime);
+        [[nodiscard]] auto HasFired() const -> bool;
+        [[nodiscard]] auto HasHalfFired() const -> bool;
+        void Construct();
+        void Reset();
 
         // rule of 5
-        virtual ~Paddle() = default;
-        Paddle(const Paddle& other) = delete;
-        auto operator=(const Paddle& other) -> Paddle& = delete;
-        Paddle(Paddle&& other) = default;
-        auto operator=(Paddle&& other) -> Paddle& = delete;
+        virtual ~AbstractPaddle() = default;
+        AbstractPaddle(const AbstractPaddle& other) = delete;
+        auto operator=(const AbstractPaddle& other) -> AbstractPaddle& = delete;
+        AbstractPaddle(AbstractPaddle&& other) = default;
+        auto operator=(AbstractPaddle&& other) -> AbstractPaddle& = delete;
 
-        void DepositLight(const Hit& hit);
+        void DepositLight(const Signal& signal);
 
-        void SetChannel(std::unique_ptr<Channel> channel);
-        void SetSignalCouplingStrategy(const SignalCouplingStrategy& strategy) { fSignalCouplingStrategy = strategy; }
+        void SetChannel(std::unique_ptr<AbstractChannel> channel);
+
+        void SetSignalCouplingStrategy(const SignalCouplingStrategy& strategy) { signal_coupling_strategy_ = strategy; }
 
         // Getters:
-        auto GetPaddleID() const -> int { return fPaddleID; }
-        auto GetSignals() const -> const std::vector<Signal>&;
-        auto GetSignalCouplingStragtegy() const -> const SignalCouplingStrategy& { return fSignalCouplingStrategy; }
-        auto GetLeftChannel() const -> const Channel* { return fLeftChannel.get(); }
-        auto& GetLeftChannelRef() { return *fLeftChannel; }
-        auto& GetRightChannelRef() { return *fRightChannel; }
-        auto GetRightChannel() const -> const Channel* { return fRightChannel.get(); }
-        auto GetTrigTime() const -> double;
+        [[nodiscard]] auto GetPaddleID() const -> int { return paddle_id_; }
+        [[nodiscard]] auto GetHits() const -> const std::vector<Hit>& { return signal_hits_; }
+        [[nodiscard]] auto GetSignalCouplingStragtegy() const -> const SignalCouplingStrategy&
+        {
+            return signal_coupling_strategy_;
+        }
+        [[nodiscard]] auto GetLeftChannel() const -> const AbstractChannel* { return left_channel_.get(); }
+        [[nodiscard]] auto GetLeftChannelRef() const -> auto& { return *left_channel_; }
+        [[nodiscard]] auto GetChannel(R3B::Side side) const -> const Digitizing::AbstractChannel&;
+        [[nodiscard]] auto GetRightChannelRef() const -> auto& { return *right_channel_; }
+        [[nodiscard]] auto GetRightChannel() const -> const AbstractChannel* { return right_channel_.get(); }
+        [[nodiscard]] auto GetTrigTime() const -> double;
+
+        // Setters:
+        void SetPaddleID(int paddle_id) { paddle_id_ = paddle_id; }
+
+        [[nodiscard]] virtual auto match_hits(const AbstractChannel::Hit& /*firstSignal*/,
+                                              const AbstractChannel::Hit& /*secondSignal*/) const -> float
+        {
+            return 0.;
+        }
 
       private:
-        mutable Validated<Signals> fSignals;
-        const int fPaddleID;
-        std::unique_ptr<Channel> fLeftChannel{};
-        std::unique_ptr<Channel> fRightChannel{};
-        SignalCouplingStrategy fSignalCouplingStrategy;
-        // virtual std::function<indexMapFunc> IndexMapFunc() const { return ConstructIndexMapByTime; }
-        virtual auto ConstructPaddelSignals(const Channel::Signals& firstSignals,
-                                            const Channel::Signals& secondSignals) const -> Signals;
-        virtual auto ComputeTime(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-            -> double = 0;
-        virtual auto ComputeEnergy(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-            -> double = 0;
-        virtual auto ComputePosition(const Channel::Signal& rightSignal, const Channel::Signal& leftSignal) const
-            -> double = 0;
-        virtual auto ComputeChannelHits(const Hit& hit) const -> Pair<Channel::Hit> = 0;
+        int paddle_id_{};
+        Hits signal_hits_;
+        std::unique_ptr<AbstractChannel> left_channel_;
+        std::unique_ptr<AbstractChannel> right_channel_;
+        SignalCouplingStrategy signal_coupling_strategy_;
+
+        // virtual private functions
+        virtual void extra_reset() {}
+        virtual void pre_construct() {}
+        [[nodiscard]] virtual auto compute_time(const AbstractChannel::Hit& firstSignal,
+                                                const AbstractChannel::Hit& secondSignal) const -> double = 0;
+        [[nodiscard]] virtual auto compute_energy(const AbstractChannel::Hit& firstSignal,
+                                                  const AbstractChannel::Hit& secondSignal) const -> double = 0;
+        [[nodiscard]] virtual auto compute_position(const AbstractChannel::Hit& rightSignal,
+                                                    const AbstractChannel::Hit& leftSignal) const -> double = 0;
+        [[nodiscard]] virtual auto compute_channel_signals(const Signal& hit) const
+            -> Pair<AbstractChannel::Signal> = 0;
+
+        // non-virtual private functions
+        void construct_paddle_signals(Hits& paddle_signals,
+                                      const AbstractChannel::Hits& firstSignals,
+                                      const AbstractChannel::Hits& secondSignals) const;
 
       public:
-        static auto SignalCouplingByTime(const Channel::Signals& firstSignals, const Channel::Signals& secondSignals)
-            -> std::vector<ChannelSignalPair>;
+        static auto SignalCouplingByTime(const AbstractPaddle& self,
+                                         const AbstractChannel::Hits& firstSignals,
+                                         const AbstractChannel::Hits& secondSignals) -> std::vector<ChannelSignalPair>;
     };
 } // namespace R3B::Digitizing
-#endif

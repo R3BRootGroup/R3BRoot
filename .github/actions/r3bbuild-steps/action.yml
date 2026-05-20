@@ -1,7 +1,6 @@
 name: build-steps
 description: 'steps to build R3BRoot and ucesb'
 
-
 inputs:
   build-needed:
     description: 'build process is needed'
@@ -25,15 +24,22 @@ runs:
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
         git submodule update --init --recursive
-        git clone https://github.com/R3BRootGroup/macros.git
-        echo ""
-        echo "path environment variable: $PATH\n"
-        echo ""
-        cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
+        # git clone https://github.com/R3BRootGroup/macros.git
+        conan remote update conancenter --url="https://center2.conan.io"
+        export ROOT_CXX_STANDARD=$(${SIMPATH}/bin/root-config --cxxstandard)
+        export ROOT_CXX_STANDARD="${ROOT_CXX_STANDARD:-17}"
+        cmake --preset ${{ matrix.preset }} . -DCMAKE_CXX_STANDARD=${ROOT_CXX_STANDARD} -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
       shell: bash
 
     - name: build ${{ matrix.repos }}
       if: inputs.build-needed == 'true'
       run: |
-        cmake --build ./build -- -j ${NUM_THREADS}
+        cmake --build --preset ${{ matrix.preset }} -- -j ${NUM_THREADS}
+      shell: bash
+
+    - name: ccache stats
+      if: github.event_name == 'pull_request' && always()
+      run: |
+        ccache --show-stats
+        ccache --print-stats
       shell: bash

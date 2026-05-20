@@ -15,20 +15,27 @@
 #define R3BNEULANDPOINT_H
 
 #include "FairMCPoint.h"
-#include "TObject.h"
 #include "TVector3.h"
+#include <Math/Vector3Dfwd.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <iostream>
+
+// NOLINTBEGIN(misc-include-cleaner)
+#include <Math/Vector3D.h>
+// NOLINTEND(misc-include-cleaner)
 
 class R3BNeulandPoint : public FairMCPoint
 {
 
   public:
     R3BNeulandPoint()
-        : FairMCPoint()
-        , fLightYield(0)
+        : fLightYield{ 0 }
+        , fParticleId{ 0 }
+        , fParentParticleId{ 0 }
     {
     }
-
+    // NOLINTBEGIN
     R3BNeulandPoint(const Int_t trackID,
                     const Int_t detID,
                     const TVector3& pos,
@@ -37,32 +44,54 @@ class R3BNeulandPoint : public FairMCPoint
                     const Double_t length,
                     const Double_t eLoss,
                     const UInt_t EventId,
-                    const Double_t lightYield)
-        : FairMCPoint(trackID, detID, pos, mom, tof, length, eLoss, EventId)
-        , fLightYield(lightYield)
+                    const Double_t lightYield,
+                    const int particle_id,
+                    const int parent_particle_id) // NOLINTEND
+        : FairMCPoint{ trackID, detID, pos, mom, tof, length, eLoss, EventId }
+        , fLightYield{ lightYield }
+        , fParticleId{ particle_id }
+        , fParentParticleId{ parent_particle_id }
     {
     }
 
-    R3BNeulandPoint(const FairMCPoint& point, const Double_t lightYield)
-        : FairMCPoint(point)
-        , fLightYield(lightYield)
+    R3BNeulandPoint(const FairMCPoint& point,
+                    const Double_t lightYield,
+                    const int particle_id,
+                    const int parent_particle_id)
+        : FairMCPoint{ point }
+        , fLightYield{ lightYield }
+        , fParticleId{ particle_id }
+        , fParentParticleId{ parent_particle_id }
     {
     }
 
-    TVector3 GetMomentum() const;
-    TVector3 GetPosition() const;
-    Int_t GetPaddle() const { return GetDetectorID(); }
-    Double_t GetLightYield() const { return fLightYield; }
+    [[nodiscard]] auto GetMomentum() const -> ROOT::Math::XYZVector
+    {
+        return ROOT::Math::XYZVector{ GetPx(), GetPy(), GetPz() };
+    }
+    [[nodiscard]] auto GetPosition() const -> ROOT::Math::XYZVector
+    {
+        return ROOT::Math::XYZVector{ GetX(), GetY(), GetZ() };
+    }
+    [[nodiscard]] auto GetPaddle() const -> int { return GetDetectorID(); }
+    [[nodiscard]] auto GetLightYield() const -> double { return fLightYield; }
+    [[nodiscard]] auto GetPID() const -> int { return fParticleId; }
 
-    void Print(const Option_t*) const override;
+    // setters:
+    void SetLightYield(double light_yield) { fLightYield = light_yield; }
+    void SetParticleId(int particle_id) { fParticleId = particle_id; }
+    void SetParentParticleId(int particle_id) { fParentParticleId = particle_id; }
 
-  protected:
-    Double_t fLightYield;
+    void Print(const Option_t* /*opt*/) const override;
 
-  public:
-    ClassDefOverride(R3BNeulandPoint, 1)
+    ClassDefOverride(R3BNeulandPoint, 2);
+
+  private:
+    double fLightYield;
+    int fParticleId;
+    int fParentParticleId;
 };
 
-std::ostream& operator<<(std::ostream&, const R3BNeulandPoint&); // Support easy printing
+auto operator<<(std::ostream&, const R3BNeulandPoint&) -> std::ostream&; // Support easy printing
 
 #endif // R3BNEULANDPOINT_H

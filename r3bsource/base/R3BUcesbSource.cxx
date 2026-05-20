@@ -85,8 +85,7 @@ Bool_t R3BUcesbSource::Init()
     std::ostringstream command;
 
     /* Call ucesb with this command */
-    command << fUcesbPath << " " << fFileName << " "
-            << "--ntuple=" << fNtupleOptions << ",STRUCT,-";
+    command << fUcesbPath << " " << fFileName << " " << "--ntuple=" << fNtupleOptions << ",STRUCT,-";
 
     if (fLastEventNo != -1)
     {

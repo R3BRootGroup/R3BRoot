@@ -1,5 +1,6 @@
-# Neuland Simulation
+# NeuLAND Simulation {#neuland_sim}
 
+[TOC]
 
 ## Detector
 `R3BNeuland` is the main class derived from `R3BDetector` for use in simulations. Note that it does not include the geometry itself, but takes `neuland_XXdp.geo.root` geometry files (XX corresponds to the number of double planes) from `/geometry/`. Suitable geometry files require proper naming of the active volume and copy numbers.

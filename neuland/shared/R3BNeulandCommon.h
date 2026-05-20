@@ -11,61 +11,67 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef NEULANDCOMMON_H
-#define NEULANDCOMMON_H
-
-#include <cmath>
+#pragma once
+#include "R3BValueError.h"
+#include <R3BMinMaxValue.h>
+#include <cassert>
 #include <limits>
-#include <vector>
 
-namespace Neuland
+namespace R3B::Neuland
 {
     // Constants
 
-    constexpr auto __sqrt12 = 3.464101615;
+    constexpr auto SQRT_12 = 3.464101615;
     constexpr auto NaN = std::numeric_limits<double>::quiet_NaN();
     constexpr auto Inf = std::numeric_limits<double>::infinity();
 
     // Useful functions I do not want to redefine in every file
 
     template <typename T>
-    constexpr T Sqr(const T val)
+    constexpr auto Sqr(const T val) -> T
     {
         return val * val;
     }
 
     // Initialize variables from Birk' s Law
-
     constexpr double BirkdP = 1.032;
     constexpr double BirkC1 = 0.013 / BirkdP;
     constexpr double BirkC2 = 9.6e-6 / (BirkdP * BirkdP);
 
-    constexpr double GetLightYieldAfterBirk(const int charge, const double length_mm, const double edep_MeV)
+    constexpr auto GetLightYieldAfterBirk(const int charge, const double length_mm, const double edep_MeV) -> double
     {
+        constexpr auto MAGIC_NUM_0 = 7.2;
+        constexpr auto MAGIC_NUM_1 = 12.6;
         return (charge * length_mm == 0.
                     ? edep_MeV
-                    : edep_MeV / (1. + BirkC1 * (Sqr(charge) > 1 ? 7.2 / 12.6 : 1.) * (edep_MeV / length_mm) +
-                                  BirkC2 * Sqr(edep_MeV / length_mm)));
+                    : edep_MeV /
+                          (1. + BirkC1 * (Sqr(charge) > 1 ? MAGIC_NUM_0 / MAGIC_NUM_1 : 1.) * (edep_MeV / length_mm) +
+                           BirkC2 * Sqr(edep_MeV / length_mm)));
     }
 
     // Physical Constants
 
-    constexpr auto CLight = 29.9792458;     // Speed of light [cm/ns]
-    constexpr auto InvCLight = 1. / CLight; // Speed of light [cm/ns]>
+    constexpr auto CLight = 29.9792458;                // Speed of light [cm/ns]
+    constexpr auto CLight2 = 898.75517873681758374898; // Speed of light [cm/ns]
+    constexpr auto InvCLight = 1. / CLight;            // Speed of light [cm/ns]>
+    constexpr auto MUON_MASS = 0.105;                  // Muonmass [GeV]
 
     // Electronics Constants
 
+    constexpr auto COARSE_TIME_CLOCK_FREQUENCY_MHZ = 200.F;
     constexpr auto MaxCalTime = 5. * 2048;
-
+    constexpr auto MaxFTValue = 4097;
+    constexpr auto MAXCTValue = 2048U;
     // Geometry & Material Constants
 
-    constexpr auto BarSize_XY = 5.0;                                  // cm NeuLAND parameter
-    constexpr auto BarUncertainty_XY = BarSize_XY / __sqrt12;         // cm NeuLAND parameter
-    constexpr auto BarSize_Z = 5.0;                                   // cm NeuLAND parameter
-    constexpr auto BarUncertainty_Z = BarSize_Z / __sqrt12;           // cm NeuLAND parameter
-    constexpr auto BarLength = 250.0;                                 // cm NeuLAND parameter
-    constexpr auto LightGuideLength = 10.0;                           // cm NeuLAND parameter
-    constexpr auto TotalBarLength = BarLength + 2 * LightGuideLength; // cm NeuLAND parameter, Bar including Light Guide
+    constexpr auto BarSize_XY = 5.0;                         // cm NeuLAND parameter
+    constexpr auto BarUncertainty_XY = BarSize_XY / SQRT_12; // cm NeuLAND parameter
+    constexpr auto BarSize_Z = 5.0;                          // cm NeuLAND parameter
+    constexpr auto BarUncertainty_Z = BarSize_Z / SQRT_12;   // cm NeuLAND parameter
+    constexpr auto BarLength = 250.0;                        // cm NeuLAND parameter
+    constexpr auto LightGuideLength = 10.0;                  // cm NeuLAND parameter
+    constexpr auto TotalBarLength =
+        BarLength + (2 * LightGuideLength); // cm NeuLAND parameter, Bar including Light Guide
 
     constexpr auto ScintillatorDensity = 1.032;        // g / cm^3
     constexpr auto MIPStoppingPowerPerDensity = 1.956; // MeV cm^2 / g
@@ -73,12 +79,43 @@ namespace Neuland
 
     constexpr auto FirstHorizontalPlane = 0;
     constexpr auto BarsPerPlane = 50;
-    constexpr auto MaxNumberOfPlanes = 60;
+    constexpr auto MaxNumberOfPlanes = 26;
+    constexpr auto DefaultNumberOfPlanes = 26;
     constexpr auto MaxNumberOfBars = MaxNumberOfPlanes * BarsPerPlane;
 
-    constexpr bool IsPlaneHorizontal(const int plane) { return (plane % 2 == FirstHorizontalPlane); }
-    constexpr bool IsPlaneVertical(const int plane) { return !IsPlaneHorizontal(plane); }
-    constexpr int GetPlaneNumber(const int barID) { return barID / BarsPerPlane; }
+    // naming convention:
+    // _num starts at 1 and _id starts at 0
+    // module number has the range of 1 ~ BarsPerPlane * NumOfPlanes
+    // bar number has the range of 1 ~ BarsPerPlane
+    constexpr auto GetBarVerticalDisplacement(int module_num) -> double
+    {
+        const auto bar_num = ((module_num - 1) % BarsPerPlane) + 1;
+        return (2 * bar_num - 1 - BarsPerPlane) / 2. * BarSize_XY;
+    }
+    constexpr auto IsPlaneIDHorizontal(int plane_id) -> bool { return (plane_id % 2 == FirstHorizontalPlane); }
+    constexpr auto IsPlaneIDVertical(int plane_id) -> bool { return !IsPlaneIDHorizontal(plane_id); }
+    constexpr auto ModuleID2PlaneID(int moduleID) -> int { return moduleID / BarsPerPlane; }
+    constexpr auto ModuleID2PlaneNum(int moduleID) -> int { return ModuleID2PlaneID(moduleID) + 1; }
+    constexpr auto IsModuleNumHorizontal(int module_num) -> bool
+    {
+        return IsPlaneIDHorizontal(ModuleID2PlaneID(module_num - 1));
+    }
+    // planeNum, barNum and ModuleNum is 1-based
+    constexpr auto Neuland_PlaneBar2ModuleNum(int planeNum, int barNum) -> int
+    {
+        assert(planeNum > 0);
+        return ((planeNum - 1) * BarsPerPlane) + barNum;
+    }
+    template <typename T = double>
+    constexpr auto PlaneID2ZPos(int plane_id) -> T
+    {
+        return static_cast<T>((plane_id + 0.5) * BarSize_Z);
+    }
+    template <typename T = double>
+    constexpr auto ModuleNum2ZPos(int module_num) -> T
+    {
+        return PlaneID2ZPos<T>(ModuleID2PlaneID(module_num - 1));
+    }
 
     // Average Parameters
 
@@ -90,6 +127,24 @@ namespace Neuland
 
     constexpr auto SaturationCoefficient = 1.75e-3; // 1 / ns
 
-} // namespace Neuland
+    // NeuLAND TPAT:
+    constexpr auto NeulandOnSpillTpatPos = 0U; // 0 based
+    namespace Calibration
+    {
+        constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_NUM = 25;
+        constexpr auto DEFAULT_TSYNC_REFERENCE_BAR_VALUE = 0.F;
+        constexpr auto DEFAULT_TSYNC_MAX_TIME_DIFF = 300; // ns
+        // Millepede calibration defaults:
+        constexpr auto DEFAULT_MINIMUM_PLANE_NUM = 10;
+        constexpr auto DEFAULT_MAX_SLOPE_VALUE = 10;
+        constexpr auto DEFAULT_EFFECTIVE_C = 8.;                // cm/ns
+        constexpr auto DEFAULT_CALIBRATION_P_VALUE_CUT = 1e-10; // any smaller values will be discarded
+        constexpr auto DEFAULT_T_DIFF_RESIDUAL_CUT = 400;       // any larger values will be discarded
 
-#endif
+    } // namespace Calibration
+
+    // Default values:
+    constexpr auto DEFAULT_BOX_GENERATOR_THETA = MinMaxValueD{ 0., 3. }; // degree
+    constexpr auto DEFAULT_BOX_GENERATOR_PHI = MinMaxValueD{ 0., 360. }; // degree
+    constexpr auto DEFAULT_GENERATOR_ENERGY = ValueErrorD{ 1., 0.2 };    // [GeV]
+} // namespace R3B::Neuland

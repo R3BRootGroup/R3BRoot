@@ -1,0 +1,2 @@
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/r3b/pede.py
+               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/pede.py COPYONLY USE_SOURCE_PERMISSIONS)

@@ -27,7 +27,10 @@
 #include "FairTask.h"
 #include "Filterable.h"
 #include "R3BNeulandCluster.h"
-#include "TCAConnector.h"
+#include <R3BIOConnector.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <TString.h>
 #include <vector>
 
 class TH1D;
@@ -37,20 +40,12 @@ class TH3D;
 class R3BNeulandClusterMon : public FairTask
 {
   public:
-    R3BNeulandClusterMon(TString input = "NeulandClusters",
-                         TString output = "NeulandClusterMon",
-                         const Option_t* option = "");
-
-    ~R3BNeulandClusterMon() override = default;
-
-    // No copy and no move is allowed (Rule of three/five)
-    R3BNeulandClusterMon(const R3BNeulandClusterMon&) = delete;            // copy constructor
-    R3BNeulandClusterMon(R3BNeulandClusterMon&&) = delete;                 // move constructor
-    R3BNeulandClusterMon& operator=(const R3BNeulandClusterMon&) = delete; // copy assignment
-    R3BNeulandClusterMon& operator=(R3BNeulandClusterMon&&) = delete;      // move assignment
+    explicit R3BNeulandClusterMon(TString input = "NeulandClusters",
+                                  TString output = "NeulandClusterMon",
+                                  const Option_t* option = "");
 
   protected:
-    InitStatus Init() override;
+    auto Init() -> InitStatus override;
     void Finish() override;
 
   public:
@@ -59,7 +54,8 @@ class R3BNeulandClusterMon : public FairTask
     void AddFilter(const Filterable<R3BNeulandCluster*>::Filter& f) { fClusterFilters.Add(f); }
 
   private:
-    TCAInputConnector<R3BNeulandCluster> fNeulandClusters;
+    R3B::InputVectorConnector<R3BNeulandCluster> fNeulandClusters;
+    std::vector<R3BNeulandCluster> fNeulandClustersBuffer;
     TString fOutput;
 
     double fBeta; // just for ClusterRValue

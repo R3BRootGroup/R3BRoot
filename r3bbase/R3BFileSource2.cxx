@@ -12,26 +12,48 @@
  ******************************************************************************/
 
 #include "R3BFileSource2.h"
-
+#include "R3BEventHeader.h"
 #include "R3BException.h"
-#include "R3BLogger.h"
+#include "R3BShared.h"
 #include <FairEventHeader.h>
 #include <FairFileHeader.h>
+#include <FairMCEventHeader.h>
 #include <FairRootManager.h>
 #include <FairRun.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
 #include <TBranchElement.h>
 #include <TClonesArray.h>
+#include <TCollection.h>
 #include <TFolder.h>
 #include <TKey.h>
-#include <fmt/chrono.h>
+#include <TObjString.h>
+#include <TObject.h>
+#include <algorithm>
+#include <array>
+#include <chrono>
+#include <cmath>
+#include <cstdint>
+#include <cstdio>
+#include <fairlogger/Logger.h>
+#include <fmt/base.h>
 #include <fmt/color.h>
 #include <fmt/core.h>
-#include <iostream>
+#include <fmt/format.h>
+#include <memory>
+#include <optional>
+#include <string>
+#include <string_view>
+#include <sys/types.h>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
 #include <vector>
 
 namespace
 {
     constexpr auto DEFAULT_TITLE = "InputRootFile";
+    constexpr auto DEFAULT_RUN_ID = 999;
 
     template <typename ContainerType, typename DataType>
     auto Vector2TContainer(std::vector<DataType>& vec) -> std::unique_ptr<ContainerType>
@@ -73,12 +95,35 @@ namespace
     }
 
     template <typename UnaryFunc>
-    void loop_through_branches(TFile* root_file, std::string_view tree_name, UnaryFunc&& action)
+    void loop_through_branch_elements(TFile* root_file, std::string_view tree_name, UnaryFunc action)
     {
         auto* tree = root_file->Get<TTree>(tree_name.data());
         auto* branches = tree->GetListOfBranches();
-        for (auto* branch : TRangeDynCast<TBranchElement>(branches))
+        LOGP(debug, "Get {} branches from the tree file {}", branches->GetEntries(), root_file->GetName());
+        for (auto* branch_obj : TRangeDynCast<TObject>(branches))
         {
+            auto* branch = dynamic_cast<TBranchElement*>(branch_obj);
+            if (branch == nullptr)
+            {
+                continue;
+            }
+            action(branch);
+        }
+    }
+
+    template <typename UnaryFunc>
+    void loop_through_branches(TFile* root_file, std::string_view tree_name, UnaryFunc action)
+    {
+        auto* tree = root_file->Get<TTree>(tree_name.data());
+        auto* branches = tree->GetListOfBranches();
+        LOGP(debug, "Get {} branches from the tree file {}", branches->GetEntries(), root_file->GetName());
+        for (auto* branch_obj : TRangeDynCast<TObject>(branches))
+        {
+            auto* branch = dynamic_cast<TBranch*>(branch_obj);
+            if (branch == nullptr)
+            {
+                continue;
+            }
             action(branch);
         }
     }
@@ -87,44 +132,46 @@ namespace
     auto GetBranchListFromTree(TFile* root_file, std::string_view tree_name) -> std::vector<StringType>
     {
         auto branch_name_list = std::vector<StringType>{};
-        loop_through_branches(root_file,
-                              tree_name,
-                              [&branch_name_list](auto* branch) { branch_name_list.emplace_back(branch->GetName()); });
+        loop_through_branch_elements(root_file,
+                                     tree_name,
+                                     [&branch_name_list](auto* branch)
+                                     { branch_name_list.emplace_back(branch->GetName()); });
         return branch_name_list;
     }
 
     auto get_tca_data_class(TBranchElement* branch) -> std::string
     {
         TClonesArray* buffer = nullptr;
-        branch->SetAddress(&buffer);
+        branch->SetAddress(&buffer); // NOLINT: Nasty ROOT API
         branch->GetEntry(0);
         branch->SetAddress(nullptr);
         if (buffer != nullptr)
         {
             auto class_name = std::string{ buffer->GetClass()->GetName() };
-            R3BLOG(debug,
-                   fmt::format("Determine the class name {:?} of the branch {:?}", class_name, branch->GetName()));
+            LOGP(debug, "Determine the class name {:?} of the branch {:?}", class_name, branch->GetName());
             return class_name;
         }
-        R3BLOG(warn, fmt::format("Cannot determine the class name of the branch {:?}", branch->GetName()));
+        LOGP(warn, "Cannot determine the class name of the branch {:?}", branch->GetName());
         return std::string{ "TObject" };
     }
 
     void add_branches_to_folder(TFolder* folder, TFile* root_file, std::string_view tree_name)
     {
-        loop_through_branches(root_file,
-                              tree_name,
-                              [folder](auto* branch)
-                              {
-                                  auto class_name = std::string_view{ branch->GetClassName() };
-                                  if (class_name == "TClonesArray")
-                                  {
-                                      const auto data_class = get_tca_data_class(branch);
-                                      auto tca_obj = std::make_unique<TClonesArray>(data_class.data());
-                                      tca_obj->SetName(branch->GetName());
-                                      folder->Add(tca_obj.release());
-                                  }
-                              });
+        loop_through_branch_elements(root_file,
+                                     tree_name,
+                                     [folder](auto* branch)
+                                     {
+                                         auto class_name = std::string_view{ branch->GetClassName() };
+                                         if (class_name == "TClonesArray")
+                                         {
+                                             const auto data_class = get_tca_data_class(branch);
+                                             auto tca_obj = std::make_unique<TClonesArray>(data_class.data());
+                                             tca_obj->SetName(branch->GetName());
+                                             folder->Add(tca_obj.release());
+                                         }
+                                     });
+
+        // TODO: what if it's branch with single literal value?
     }
 
     auto HasBranchList(TFile* rootFile, const std::vector<std::string>& branchList) -> bool
@@ -133,8 +180,13 @@ namespace
         auto view1 = std::vector<std::string_view>(branchList.begin(), branchList.end());
         auto view2 = std::vector<std::string_view>(newBranchList.begin(), newBranchList.end());
 
+#ifdef HAS_CPP_STANDARD_17
         std::sort(view1.begin(), view1.end());
         std::sort(view2.begin(), view2.end());
+#else
+        std::ranges::sort(view1);
+        std::ranges::sort(view2);
+#endif
         return view1 == view2;
     }
 
@@ -143,11 +195,11 @@ namespace
     {
         for (auto const& name : folderNames)
         {
-            R3BLOG(debug, "looking for " + name);
+            LOGP(debug, "Looking for {}", name);
             auto* dataFolder = dynamic_cast<TKey*>(rootFile->FindKey(name.c_str()));
             if (dataFolder != nullptr)
             {
-                R3BLOG(debug, name + " has been found!");
+                LOGP(debug, "{} has been found!", name);
                 return dataFolder;
             }
         }
@@ -158,7 +210,7 @@ namespace
     {
         auto const chainTitle = "/" + std::string{ FairRootManager::GetFolderName() };
         auto inChain = std::make_unique<TChain>(FairRootManager::GetTreeName(), chainTitle.c_str());
-        R3BLOG(debug, "Chain created");
+        LOGP(debug, "Chain created");
         LOG(info) << "chain name: " << FairRootManager::GetTreeName();
         rootMan->SetInChain(inChain.release());
         return FairRootManager::Instance()->GetInChain();
@@ -190,9 +242,17 @@ void R3BEventProgressPrinter::ShowProgress(uint64_t event_num)
     const auto time_spent = std::chrono::ceil<std::chrono::milliseconds>(now_t - previous_t_);
     if (time_spent > refresh_period_)
     {
+        const auto total_time_spent = std::chrono::ceil<std::chrono::milliseconds>(now_t - begin_t_);
         const auto processed_events = event_num - previous_event_num_;
-        const auto events_per_millisecond =
-            static_cast<double>(processed_events) / static_cast<double>(time_spent.count());
+        const auto events_per_millisecond = [&, this]()
+        {
+            if (mode_ == Mode::piecewise)
+            {
+                return static_cast<double>(processed_events) / static_cast<double>(time_spent.count());
+            }
+            return static_cast<double>(event_num) / static_cast<double>(total_time_spent.count());
+        }();
+
         Print(event_num, events_per_millisecond);
 
         previous_t_ = now_t;
@@ -208,7 +268,7 @@ void R3BEventProgressPrinter::Print(uint64_t event_num, double speed_per_ms)
     }
     const auto event_num_str =
         fmt::format(fg(fmt::terminal_color::bright_green) | fmt::emphasis::bold, "{:^5d}k", event_num / 1000);
-    const auto speed_str = fmt::format(fg(fmt::color::white), "{:^6.1F}k/s", speed_per_ms);
+    const auto speed_str = fmt::format("{:^6.1F}k/s", speed_per_ms);
     const auto progress_str = fmt::format(fg(fmt::terminal_color::bright_yellow) | fmt::emphasis::bold,
                                           "{:^6.2F}",
                                           100. * static_cast<double>(event_num) / static_cast<double>(max_event_num_));
@@ -220,13 +280,12 @@ void R3BEventProgressPrinter::Print(uint64_t event_num, double speed_per_ms)
                progress_str,
                std::chrono::ceil<std::chrono::seconds>(time_left_ms),
                run_id_);
-    std::cout << std::flush;
+    std::fflush(stdout);
 }
 
 auto R3BInputRootFiles::AddFileName(std::string fileName, bool is_tree_file) -> std::optional<std::string>
 {
-    auto const msg = fmt::format("Adding {} to file source\n", fileName);
-    R3BLOG(info, msg);
+    LOGP(info, "Adding {} to file source\n", fileName);
     if (fileNames_.empty())
     {
         Initialize(fileName, is_tree_file);
@@ -276,7 +335,7 @@ void R3BInputRootFiles::RegisterTo(FairRootManager* rootMan)
     if (!is_friend_)
     {
         auto listOfFolders = Vector2TContainer<TObjArray>(validMainFolders_);
-        R3BLOG(debug, fmt::format("Set {} main folder(s) to FairRootManager.", listOfFolders->GetEntries()));
+        LOGP(debug, "Set {} main folder(s) to FairRootManager.", listOfFolders->GetEntries());
         rootMan->SetListOfFolders(listOfFolders.release());
         rootMan->SetTimeBasedBranchNameList(Vector2TContainer<TList>(timeBasedBranchList_).release());
         SetInputFileChain(Get_TChain_FromFairRM(rootMan));
@@ -308,12 +367,13 @@ auto R3BInputRootFiles::ValidateFile(const std::string& filename, bool is_tree_f
     }
 
     auto folderKey = ExtractMainFolder(rootFile.get());
-    auto res = folderKey.has_value() && HasBranchList(rootFile.get(), branchList_);
-    if (res)
+    auto res1 = folderKey.has_value();
+    auto res2 = HasBranchList(rootFile.get(), branchList_);
+    if (res1 and res2)
     {
         if (!folderName_.empty() && (folderKey.value()->GetName() != folderName_))
         {
-            R3BLOG(warn, "Different folder name!");
+            LOGP(warn, "Different folder name!");
         }
         if (!is_friend_)
         {
@@ -321,10 +381,21 @@ auto R3BInputRootFiles::ValidateFile(const std::string& filename, bool is_tree_f
             validMainFolders_.push_back((folderKey.value())->ReadObject<TFolder>());
         }
     }
-    return res;
+    else
+    {
+        if (not res1)
+        {
+            LOGP(warn, "folder has no key");
+        }
+        if (not res2)
+        {
+            LOGP(warn, "HasBranchList is false!");
+        }
+    }
+    return res1 and res2;
 }
 
-auto R3BInputRootFiles::ExtractRunId(TFile* rootFile) -> std::optional<uint>
+auto R3BInputRootFiles::ExtractRunId(TFile* rootFile) -> std::optional<int>
 {
     //
     auto* header = rootFile->Get<FairFileHeader>(fileHeader_.c_str());
@@ -348,14 +419,12 @@ void R3BInputRootFiles::Initialize(std::string_view filename, bool is_tree_file)
 
     if (const auto runID = ExtractRunId(file.get()); runID.has_value() && runID.value() != 0)
     {
-        auto const msg = fmt::format(R"(Successfully extract RunID "{}" from root file "{}")", runID.value(), filename);
-        R3BLOG(debug, msg);
+        LOGP(debug, "Successfully extract RunID {} from root file {:?}", runID.value(), filename);
         initial_RunID_ = runID.value();
     }
     else
     {
-        auto const msg = fmt::format("Failed to extract RunID from root file \"{}\"", filename);
-        R3BLOG(error, msg);
+        LOGP(error, "Failed to extract RunID from root file {:?}", filename);
     }
 
     if (auto folderKey = ExtractMainFolder(file.get()); folderKey.has_value())
@@ -372,7 +441,7 @@ void R3BInputRootFiles::Initialize(std::string_view filename, bool is_tree_file)
     if (timeBasedBranchList_ = GetBranchList<TObjString>(file.get(), "TimeBasedBranchList");
         timeBasedBranchList_.empty())
     {
-        LOG(warn) << "No time based branch list in input file";
+        LOG(info) << "No time based branch list in input file";
     }
 }
 
@@ -433,14 +502,14 @@ void R3BFileSource2::AddFile(std::string file_name, bool is_tree_file)
         if (not dataFileNames_.empty())
         {
 
-            R3BLOG(
-                error,
-                fmt::format(
-                    "Root file {0} is incompatible with the first root file {1}", res.value(), dataFileNames_.front()));
+            LOGP(error,
+                 "Root file {:?} is incompatible with the first root file {:?}",
+                 res.value(),
+                 dataFileNames_.front());
         }
         else
         {
-            R3BLOG(error, fmt::format("Failed to add the first root file {:?}", file_name));
+            LOGP(error, "Failed to add the first root file {:?}", file_name);
         }
     }
     dataFileNames_.emplace_back(file_name);
@@ -466,10 +535,16 @@ void R3BFileSource2::AddFriend(std::string file_name, bool is_tree_file)
 {
     //
     auto rootfile = R3B::make_rootfile(file_name.c_str());
+#ifdef HAS_CPP_STANDARD_17
     auto friendGroup = std::find_if(inputFriendFiles_.begin(),
                                     inputFriendFiles_.end(),
                                     [&rootfile](const auto& friends)
                                     { return HasBranchList(rootfile.get(), friends.GetBranchListRef()); });
+#else
+    auto friendGroup = std::ranges::find_if(inputFriendFiles_,
+                                            [&rootfile](const auto& friends)
+                                            { return HasBranchList(rootfile.get(), friends.GetBranchListRef()); });
+#endif
     if (friendGroup == inputFriendFiles_.end())
     {
         auto newFriendGroup = R3BInputRootFiles{};
@@ -481,10 +556,10 @@ void R3BFileSource2::AddFriend(std::string file_name, bool is_tree_file)
     auto res = friendGroup->AddFileName(file_name, is_tree_file);
     if (res.has_value())
     {
-        R3BLOG(error,
-               fmt::format("Friend file {0} is incompatible with the first friend file {1}",
-                           res.value(),
-                           friendGroup->GetBaseFileName()));
+        LOGP(error,
+             "Friend file {} is incompatible with the first friend file {:?}",
+             res.value(),
+             friendGroup->GetBaseFileName());
     }
     else
     {
@@ -510,6 +585,15 @@ Bool_t R3BFileSource2::Init()
     event_progress_.SetMaxEventNum(inputDataFiles_.GetEntries());
     event_progress_.SetRunID(inputDataFiles_.GetInitialRunID());
 
+    r3b_event_header_ = dynamic_cast<R3BEventHeader*>(FairRootManager::Instance()->GetObject("EventHeader."));
+    mc_event_header_ = dynamic_cast<FairMCEventHeader*>(FairRootManager::Instance()->GetObject("MCEventHeader."));
+
+    if (r3b_event_header_ == nullptr and mc_event_header_ == nullptr)
+    {
+        throw R3B::runtime_error(
+            "Event header from the input root file can neither be casted as R3BEventHeader nor FairMCEventHeader!");
+    }
+
     return true;
 }
 
@@ -519,7 +603,26 @@ void R3BFileSource2::FillEventHeader(FairEventHeader* evtHeader)
     {
         throw R3B::logic_error("Filled event header is empty!");
     }
-    evtHeader_ = evtHeader;
+
+    auto* event_header = dynamic_cast<R3BEventHeader*>(evtHeader);
+    if (event_header == nullptr)
+    {
+        if (r3b_event_header_ != nullptr)
+        {
+            r3b_event_header_->Copy(*evtHeader);
+        }
+    }
+    else
+    {
+        if (r3b_event_header_ != nullptr)
+        {
+            (*event_header) = *r3b_event_header_;
+        }
+        else if (mc_event_header_ != nullptr)
+        {
+            (*event_header) = *mc_event_header_;
+        }
+    }
 
     // Set runID for event header:
     auto const init_runID = inputDataFiles_.GetInitialRunID();
@@ -529,11 +632,12 @@ void R3BFileSource2::FillEventHeader(FairEventHeader* evtHeader)
         throw R3B::logic_error("RunId is not being set!");
     }
 
-    if (init_runID != GetRunId())
+    if (GetRunId() != DEFAULT_RUN_ID and init_runID != GetRunId())
     {
-        R3BLOG(
-            warn,
-            fmt::format("runID {} being set is different from the runID {} in the data file!", GetRunId(), init_runID));
+        LOGP(warn,
+             "runID {} being set is different from the runID {} in the data file! Use the runID in the data file.",
+             GetRunId(),
+             init_runID);
     }
     SetRunId(init_runID); // NOLINT
     evtHeader->SetRunId(init_runID);
@@ -542,18 +646,18 @@ void R3BFileSource2::FillEventHeader(FairEventHeader* evtHeader)
 Int_t R3BFileSource2::CheckMaxEventNo(Int_t EvtEnd)
 {
     event_end_ = (EvtEnd <= 0) ? inputDataFiles_.GetEntries() : EvtEnd; // NOLINT
-    R3BLOG(info, fmt::format("Setting printing event max to {}", event_end_));
+    LOGP(info, "Setting printing event max to {}", event_end_);
     event_progress_.SetMaxEventNum(event_end_);
     return event_end_;
 }
 
 void R3BFileSource2::ReadBranchEvent(const char* BrName)
 {
-    auto const currentEventID = evtHeader_->GetMCEntryNumber();
+    auto const currentEventID = r3b_event_header_->GetMCEntryNumber();
     ReadBranchEvent(BrName, currentEventID);
 }
 
-void R3BFileSource2::ReadBranchEvent(const char* BrName, Int_t entryID)
+void R3BFileSource2::ReadBranchEvent(const char* BrName, int entryID)
 {
     auto const read_bytes = inputDataFiles_.GetChain()->FindBranch(BrName)->GetEntry(entryID);
     if (read_bytes == 0)
@@ -562,7 +666,7 @@ void R3BFileSource2::ReadBranchEvent(const char* BrName, Int_t entryID)
     }
 }
 
-Int_t R3BFileSource2::ReadEvent(UInt_t eventID)
+Int_t R3BFileSource2::ReadEvent(unsigned int eventID)
 {
     auto* chain = inputDataFiles_.GetChain();
     if (fair::Logger::GetConsoleSeverity() == fair::Severity::info)

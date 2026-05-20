@@ -1,42 +1,48 @@
 #include "R3BNeulandMultiplicityBayes.h"
-#include "FairLogger.h"
 #include "FairRootManager.h"
 #include "FairRtdbRun.h"
 #include "FairRuntimeDb.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicity.h"
+#include "R3BNeulandMultiplicityBayesPar.h"
+#include <FairTask.h>
+#include <Rtypes.h>
+#include <RtypesCore.h>
+#include <cmath>
+#include <fairlogger/Logger.h>
+#include <memory>
 #include <numeric>
-#include <utility>
+#include <string_view>
 
-R3BNeulandMultiplicityBayes::R3BNeulandMultiplicityBayes(TString input, TString output)
+R3BNeulandMultiplicityBayes::R3BNeulandMultiplicityBayes(std::string_view input, std::string_view output)
     : FairTask("R3BNeulandMultiplicityBayes")
-    , fClusters(std::move(input))
-    , fMultiplicity(new R3BNeulandMultiplicity())
-    , fOutputName(std::move(output))
-    , fPar(nullptr)
+    , fClusters(input)
+    , fMultiplicity{ std::make_unique<R3BNeulandMultiplicity>() }
+    , multiplicity_par_ptr{ fMultiplicity.get() }
+    , fOutputName(output)
 {
 }
 
-R3BNeulandMultiplicityBayes::~R3BNeulandMultiplicityBayes() { delete fMultiplicity; }
-
-InitStatus R3BNeulandMultiplicityBayes::Init()
+auto R3BNeulandMultiplicityBayes::Init() -> InitStatus
 {
     // Input
-    fClusters.Init();
+    fClusters.init();
 
     // Output
-    auto ioman = FairRootManager::Instance();
+    auto* ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityBayes:Init: No FairRootManager";
         return kFATAL;
     }
-    ioman->RegisterAny(fOutputName, fMultiplicity, true);
+    ioman->RegisterAny(fOutputName.c_str(), multiplicity_par_ptr, true);
 
     return kSUCCESS;
 }
 
 void R3BNeulandMultiplicityBayes::SetParContainers()
 {
-    auto rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityBayes::SetParContainers: No FairRuntimeDb!";
@@ -56,8 +62,8 @@ void R3BNeulandMultiplicityBayes::SetParContainers()
 
 void R3BNeulandMultiplicityBayes::Exec(Option_t*)
 {
-    const auto clusters = fClusters.Retrieve();
-    const int nClusters = clusters.size();
+    const auto& clusters = fClusters.get();
+    const auto nClusters = clusters.size();
 
     if (nClusters == 0)
     {
@@ -66,12 +72,18 @@ void R3BNeulandMultiplicityBayes::Exec(Option_t*)
         return;
     }
 
-    const int nHits = std::accumulate(
-        clusters.cbegin(), clusters.cend(), 0, [](size_t s, const R3BNeulandCluster* c) { return s + c->GetSize(); });
-    const int Edep = (int)std::accumulate(
-        clusters.cbegin(), clusters.cend(), 0., [](Double_t s, const R3BNeulandCluster* c) { return s + c->GetE(); });
+    const auto nHits =
+        std::accumulate(clusters.cbegin(),
+                        clusters.cend(),
+                        0,
+                        [](auto size, const R3BNeulandCluster& cluster) { return size + cluster.GetSize(); });
+    const auto Edep =
+        std::accumulate(clusters.cbegin(),
+                        clusters.cend(),
+                        0.,
+                        [](double energy, const R3BNeulandCluster& cluster) { return energy + cluster.GetE(); });
 
-    fMultiplicity->m = fPar->GetProbabilities(nHits, nClusters, Edep);
+    fMultiplicity->m = fPar->GetProbabilities(nHits, static_cast<int>(nClusters), static_cast<int>(std::ceil(Edep)));
 }
 
 ClassImp(R3BNeulandMultiplicityBayes)

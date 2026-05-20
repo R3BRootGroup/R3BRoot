@@ -1,4 +1,4 @@
-# How to use Conan package manager
+# How to use Conan package manager {#conan_usage}
 
 Conan package manager is a widely-used package manager for large C++ projects. The benefits of using Conan, in the contrary to Spack, is the third-party packages are attached with the individual project, instead of an environment. Therefore, users don't need to go into a specific environment to use the packages. For more information, please refer to the [Conan Documentation](https://docs.conan.io/2/index.html).
 

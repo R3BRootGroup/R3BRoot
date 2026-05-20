@@ -12,17 +12,24 @@
  ******************************************************************************/
 
 #include "R3BNeulandNeutron.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandHit.h"
+#include <Math/Vector3Dfwd.h>
+#include <RtypesCore.h>
 #include <cmath>
+#include <iostream>
+#include <ostream>
+#include <utility>
 
-static const Double_t massNeutron = 939.565379;   // MeV/c²
-static const Double_t c = 29.9792458;             // cm/ns
-static const Double_t c2 = 898.75517873681758374; // cm²/ns²
+static const double MASS_OF_NEUTRON = 939.565379;              // MeV/c²
+static const double SPEED_OF_LIGHT = 29.9792458;               // cm/ns
+static const double SPEED_OF_LIGHT_SQ = 898.75517873681758374; // cm²/ns²
 
-R3BNeulandNeutron::R3BNeulandNeutron(Int_t paddle, Double_t time, const TVector3& pos, const TVector3& pix)
+R3BNeulandNeutron::R3BNeulandNeutron(Int_t paddle, double time, ROOT::Math::XYZVector pos, ROOT::Math::XYZVector pix)
     : fPaddle(paddle)
     , fT(time)
-    , fPosition(pos)
-    , fPixel(pix)
+    , fPosition(std::move(pos))
+    , fPixel(std::move(pix))
 {
 }
 
@@ -39,25 +46,26 @@ R3BNeulandNeutron::R3BNeulandNeutron(const R3BNeulandCluster& cluster)
 {
 }
 
-Double_t R3BNeulandNeutron::GetGamma() const
+auto R3BNeulandNeutron::GetGamma() const -> double
 {
-    const Double_t v2 = GetPosition().Mag2() / std::pow(GetT(), 2); // cm²/ns²
-    return 1. / std::sqrt(1. - (v2 / c2));
+    const double velocity_sq = GetPosition().Mag2() / std::pow(GetT(), 2); // cm²/ns²
+    return 1. / std::sqrt(1. - (velocity_sq / SPEED_OF_LIGHT_SQ));
 }
 
-TVector3 R3BNeulandNeutron::GetP() const { return GetPosition() * (GetGamma() * massNeutron / GetT() / c); }
-
-Double_t R3BNeulandNeutron::GetEtot() const { return GetGamma() * massNeutron; }
-
-Double_t R3BNeulandNeutron::GetEkin() const { return (GetGamma() - 1.) * massNeutron; }
-
-std::ostream& operator<<(std::ostream& os, const R3BNeulandNeutron& digi)
+auto R3BNeulandNeutron::GetP() const -> ROOT::Math::XYZVector
 {
-    os << "R3BNeulandNeutron: XYZTE    " << digi.GetPosition().X() << "    " << digi.GetPosition().Y() << "    "
-       << digi.GetPosition().Z() << "    " << digi.GetT() << "    " << digi.GetEkin() << std::endl;
-    return os;
+    return GetPosition() * (GetGamma() * MASS_OF_NEUTRON / GetT() / SPEED_OF_LIGHT);
 }
 
-void R3BNeulandNeutron::Print(const Option_t*) const { std::cout << *this; }
+auto R3BNeulandNeutron::GetEtot() const -> double { return GetGamma() * MASS_OF_NEUTRON; }
 
-ClassImp(R3BNeulandNeutron)
+auto R3BNeulandNeutron::GetEkin() const -> double { return (GetGamma() - 1.) * MASS_OF_NEUTRON; }
+
+auto operator<<(std::ostream& ostream, const R3BNeulandNeutron& digi) -> std::ostream&
+{
+    ostream << "R3BNeulandNeutron: XYZTE    " << digi.GetPosition().X() << "    " << digi.GetPosition().Y() << "    "
+            << digi.GetPosition().Z() << "    " << digi.GetT() << "    " << digi.GetEkin() << "\n";
+    return ostream;
+}
+
+void R3BNeulandNeutron::Print(const Option_t* /*option*/) const { std::cout << *this; }

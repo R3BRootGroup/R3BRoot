@@ -19,51 +19,56 @@
  *
  */
 
+#include "R3BDigitizingChannel.h"
 #include "R3BDigitizingPaddle.h"
+#include "R3BLogger.h"
+#include "R3BShared.h"
+#include <RtypesCore.h>
+#include <cstdint>
 
 namespace R3B::Digitizing::Neuland
 {
-    class MockPaddle : public Digitizing::Paddle
+    class MockPaddle : public Digitizing::AbstractPaddle
     {
       public:
         explicit MockPaddle(uint16_t paddleID)
-            : Digitizing::Paddle{ paddleID }
+            : Digitizing::AbstractPaddle{ paddleID }
         {
         }
 
       private:
-        [[nodiscard]] auto ComputeTime(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-            -> double override
+        [[nodiscard]] auto compute_time(const AbstractChannel::Hit& firstSignal,
+                                        const AbstractChannel::Hit& secondSignal) const -> double override
         {
             return (firstSignal.tdc + secondSignal.tdc) / 2;
         }
-        [[nodiscard]] auto ComputeEnergy(const Channel::Signal& firstSignal, const Channel::Signal& secondSignal) const
-            -> double override
+        [[nodiscard]] auto compute_energy(const AbstractChannel::Hit& firstSignal,
+                                          const AbstractChannel::Hit& secondSignal) const -> double override
         {
             return (firstSignal.qdcUnSat + secondSignal.qdcUnSat) / 2;
         }
-        [[nodiscard]] auto ComputePosition(const Channel::Signal& leftSignal, const Channel::Signal& rightSignal) const
-            -> double override
+        [[nodiscard]] auto compute_position(const AbstractChannel::Hit& leftSignal,
+                                            const AbstractChannel::Hit& rightSignal) const -> double override
         {
             if (leftSignal.side == rightSignal.side)
             {
                 R3BLOG(fatal, "cannot compute position with signals from same side!");
                 return 0.F;
             }
-            return (leftSignal.side == ChannelSide::left) ? (leftSignal.tdc - rightSignal.tdc) / 2 * gCMedium
-                                                          : (rightSignal.tdc - leftSignal.tdc) / 2 * gCMedium;
+            return (leftSignal.side == Side::left) ? (leftSignal.tdc - rightSignal.tdc) / 2 * gCMedium
+                                                   : (rightSignal.tdc - leftSignal.tdc) / 2 * gCMedium;
         }
-        auto ComputeChannelHits(const Hit& hit) const -> Pair<Channel::Hit> override
+        [[nodiscard]] auto compute_channel_signals(const Signal& hit) const -> Pair<AbstractChannel::Signal> override
         {
-            auto rightChannelHit = GenerateMockChannelHit(hit.time, hit.LightDep, hit.DistToPaddleCenter);
-            auto leftChannelHit = GenerateMockChannelHit(hit.time, hit.LightDep, -1 * hit.DistToPaddleCenter);
+            auto rightChannelHit = GenerateMockChannelHit(hit.time, hit.energy_dep, hit.distance_to_center);
+            auto leftChannelHit = GenerateMockChannelHit(hit.time, hit.energy_dep, -1 * hit.distance_to_center);
             return { leftChannelHit, rightChannelHit };
         }
 
       public:
         static constexpr double gHalfLength = 135.; // [cm]
         static constexpr double gCMedium = 30.;     // speed of light in material in [cm/ns]
-        static auto GenerateMockChannelHit(Double_t mcTime, Double_t mcLight, Double_t dist) -> Channel::Hit
+        static auto GenerateMockChannelHit(Double_t mcTime, Double_t mcLight, Double_t dist) -> AbstractChannel::Signal
         {
             auto time = mcTime - (MockPaddle::gHalfLength + dist) / MockPaddle::gCMedium;
             auto light = mcLight;

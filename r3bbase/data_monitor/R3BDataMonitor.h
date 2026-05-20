@@ -17,8 +17,17 @@
 #include "R3BShared.h"
 #include <FairRun.h>
 #include <R3BException.h>
+#include <TCanvas.h>
+#include <TDirectory.h>
+#include <TGraph.h>
+#include <TH2.h>
+#include <fmt/core.h>
 #include <map>
+#include <memory>
 #include <string>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 class FairRun;
 
@@ -31,30 +40,31 @@ namespace R3B
         DataMonitor() = default;
 
         template <typename... Args>
-        [[nodiscard]] auto create_canvas(std::string_view canvas_name, std::string_view canvas_title, Args&&... args)
+        auto create_canvas(std::string_view canvas_name, std::string_view canvas_title, Args&&... args)
             -> DataMonitorCanvas&;
 
         // Use R3B::make_hist to create unique_ptr<TH1>
-        [[nodiscard]] auto add_hist(std::unique_ptr<TH1> hist) -> TH1*
-        {
-            return add_to_map(std::move(hist), histograms_);
-        }
+        auto add_hist(std::unique_ptr<TH1> hist) -> TH1* { return add_to_map(std::move(hist), histograms_); }
 
         template <typename Hist, typename... Args>
-        [[nodiscard]] auto add_hist(std::string_view histName, std::string_view histTitle, Args&&... args) -> Hist*;
+        auto add_hist(std::string_view histName, std::string_view histTitle, Args&&... args) -> Hist*;
 
         template <typename GraphType>
-        [[nodiscard]] auto add_graph(std::string_view graph_name, std::unique_ptr<GraphType> graph) -> GraphType*
+        auto add_graph(std::string_view graph_name, std::unique_ptr<GraphType> graph) -> GraphType*
         {
             graph->SetName(graph_name.data());
             return add_to_map(std::move(graph), graphs_);
         }
 
         template <typename... Args>
-        [[nodiscard]] auto add_graph(std::string_view graph_name, Args&&... args) -> TGraph*
+        auto add_graph(std::string_view graph_name, Args&&... args) -> TGraph*
         {
             return add_graph(graph_name, std::make_unique<TGraph>(std::forward<Args>(args)...));
         }
+
+        auto get(const std::string& histName) -> TH1*;
+
+        auto get_canvas(const std::string& histName) -> DataMonitorCanvas&;
 
         // Save plots to FairSink
         void save_to_sink(std::string_view folderName = "", FairSink* sinkFile = FairRun::Instance()->GetSink());
@@ -94,7 +104,7 @@ namespace R3B
         if (not is_success)
         {
             throw R3B::logic_error(fmt::format(
-                "Element with the name {} has been already added. Please use different name!", element_name));
+                "Element with the name {} has been already added. Please use a different name!", element_name));
         }
         return element_ptr;
     }
@@ -116,7 +126,8 @@ namespace R3B
                 "A canvas with the name {} has been already added. Please use different name!", canvas_name));
         }
         const auto [it, is_success] = canvases_.insert(
-            { std::string{ canvas_name }, DataMonitorCanvas(this, canvas_name.data(), canvas_title.data(), args...) });
+            { std::string{ canvas_name },
+              DataMonitorCanvas(this, canvas_name.data(), canvas_title.data(), std::forward<Args>(args)...) });
         return it->second;
     }
 

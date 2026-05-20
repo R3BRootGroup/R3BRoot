@@ -13,12 +13,12 @@
 
 void testNeulandDigitizer()
 {
-    TStopwatch timer;
+    auto timer = TStopwatch{};
     timer.Start();
 
-    FairLogger::GetLogger()->SetLogScreenLevel("debug");
+    FairLogger::GetLogger()->SetLogScreenLevel("info");
 
-    FairRunAna run;
+    auto run = FairRunAna{};
     run.SetSource(new FairFileSource("test.simu.root"));
     run.SetSink(new FairRootFileSink("test.digi.root"));
 
@@ -26,15 +26,20 @@ void testNeulandDigitizer()
     io->open("test.para.root");
     run.GetRuntimeDb()->setFirstInput(io);
 
-    run.AddTask(new R3BNeulandDigitizer(R3BNeulandDigitizer::Options::neulandTamex));
-    run.AddTask(new R3BNeulandClusterFinder());
-    run.AddTask(new R3BNeulandPrimaryInteractionFinder());
-    run.AddTask(new R3BNeulandPrimaryClusterFinder());
+    auto digi_options = R3B::Neuland::DigiTaskOptions();
+    digi_options.channel = "tamex";
+    digi_options.paddle = "neuland";
+    digi_options.enable_sim_cal = false;
+    auto task = R3B::Neuland::Digitizer::Create(digi_options, &run);
+    run.AddTask(task.release());
+    run.AddTask(std::make_unique<R3BNeulandClusterFinder>().release());
+    run.AddTask(std::make_unique<R3BNeulandPrimaryInteractionFinder>().release());
+    run.AddTask(std::make_unique<R3BNeulandPrimaryClusterFinder>().release());
 
     run.Init();
     run.Run(0, 0);
 
     timer.Stop();
-    cout << "Macro finished successfully." << endl;
-    cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s" << endl;
+    std::cout << "Macro finished successfully.\n";
+    std::cout << "Real time: " << timer.RealTime() << "s, CPU time: " << timer.CpuTime() << "s\n";
 }

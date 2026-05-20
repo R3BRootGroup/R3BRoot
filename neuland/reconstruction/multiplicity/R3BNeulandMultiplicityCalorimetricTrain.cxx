@@ -1,15 +1,25 @@
 #include "R3BNeulandMultiplicityCalorimetricTrain.h"
 #include "FairLogger.h"
 #include "FairRootManager.h"
-#include "FairRtdbRun.h"
 #include "FairRuntimeDb.h"
 #include "Math/Factory.h"
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
-// #include "Math/GeneticMinimizer.h"
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandMultiplicityCalorimetricPar.h"
 #include "TDirectory.h"
+#include <FairTask.h>
+#include <RtypesCore.h>
+#include <TCutG.h>
+#include <TH2.h>
+#include <TString.h>
+#include <cmath>
+#include <fairlogger/Logger.h>
 #include <iostream>
 #include <numeric>
+#include <string>
+#include <string_view>
+#include <utility>
 
 /*
  *      ^
@@ -26,12 +36,12 @@
  *                   edep
  */
 
-R3BNeulandMultiplicityCalorimetricTrain::R3BNeulandMultiplicityCalorimetricTrain(TString clusters,
-                                                                                 TString tracks,
-                                                                                 TString phits)
+R3BNeulandMultiplicityCalorimetricTrain::R3BNeulandMultiplicityCalorimetricTrain(std::string_view clusters,
+                                                                                 std::string_view tracks,
+                                                                                 std::string_view phits)
     : FairTask("R3BNeulandMultiplicityCalorimetricTrain")
-    , fClusters(std::move(clusters))
-    , fTracks(std::move(tracks))
+    , fClusters(clusters)
+    , fTracks(tracks)
     , fPHits(std::move(phits))
     , fPar(nullptr)
     , fUseHits(false)
@@ -54,19 +64,19 @@ R3BNeulandMultiplicityCalorimetricTrain::~R3BNeulandMultiplicityCalorimetricTrai
 InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
 {
     // Input
-    fClusters.Init();
-    fTracks.Init();
-    fPHits.Init();
+    fClusters.init();
+    fTracks.init();
+    fPHits.init(true);
 
     // Output Parameter Container
-    auto ioman = FairRootManager::Instance();
+    auto* ioman = FairRootManager::Instance();
     if (ioman == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain:Init: No FairRootManager";
         return kFATAL;
     }
 
-    auto rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     if (rtdb == nullptr)
     {
         LOG(fatal) << "R3BNeulandMultiplicityCalorimetricTrain::Init: No FairRuntimeDb!";
@@ -85,22 +95,25 @@ InitStatus R3BNeulandMultiplicityCalorimetricTrain::Init()
     return kSUCCESS;
 }
 
-void R3BNeulandMultiplicityCalorimetricTrain::Exec(Option_t*)
+void R3BNeulandMultiplicityCalorimetricTrain::Exec(Option_t* /*option*/)
 {
-    const int nPN = fUseHits ? fPHits.Retrieve().size() : fTracks.Retrieve().size();
+    const auto nPN = fUseHits ? fPHits.get().size() : fTracks.get().size();
 
-    const auto clusters = fClusters.Retrieve();
-    const int nClusters = clusters.size();
+    const auto& clusters = fClusters.get();
+    const auto nClusters = clusters.size();
 
     if (nClusters == 0)
     {
         return;
     }
 
-    const int Edep = (int)std::accumulate(
-        clusters.cbegin(), clusters.cend(), 0., [](Double_t s, const R3BNeulandCluster* c) { return s + c->GetE(); });
+    const auto Edep =
+        std::accumulate(clusters.cbegin(),
+                        clusters.cend(),
+                        double{},
+                        [](double sum, const R3BNeulandCluster& cluster) { return sum + cluster.GetE(); });
 
-    GetOrBuildHist(nPN)->Fill(Edep, nClusters);
+    GetOrBuildHist(nPN)->Fill(static_cast<int>(std::ceil(Edep)), static_cast<double>(nClusters));
 }
 
 void R3BNeulandMultiplicityCalorimetricTrain::FinishTask()
@@ -112,7 +125,7 @@ void R3BNeulandMultiplicityCalorimetricTrain::FinishTask()
         Print();
     }
 
-    auto rtdb = FairRuntimeDb::instance();
+    auto* rtdb = FairRuntimeDb::instance();
     rtdb->addRun(1);
     fPar->SetNeutronCuts(fCuts);
     fPar->setChanged();
@@ -136,8 +149,8 @@ void R3BNeulandMultiplicityCalorimetricTrain::Optimize()
 {
     ROOT::Math::Minimizer* min = ROOT::Math::Factory::CreateMinimizer("Genetic");
 
-    ROOT::Math::Functor f([&](const double* d) { return WastedEfficiency(d); }, 4);
-    min->SetFunction(f);
+    const ROOT::Math::Functor minimizor_functor([&](const double* cut) { return WastedEfficiency(cut); }, 4);
+    min->SetFunction(minimizor_functor);
 
     min->SetLimitedVariable(0, "edep", fEdepOpt.at(0), fEdepOpt.at(1), fEdepOpt.at(2), fEdepOpt.at(3));
     min->SetLimitedVariable(1, "edepoff", fEdepOffOpt.at(0), fEdepOffOpt.at(1), fEdepOffOpt.at(2), fEdepOffOpt.at(3));

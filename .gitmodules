@@ -2,3 +2,6 @@
 	path = util/cmake-conan
 	url = https://github.com/conan-io/cmake-conan.git
     branch = develop2
+[submodule "util/millepede2"]
+	path = util/millepede2
+	url = https://github.com/YanzhaoW/Millepede-II.git

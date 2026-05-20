@@ -36,7 +36,7 @@ R3BNeulandTacquilaReader::R3BNeulandTacquilaReader(EXT_STR_h101_raw_nnp_tacquila
 
 R3BNeulandTacquilaReader::~R3BNeulandTacquilaReader() {}
 
-Bool_t R3BNeulandTacquilaReader::Init(ext_data_struct_info* a_struct_info)
+auto R3BNeulandTacquilaReader::Init(ext_data_struct_info* a_struct_info) -> bool
 {
     // Initialize input UCESB structure
     Int_t ok;

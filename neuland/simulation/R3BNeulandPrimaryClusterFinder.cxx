@@ -12,60 +12,70 @@
  ******************************************************************************/
 
 #include "R3BNeulandPrimaryClusterFinder.h"
-#include <utility>
+#include "R3BNeulandCluster.h"
+#include "R3BNeulandHit.h"
+#include <FairTask.h>
+#include <RtypesCore.h>
+#include <string_view>
+#include <vector>
 
-bool IsPrimaryCluster(const R3BNeulandCluster* c, const std::vector<R3BNeulandHit*>& primaryHits)
+namespace
 {
-    for (const auto ph : primaryHits)
+    auto IsPrimaryCluster(const R3BNeulandCluster& cluster, const std::vector<R3BNeulandHit>& primaryHits) -> bool
     {
-        for (const auto& h : c->GetHits())
+        for (const auto& primary_hit : primaryHits)
         {
-            if (h == *ph)
+            for (const auto& hit : cluster.GetHits())
             {
-                return true;
+                if (hit == primary_hit)
+                {
+                    return true;
+                }
             }
         }
+        return false;
     }
-    return false;
-}
 
-R3BNeulandPrimaryClusterFinder::R3BNeulandPrimaryClusterFinder(TString primaryHits,
-                                                               TString clusters,
-                                                               TString primaryClusters,
-                                                               TString secondaryClusters)
-    : fPrimaryHits(std::move(primaryHits))
-    , fClusters(std::move(clusters))
-    , fPrimaryClusters(std::move(primaryClusters))
-    , fSecondaryClusters(std::move(secondaryClusters))
+} // namespace
+
+// NOLINTNEXTLINE: bugprone-easily-swappable-parameters
+R3BNeulandPrimaryClusterFinder::R3BNeulandPrimaryClusterFinder(std::string_view primaryHits,
+                                                               std::string_view clusters,
+                                                               std::string_view primaryClusters,
+                                                               std::string_view secondaryClusters)
+    : fPrimaryHits{ primaryHits }
+    , fClusters{ clusters }
+    , fPrimaryClusters{ primaryClusters }
+    , fSecondaryClusters{ secondaryClusters }
 {
 }
 
-InitStatus R3BNeulandPrimaryClusterFinder::Init()
+auto R3BNeulandPrimaryClusterFinder::Init() -> InitStatus
 {
-    fPrimaryHits.Init();
-    fClusters.Init();
-    fPrimaryClusters.Init();
-    fSecondaryClusters.Init();
+    fPrimaryHits.init();
+    fClusters.init();
+    fPrimaryClusters.init();
+    fSecondaryClusters.init();
 
     return kSUCCESS;
 }
 
-void R3BNeulandPrimaryClusterFinder::Exec(Option_t*)
+void R3BNeulandPrimaryClusterFinder::Exec(Option_t* /*option*/)
 {
-    const auto primaryHits = fPrimaryHits.Retrieve();
-    const auto clusters = fClusters.Retrieve();
-    fPrimaryClusters.Reset();
-    fSecondaryClusters.Reset();
+    const auto& primaryHits = fPrimaryHits.get();
+    const auto& clusters = fClusters.get();
+    fPrimaryClusters.clear();
+    fSecondaryClusters.clear();
 
     for (const auto& cluster : clusters)
     {
         if (IsPrimaryCluster(cluster, primaryHits))
         {
-            fPrimaryClusters.Insert(cluster);
+            fPrimaryClusters.get().push_back(cluster);
         }
         else
         {
-            fSecondaryClusters.Insert(cluster);
+            fSecondaryClusters.get().push_back(cluster);
         }
     }
 }

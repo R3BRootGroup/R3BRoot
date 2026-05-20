@@ -1,31 +1,27 @@
 #pragma once
 #include "R3BDigitizingChannel.h"
-#include "R3BDigitizingPaddle.h"
+#include "R3BShared.h"
 
 namespace R3B::Digitizing::Neuland
 {
-    class MockChannel : public Digitizing::Channel
+    class MockChannel : public Digitizing::AbstractChannel
     {
       public:
-        explicit MockChannel(ChannelSide side)
-            : Digitizing::Channel{ side } {};
-        void AddHit(Hit newHit) override
+        explicit MockChannel(Side side)
+            : Digitizing::AbstractChannel{ side } {};
+        void add_signal(Signal newHit) override
         {
-            InvalidateSignals();
-            InvalidateTrigTime();
-
-            auto signal = Signal{};
-            signal.qdc = newHit.light;
-            signal.qdcUnSat = newHit.light;
+            auto signal = Hit{};
+            signal.qdc = newHit.intensity;
+            signal.qdcUnSat = newHit.intensity;
             signal.tdc = newHit.time;
             signal.side = GetSide();
-            m_Signals.emplace_back(signal);
+            signals_.emplace_back(signal);
         }
 
-        void AttachToPaddle(Digitizing::Paddle* paddle) override {}
-
       private:
-        Signals m_Signals{};
-        auto ConstructSignals() -> Signals override { return m_Signals; }
+        Hits signals_;
+        void construct_hits(Hits& signals) override { signals = signals_; }
+        void extra_reset() override { signals_.clear(); }
     };
 } // namespace R3B::Digitizing::Neuland

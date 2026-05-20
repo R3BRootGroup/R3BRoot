@@ -15,9 +15,9 @@
 // -----                      R3BFieldPar source file                  -----
 // -------------------------------------------------------------------------
 
-#include "R3BFieldPar.h"
 #include "R3BAladinFieldMap.h"
 #include "R3BFieldConst.h"
+#include "R3BFieldPar.h"
 #include "R3BGladFieldMap.h"
 
 #include <FairParamList.h>
@@ -39,8 +39,6 @@ R3BFieldPar::R3BFieldPar()
 // ------   Put parameters   -----------------------------------------------
 void R3BFieldPar::putParams(FairParamList* list)
 {
-    LOG(info) << "R3BFieldPar::putParams()";
-
     if (list == nullptr)
     {
         return;
@@ -79,8 +77,6 @@ void R3BFieldPar::putParams(FairParamList* list)
 // --------   Get parameters   ---------------------------------------------
 Bool_t R3BFieldPar::getParams(FairParamList* list)
 {
-    LOG(info) << "R3BFieldPar::getParams()";
-
     if (list == nullptr)
     {
         return kFALSE;

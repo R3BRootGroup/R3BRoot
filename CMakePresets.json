@@ -1,43 +1,109 @@
 {
-    "version": 4,
-    "cmakeMinimumRequired": {
-        "major": 3,
-        "minor": 24,
-        "patch": 0
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 24,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "simple",
+      "displayName": "Simple config for R3BRoot without conan",
+      "description": "Simple build with conan package manager",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_GEOMETRY": "OFF",
+        "USE_DIFFERENT_COMPILER": "ON",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "FETCH_GTEST": "ON",
+        "CONAN_ENABLED": "OFF"
+      }
     },
-    "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config for R3BRoot",
+      "description": "Default build with conan package manager",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "BUILD_GEOMETRY": "OFF",
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "util/cmake-conan/conan_provider.cmake",
+        "WITH_MILLEPEDE": "ON",
+        "CONAN_ENABLED": "ON",
+        "BUILD_LAND_DIR": "OFF",
+        "CMAKE_CXX_STANDARD": "23",
+        "CONAN_INSTALL_ARGS": "--build=missing;--settings:build=compiler.cppstd=gnu17"
+      }
+    },
+    {
+      "name": "doxygen",
+      "displayName": "Config for doxygen build of R3BRoot",
+      "description": "Only build the doxygen documentation",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "WITH_DOX": "ON",
+        "BUILD_LAND_DIR": "OFF",
+        "NO_BUILD": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "configurePreset": "default"
+    },
+    {
+      "name": "doxygen",
+      "configurePreset": "doxygen",
+      "targets": "doxygen"
+    },
+    {
+      "name": "simple",
+      "configurePreset": "simple"
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "default",
+      "steps": [
         {
-            "name": "simple",
-            "displayName": "simple Config for R3BRoot without conan",
-            "description": "simple build with conan package manager",
-            "binaryDir": "${sourceDir}/build",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_GEOMETRY": "OFF",
-                "USE_DIFFERENT_COMPILER": "ON",
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "FETCH_GTEST": "ON"
-            }
+          "type": "configure",
+          "name": "default"
         },
         {
-            "name": "default",
-            "displayName": "Default Config for R3BRoot",
-            "description": "Default build with conan package manager",
-            "binaryDir": "${sourceDir}/build",
-            "cacheVariables": {
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-                "BUILD_GEOMETRY": "OFF",
-                "USE_DIFFERENT_COMPILER": "ON",
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "CMAKE_PROJECT_TOP_LEVEL_INCLUDES": "util/cmake-conan/conan_provider.cmake",
-                "CONAN_ENABLED": "ON"
-            }
+          "type": "build",
+          "name": "default"
         }
-    ],
-    "buildPresets": [
+      ]
+    },
+    {
+      "name": "simple",
+      "steps": [
         {
-            "name": "default",
-            "configurePreset": "default"
+          "type": "configure",
+          "name": "simple"
+        },
+        {
+          "type": "build",
+          "name": "simple"
         }
-    ]
+      ]
+    },
+    {
+      "name": "doxygen",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "doxygen"
+        },
+        {
+          "type": "build",
+          "name": "doxygen"
+        }
+      ]
+    }
+  ]
 }

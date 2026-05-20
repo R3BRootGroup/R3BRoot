@@ -21,5 +21,6 @@
 
 #pragma link C++ class R3BNeulandOnlineReconstruction+;
 #pragma link C++ class R3BNeulandOnlineSpectra+;
+#pragma link C++ class R3B::Neuland::OnlineSpectra+;
 
 #endif

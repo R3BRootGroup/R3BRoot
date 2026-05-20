@@ -1,0 +1,65 @@
+# Requires following secrets and variables:
+#
+# variables:
+# - DOCKER_REPO: repository to be pushed to.
+# - DOCKER_USERNAME: the user name of the repository owner.
+#
+# secrets:
+# - DOCKER_TOKEN: access token to dockerhub
+
+name: deploy-container
+
+on:
+  push:
+    branches: [ edwin_dev ]
+  workflow_dispatch:
+
+
+jobs:
+  docker-build:
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: 
+          - 'r3broot:latest'
+          - 'r3broot:latest-arm'
+          - 'r3broot:stable'
+          - 'r3broot:stable-arm'
+        include:
+          - repo: 'r3broot:stable'
+            build-repo: 'r3bdev:fedora-stable'
+            build-env: 'ubuntu-latest'
+          - repo: 'r3broot:stable-arm'
+            build-repo: 'r3bdev:fedora-stable-arm'
+            build-env: 'ubuntu-24.04-arm'
+          - repo: 'r3broot:latest'
+            build-repo: 'r3bdev:fedora-latest'
+            build-env: 'ubuntu-latest'
+          - repo: 'r3broot:latest-arm'
+            build-repo: 'r3bdev:fedora-latest-arm'
+            build-env: 'ubuntu-24.04-arm'
+
+    runs-on: ${{ matrix.build-env }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          context: util/container
+          tags: ${{ vars.DOCKER_USERNAME }}/${{ matrix.repo }}
+          build-args: |
+            BUILD_REPO=${{ matrix.build-repo }}
+            THREAD_NUM=4 
+            R3B_BRNAME=${{ github.head_ref || github.ref_name }}

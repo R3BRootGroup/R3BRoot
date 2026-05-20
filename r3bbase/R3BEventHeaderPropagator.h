@@ -17,7 +17,6 @@
 #include <Rtypes.h>
 
 #include "R3BEventHeader.h"
-
 class R3BFileSource;
 class FairSource;
 

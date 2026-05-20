@@ -1,4 +1,3 @@
----
 Language:        Cpp
 #AccessModifierOffset: -4
 ConstructorInitializerIndentWidth: 4
@@ -53,4 +52,3 @@ ContinuationIndentWidth: 4
 CommentPragmas:  '^ IWYU pragma:'
 SpaceBeforeParens: ControlStatements
 SpaceBeforeCpp11BracedList: false
-...

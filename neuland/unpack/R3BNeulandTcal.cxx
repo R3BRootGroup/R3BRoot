@@ -18,18 +18,20 @@
 
 #include "R3BNeulandTcal.h"
 
-#include "R3BEventHeader.h"
+#include "FairRootManager.h"
+#include "FairRunAna.h"
+#include "FairRuntimeDb.h"
+#include "FairTask.h"
 #include "R3BNeulandPmt.h"
 #include "R3BPaddleTamexMappedData.h"
 #include "R3BTCalEngine.h"
 #include "R3BTCalPar.h"
 
-#include "FairLogger.h"
-#include "FairRootManager.h"
-#include "FairRunAna.h"
-#include "FairRuntimeDb.h"
-
+#include "Rtypes.h"
+#include "RtypesCore.h"
 #include "TClonesArray.h"
+#include <cstddef>
+#include <fairlogger/Logger.h>
 
 R3BNeulandTcal::R3BNeulandTcal()
     : FairTask("LandTcal", 1)
@@ -133,7 +135,7 @@ void R3BNeulandTcal::Exec(Option_t*)
     R3BPaddleTamexMappedData* hit;
     Int_t iPlane;
     Int_t iBar;
-    Int_t channel;
+    const auto channel = 0;
     Int_t tdc;
     R3BTCalModulePar* par;
     Double_t timeLE;

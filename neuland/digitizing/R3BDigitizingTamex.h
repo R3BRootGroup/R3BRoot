@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BROOT_DIGITIZINGTAMEX_H
-#define R3BROOT_DIGITIZINGTAMEX_H
+#pragma once
 /**
  * NeuLAND Tamex digitizing module with multiple hits per event
  * @author Yanzhao Wang
@@ -22,10 +21,14 @@
  */
 
 #include "R3BDigitizingChannel.h"
-#include "R3BDigitizingPaddle.h"
+#include "R3BShared.h"
 #include "TRandom3.h"
-#include "Validated.h"
-#include <optional>
+#include <R3BNeulandCalToHitPar.h>
+#include <algorithm>
+#include <cstdint>
+#include <cstdlib>
+#include <functional>
+#include <vector>
 
 class R3BNeulandHitPar;
 class R3BNeulandHitModulePar;
@@ -36,32 +39,25 @@ namespace R3B::Digitizing::Neuland::Tamex
     struct Params
     {
         // NOLINTBEGIN
-        double fPMTThresh = 1.;                // [MeV]
-        double fSaturationCoefficient = 0.012; // Saturation coefficient of PMTs
-        bool fExperimentalDataIsCorrectedForSaturation = true;
-        double fTimeRes = 0.15; // time + Gaus(0., fTimeRes) [ns]
-        double fEResRel = 0.05; // Gaus(e, fEResRel * e) []
-        double fEnergyGain = 15.0;
-        double fPedestal = 14.0;
-        double fTimeMax = 1000.;          // ns
-        double fTimeMin = 1.;             // ns
-        double fPileUpTimeWindow = 1000.; // ns
-        double fPileUpDistance = 100.;    // ns
-        double fQdcMin = 0.067;
-        TRandom3* fRnd = nullptr;
+        bool experimental_data_is_corrected_for_saturation = true; //!< Flag if saturation effect enabled
+        double pmt_thresh = 1.;                                    //!< [MeV]
+        double saturation_coefficient = 0.012;                     //!< Saturation coefficient of PMTs
+        double time_res = 0.15;                                    //!< time + Gaus(0., fTimeRes) [ns]
+        double energy_res_rel = 0.05;                              //!< Gaus(e, fEResRel * e) []
+        double energy_gain = 15.0;                                 //!< Energy gain
+        double pedestal = 14.0;                                    //!< Energy offset parameter [ns]
+        double max_time = 1000.;                                   //!< [ns]
+        double min_time = 1.;                                      //!< [ns]
+        double pileup_time_window = 1000.;                         //!< [ns]
+        double pileup_distance = 100.;                             //!< [ns]
+        double min_energy = 0.067;                                 //!< minimal energy of a FQT peak [MeV]
+        std::reference_wrapper<TRandom3> rnd_gen;                  //!< Reference to shared random generator
         // NOLINTEND
 
         explicit Params(TRandom3&);
-
-        // rule of 5
-        Params(Params&&) = delete;
-        auto operator=(const Params&) -> Params& = default;
-        auto operator=(Params&&) -> Params& = delete;
-        ~Params() = default;
-        Params(const Params& other);
     };
 
-    enum class PeakPileUpStrategy
+    enum class PeakPileUpStrategy : uint8_t
     {
         width,
         distance,
@@ -72,16 +68,16 @@ namespace R3B::Digitizing::Neuland::Tamex
     {
       public:
         PMTPeak() = default;
-        PMTPeak(Digitizing::Channel::Hit pmtHit, const Channel&);
+        PMTPeak(Digitizing::AbstractChannel::Signal channel_signal, const Channel&);
         auto operator<(const PMTPeak& rhs) const -> bool { return (time_ < rhs.time_); }
         auto operator==(const PMTPeak& rhs) const -> bool { return std::abs(time_ - rhs.time_) < peakWidth; }
         auto operator+=(const PMTPeak& other) -> PMTPeak&;
-        [[nodiscard]] auto GetQDC() const -> double { return qdc_; }
+        [[nodiscard]] auto GetHeight() const -> double { return height_; }
         [[nodiscard]] auto GetLETime() const -> double { return time_; }
         static constexpr double peakWidth = 15.0; // ns
 
       private:
-        double qdc_ = 0.0;
+        double height_ = 0.0;
         double time_ = 0.0;
     };
 
@@ -92,8 +88,8 @@ namespace R3B::Digitizing::Neuland::Tamex
         FQTPeak() = default;
 
         // Getters:
-        [[nodiscard]] auto GetWidth() const -> double { return width_; }
-        [[nodiscard]] auto GetQDC() const -> double { return qdc_; }
+        [[nodiscard]] auto GetToT() const -> double { return time_over_thresh_; }
+        [[nodiscard]] auto GetEnergy() const -> double { return energy_; }
         [[nodiscard]] auto GetLETime() const -> double { return leading_edge_time_; }
         [[nodiscard]] auto GetTETime() const -> double { return trailing_edge_time_; }
 
@@ -104,89 +100,92 @@ namespace R3B::Digitizing::Neuland::Tamex
         auto operator>(const FQTPeak& other) const -> bool { return leading_edge_time_ - other.leading_edge_time_ > 0; }
         auto operator<(const FQTPeak& other) const -> bool { return leading_edge_time_ - other.leading_edge_time_ < 0; }
 
-        void AddQDC(double qdc) { qdc_ += qdc; }
+        void AddEnergy(double energy) { energy_ += energy; }
 
-        template <typename Par>
-        static auto WidthToQdc(double width, const Par& par) -> double
+        static auto ToT2Energy(double width, const Params& par) -> double
         {
-            return std::max(1., width - par.fPedestal) / par.fEnergyGain;
+            return std::max(1., width - par.pedestal) / par.energy_gain;
         }
 
-        template <typename Par>
-        static auto QdcToWidth(double qdc, const Par& par) -> double
+        static auto Energy2ToT(double height, const Params& par) -> double
         {
-            auto width = 0.0;
-            if (qdc > par.fQdcMin)
+            auto time_over_thresh = 0.0;
+            if (height > par.min_energy)
             {
-                width = qdc * par.fEnergyGain + par.fPedestal;
+                time_over_thresh = height * par.energy_gain + par.pedestal;
             }
             else
             {
-                width = qdc * par.fEnergyGain * (par.fPedestal + 1);
+                time_over_thresh = height * par.energy_gain * (par.pedestal + 1);
             }
-            return width;
+            return time_over_thresh;
         }
-        explicit operator Digitizing::Channel::Signal() const;
+        explicit operator Digitizing::AbstractChannel::Hit() const;
 
       private:
-        double width_ = 0.0;              // the temperal width of the TmxPeak in [ns]
-        double qdc_ = 0.0;                // the qdc value in [MeV] (without threshold)
-        double leading_edge_time_ = 0.0;  // leading edge of the TmxPeak in [ns]
-        double trailing_edge_time_ = 0.0; // tailing edge of the TmxPeak
-        Channel* channel_ptr_ = nullptr;
+        double time_over_thresh_ = 0.0;   //<! The temperal time-over-thresh of the TmxPeak in [ns]
+        double energy_ = 0.0;             //<! The energy value of the FQT signal [MeV] (without threshold)
+        double leading_edge_time_ = 0.0;  //<! Leading edge of the TmxPeak in [ns]
+        double trailing_edge_time_ = 0.0; //<! Tailing edge of the TmxPeak
+        Channel* channel_ptr_ = nullptr;  //<! Pointer to the channel which the peak belongs to
     };
 
-    class Channel : public Digitizing::Channel
+    class Channel : public Digitizing::AbstractChannel
     {
       public:
-        Channel(ChannelSide, PeakPileUpStrategy strategy, TRandom3&);
-        Channel(ChannelSide, PeakPileUpStrategy strategy, const Params&);
-        explicit Channel(ChannelSide side, PeakPileUpStrategy strategy = PeakPileUpStrategy::width)
+        Channel(Side, PeakPileUpStrategy strategy, TRandom3&);
+        Channel(Side,
+                PeakPileUpStrategy strategy,
+                const Params&,
+                R3B::Neuland::Cal2HitPar* cal_to_hit_par = nullptr,
+                bool has_cal_output = false);
+        explicit Channel(Side side, PeakPileUpStrategy strategy = PeakPileUpStrategy::width)
             : Channel(side, strategy, GetDefaultRandomGen())
         {
         }
         // Setters:
         void SetPileUpStrategy(PeakPileUpStrategy strategy) { pileup_strategy_ = strategy; }
+        void SetPar(const Tamex::Params& par) { par_ = par; }
 
         // Getters:
-        auto GetPar() -> Tamex::Params& { return par_; }
-        auto GetParConstRef() const -> const Tamex::Params& { return par_; }
-        auto GetFQTPeaks() -> const std::vector<FQTPeak>&;
-        auto GetPMTPeaks() -> const std::vector<PMTPeak>&;
+        [[nodiscard]] auto GetPar() const -> const Tamex::Params& { return par_; }
+        [[nodiscard]] auto GetFQTPeaks() const -> const std::vector<FQTPeak>& { return fqt_peaks_; }
+        [[nodiscard]] auto GetPMTPeaks() const -> const std::vector<PMTPeak>& { return pmt_peaks_; }
+        auto GetCal2HitPar() -> auto* { return neuland_hit_par_; }
 
-        void AddHit(Hit /*hit*/) override;
-        auto CreateSignal(const FQTPeak& peak) const -> Signal;
-        static void GetHitPar(const std::string& hitParName);
+        void add_signal(Signal /*signal*/) override;
+        [[nodiscard]] auto CreateHit(const FQTPeak& peak) const -> Hit;
+        [[nodiscard]] auto CreateCalSignal(const FQTPeak& peak) const -> CalSignal;
 
       private:
         PeakPileUpStrategy pileup_strategy_ = PeakPileUpStrategy::width;
         std::vector<PMTPeak> pmt_peaks_;
         std::vector<FQTPeak> fqt_peaks_;
-        static R3BNeulandHitPar* neuland_hit_par_; // NOLINT
-        R3BNeulandHitModulePar* neuland_hit_module_par_ = nullptr;
+        R3B::Neuland::Cal2HitPar* neuland_hit_par_ = nullptr;
         Tamex::Params par_;
 
         // private virtual functions
-        auto ConstructSignals() -> Signals override;
-        void AttachToPaddle(Digitizing::Paddle* paddle) override;
+        void construct_hits(Hits& hits) override;
+        void construct_cal_signals(CalSignals& cal_signals) const override;
+        void extra_reset() override;
+        void pre_construct() override;
 
         // private non-virtual functions
-        auto CheckPaddleIDInHitPar() const -> bool;
-        auto CheckPaddleIDInHitModulePar() const -> bool;
-        void SetHitModulePar(int PaddleId);
-        auto ToQdc(double) const -> double;
-        auto ToTdc(double) const -> double;
-        auto ToUnSatQdc(double) const -> double;
+        void set_hit_module_par(int PaddleId);
+        [[nodiscard]] auto check_paddle_id_in_hit_par() const -> bool;
+        [[nodiscard]] auto smear_energy(double) const -> double;
+        [[nodiscard]] auto smear_time(double) const -> double;
+        [[nodiscard]] auto to_unsat_energy(double) const -> double;
+        [[nodiscard]] auto calculate_ToT(double energy) const -> double;
         template <typename Peak>
-        void ApplyThreshold(/* inout */ std::vector<Peak>&);
-        auto ConstructFQTPeaks(std::vector<PMTPeak>& pmtPeaks) -> std::vector<FQTPeak>;
+        void apply_threshold(/* inout */ std::vector<Peak>&);
+        void construct_FQT_peaks(std::vector<FQTPeak>& FQTPeaks, std::vector<PMTPeak>& pmtPeaks);
         template <typename Peak>
-        static void PeakPileUp(/* inout */ std::vector<Peak>& peaks);
+        static void do_peak_pileup(/* inout */ std::vector<Peak>& peaks);
 
-        static void PeakPileUpWithDistance(/* inout */ std::vector<FQTPeak>& peaks, double distance);
-        static void PeakPileUpInTimeWindow(/* inout */ std::vector<FQTPeak>& peaks, double time_window);
-        void FQTPeakPileUp(/* inout */ std::vector<FQTPeak>& peaks);
+        static void peak_pileup_with_distance(/* inout */ std::vector<FQTPeak>& peaks, double distance);
+        static void peak_pileup_in_time_window(/* inout */ std::vector<FQTPeak>& peaks, double time_window);
+        void fqt_peak_pileup(/* inout */ std::vector<FQTPeak>& peaks);
     };
 
 } // namespace R3B::Digitizing::Neuland::Tamex
-#endif // R3BROOT_DIGITIZINGTAMEX_H
