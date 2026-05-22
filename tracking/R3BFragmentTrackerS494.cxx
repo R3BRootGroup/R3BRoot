@@ -330,13 +330,12 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_p_vs_ch2 = new TH2F("h_p_vs_chi2", "p.Mag vs chi2", 200, 0., 200., 200, 0., 20.);
     fh_mass_vs_ch2 = new TH2F("h_mass_vs_chi2", "mass vs chi2", 2000, 0., 200., 200, 0., 20.);
 
-    fh_theta_16O = new TH2F("theta_16O", "theta of 6O ", 100, 0., 5., 200, 16, 18);
+    fh_theta_16O = new TH1F("theta_16O", "theta of 6O ", 500, 0., 5.);
     fh_theta_16O->GetXaxis()->SetTitle("angle / degree");
-    fh_theta_16O->GetYaxis()->SetTitle("pz / GeV/c");
+    
 
-    fh_phi_16O = new TH2F("phi_16O", "phi of 16O ", 360, 0., 360, 200, 16, 18);
+    fh_phi_16O = new TH1F("phi_16O", "phi of 16O ", 360, 0., 360);
     fh_phi_16O->GetXaxis()->SetTitle("angle / degree");
-    fh_phi_16O->GetYaxis()->SetTitle("pz / GeV/c");
 
     Double_t ranges[] = { 10., 5., 5., 10., 10., 10., 10., 50 };
     Int_t bins[] = { 2000, 5000, 5000, 2000, 2000, 2000, 2000, 2000 };
@@ -625,6 +624,46 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_theta_vs_y = new TH2F("h_theta_vs_y", "theta_vs_y", 429, -6.006, 6.006, 125, 0., 5.);
     fh_theta_vs_y->GetXaxis()->SetTitle("y fib23b / cm");
     fh_theta_vs_y->GetYaxis()->SetTitle("theta / deg");
+    
+    fh_beam_py_vs_px= new TH2F("h_beam_py_vs_px", "beam_py_vs_px", 500,-100,100,500,-100,100);
+    fh_beam_py_vs_px->GetXaxis()->SetTitle("px beam / MeV/c");
+    fh_beam_py_vs_px->GetYaxis()->SetTitle("py beam / MeV/c");
+    
+    fh_beam_px_vs_x0= new TH2F("h_beam_px_vs_x0", "beam_px_vs_x0", 200, -1, 1,500,-100,100);
+    fh_beam_px_vs_x0->GetXaxis()->SetTitle("x0 / cm");
+    fh_beam_px_vs_x0->GetYaxis()->SetTitle("px beam / MeV/c");
+    
+    fh_beam_py_vs_y0= new TH2F("h_beam_py_vs_y0", "beam_py_vs_y0", 200, -1, 1,500,-100,100);
+    fh_beam_py_vs_y0->GetXaxis()->SetTitle("y0 / cm");
+    fh_beam_py_vs_y0->GetYaxis()->SetTitle("py beam / MeV/c");
+    
+    fh_beam_px_vs_psum= new TH2F("h_beam_px_vs_psum", "beam_px_vs_psum", 500, 16000, 18000,500,-100,100);
+    fh_beam_px_vs_psum->GetXaxis()->SetTitle("psum / MeV/c");
+    fh_beam_px_vs_psum->GetYaxis()->SetTitle("px beam / MeV/c");
+    
+    fh_beam_py_vs_psum= new TH2F("h_beam_py_vs_psum", "beam_py_vs_psum", 500, 16000, 18000,500,-100,100);
+    fh_beam_py_vs_psum->GetXaxis()->SetTitle("psum / MeV/c");
+    fh_beam_py_vs_psum->GetYaxis()->SetTitle("py beam / MeV/c");
+    
+    fh_beam_py_vs_px_0= new TH2F("h_beam_py_vs_px_0", "beam_py_vs_px", 500,-100,100,500,-100,100);
+    fh_beam_py_vs_px_0->GetXaxis()->SetTitle("px beam / MeV/c");
+    fh_beam_py_vs_px_0->GetYaxis()->SetTitle("py beam / MeV/c");
+    
+    fh_beam_px_vs_x0_0= new TH2F("h_beam_px_vs_x0_0", "beam_px_vs_x0", 200, -1, 1,500,-100,100);
+    fh_beam_px_vs_x0_0->GetXaxis()->SetTitle("x0 / cm");
+    fh_beam_px_vs_x0_0->GetYaxis()->SetTitle("px beam / MeV/c");
+    
+    fh_beam_py_vs_y0_0= new TH2F("h_beam_py_vs_y0_0", "beam_py_vs_y0", 200, -1, 1,500,-100,100);
+    fh_beam_py_vs_y0_0->GetXaxis()->SetTitle("y0 / cm");
+    fh_beam_py_vs_y0_0->GetYaxis()->SetTitle("py beam / MeV/c");
+    
+    fh_beam_px_vs_psum_0= new TH2F("h_beam_px_vs_psum_0", "beam_px_vs_psum", 500, 16000, 18000,500,-100,100);
+    fh_beam_px_vs_psum_0->GetXaxis()->SetTitle("psum / MeV/c");
+    fh_beam_px_vs_psum_0->GetYaxis()->SetTitle("px beam / MeV/c");
+    
+    fh_beam_py_vs_psum_0= new TH2F("h_beam_py_vs_psum_0", "beam_py_vs_psum", 500, 16000, 18000,500,-100,100);
+    fh_beam_py_vs_psum_0->GetXaxis()->SetTitle("psum / MeV/c");
+    fh_beam_py_vs_psum_0->GetYaxis()->SetTitle("py beam / MeV/c");
 
     fFitter->Init(fPropagator, fEnergyLoss);
 
@@ -789,7 +828,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     */
     fNEvents_nonull += 1;
-    //   cout<<"Selected num events: "<<fNEvents_nonull<<endl;
+      // cout<<" "<<endl;
+      // cout<<"*******Selected num events: "<<fNEvents_nonull<<endl;
     // if(fNEvents_nonull > 11) return;
 
     // Start values
@@ -869,6 +909,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t AoverZ = -1000.0;
     Double_t local_chi2 = 1.e+6;
     Double_t psum_cand = 0.0;
+    Double_t px0_beam=0., py0_beam=0., px0_beam_mem=0., py0_beam_mem=0.;
+    Double_t theta_16O=0., phi_16O = 0.;
     vector<Double_t> posHe;
     vector<Double_t> posC;
     vector<Double_t> posO;
@@ -1259,8 +1301,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             if (iretrack == 1 && l < 2 && psum_mem > 0.)
             {
                 // y0 = ymem;
-                x0 = xmem - (psum_mem - ps) / 978.518;
-                //  x0 = xmem + 10.8993 - 0.000626378*psum_mem ;
+                x0 = xmem - (psum_mem - ps) / 978.518;              
+                //x0 = xmem - (psum_mem - ps) / 979.35519;
             }
             if (l == 2)
             {
@@ -1496,7 +1538,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                             px0_cand =
                                                 (pos23a.X() - x0 - 0.0093 * 1.) / pos23a.Z() * p0step;
                                             pz0_cand = sqrt(p0step*p0step-py0_cand*py0_cand-px0_cand*px0_cand);*/
-
+                                            px0_beam = 0.;
+                                            py0_beam = 0.;
                                             px0_cand = 0.0;
                                             py0_cand = 0.0;
                                             pz0_cand = p0step;
@@ -1505,19 +1548,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                             beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
                                             candidate = new R3BTrackingParticle(
-                                                charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0);
+                                                charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam, py0_beam);
                                         }
                                         else if (l == 2)
                                         {
-                                            px0_cand = -pxmem;
-                                            py0_cand = -pymem;
+                                            px0_cand = -pxmem - px0_beam_mem;
+                                            py0_cand = -pymem - py0_beam_mem;
                                             pz0_cand = sqrt(p0step * p0step - pxmem * pxmem - pymem * pymem);
                                             Double_t ptot_cand =
                                                 sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
                                             beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
                                             candidate = new R3BTrackingParticle(
-                                                charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0);
+                                                charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam_mem, py0_beam_mem);
                                         }
 
                                         if (debug_loopin)
@@ -1726,10 +1769,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     continue;
                                 }
                                 fi23b->LocalToGlobal(pos23b, 0.0, fi23b->hits.at(ifi23b)->GetY());
-                                Double_t y_tp =
-                                    (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
-                                    (1. + fslope * ltofd / (z_tp - pos23b.Z()));
-                                y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+                                
+                                
+									Double_t y_tp =
+										(postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
+										(1. + fslope * ltofd / (z_tp - pos23b.Z()));
+									y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+									
+								
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
@@ -1778,6 +1825,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                                 (pos23a.X() - x0 - 0.0093 * 1.) / pos23a.Z() * p0step;
                                             pz0_cand = sqrt(p0step*p0step-py0_cand*py0_cand-px0_cand*px0_cand);*/
 
+                                            px0_beam = 0.;
+                                            py0_beam = 0.;
                                             px0_cand = 0.0;
                                             py0_cand = 0.0;
                                             pz0_cand = p0step;
@@ -1786,19 +1835,19 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                             beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
                                             candidate = new R3BTrackingParticle(
-                                                charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0);
+                                                charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam, py0_beam);
                                         }
                                         else if (l == 2)
                                         {
-                                            px0_cand = -pxmem;
-                                            py0_cand = -pymem;
+                                            px0_cand = -pxmem - px0_beam_mem;
+                                            py0_cand = -pymem - py0_beam_mem;
                                             pz0_cand = sqrt(p0step * p0step - pxmem * pxmem - pymem * pymem);
                                             Double_t ptot_cand =
                                                 sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
                                             beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
                                             candidate = new R3BTrackingParticle(
-                                                charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0);
+                                                charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam_mem, py0_beam_mem);
                                         }
 
                                         if (debug_loopin)
@@ -2020,10 +2069,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                         pChi2 = (psum_cand - ps) * (psum_cand - ps) / (ps * ps * 0.01 * 0.01);
 
-                        // if(iretrack == 1) pChi2 = 0.;
-                        // parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
+                        if(iretrack == 1) pChi2 = 0.;
+                        parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
 
-                        parChi2 = xChi2;
+                       // parChi2 = xChi2;
 
                         if (debug_loopout)
                         {
@@ -2042,8 +2091,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (debug_loopout)
                             cout << "New min chi2: " << minChi2 << ", p = " << x->GetStartMomentum().Mag()
                                  << ", mass: " << x->GetMass() << endl;
-                        if (l == 2)
-                            psum_mem = psum_cand;
+                        if (l == 2){
+                            psum_mem = psum_cand;                          
+						}
                     }
                 }
 
@@ -2244,7 +2294,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     xmem = bestcandidate->GetStartPosition().X();
                     ymem = bestcandidate->GetStartPosition().Y();
                     zmem = bestcandidate->GetStartPosition().Z();
-
+                    px0_beam_mem = bestcandidate->GetBeamMomentum().X();
+                    py0_beam_mem = bestcandidate->GetBeamMomentum().Y();
+                    
                     pCx = bestcandidate->GetStartMomentum().X() * 1000.0;
                     pCy = bestcandidate->GetStartMomentum().Y() * 1000.0;
                     pCz = bestcandidate->GetStartMomentum().Z() * 1000.0;
@@ -2269,9 +2321,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         // "<<pCx<<", "<<pCy<<"; "<<pCz<<", "<<pHex<<", "<<pHey<<", "<<pHez<<"; "<<psum<<"; "<<endl;
                         // std::setprecision(10);
                         // cout<<"psum best candidates: "<<psum<<endl;
+                        Oxygen = alphaP + carbonP; // excited oxygen
+                        Double_t pz0_beam = sqrt(psum*psum-px0_beam_mem*px0_beam_mem*1.e6-py0_beam_mem*py0_beam_mem*1.e6);
+						beamP.SetPxPyPzE(
+                        px0_beam_mem*1.e3, py0_beam_mem*1.e3, pz0_beam, sqrt(pow(px0_beam_mem*1.e3, 2) + pow(py0_beam_mem*1.e3, 2) + pow(pz0_beam, 2) + pow(massO*1.e3, 2)));
+						theta_16O = Oxygen.Angle(beamP.Vect()) * TMath::RadToDeg();
+						phi_16O = Oxygen.Phi() * TMath::RadToDeg();
+						if (phi_16O < 0)
+							phi_16O += 360.;
                         psum_res = (psum - ps) / ps * 100.0;
-                        if (iretrack == iretrack_max)
-                            fh_psum_res->Fill(psum_res);
+                        if (iretrack == iretrack_max){
+                            fh_psum_res->Fill(psum_res);                           
+						}
                     }
                 }
 
@@ -2284,13 +2345,13 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                            pow(bestcandidate->GetStartMomentum().Y() * 1000.0, 2) +
                                            pow(bestcandidate->GetStartMomentum().Z() * 1000.0, 2) + pow(m0, 2)));
 
-                    Double_t theta_16O = Oxygen.Theta() * TMath::RadToDeg();
-                    Double_t phi_16O = Oxygen.Phi() * TMath::RadToDeg();
+                    theta_16O = Oxygen.Theta() * TMath::RadToDeg();
+                    phi_16O = Oxygen.Phi() * TMath::RadToDeg();
                     Double_t pz_16 = bestcandidate->GetStartMomentum().Z();
                     if (iretrack == iretrack_max)
                     {
-                        fh_theta_16O->Fill(theta_16O, pz_16);
-                        fh_phi_16O->Fill(phi_16O, pz_16);
+                        fh_theta_16O->Fill(theta_16O);
+                        fh_phi_16O->Fill(phi_16O);
                         fh_y0_vs_ytrack->Fill(y0, bestcandidate->GetStartPosition().Y());
                     }
                     psum = sqrt(pow(bestcandidate->GetStartMomentum().X() * 1000., 2) +
@@ -2777,6 +2838,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                              0,
                              posC,
                              det_hit_tC[7]);
+                        //     px0_beam_mem*1000.,
+                        //     py0_beam_mem*1000.);
 
                     AddTrack(bestcandidate->GetStartPosition().X(),          // cm
                              bestcandidate->GetStartPosition().Y(),          // cm
@@ -2791,6 +2854,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                              0,
                              posHe,
                              det_hit_tHe[7]);
+                           //  px0_beam_mem*1000.,
+                           //  py0_beam_mem*1000.);
 
                     if (fHitItems.at(DET_CALIFA))
                     {
@@ -2894,6 +2959,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                              0,
                              posO,
                              det_hit_tO[7]);
+                           //  px0_beam_mem*1000.,
+                           //  py0_beam_mem*1000.);
 
                     if (fWriteOut && bestevents)
                     {
@@ -2995,21 +3062,28 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
         } // end for l
 
-        if ((alpha && carbon) && fPairs && (iretrack == 0))
+        if ((alpha && carbon) && fPairs && (iretrack < iretrack_max))
         {
             counter0++;
 
             // LOG(info)
             cout << "Found Tracks: " << counter0 << " with chi2 He/C= " << minChi2 << " / " << minChi2_12C
-                 << ", Erel: " << Erel << ", psum: " << psum << ", x0: " << xmem << ", y0: " << ymem
+                 << ", Erel: " << Erel << ", psum: " << psum << ", x0: " << xmem << ", y0: " << ymem <<", ygeom: "<<ygeomC
                  << ", from selected NEvents: " << fNEvents_nonull << endl;
-            cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << endl;
+            cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << ", iretrack: "<<iretrack<<endl;
+            cout<<"pbeam_mem: "<<px0_beam_mem*1.e3<<" "<<py0_beam_mem*1.e3<<" "<<psum<<endl;
+
             if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10.)
             {
                 fh_Erel0->Fill(Erel);
                 fh_psum0->Fill(psum);
                 fh_theta0->Fill(theta_26);
             }
+            fh_beam_py_vs_px_0->Fill(px0_beam_mem*1000.,py0_beam_mem*1000.);
+            fh_beam_px_vs_x0_0->Fill(xmem,px0_beam_mem*1000.);
+            fh_beam_py_vs_y0_0->Fill(ymem,py0_beam_mem*1000.);
+            fh_beam_px_vs_psum_0->Fill(psum,px0_beam_mem*1000.);
+            fh_beam_py_vs_psum_0->Fill(psum,py0_beam_mem*1000.);
         }
         if ((alpha && carbon) && fPairs && (iretrack == iretrack_max))
         {
@@ -3017,9 +3091,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             // LOG(info)
             cout << "Found Tracks: " << counter1 << " with chi2 He/C= " << minChi2 << " / " << minChi2_12C
-                 << ", Erel: " << Erel << ", psum: " << psum << ", x0: " << xmem << ", y0: " << ymem
+                 << ", Erel: " << Erel << ", psum: " << psum << ", x0: " << xmem << ", y0: " << ymem<<", ygeom: "<<ygeomC
                  << ", from selected NEvents: " << fNEvents_nonull << endl;
-            cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << endl;
+            cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << ", iretrack: "<<iretrack<<endl;
+            cout<<"pbeam_mem: "<<px0_beam_mem*1.e3<<" "<<py0_beam_mem*1.e3<<" "<<psum<<endl;
             cout << " " << endl;
 
             if (fWriteOut)
@@ -3032,7 +3107,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 fh_Erel->Fill(Erel);
                 fh_psum->Fill(psum);
                 fh_theta->Fill(theta_26);
+                fh_theta_16O->Fill(theta_16O);
+				fh_phi_16O->Fill(phi_16O);	
             }
+            fh_beam_py_vs_px->Fill(px0_beam_mem*1000.,py0_beam_mem*1000.);
+            fh_beam_px_vs_x0->Fill(xmem,px0_beam_mem*1000.);
+            fh_beam_py_vs_y0->Fill(ymem,py0_beam_mem*1000.);
+            fh_beam_px_vs_psum->Fill(psum,px0_beam_mem*1000.);
+            fh_beam_py_vs_psum->Fill(psum,py0_beam_mem*1000.);
         }
 
         if ((oxygen && !fPairs) && (iretrack == iretrack_max))
@@ -3245,6 +3327,17 @@ void R3BFragmentTrackerS494::Finish()
         fh_y0_vs_ytrack->Write();
         fh_yC_vs_yC_target->Write();
         fh_yC_vs_yHe_target_geom->Write();
+        fh_beam_py_vs_px->Write();
+        fh_beam_px_vs_x0->Write();
+        fh_beam_py_vs_y0->Write();
+        fh_beam_px_vs_psum->Write();
+        fh_beam_py_vs_psum->Write();
+        fh_beam_py_vs_px_0->Write();
+        fh_beam_px_vs_x0_0->Write();
+        fh_beam_py_vs_y0_0->Write();
+        fh_beam_px_vs_psum_0->Write();
+        fh_beam_py_vs_psum_0->Write();
+        
     }
 
     if (fVis)

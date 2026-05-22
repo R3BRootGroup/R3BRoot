@@ -52,14 +52,14 @@ R3BTPropagator.cxx
 R3BTGeoPar.cxx
 R3BFragmentFitterGeneric.cxx
 R3BFragmentTrackerS494.cxx
-R3BFragmentTrajectoryS494.cxx
+#R3BFragmentTrajectoryS494.cxx
 #R3BFragmentTrackerPAS.cxx
 R3BFragmentFitterChi2S494.cxx
 #R3BFragmentFitterChi2PAS.cxx
 R3BTrackingDetector.cxx
 R3BTrackingParticle.cxx
 R3BTrackingSetup.cxx
-R3BOptimizeGeometryS494.cxx
+#R3BOptimizeGeometryS494.cxx
 #R3BOptimizeSetupS494.cxx
 #R3BOptimizeMagfieldS494.cxx
 )

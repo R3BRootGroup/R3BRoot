@@ -137,16 +137,21 @@ double Chi2MomentumForward(const double* xx)
         cout << "Starting position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y() << "  "
              << gCandidate->GetPosition().Z() << endl;
     }
-
+    if(xx[0] <= 0. || (17.3915*17.3915-xx[3]*xx[3]-xx[4]*xx[4]) <= 0.){
+		return 1.e+10;
+	}
     Double_t x_l = 0.0;
     Double_t y_l = 0.0;
     Double_t chi2 = 0.0;
     Int_t nchi2 = 0;
-    Double_t diffx, diffy;
+    Double_t diffx=0., diffy=0.;
 
     Double_t pz0 = xx[0];
     Double_t x0 = xx[1];
     Double_t y0 = xx[2];
+    Double_t px0beam = xx[3];
+    Double_t py0beam = xx[4];
+    Double_t pz0beam = sqrt(17.3915*17.3915-px0beam*px0beam-py0beam*py0beam);
     Double_t px0 = 0.0;
     Double_t py0 = 0.0;
     Double_t z0 = 0.0;
@@ -165,7 +170,7 @@ double Chi2MomentumForward(const double* xx)
             diffx = 0.0093 * 0.996;      // standard field
             diffy = -0.000365 * (0.125); // 0.0002;//(1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/pz0 ;
         }
-        else if (gCandidate->GetMass() > 11.1) // && gCandidate->GetMass() < 11.2) // C&& O
+        else //if (gCandidate->GetMass() > 11.1) // && gCandidate->GetMass() < 11.2) // C&& O
         {
             // diffx = 0.058115; //0.058125 test field
             diffx = 0.0093 * 0.996;       // standard field
@@ -180,6 +185,11 @@ double Chi2MomentumForward(const double* xx)
 
         px0 = (pos23a.X() - x0 - diffx) / pos23a.Z() * pz0;
         py0 = (pos23b.Y() - y0 - diffy) / pos23b.Z() * pz0;
+		//correction for incomming-beam angle:
+		px0 = px0 - gCandidate->GetMass() / 15.01235 * px0beam;  
+		py0 = py0 - gCandidate->GetMass() / 15.01235 * py0beam;
+		
+		
         /*
             cout << "fib23a x: " << pos23a.X()<< ", fib23a z: " <<pos23a.Z()  << " x0: " << x0 << " px0: " << px0 <<
               "pz0: "<<pz0<<", mass= "<<gCandidate->GetMass() <<endl;
@@ -203,9 +213,15 @@ double Chi2MomentumForward(const double* xx)
     startMomentumChi.SetX(px0);
     startMomentumChi.SetY(py0);
     startMomentumChi.SetZ(pz0);
+    
+    TVector3 beamMomentumChi;
+    beamMomentumChi.SetX(px0beam);
+    beamMomentumChi.SetY(py0beam);
+    beamMomentumChi.SetZ(pz0beam);
 
     gCandidate->SetStartPosition(startPositionChi);
     gCandidate->SetStartMomentum(startMomentumChi);
+    gCandidate->SetBeamMomentum(beamMomentumChi);
     gCandidate->Reset();
 
     LOG(debug3) << "Nach setzen der Startwerte" << endl;
@@ -363,6 +379,8 @@ double Chi2MomentumForward(const double* xx)
                 << "  " << gCandidate->GetMomentum().Z() << endl;
     LOG(debug3) << "current position: " << gCandidate->GetPosition().X() << "  " << gCandidate->GetPosition().Y()
                 << "  " << gCandidate->GetPosition().Z() << endl;
+    LOG(debug3) << "current beam momentum: " << gCandidate->GetBeamMomentum().X() << "  " << gCandidate->GetBeamMomentum().Y()
+                << "  " << gCandidate->GetBeamMomentum().Z() << endl;
 
     // gCandidate->Reset();
     if (gCandidate->GetMass() > 110.0)
@@ -860,11 +878,11 @@ void R3BFragmentFitterChi2S494::Init(R3BTPropagator* prop, Bool_t energyLoss)
     ROOT::Math::Functor* f = new ROOT::Math::Functor(&Chi2Backward2D, 1);
     fMinimum->SetFunction(*f);
 
-    // FORWARD TRACKING:
-
+    // FORWARD TRACKING:  
+      
     //  minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
-    minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Minimize");
-    //  minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
+    // minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit", "Minimize"); 
+      minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
     // minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Scan");
     // minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Seek");
 
@@ -877,11 +895,26 @@ void R3BFragmentFitterChi2S494::Init(R3BTPropagator* prop, Bool_t energyLoss)
     minimum_m->SetTolerance(0.1);           // 0.1);
     minimum_m->SetPrintLevel(0);
     minimum_m->SetStrategy(1);
-
     // create funciton wrapper for minmizer
-    // a IMultiGenFunction type
-    ROOT::Math::Functor* fm = new ROOT::Math::Functor(&Chi2MomentumForward, 3);
+    ROOT::Math::Functor* fm = new ROOT::Math::Functor(&Chi2MomentumForward, 5);
     minimum_m->SetFunction(*fm);
+    
+ // global       
+    minimum_g = ROOT::Math::Factory::CreateMinimizer("GSLSimAn", "");
+    minimum_g->SetMaxFunctionCalls(100000);
+    // Increase default search steps from 200 to 1000 for tough data fits
+	ROOT::Math::GenAlgoOptions simanOpt;
+	simanOpt.SetValue("n_tries", 50); // default 200
+	simanOpt.SetValue("iters_per_tmp", 5); // default 10
+	simanOpt.SetValue("t_initial", 5); // defaul 10
+
+	ROOT::Math::MinimizerOptions opt;
+	opt.SetExtraOptions(simanOpt);
+	minimum_g->SetOptions(opt);
+
+    ROOT::Math::Functor fg(&Chi2MomentumForward, 5);
+    minimum_g->SetFunction(fg);
+    
 }
 
 Int_t R3BFragmentFitterChi2S494::FitTrack(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
@@ -945,10 +978,11 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     gCandidate = particle;
     gSetup = setup;
     Double_t pbeam = 17.3915;
+    Double_t pzbeam_optimized = 17.3915;
     Double_t theta0 = 0.0;
     Double_t phi0 = 0.0;
     Double_t dy_tof = 0.0, dy_fi23b = 0.0;
-
+	Double_t pzmin = 0., pzmax = 0.;
     TVector3 pos0;
     TVector3 pos1;
     TVector3 pos2;
@@ -974,28 +1008,23 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     Double_t mass = gCandidate->GetMass();
     Double_t x0start = x0;
     Double_t y0start = y0;
-
+    Double_t pxbeam = gCandidate->GetBeamMomentum().X();
+    Double_t pybeam = gCandidate->GetBeamMomentum().Y();
+    Double_t pzbeam = sqrt(pbeam*pbeam-pxbeam*pxbeam-pybeam*pybeam);
+	Double_t px0_cand = px0, py0_cand = py0, pz0_cand = pz0;
     LOG(debug3) << "In FitTrackMomentumForward" << endl;
     LOG(debug3) << "Start Momenta: " << px0 << ", " << py0 << ", " << pz0 << endl;
     LOG(debug3) << "Start Position: " << x0 << "; " << y0 << ", " << z0 << endl;
-
-    /*
-         cout << "*** In FitTrackMomentumForward ***" << endl;
-         cout << "Incoming Momenta: " << px0 << ", " << py0 << ", " << pz0 << ", mass: "<<mass<< endl;
-         cout << "Incoming Position: " << x0 << "; " << y0 << ", " << z0 << ", mass: "<<mass<< endl;
-    */
 
     Double_t diffx = 0.0, diffy = 0.0; // correction for deviation in the magnetic field for protons 1 GeV
 
     if (gCandidate->GetMass() > 3.7 && gCandidate->GetMass() < 3.8) // alpha
     {
-        // diffx = 0.058115; // test field
         diffx = 0.0093 * 0.996;      // standard field
         diffy = -0.000365 * (0.125); // 0.0002;// (1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/pz0 ;
     }
-    else if (gCandidate->GetMass() > 11.1) //&& gCandidate->GetMass() < 11.2) // C && O
+    else //if (gCandidate->GetMass() > 11.1) //&& gCandidate->GetMass() < 11.2) // C && O
     {
-        // diffx = 0.058115; // test field
         diffx = 0.0093 * 0.996;       // standard field
         diffy = -0.000365 * (-0.226); // 0.0002;//(1.9475601 + 0.02056205*pos23b.Y())*1.e-3*pos23b.Z()/pz0 ;
     }
@@ -1023,11 +1052,13 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
         fi23b->LocalToGlobal(
             pos3, xfi23b, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY() - diffy);
     }
-
     py0 = (pos3.Y() - y0) / pos3.Z() * pz0; // diffy is in pos3
     px0 = (pos3.X() - x0) / pos3.Z() * pz0; // diffx is in pos3
+    //correction for incomming-beam angle:
+    px0 = px0 - gCandidate->GetMass() / 15.01235 * pxbeam;  
+    py0 = py0 - gCandidate->GetMass() / 15.01235 * pybeam;
     pz0 = sqrt(ptot0 * ptot0 - px0 * px0 - py0 * py0);
-
+    
     pos0.SetX(x0);
     pos0.SetY(y0);
     pos0.SetZ(z0);
@@ -1049,16 +1080,21 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     gCandidate->SetStartPosition(inputPosition);
 
     gCandidate->SetStartMomentum(inputMomentum);
+    
+    TVector3 inputBeamMomentum(pxbeam,pybeam,pzbeam);  
+    gCandidate->SetBeamMomentum(inputBeamMomentum);
 
     gCandidate->Reset();
 
-    /*
-        cout << "In FitTrackMomentumForward" << endl;
-        cout << "From vector(x0,y0)-(xf23,yf23): " << px0 << ", " << py0 << ", " << pz0 << endl;
-        cout << "From vector(x0,y0)-(xf23,yf23): " << x0 << "; " << y0 << ", " << z0 <<  endl;
-        inputPosition.Print();
-        inputMomentum.Print();
-    */
+ // The logic: in the first step use GSLSimAn (Simulated Annealing) to explore
+ // the avaliable parameter space. Thus obtained parameters use as starting values
+ // for Minuit2::Migrad to refine the search.
+ // Step sizes: 
+ // For GSLSimAn set generous step size, typically 10%-20% of total physical parameter range
+ // For Minuit2:Migrad set tight step size, usually 1% or less of expected parameter value 
+ // or equal to expected detector resolution.
+ 
+ 
     if (x0 < -1.5)
         x0 = -1.5;
     if (y0 < -1.5)
@@ -1068,67 +1104,59 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     if (y0 > 1.5)
         y0 = 1.5;
 
-    /*
-      if (x0 < -0.49)
-          x0 = -0.49;
-      if (y0 < -0.49)
-          y0 = -0.49;
-      if (x0 > 0.49)
-          x0 = 0.49;
-      if (y0 > 0.49)
-          y0 = 0.49;
-      */
 
     LOG(debug) << "Start values momentum:     " << px0 << "  " << py0 << "  " << pz0 << endl;
     LOG(debug) << "Start values position:     " << x0 << "  " << y0 << "  " << z0 << endl;
     LOG(debug3) << "Pos3 x,y,z pos:           " << pos3.X() << "  " << pos3.Y() << "  " << pos3.Z() << endl;
     LOG(debug3) << "Direction x,y,z pos:      " << pos3.X() << "  " << pos3.Y() << "  " << pos3.Z() << endl;
-
-    Double_t variable[3] = { pz0, x0, y0 };
-    // Double_t step[3] = { 0.001, 0.25, 0.15};
-    Double_t step[3] = { 0.001, 0.02, 0.02 };
-
-    Double_t pzmin = gCandidate->GetStartMomentum().Z() * 0.7;
-    Double_t pzmax = gCandidate->GetStartMomentum().Z() * 1.3;
-
-    /*
-       if (gCandidate->GetHitIndexByName("tofd") > -1)
-       {
-           auto tof = gSetup->GetByName("tofd");
-           tof->LocalToGlobal(postofd, gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX(),
-                                       gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY());
-           dy_tof = tof->res_y;
-       }
-
-       Double_t y0min = ((pos23b.Y()-dy_fi23b)*postofd.Z()-(postofd.Y()-dy_tof)*pos23b.Z())/
-                                            (postofd.Z()-pos23b.Z());
-       Double_t y0max = ((pos23b.Y()+dy_fi23b)*postofd.Z()-(postofd.Y()+dy_tof)*pos23b.Z())/
-                                            (postofd.Z()-pos23b.Z());
-   */
-    //   Double_t y0min = y0 - 3.*0.045;
-    //   Double_t y0max = y0 + 3.*0.045;
-    //   step[2] = (y0max - y0min) / 9.;
-
-    // cout<<"In fragment fitter: y0/max/min: "<<y0<<", "<<y0max<<", "<<y0min<<", "<<y0max-y0min<<", "<<step[2]<<endl;
-
-    minimum_m->SetLimitedVariable(0, "pz", variable[0], step[0], pzmin, pzmax);
-    minimum_m->SetLimitedVariable(1, "x0", variable[1], step[1], -1.5, 1.5);
-    minimum_m->SetLimitedVariable(2, "y0", variable[2], step[2], -1.5, 1.5);
-
-    // minimum_m->FixVariable(2); // y fixed
-
-    // if ((mass < 3.8 && mass > 3.7) || (mass > 4. && !(x0start == 0. && y0start == 0.))) // 4He
+    LOG(debug) << "Beam momentum:     " << pxbeam << "  " << pybeam << "  " << pzbeam << endl;
+       
+    pzmin = gCandidate->GetStartMomentum().Z() * 0.7;
+    pzmax = gCandidate->GetStartMomentum().Z() * 1.3;
+   /* if(mass < 3.8 && mass > 3.7)
     {
-        minimum_m->FixVariable(1); // x fixed
-        minimum_m->FixVariable(2); // y fixed
+		pzmin = gCandidate->GetStartMomentum().Z() * 0.7;
+		pzmax = gCandidate->GetStartMomentum().Z() * 1.30;
+	}
+	else
+	{
+		pzmin = gCandidate->GetStartMomentum().Z() * 0.85;
+		pzmax = gCandidate->GetStartMomentum().Z() * 1.15;
+	}
+    **/
+    Double_t variable[5] = { pz0, x0, y0, pxbeam, pybeam };
+    Double_t pz0step = variable[0]*0.002; // 0.2% resolution
+    //Double_t stepmig[5] = { pz0step, 0.02, 0.02, 13.e-3, 13.e-3 }; // for minuit, step sizes corresponding to expected resolution
+    Double_t stepmig[5] = { 0.001, 0.02, 0.02, 0.01, 0.01 }; // for minuit, step sizes corresponding to expected resolution
+    Double_t lower[5] = {pzmin, -1.5, -1.5, -0.2, -0.2};
+    Double_t upper[5] = {pzmax, 1.5, 1.5, 0.2, 0.2};
+
+/*
+ // GSL too slow
+    Double_t pz0_stepgsl = (pzmax - pzmin) * 0.15;
+    Double_t stepgsl[5] = { pz0_stepgsl, 0.45, 0.45, 0.08, 0.08 }; // for gsl    
+    minimum_g->SetLimitedVariable(0, "pzgsl",     variable[0], stepgsl[0], lower[0], upper[0]);
+    minimum_g->SetLimitedVariable(1, "x0gsl",     variable[1], stepgsl[1], lower[1], upper[1]);
+    minimum_g->SetLimitedVariable(2, "y0gsl",     variable[2], stepgsl[2], lower[2], upper[2]);
+    minimum_g->SetLimitedVariable(3, "pxbeamgsl", variable[3], stepgsl[3], lower[3], upper[3]);  
+    minimum_g->SetLimitedVariable(4, "pybeamgsl", variable[4], stepgsl[4], lower[4], upper[4]); 
+    
+    if ((mass < 3.8 && mass > 3.7) ) // 4He
+    {
+        minimum_g->FixVariable(1); // x fixed
+        minimum_g->FixVariable(3); 
+        minimum_g->FixVariable(4); 
     }
-
-    Double_t py0_cand =
-        (pos23b.Y() - gCandidate->GetStartPosition().Y() - diffy) / pos23b.Z() * gCandidate->GetStartMomentum().Z();
-    Double_t px0_cand =
-        (pos23a.X() - gCandidate->GetStartPosition().X() - diffx) / pos23a.Z() * gCandidate->GetStartMomentum().Z();
-    Double_t pz0_cand = gCandidate->GetStartMomentum().Z();
-
+   // if(mass > 4. && !(x0start == 0.)) minimum_g->FixVariable(1); // x fixed for iretrack==1
+    minimum_g->FixVariable(2); 
+    minimum_g->FixVariable(3); 
+    minimum_g->FixVariable(4); 
+    
+// Start candidate = Init candidate, as we haven't changed anything in between
+    py0_cand = gCandidate->GetStartMomentum().Y();
+    px0_cand = gCandidate->GetStartMomentum().X();
+    pz0_cand = gCandidate->GetStartMomentum().Z();
+    
     startMomentum.SetX(px0_cand);
     startMomentum.SetY(py0_cand);
     startMomentum.SetZ(pz0_cand);
@@ -1136,73 +1164,129 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     startPosition.SetX(gCandidate->GetStartPosition().X());
     startPosition.SetY(gCandidate->GetStartPosition().Y());
     startPosition.SetZ(gCandidate->GetStartPosition().Z());
-
-    /*
-        cout<<"Start values:"<<endl;
-        startMomentum.Print();
-        startPosition.Print();
-        cout<<"*************"<<endl;
-    */
+    LOG(debug) << "Start Position:     " << gCandidate->GetStartPosition().X() << "  Start Momentum: " << pz0_cand << endl;
+   
     gCandidate->SetStartPosition(startPosition);
 
     gCandidate->SetStartMomentum(startMomentum);
-
+        
     gCandidate->Reset();
-
-    Double_t delta = 0.0;
+    
     Double_t oldChi = 0.0;
     Double_t ptot0_cand;
+    Int_t status0 = 0;
+    
+	// do the minimization
+	minimum_g->Minimize();
+
+	status0 = minimum_g->Status();
+	LOG(debug3) << "Status0: " << status0 << endl;
+	
+	px0_cand = (pos23a.X() - minimum_g->X()[1] - diffx) / pos23a.Z() * minimum_g->X()[0];
+	py0_cand = (pos23b.Y() - minimum_g->X()[2] - diffy) / pos23b.Z() * minimum_g->X()[0];
+	//correction for incomming-beam angle:
+	px0_cand = px0_cand - gCandidate->GetMass() / 15.01235 * minimum_g->X()[3]; 
+	py0_cand = py0_cand - gCandidate->GetMass() / 15.01235 * minimum_g->X()[4];;
+	pz0_cand = minimum_g->X()[0];
+
+	LOG(debug3) << "optimized momentum: " << px0_cand << "  " << py0_cand << "  " << pz0_cand << endl;
+	LOG(debug3) << "optimized position: " << minimum_g->X()[1] << "  " << minimum_g->X()[2] << "  "
+				<< "0. " << endl;
+	pzbeam_optimized = sqrt(pbeam*pbeam - minimum_g->X()[3] * minimum_g->X()[3] -
+									  minimum_g->X()[4] *minimum_g->X()[4]); 
+	LOG(debug3) << "optimized beam momentum: " << minimum_g->X()[3] << "  " << minimum_g->X()[4] << " " <<pzbeam_optimized<<endl;
+	
+	TVector3 startPositionOptimized(minimum_g->X()[1], minimum_g->X()[2], 0.);
+	TVector3 startMomentumOptimized(px0_cand, py0_cand, pz0_cand);
+	TVector3 startBeamMomentumOptimized(minimum_g->X()[3],minimum_g->X()[4],pzbeam_optimized);
+
+	oldChi = minimum_g->MinValue();
+	gCandidate->SetChi2(oldChi);
+	gCandidate->SetStartPosition(startPositionOptimized);
+	gCandidate->SetStartMomentum(startMomentumOptimized);
+	gCandidate->SetBeamMomentum(startBeamMomentumOptimized);
+	gCandidate->Reset();
+	
+	minimum_g->Clear();
+	
+	if(oldChi > 100.){
+		return 20;
+	}
+*/         
+// GSL too slow, we will do only migrad:
     Int_t status = 0;
+    Double_t pz0minuit = gCandidate->GetStartMomentum().Z();
+    Double_t x0minuit = gCandidate->GetStartPosition().X();
+    Double_t y0minuit = gCandidate->GetStartPosition().Y();
+    Double_t pxbeamminuit = gCandidate->GetBeamMomentum().X();
+    Double_t pybeamminuit = gCandidate->GetBeamMomentum().Y();
+    
+    minimum_m->SetLimitedVariable(0, "pz", pz0minuit, stepmig[0], lower[0], upper[0]);
+    minimum_m->SetLimitedVariable(1, "x0", x0minuit, stepmig[1], lower[1], upper[1]);
+    minimum_m->SetLimitedVariable(2, "y0", y0minuit, stepmig[2], lower[2], upper[2]);
+    minimum_m->SetLimitedVariable(3, "pxbeam", pxbeamminuit, stepmig[3], lower[3], upper[3]); 
+    minimum_m->SetLimitedVariable(4, "pybeam", pybeamminuit, stepmig[4], lower[4], upper[4]); 
+ 
+// y0 fixed to y0geom 
+// x0 fixed to 0 for iretrack=0, and to xcorrected for iretrack=1 
+    minimum_m->FixVariable(1); // x fixed
+    minimum_m->FixVariable(2); // y fixed
+    
+    if ((mass < 3.8 && mass > 3.7) ) // 4He
+    {        
+        minimum_m->FixVariable(3); 
+        minimum_m->FixVariable(4); 
+    }
+    if(x0start == 0.){
+		minimum_m->FixVariable(3); 
+		minimum_m->FixVariable(4); 
+	}
+        
+    minimum_m->Minimize();
 
-    do
-    {
-        // do the minimization
-        minimum_m->Minimize();
+	status = minimum_m->Status();
+	LOG(debug3) << "Status: " << status << endl;
+			
+	px0_cand = (pos23a.X() - minimum_m->X()[1] - diffx) / pos23a.Z() * minimum_m->X()[0];
+	py0_cand = (pos23b.Y() - minimum_m->X()[2] - diffy) / pos23b.Z() * minimum_m->X()[0];
+	//correction for incomming-beam angle:
+	px0_cand = px0_cand - gCandidate->GetMass() / 15.01235 * minimum_m->X()[3]; 
+	py0_cand = py0_cand - gCandidate->GetMass() / 15.01235 * minimum_m->X()[4];;
+	pz0_cand = minimum_m->X()[0];
 
-        status = minimum_m->Status();
-        LOG(debug3) << "Status: " << status << endl;
+	LOG(debug3) << "second optimized momentum: " << px0_cand << "  " << py0_cand << "  " << pz0_cand << endl;
+	LOG(debug3) << "second optimized position: " << minimum_m->X()[1] << "  " << minimum_m->X()[2] << "  "
+				<< "0. " << endl;
+	pzbeam_optimized = sqrt(pbeam*pbeam - minimum_m->X()[3] * minimum_m->X()[3] -
+									  minimum_m->X()[4] *minimum_m->X()[4]); 
+	LOG(debug3) << "second optimized beam momentum: " << minimum_m->X()[3] << "  " << minimum_m->X()[4] << " " <<pzbeam_optimized<<endl;
+	 
+	TVector3 FinalstartPositionOptimized(minimum_m->X()[1], minimum_m->X()[2], 0.);
+	TVector3 FinalstartMomentumOptimized(px0_cand, py0_cand, pz0_cand);
+	TVector3 FinalstartBeamMomentumOptimized(minimum_m->X()[3],minimum_m->X()[4],pzbeam_optimized);
 
-        px0_cand = (pos23a.X() - minimum_m->X()[1] - diffx) / pos23a.Z() * minimum_m->X()[0];
-        py0_cand = (pos23b.Y() - minimum_m->X()[2] - diffy) / pos23b.Z() * minimum_m->X()[0];
-        pz0_cand = minimum_m->X()[0];
+	Double_t newChi = minimum_m->MinValue();
+	gCandidate->SetChi2(newChi);
+	gCandidate->SetStartPosition(FinalstartPositionOptimized);
+	gCandidate->SetStartMomentum(FinalstartMomentumOptimized);
+	gCandidate->SetBeamMomentum(FinalstartBeamMomentumOptimized);
+	gCandidate->Reset();
 
-        LOG(debug3) << "optimized momentum: " << px0_cand << "  " << py0_cand << "  " << pz0_cand << endl;
-        LOG(debug3) << "optimized position: " << minimum_m->X()[1] << "  " << minimum_m->X()[2] << "  "
-                    << "0. " << endl;
-
-        TVector3 startPositionOptimized(minimum_m->X()[1], minimum_m->X()[2], 0.);
-        TVector3 startMomentumOptimized(px0_cand, py0_cand, pz0_cand);
-
-        Double_t newChi = minimum_m->MinValue();
-        gCandidate->SetChi2(newChi);
-        gCandidate->SetStartPosition(startPositionOptimized);
-        gCandidate->SetStartMomentum(startMomentumOptimized);
-        delta = TMath::Abs(oldChi - newChi);
-        gCandidate->Reset();
-
-        //   cout << "current chi: " << newChi << "  old chi: " << oldChi << "  delta: " << delta << endl;
-        oldChi = newChi;
-        /*
-                 cout << "Optimized chi: "<<newChi<<endl;
-                 cout << "Optimized momentum: " << gCandidate->GetMomentum().X() << "  " <<
-           gCandidate->GetMomentum().Y()
-                        << "  " << gCandidate->GetMomentum().Z()<< endl;
-                 cout << "Optimized position: " << gCandidate->GetPosition().X() << "  " <<
-           gCandidate->GetPosition().Y()
-                            << "  " << gCandidate->GetPosition().Z()<< endl;
-        */
-        delta = 0.0;
-    } while (delta > 0.1);
-
+    //cout << "current chi: " << newChi << "  old chi: " << oldChi << endl;
+	
+    
     if (mass > 40.)
     {
-        cout << "For parameters: " << minimum_m->X()[0] << ", " << minimum_m->X()[1] << ", " << minimum_m->X()[2]
-             << ", and chi2: " << oldChi << endl;
+       // cout << "For gsl parameters: " << pz0minuit << ", " << x0minuit << ", " << y0minuit
+       //      << ", and chi2: " << oldChi << endl;
+		cout << "For migrad parameters: " << minimum_m->X()[0] << ", " << minimum_m->X()[1] << ", " << minimum_m->X()[2]
+             << ", and chi2: " << newChi << endl;
         cout << "Correlation between pz and x0: " << minimum_m->Correlation(0, 1)
              << ", pz and y0: " << minimum_m->Correlation(0, 2) << ", x0 and y0: " << minimum_m->Correlation(1, 2)
              << endl;
     }
-
+    
+   
     minimum_m->Clear();
 
     return status;

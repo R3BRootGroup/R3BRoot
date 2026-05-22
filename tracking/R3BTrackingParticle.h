@@ -35,7 +35,9 @@ class R3BTrackingParticle : public TObject
                         Double_t py,
                         Double_t pz,
                         Double_t beta,
-                        Double_t mass);
+                        Double_t mass,
+                        Double_t px_beam,
+                        Double_t py_beam);
 
     virtual ~R3BTrackingParticle();
 
@@ -54,6 +56,12 @@ class R3BTrackingParticle : public TObject
         p[1] = fMomentum.Y();
         p[2] = fMomentum.Z();
     }
+    void GetBeamMomentum(Double_t* pbeam) const
+    {
+        pbeam[0] = fBeamMomentum.X();
+        pbeam[1] = fBeamMomentum.Y();
+        pbeam[2] = sqrt(17.3195*17.3195-pbeam[0]*pbeam[0]-pbeam[1]*pbeam[1]);
+    }
     void GetCosines(Double_t* cos) const
     {
         cos[3] = fMomentum.Mag();
@@ -65,6 +73,7 @@ class R3BTrackingParticle : public TObject
     void SetPosition(const TVector3& pos) { fPosition = pos; }
     void SetPosition(Double_t* xyz) { fPosition.SetXYZ(xyz[0], xyz[1], xyz[2]); }
     void SetMomentum(const TVector3& mom) { fMomentum = mom; }
+    void SetBeamMomentum(const TVector3& beammom) { fBeamMomentum = beammom; }
     void SetMomentum(Double_t* p) { fMomentum.SetXYZ(p[0], p[1], p[2]); }
     void SetCosines(Double_t* cos) { fMomentum.SetXYZ(cos[0] * cos[3], cos[1] * cos[3], cos[2] * cos[3]); }
 
@@ -83,6 +92,8 @@ class R3BTrackingParticle : public TObject
     const TVector3& GetPosition() const { return fPosition; }
 
     const TVector3& GetMomentum() const { return fMomentum; }
+
+    const TVector3& GetBeamMomentum() const { return fBeamMomentum; }
 
     const TVector3& GetStartPosition() const { return fStartPosition; }
     const TVector3& GetStartMomentum() const { return fStartMomentum; }
@@ -143,6 +154,7 @@ class R3BTrackingParticle : public TObject
 
     TVector3 fPosition;
     TVector3 fMomentum;
+    TVector3 fBeamMomentum;
     Double_t fBeta;
     Double_t fLength;
 

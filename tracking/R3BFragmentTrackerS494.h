@@ -184,7 +184,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Int_t eventCounter = 0;
     Double_t minChi2;
     Double_t minChi2_12C;
-    TLorentzVector alphaP, carbonP;
+    TLorentzVector alphaP, carbonP, beamP;
     TVector3 p12C, p4He;
     Int_t iwriteout = 0;
     
@@ -319,8 +319,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_yFi23b_tofd_exp;
     TH2F* fh_pyC_vs_pyHe; 
     TH2F* fh_A_overZ;
-    TH2F* fh_theta_16O;
-    TH2F* fh_phi_16O;
+    TH1F* fh_theta_16O;
+    TH1F* fh_phi_16O;
     TH2F* fh_xfi23a_target_track;
     TH2F* fh_yfi23b_target_track;
     TH2F* fh_xy_target;
@@ -357,6 +357,16 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_yC_vs_yHe_target_geom;
     TH2F* fh_xFi23a_tofd_track;
     TH2F* fh_chiX_vs_chiP;
+    TH2F* fh_beam_py_vs_px;
+    TH2F* fh_beam_px_vs_x0;
+    TH2F* fh_beam_py_vs_y0;
+    TH2F* fh_beam_px_vs_psum;
+    TH2F* fh_beam_py_vs_psum;
+    TH2F* fh_beam_py_vs_px_0;
+    TH2F* fh_beam_px_vs_x0_0;
+    TH2F* fh_beam_py_vs_y0_0;
+    TH2F* fh_beam_px_vs_psum_0;
+    TH2F* fh_beam_py_vs_psum_0;
     
 
     TH2F* fh_califa_energy;

@@ -26,6 +26,7 @@ R3BTrackingParticle::R3BTrackingParticle()
     , fBeta(0.)
     , fLength(0.)
     , fChi2(0.)
+    , fBeamMomentum(0.,0.,17.391)
 {
 }
 
@@ -37,7 +38,9 @@ R3BTrackingParticle::R3BTrackingParticle(Double_t charge,
                                          Double_t py,
                                          Double_t pz,
                                          Double_t beta,
-                                         Double_t mass)
+                                         Double_t mass,
+                                         Double_t px_beam,
+                                         Double_t py_beam)
     : fCharge(charge)
     , fStartPosition(x, y, z)
     , fStartMomentum(px, py, pz)
@@ -48,6 +51,7 @@ R3BTrackingParticle::R3BTrackingParticle(Double_t charge,
     , fBeta(beta)
     , fLength(0.)
     , fChi2(0.)
+    , fBeamMomentum(px_beam, py_beam, 17.391)
 {
 }
 

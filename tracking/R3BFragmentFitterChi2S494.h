@@ -20,6 +20,7 @@
 #include "Math/Functor.h"
 #include "Math/Minimizer.h"
 #include "Minuit2/Minuit2Minimizer.h"
+#include "Math/GenAlgoOptions.h"
 
 class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
 {
@@ -57,6 +58,7 @@ class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
   private:
     ROOT::Math::Minimizer* fMinimum;
     ROOT::Math::Minimizer* minimum_m;
+    ROOT::Math::Minimizer* minimum_g;
     R3BTPropagator* fPropagator;
    	Double_t amu = 0.931494028;   // Gev/c**2
     TVector3 pinv;

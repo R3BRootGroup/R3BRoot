@@ -2241,7 +2241,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                         Int_t CrystalNb = hitCalifa->GetCrystalList().size();
                         Double_t Energy = hitCalifa->GetEnergy();
                         Double_t theta = hitCalifa->GetTheta();
-                        Double_t Energy_dc = Energy * GAMMA * (1 - BETA * TMath::Cos(theta));
+                        Double_t Energy_dc = Energy * GAMMA * (1 - BETA * TMath::Cos(theta+theta_16O*TMath::DegToRad()));
                         Int_t motherId = hitCalifa->GetMotherCrystal();
                         std::vector<Int_t> clist = hitCalifa->GetCrystalList();
                         std::vector<Double_t> elist = hitCalifa->GetEnergyList();
@@ -2372,7 +2372,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                             if (!(motherId > 927 && motherId < 2433))
                                 continue;
 
-                            Double_t esumcluster_dc = esumcluster * GAMMA * (1 - BETA * TMath::Cos(theta));
+                            Double_t esumcluster_dc = esumcluster * GAMMA * (1 - BETA * TMath::Cos(theta+theta_16O*TMath::DegToRad()));
 
                             fh_crystalNb->Fill(CrystalNb, CrystalNb_new);
 
