@@ -18,6 +18,7 @@
 #include <R3BValueError.h>
 #include <TFile.h>
 #include <filesystem>
+#include <fmt/core.h>
 #include <fmt/std.h>
 #include <regex>
 #include <type_traits>
@@ -181,10 +182,11 @@ namespace R3B
 
         if (not fs::exists(parent_folder))
         {
-            R3BLOG(
-                error,
-                fmt::format(R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)",
-                            filename));
+            R3BLOG(error,
+                   fmt::format(
+                       fmt::runtime(
+                           R"(Cannot get the parent folder of the regex path "{}"! Setting it to the current folder)"),
+                       filename));
             return ".";
         }
 
@@ -210,7 +212,7 @@ namespace R3B
         }
         if (filelist.empty())
         {
-            R3BLOG(error, fmt::format(R"(Cannot find any files with regex "{}")", regex_string));
+            R3BLOG(error, fmt::format(fmt::runtime(R"(Cannot find any files with regex "{}")"), regex_string));
         }
         std::sort(filelist.begin(), filelist.end());
         return filelist;

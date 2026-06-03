@@ -73,7 +73,7 @@ Bool_t R3BUcesbSource::Init()
     else
     {
 #ifdef FAIRROOT_GE_19
-        run->SetEventHeader(std::unique_ptr<R3BEventHeader>());
+        run->SetEventHeader(std::make_unique<R3BEventHeader>());
 #else
         eventHeader = new R3BEventHeader();
         run->SetEventHeader(eventHeader); // Implicit conversion and transfer ownership to FairRun
@@ -185,16 +185,15 @@ Bool_t R3BUcesbSource::InitUnpackers()
                    "ext_data_clnt::setup() mapping failure may "
                    "cause unexpected analysis results due to missing "
                    "data members. Unpacker needs fixing.");
+            return kFALSE;
         }
         else
         {
-            R3BLOG(error,
+            R3BLOG(warn,
                    "ext_data_clnt::setup() mapping failure may "
                    "cause unexpected analysis results due to missing "
                    "data members. Unpacker needs fixing.");
         }
-
-        return kFALSE;
     }
 
     return kTRUE;

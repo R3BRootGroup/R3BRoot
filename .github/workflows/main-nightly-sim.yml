@@ -65,9 +65,7 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy ]
-        os: [ debian11, debian12 ] # ubuntu24.04 ]
-        fsv: [ jan24p1, jan24p5 ]
-        cpp: [ 17 ]
+        sys: [ debian13_cpp17_feb26p1_v19.0.1 ]
         
         # The list under "include" defines some properties for each group:
         #
@@ -119,18 +117,13 @@ jobs:
     # tool-kits for the building, such as clang-tidy and cvmfs. For more
     # information, please visit the Docker repository at Dockerhub.
     container: 
-      image: r3bdockers/${{ matrix.os }}
-      volumes:
-        - /tmp:/cvmfs
+      image: r3bdockers/${{ matrix.sys }}
       env:
-        CVMDIR: /cvmfs/fairsoft.gsi.de
         # Specifying the number of threads available for the building and
         # testing. Github hosted runners can have at most 4 cores. The number
         # of the cores can be increased with a larger runner, thus increasing
         # the speed of the run.
         NUM_THREADS: 4
-      # Options for the Docker container to be run with cvmfs.
-      options: --user root --privileged  --ulimit nofile=10000:10000 --cap-add SYS_ADMIN --device /dev/fuse
 
     # Each job contains different steps that are executed sequentially. Each
     # step could be multiple shell commands or a composite action either from
@@ -142,14 +135,20 @@ jobs:
           # This allows all commits of all branches to be fetched.
           fetch-depth: 0
 
+      # Restore ccache
+      - name: Restore cache
+        uses: actions/cache@v5
+        with:
+          path: ~/.ccache
+          key: ccache-${{ matrix.cache }}-${{ matrix.sys }}
+          restore-keys: |
+            ccache-${{ matrix.cache }}-${{ matrix.sys }}
+
       # A self-defined composite action. It sets multiple necessary environment
       # variables and mounts the cmvfs folder of fairroot and fairsoft.
       - name: pre-build
-        uses: './.github/actions/pre-build'
+        uses: './.github/actions/pre-build-wfr'
         
-      - name: set custom CMake path
-        run: echo "/usr/local/bin" >> $GITHUB_PATH && cmake --version && export PATH=/usr/local/bin:$PATH && cmake --version 
-
       # A self-defined composite action, which restores the caches of
       # dependencies and builds and install them if the cache doesn't exist.
       # The two inputs for this action, r3b-dev-key and cache-name, determine
@@ -180,7 +179,7 @@ jobs:
       # are rerun after 'make clean'.
       - name: ctest-cdash
         if: always()
-        uses: './.github/actions/ctest-cdash'
+        uses: './.github/actions/ctest-cdash-wfr'
         with:
           repo: ${{ matrix.repos }}
 

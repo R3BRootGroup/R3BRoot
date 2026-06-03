@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2021 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2021-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2021-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -161,8 +161,8 @@ void create_twin_geo(const TString geoTag = "v2021.3")
     AnodeLog->SetVisLeaves(kTRUE);
     AnodeLog->SetLineColor(2);
 
-    Int_t nbSections = 4;
-    Int_t nbAnodes = 16;
+    const Int_t nbSections = 4;
+    const Int_t nbAnodes = 16;
     TGeoCombiTrans* pMatrixAnode[nbSections * nbAnodes];
 
     Int_t nbanode = 0;

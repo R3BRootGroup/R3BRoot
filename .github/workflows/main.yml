@@ -44,7 +44,7 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-name: CI-CD-C++17
+name: CI-CD-GSI
 
 # Controls when the action will run. 
 on:
@@ -91,23 +91,14 @@ jobs:
       matrix:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
-        repos: [ r3broot, glad-tpc, sofia-frs-asy, r3broot-conan ]
-        os: [ debian11, debian12 , debian13]
-        fsv: [ jan24p5 , jan24p6]
+        repos: [ r3broot, sofia-frs-asy-glad-tpc, r3broot-conan ]
+        os: [ debian11, debian12 ]
+        fsv: [ jan24p5 ]
         cpp: [ 17 ]
         exclude:
           - os: debian11
-            fsv: jan24p6
-          - os: debian11
             fsv: jan24p5
             repos: r3broot-conan
-          - os: debian12
-            fsv: jan24p5
-            repos: r3broot-conan
-          - os: debian12
-            fsv: jan24p6
-          - os: debian13
-            fsv: jan24p5
 
         # The list under "include" defines some properties for each group:
         #
@@ -137,14 +128,9 @@ jobs:
           # This job is only for testing R3BRoot without downloading any
           # dependencies.
           - repos: r3broot
-          # The job for testing with glad-tpc
-          - repos: glad-tpc
-            url: https://github.com/R3BRootGroup/glad-tpc.git
-            cache: glad-tpc
-            # skip-save: true
-          # The job for testing with sofia, frs and asyeos dependencies. All three
+          # The job for testing with sofia, frs, asyeos and glad-tpc dependencies. All four
           # repositories are downloaded and run together in the job.
-          - repos: sofia-frs-asy
+          - repos: sofia-frs-asy-glad-tpc
             # If more than one repos needs to be downloaded in a job. "url" needs
             # to be a space separated list of urls using the operator ">-". Append
             # more urls to this list if more repos need to be added.
@@ -153,6 +139,7 @@ jobs:
               https://github.com/R3BRootGroup/sofia.git
               https://github.com/R3BRootGroup/frs.git
               https://github.com/R3BRootGroup/asyeos.git
+              https://github.com/R3BRootGroup/glad-tpc.git
               https://github.com/R3BRootGroup/R3BFileSource.git
             # Using own cache file
             cache: other-repos

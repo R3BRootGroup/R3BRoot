@@ -1,6 +1,6 @@
 /******************************************************************************
  *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2025 Members of R3B Collaboration                     *
+ *   Copyright (C) 2019-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -18,8 +18,7 @@
  * Do not edit - automatically generated.
  */
 
-#ifndef __GUARD_H101_EXT_H101_UNPACK_H__
-#define __GUARD_H101_EXT_H101_UNPACK_H__
+#pragma once
 
 #ifndef __CINT__
 #include <stdint.h>
@@ -56,7 +55,5 @@ typedef struct EXT_STR_h101_unpack_t
         EXT_STR_ITEM_INFO_LIM(ok, si, offset, struct_t, printerr, TRIGGER, UINT32, "TRIGGER", 15); \
         EXT_STR_ITEM_INFO(ok, si, offset, struct_t, printerr, EVENTNO, UINT32, "EVENTNO");         \
     } while (0);
-
-#endif /*__GUARD_H101_EXT_H101_unpack_H__*/
 
 /*******************************************************/
