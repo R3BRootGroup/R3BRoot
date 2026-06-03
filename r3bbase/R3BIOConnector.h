@@ -55,10 +55,11 @@ namespace R3B
             auto* ioman = FairRootManager::Instance();
             if (ioman == nullptr)
             {
-                throw R3B::runtime_error(fmt::format("FairRootManager is nullptr during the initialisation of the "
-                                                     "input data with  the branch name \"{}\"",
-                                                     branch_name_),
-                                         loc);
+                throw R3B::runtime_error(
+                    fmt::format(fmt::runtime("FairRootManager is nullptr during the initialisation of the "
+                                             "input data with  the branch name \"{}\""),
+                                branch_name_),
+                    loc);
             }
 
             data_ = ioman->InitObjectAs<const RawDataType*>(branch_name_.c_str());
@@ -68,13 +69,15 @@ namespace R3B
                 if (is_optional)
                 {
                     R3BLOG(warn,
-                           fmt::format("The data branch {:?} doesn't exist in the input root file!", branch_name_));
+                           fmt::format(fmt::runtime("The data branch {:?} doesn't exist in the input root file!"),
+                                       branch_name_));
                 }
                 else
                 {
                     throw R3B::runtime_error(
-                        fmt::format("Initialisation of the input data with the branch name \"{}\" failed!",
-                                    branch_name_),
+                        fmt::format(
+                            fmt::runtime("Initialisation of the input data with the branch name \"{}\" failed!"),
+                            branch_name_),
                         loc);
                 }
             }
@@ -122,8 +125,8 @@ namespace R3B
         {
             if (data_ == nullptr)
             {
-                throw R3B::runtime_error(fmt::format("Input data with the branch name \"{}\" cannot be "
-                                                     "queried without an initialisation!",
+                throw R3B::runtime_error(fmt::format(fmt::runtime("Input data with the branch name \"{}\" cannot be "
+                                                                  "queried without an initialisation!"),
                                                      branch_name_),
                                          loc);
             }
@@ -146,17 +149,19 @@ namespace R3B
             auto* ioman = FairRootManager::Instance();
             if (ioman == nullptr)
             {
-                throw R3B::runtime_error(fmt::format("FairRootManager is nullptr during the initialisation of the "
-                                                     "input data with  the branch name \"{}\"",
-                                                     branch_name_),
-                                         loc);
+                throw R3B::runtime_error(
+                    fmt::format(fmt::runtime("FairRootManager is nullptr during the initialisation of the "
+                                             "input data with  the branch name \"{}\""),
+                                branch_name_),
+                    loc);
             }
 
             data_ = dynamic_cast<TClonesArray*>(ioman->GetObject(branch_name_.c_str()));
             if (data_ == nullptr)
             {
                 const auto msg = fmt::format(
-                    "Input TCA data with the branch name {:?} cannot be retrieved from the input file !", branch_name_);
+                    fmt::runtime("Input TCA data with the branch name {:?} cannot be retrieved from the input file !"),
+                    branch_name_);
                 if (is_optional)
                 {
                     R3BLOG(warn, msg.c_str());
@@ -198,10 +203,10 @@ namespace R3B
         {
             if (std::string_view{ data_->GetClass()->GetName() } != InputType::Class_Name())
             {
-                const auto msg = fmt::format(
-                    "The type of the retrieved data {:?} is not the same as the type given by the connector class {}!",
-                    data_->GetClass()->GetName(),
-                    InputType::Class_Name());
+                const auto msg = fmt::format(fmt::runtime("The type of the retrieved data {:?} is not the same as the "
+                                                          "type given by the connector class {}!"),
+                                             data_->GetClass()->GetName(),
+                                             InputType::Class_Name());
                 if (is_optional)
                 {
                     R3BLOG(warn, msg.c_str());
@@ -237,10 +242,11 @@ namespace R3B
             }
             else
             {
-                throw R3B::runtime_error(fmt::format("FairRootManager is nullptr during the initialisation of the "
-                                                     "output data with the branch name \"{}\"",
-                                                     branch_name_),
-                                         loc);
+                throw R3B::runtime_error(
+                    fmt::format(fmt::runtime("FairRootManager is nullptr during the initialisation of the "
+                                             "output data with the branch name \"{}\""),
+                                branch_name_),
+                    loc);
             }
         }
 

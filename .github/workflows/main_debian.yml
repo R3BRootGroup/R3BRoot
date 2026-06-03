@@ -8,7 +8,7 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-name: CI-CD-Other-OS
+name: CI-CD-Main
 
 # Controls when the action will run. 
 on:
@@ -38,7 +38,7 @@ jobs:
         uses: './.github/actions/cache-clean'
         with:
           path: ~/.ccache
-          key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
+          key: ccache-${{ matrix.cache }}-${{ matrix.sys }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   # The job to run the main CI pipelines
@@ -57,45 +57,10 @@ jobs:
       matrix:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
-        repos: [ r3broot, glad-tpc, sofia-frs-asy ] # exclude r3broot-conan
-        os: [ ubuntu2404, ubuntu2504 , ubuntu2604 ]
-        cpp: [ 17 ]
-        fsv: [ jan24p5, jan24p6 ]
-        frv: [ v18.8.2, v19.0.1 ]
-        exclude:
-          - os: ubuntu2404
-            fsv: jan24p6
-            frv: v19.0.1
-          - os: ubuntu2404
-            fsv: jan24p5
-            frv: v19.0.1
-          - os: ubuntu2404
-            fsv: jan24p6
-            frv: v18.8.2
-          - os: ubuntu2404
-            fsv: jan24p5
-            frv: v19.0.1
-          - os: ubuntu2504
-            fsv: jan24p6
-            frv: v19.0.1
-          - os: ubuntu2504
-            fsv: jan24p6
-            frv: v18.8.2
-          - os: ubuntu2504
-            fsv: jan24p5
-            frv: v19.0.1
-          - os: ubuntu2404
-            fsv: jan24p5
-            frv: v19.0.1
-          - os: ubuntu2604
-            fsv: jan24p5
-            frv: v18.8.2
-          - os: ubuntu2604
-            fsv: jan24p6
-            frv: v18.8.2
-          - os: ubuntu2604
-            fsv: jan24p5
-            frv: v19.0.1
+        repos: [ r3broot, sofia-frs-asy-glad-tpc ]
+        sys: [ debian12_cpp17_feb26p1_v19.0.1,
+               debian13_cpp17_feb26p1_v19.0.1, debian13_cpp20_feb26p1_v19.0.1, debian13_cpp23_feb26p1_v19.0.1,
+               debian14_cpp17_feb26p1_v19.0.1, debian14_cpp20_feb26p1_v19.0.1, debian14_cpp23_feb26p1_v19.0.1 ]
 
         # The list under "include" defines some properties for each group:
         #
@@ -125,14 +90,9 @@ jobs:
           # This job is only for testing R3BRoot without downloading any
           # dependencies.
           - repos: r3broot
-          # The job for testing with glad-tpc
-          - repos: glad-tpc
-            url: https://github.com/R3BRootGroup/glad-tpc.git
-            cache: glad-tpc
-            # skip-save: true
-          # The job for testing with sofia, frs and asyeos dependencies. All three
+          # The job for testing with sofia, frs, asyeos and glad-tpc dependencies. All four
           # repositories are downloaded and run together in the job.
-          - repos: sofia-frs-asy
+          - repos: sofia-frs-asy-glad-tpc
             # If more than one repos needs to be downloaded in a job. "url" needs
             # to be a space separated list of urls using the operator ">-". Append
             # more urls to this list if more repos need to be added.
@@ -141,19 +101,16 @@ jobs:
               https://github.com/R3BRootGroup/sofia.git
               https://github.com/R3BRootGroup/frs.git
               https://github.com/R3BRootGroup/asyeos.git
+              https://github.com/R3BRootGroup/glad-tpc.git
               https://github.com/R3BRootGroup/R3BFileSource.git
             # Using own cache file
             cache: other-repos
-
-          # build with conan package manager
-#          - repos: r3broot-conan
-#           preset: default
 
     # Jobs are run inside a Docker container, which provides different compiled
     # tool-kits for the building, such as clang-tidy. For more
     # information, please visit the Docker repository at Dockerhub.
     container: 
-      image: r3bdockers/${{ matrix.os }}_cpp${{ matrix.cpp }}_${{ matrix.fsv }}_${{ matrix.frv }}
+      image: r3bdockers/${{ matrix.sys }}
       env:
         NUM_THREADS: 4
 
@@ -172,14 +129,35 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.ccache
-          key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
+          key: ccache-${{ matrix.cache }}-${{ matrix.sys }}
           restore-keys: |
-            ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}
+            ccache-${{ matrix.cache }}-${{ matrix.sys }}
+
+      # A self-defined composite action. It sets multiple necessary environment
+      # variables of fairroot and fairsoft.
+      - name: pre-build
+        uses: './.github/actions/pre-build-wfr'
+        
+      # A self-defined composite action, which restores the caches of
+      # dependencies and builds and install them if the cache doesn't exist.
+      # The two inputs for this action, r3b-dev-key and cache-name, determine
+      # the name (key) of the R3BRoot build cache being used in the the run.
+      # Its name is defined as
+      # "r3b-build-${cache-name}-${r3b-dev-key}". Apart from r3b build cache,
+      # there is another cache called "r3b-build-deps", which contains all
+      # dependencies for the R3BRoot build, such as googletest, catima and ucesb. The
+      # cache restoring step is only used for the run triggered with
+      # "pull_request" and disabled for the merge event.
+      - name: install dependencies
+        id: restore-cache
+        uses: './.github/actions/install-deps-wfr'
+        with: 
+          cache-name: ${{ matrix.cache }}
 
       # A self-defined composite action. It sets the required environment variables
       # for FairSoft and FairRoot, and then compiles R3BRoot.
       - name: configure-build
-        uses: './.github/actions/r3bbuild-steps-wfr'
+        uses: './.github/actions/r3bbuild-steps'
 
       # A self-defined composite action to perform the ctest and push the
       # results to the cdash (cmake-dashborad). To fully show the errors and
@@ -187,7 +165,7 @@ jobs:
       # are rerun after 'make clean'.
       - name: ctest-cdash
         if: always()
-        uses: './.github/actions/ctest-cdash'
+        uses: './.github/actions/ctest-cdash-wfr'
         with:
           repo: ${{ matrix.repos }}
 
@@ -199,7 +177,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.ccache
-          key: ccache-${{ matrix.cache }}-${{ matrix.os }}-${{ matrix.cpp }}-${{ matrix.fsv }}-${{ matrix.frv }}
+          key: ccache-${{ matrix.cache }}-${{ matrix.sys }}
 
       # Show the cache stats
       - name: Show-ccache-stats

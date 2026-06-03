@@ -1,6 +1,6 @@
 /******************************************************************************
- *   Copyright (C) 2019 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
- *   Copyright (C) 2019-2023 Members of R3B Collaboration                     *
+ *   Copyright (C) 2024 GSI Helmholtzzentrum für Schwerionenforschung GmbH    *
+ *   Copyright (C) 2024-2026 Members of R3B Collaboration                     *
  *                                                                            *
  *             This software is distributed under the terms of the            *
  *                 GNU General Public Licence (GPL) version 3,                *
@@ -17,6 +17,7 @@
 #include "R3BShared.h"
 #include <FairRun.h>
 #include <R3BException.h>
+#include <fmt/core.h>
 #include <map>
 #include <string>
 
@@ -93,8 +94,9 @@ namespace R3B
         const auto [it, is_success] = container.emplace(std::string{ element_name }, std::move(element));
         if (not is_success)
         {
-            throw R3B::logic_error(fmt::format(
-                "Element with the name {} has been already added. Please use different name!", element_name));
+            throw R3B::logic_error(
+                fmt::format(fmt::runtime("Element with the name {} has been already added. Please use different name!"),
+                            element_name));
         }
         return element_ptr;
     }
@@ -113,7 +115,8 @@ namespace R3B
         if (canvases_.find(std::string{ canvas_name }) != canvases_.end())
         {
             throw R3B::logic_error(fmt::format(
-                "A canvas with the name {} has been already added. Please use different name!", canvas_name));
+                fmt::runtime("A canvas with the name {} has been already added. Please use different name!"),
+                canvas_name));
         }
         const auto [it, is_success] = canvases_.insert(
             { std::string{ canvas_name }, DataMonitorCanvas(this, canvas_name.data(), canvas_title.data(), args...) });
@@ -158,7 +161,7 @@ namespace R3B
         if constexpr (std::is_base_of_v<TH2, ElementType>)
         {
             const auto* option = figure->GetOption();
-            figure->SetOption(fmt::format("{} COLZ", option).c_str());
+            figure->SetOption(fmt::format(fmt::runtime("{} COLZ"), option).c_str());
         }
         auto* pad = canvas_->GetPad(div_num);
         return CanvasElement{ figure, pad };

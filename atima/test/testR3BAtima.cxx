@@ -15,10 +15,6 @@
 
 #include <cmath>
 #include <gtest/gtest.h>
-#include <map>
-#include <tuple>
-#include <utility>
-#include <vector>
 
 namespace
 {

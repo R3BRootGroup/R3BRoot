@@ -1,0 +1,40 @@
+name: pre build
+description: 'steps before building R3BRoot'
+
+runs:
+  using: composite
+  steps:
+    - name: set env variables
+      run: |
+        git config --global --add safe.directory $GITHUB_WORKSPACE
+        echo "UCESB_DIR=$GITHUB_WORKSPACE/ucesb/" >> $GITHUB_ENV
+        echo "ATIMA_DIR=$GITHUB_WORKSPACE/catima/" >> $GITHUB_ENV
+        echo "ATIMAPATH=$GITHUB_WORKSPACE/catima/install/" >> $GITHUB_ENV
+        export SIMPATH=$FAIRSOFTPATH
+        echo "SIMPATH=${SIMPATH}" >> $GITHUB_ENV
+        echo "FAIRROOTPATH=$FAIRROOTPATH" >> $GITHUB_ENV
+        echo "${SIMPATH}/bin" >> $GITHUB_PATH 
+        # variables for ccache
+        echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
+        echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
+        echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
+        echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
+        echo "SOURCEDIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+        echo "BUILDDIR=$GITHUB_WORKSPACE/build" >> $GITHUB_ENV
+        echo "cacheSHA=$([[ ${{github.event_name}} = "push" ]] && git rev-parse --short HEAD || git rev-parse --short HEAD^)" >> $GITHUB_ENV
+      shell: bash
+
+    - name: mount cvmfs
+      run: |
+        apt-get update
+        apt-get install --fix-missing -y sudo gnupg lsb-release
+        lsb_release -a
+        # apt-get install --fix-missing -y sudo python3-venv
+        # python3 -m venv /tmp/conan-venv
+        # /tmp/conan-venv/bin/python -m pip install --no-cache-dir --upgrade pip conan
+        # echo "/tmp/conan-venv/bin" >> $GITHUB_PATH
+        # conan --version
+        mkdir -p ${UCESB_DIR}
+        mkdir -p ${ATIMA_DIR}
+        mkdir -p ${CCACHE_DIR}
+      shell: bash

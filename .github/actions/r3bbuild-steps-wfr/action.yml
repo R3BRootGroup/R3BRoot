@@ -21,32 +21,9 @@ runs:
     - name: Configure CMake
       run: |
         git config --global --add safe.directory $GITHUB_WORKSPACE
-        export UCESB_DIR=/opt/ucesb/
-        echo "UCESB_DIR=/opt/ucesb/" >> $GITHUB_ENV
-        export SIMPATH=/opt/FairSoft
-        echo "SIMPATH=${SIMPATH}" >> $GITHUB_ENV
-        export FAIRROOTPATH=/opt/FairRoot
-        echo "FAIRROOTPATH=${FAIRROOTPATH}" >> $GITHUB_ENV
-        echo "${SIMPATH}/bin" >> $GITHUB_PATH
-        echo "CCACHE_BASEDIR=${GITHUB_WORKSPACE}" >> $GITHUB_ENV
-        echo "CCACHE_DIR=${GITHUB_WORKSPACE}/.ccache" >> $GITHUB_ENV
-        echo "CCACHE_COMPRESS=true" >> $GITHUB_ENV
-        echo "CCACHE_COMPRESSLEVEL=6" >> $GITHUB_ENV
-        echo "SOURCEDIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
-        echo "BUILDDIR=$GITHUB_WORKSPACE/build" >> $GITHUB_ENV
         echo "cacheSHA=$([[ ${{github.event_name}} = 'push' ]] && git rev-parse --short HEAD || git rev-parse --short HEAD^)" >> $GITHUB_ENV
         git submodule update --init --recursive
-        git clone https://github.com/R3BRootGroup/macros.git
-        if [[ "${{ matrix.os }}" == "fedora42" || "${{ matrix.os }}" == "ubuntu2504" || "${{ matrix.os }}" == "ubuntu2604" ]]; then
-          unset UCESB_DIR
-          echo "UCESB_DIR=" >> $GITHUB_ENV
-        fi
-        
-        if [[ "${{ matrix.os }}" == "ubuntu2404" || "${{ matrix.os }}" == "ubuntu2504" ]]; then
-          cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake" -DCMAKE_CXX_STANDARD=${{ matrix.cpp }} -DFETCH_GTEST=OFF
-        else
-          cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake" -DCMAKE_CXX_STANDARD=${{ matrix.cpp }} -DFETCH_GTEST=ON
-        fi
+        cmake --preset ${{ matrix.preset }} . -C "$GITHUB_WORKSPACE/cmake/CI_CD/configure_options.cmake"
       shell: bash
 
     - name: Build

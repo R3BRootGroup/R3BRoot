@@ -83,7 +83,6 @@ option(WITH_FRS "Build FRS" OFF)
 option(WITH_ASYEOS "Build ASYEOS" OFF)
 option(BUILD_C3W "Build C3W" OFF)
 option(CONAN_ENABLED "conan package is enabled. (Use CMakePreset to set it)" OFF)
-option(FETCH_GTEST "Fetch GTest from CMake" OFF)
 
 find_package(FairCMakeModules CONFIG REQUIRED)
 if(NOT FairCMakeModules_FOUND)
@@ -230,12 +229,6 @@ if("${FairRoot_VERSION}" VERSION_GREATER 18.6.4)
         ${boost_dependencies}
         ADD_REQUIREMENTS_OF
         FairMQ)
-    #  If (FairMQ_FOUND AND Boost_FOUND)
-    #    add_subdirectory(base/MQ)
-    #    add_subdirectory(parmq)
-    #  Else ()
-    #    Message(STATUS "base/MQ and parmq will not be built, because FairMQ and/or Boost was not found.")
-    #  EndIf ()
 else()
     set(Boost_NO_SYSTEM_PATHS TRUE)
     set(Boost_NO_BOOST_CMAKE TRUE)
@@ -285,10 +278,12 @@ if(CONAN_ENABLED)
         CACHE BOOL "disable implicit conversion of JSON" FORCE)
 endif()
 
-include(cmake/modules/FetchAllContents.cmake)
-
-if(NOT FETCH_GTEST)
-    find_package2(PRIVATE GTest)
+find_package(GTest CONFIG QUIET)
+if(GTest_FOUND)
+    set(GTEST_FOUND TRUE)
+    include(GoogleTest)
+else()
+    set(GTEST_FOUND FALSE)
 endif()
 
 find_package2(PUBLIC Pythia6)
@@ -408,8 +403,6 @@ if(yaml-cpp_FOUND
     set_target_properties(yaml-cpp PROPERTIES INTERFACE_INCLUDE_DIRECTORIES
                                               "${YAML_CPP_INCLUDE_DIR}")
 endif()
-
-# include(${CMAKE_SOURCE_DIR}/cmake/scripts/fetchGTest.cmake)
 
 setbasicvariables()
 
