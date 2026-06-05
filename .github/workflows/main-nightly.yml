@@ -38,7 +38,7 @@ jobs:
   cache-cleanup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -65,7 +65,7 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy ]
-        sys: [ debian13_cpp17_feb26p1_v19.0.1 ]
+        sys: [ debian13_cpp17_feb26p1_v19.0.1 , debian13_cpp20_feb26p1_v19.0.1 , debian13_cpp23_feb26p1_v19.0.1 ]
 
         # The list under "include" defines some properties for each group:
         #
@@ -132,7 +132,7 @@ jobs:
     # another github repo or a self-defined one in .github/actions.
     steps:
       # Fetch updates from pull request branches using a public github action.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           # This allows all commits of all branches to be fetched.
           fetch-depth: 0

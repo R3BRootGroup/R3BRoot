@@ -29,7 +29,7 @@ jobs:
   cache-cleanup:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: 'true'
@@ -119,7 +119,7 @@ jobs:
     # another github repo or a self-defined one in .github/actions.
     steps:
       # Fetch updates from pull request branches using a public github action.
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           # This allows all commits of all branches to be fetched.
           fetch-depth: 0
