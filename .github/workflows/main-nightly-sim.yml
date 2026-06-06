@@ -65,7 +65,9 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, glad-tpc, sofia-frs-asy ]
-        sys: [ debian13_cpp17_feb26p1_v19.0.1 , debian13_cpp20_feb26p1_v19.0.1 , debian13_cpp23_feb26p1_v19.0.1 ]
+        sys: [ debian12_cpp17_feb26p1_v19.0.1, ubuntu2604_cpp17_feb26p1_v19.0.1, almalinux101_cpp17_feb26p1_v19.0.1, 
+               debian13_cpp17_feb26p1_v19.0.1, debian13_cpp20_feb26p1_v19.0.1, debian13_cpp23_feb26p1_v19.0.1,
+               debian14_cpp17_feb26p1_v19.0.1, debian14_cpp20_feb26p1_v19.0.1, debian14_cpp23_feb26p1_v19.0.1 ]
         
         # The list under "include" defines some properties for each group:
         #

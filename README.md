@@ -56,7 +56,7 @@ First, you will need to install FairSoft and FairRoot. For more details:
 export SIMPATH=%PATH_TO_FAIRSOFT%
 export FAIRROOTPATH=%PATH_TO_FAIRROOT%
 # from %R3BRoot_DIRECTORY%
-./build_thisr3broot.sh
+. ./build_thisr3broot.sh
 # or a second option is the following
 mkdir ../build
 cmake -S . -B ../build
@@ -86,7 +86,7 @@ Please ask your questions, request features, and report issues by [creating a gi
 
 The R3BRoot project uses clang-format-16 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
 ~~~bash
-bash util/clang-format-all.sh
+. util/clang-format-all.sh
 ~~~
 
 ## Spell Checking
@@ -113,12 +113,16 @@ The following systems are tested regularly.
 | ----------- | -------- | -------------- | ------------- | --------------- | --------------- |
 | Almalinux   | x86\_64  | 9.3            | GCC 11.4.1    | 3.27.9 / 4.0.3  | C++17 / C++20 / C++23 |
 | Almalinux   | x86\_64  | 9.4            | GCC 14.2.0    | 3.30.6          | C++17           |
+| Almalinux   | x86\_64  | 9.7            | GCC 11.4.1    | 4.2.0           | C++17 / C++20 / C++23 |
+| Almalinux   | x86\_64  | 10.1           | GCC 14.2.0    | 4.0.3           | C++17 / C++20 / C++23 |
 | RHEL        | x86\_64  | 9.6            | GCC 14.2.0    | 3.30.6          | C++17           |
 | Debian      | x86\_64  | 11             | GCC 10.2.1    | 3.27.4 / 3.30.0 | C++17           |
-| Debian      | x86\_64  | 12             | GCC 12.2.0    | 3.27.4 / 3.30.0 | C++17 / C++20   |
-| Debian      | x86\_64  | 13             | GCC 14.2.0    | 3.31.6 / 4.0.3  | C++17           |
-| Ubuntu      | x86\_64  | 24.04          | GCC 13.3.0    | 3.28.3 / 4.0.3  | C++17 / C++20   |
-| Ubuntu      | x86\_64  | 25.04          | GCC 14.2.0    | 3.31.6          | C++17           |
+| Debian      | x86\_64  | 12             | GCC 12.2.0    | 3.27.4 / 4.0.3  | C++17 / C++20   |
+| Debian      | x86\_64  | 13             | GCC 14.2.0    | 3.31.6 / 4.0.3  | C++17 / C++20 / C++23 |
+| Debian      | x86\_64  | 14             | GCC 15.2.0    | 3.31.6 / 4.0.3  | C++17 / C++20 / C++23 |
+| Ubuntu      | x86\_64  | 24.04          | GCC 13.3.0    | 3.28.3 / 4.0.3  | C++17 / C++20 / C++23 |
+| Ubuntu      | x86\_64  | 25.04          | GCC 14.2.0    | 3.31.6          | C++17 / C++20   |
+| Ubuntu      | x86\_64  | 26.04          | GCC 15.2.0    | 3.31.6 / 4.0.3  | C++17 / C++20 / C++23 |
 | MacOS       | arm64    | 15.3           | AppleClang 15 |  4.0.3          | C++17           |
 
 ## Security Policy
