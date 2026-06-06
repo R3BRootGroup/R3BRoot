@@ -115,6 +115,7 @@ The following systems are tested regularly.
 | Almalinux   | x86\_64  | 9.4            | GCC 14.2.0    | 3.30.6          | C++17           |
 | Almalinux   | x86\_64  | 9.7            | GCC 11.4.1    | 4.2.0           | C++17 / C++20 / C++23 |
 | Almalinux   | x86\_64  | 10.1           | GCC 14.2.0    | 4.0.3           | C++17 / C++20 / C++23 |
+| Almalinux   | x86\_64  | 10.2           | GCC 14.3.1    | 4.0.3           | C++17 / C++20 / C++23 |
 | RHEL        | x86\_64  | 9.6            | GCC 14.2.0    | 3.30.6          | C++17           |
 | Debian      | x86\_64  | 11             | GCC 10.2.1    | 3.27.4 / 3.30.0 | C++17           |
 | Debian      | x86\_64  | 12             | GCC 12.2.0    | 3.27.4 / 4.0.3  | C++17 / C++20   |

@@ -26,9 +26,15 @@ runs:
 
     - name: mount cvmfs
       run: |
-        apt-get update
-        apt-get install --fix-missing -y sudo gnupg lsb-release
-        lsb_release -a
+        if command -v apt-get >/dev/null 2>&1; then
+            apt-get update
+            apt-get install --fix-missing -y sudo gnupg lsb-release
+            lsb_release -a
+        elif command -v dnf >/dev/null 2>&1; then
+            dnf -y install sudo gnupg2 which diffutils
+            echo "YACC=bison" >> $GITHUB_ENV
+            cat /etc/os-release
+        fi
         # apt-get install --fix-missing -y sudo python3-venv
         # python3 -m venv /tmp/conan-venv
         # /tmp/conan-venv/bin/python -m pip install --no-cache-dir --upgrade pip conan
