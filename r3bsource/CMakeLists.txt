@@ -310,6 +310,9 @@ add_library_with_dictionary(
     R3BData
     R3BActaf
     Ucesb)
+    if(TARGET Boost::process)
+           target_link_libraries(R3BSource PUBLIC Boost::process)
+    endif()
 
 if("${FairRoot_VERSION}" VERSION_GREATER_EQUAL 19.0.0)
     target_compile_definitions(R3BSource PUBLIC FAIRROOT_GE_19)

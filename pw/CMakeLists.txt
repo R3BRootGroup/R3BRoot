@@ -1,6 +1,6 @@
 ##############################################################################
-#   Copyright (C) 2022 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
-#   Copyright (C) 2022-2025 Members of R3B Collaboration                     #
+#   Copyright (C) 2026 GSI Helmholtzzentrum für Schwerionenforschung GmbH    #
+#   Copyright (C) 2026 Members of R3B Collaboration                          #
 #                                                                            #
 #             This software is distributed under the terms of the            #
 #                 GNU General Public Licence (GPL) version 3,                #
@@ -52,5 +52,3 @@ add_library_with_dictionary(
     DEPENDENCIES
     R3BTracking
     R3BTCal)
-
-
