@@ -220,6 +220,7 @@ if("${FairRoot_VERSION}" VERSION_GREATER 18.6.4)
         log
         atomic)
 
+
     find_package2(
         PUBLIC
         Boost
@@ -229,6 +230,7 @@ if("${FairRoot_VERSION}" VERSION_GREATER 18.6.4)
         ${boost_dependencies}
         ADD_REQUIREMENTS_OF
         FairMQ)
+    find_package(Boost COMPONENTS process QUIET)
 else()
     set(Boost_NO_SYSTEM_PATHS TRUE)
     set(Boost_NO_BOOST_CMAKE TRUE)

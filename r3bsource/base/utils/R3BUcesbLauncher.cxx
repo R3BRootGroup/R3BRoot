@@ -24,6 +24,7 @@
 #include <boost/process/v2/process.hpp>
 #include <boost/process/v2/stdio.hpp>
 #include <chrono>
+#include <cstdio>
 #include <fairlogger/Logger.h>
 #include <filesystem>
 #include <fmt/core.h>
@@ -156,12 +157,16 @@ namespace R3B
 
     void UcesbServerLauncher::Launch()
     {
+        auto stdio = bpv2::process_stdio{};
+        stdio.in = nullptr;
+        stdio.out = server_pipe_;
+        stdio.err = stderr;
+
         ucesb_server_ =
-            std::make_unique<bpv2::process>(ios_,
-                                            launch_strings_.executable,
-                                            launch_args,
-                                            bpv2::process_stdio{ .in = nullptr, .out = server_pipe_, .err = stderr });
+            std::make_unique<bpv2::process>(ios_, launch_strings_.executable, launch_args, std::move(stdio));
+
         R3BLOG(info, fmt::format("Launching an ucesb server with pid: {}", ucesb_server_->id()));
+
         if (auto is_status_ok = client_->connect(server_pipe_.native_handle()); not is_status_ok)
         {
             R3BLOG(error, "ext_data_clnt::connect() failed");
