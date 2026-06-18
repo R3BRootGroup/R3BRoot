@@ -184,7 +184,7 @@ class R3BFragmentTrackerS494 : public FairTask
     Int_t eventCounter = 0;
     Double_t minChi2;
     Double_t minChi2_12C;
-    TLorentzVector alphaP, carbonP, beamP;
+    TLorentzVector alphaP, carbonP;
     TVector3 p12C, p4He;
     Int_t iwriteout = 0;
     
@@ -192,7 +192,7 @@ class R3BFragmentTrackerS494 : public FairTask
    	Double_t amu = 0.931494028;   // Gev/c**2
     Double_t mHe = 3.7273791; //simu
 	Double_t mC = 11.17486; //simu
-	Double_t mO = 15.01235;//14.895085; //simu
+	Double_t mO = 14.895085; //15.01235;//simu
 	
 	Double_t ps = 17391.5;
 	Double_t pBeamz = 17.3915;
@@ -286,6 +286,7 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_xfi31_tofd_track;
     
     TH1F* fh_Erel;
+    TH1F* fh_Erel_true;
     TH1F* fh_psum;
     TH1F* fh_theta;
     TH1F* fh_Erel0;
@@ -320,7 +321,10 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_pyC_vs_pyHe; 
     TH2F* fh_A_overZ;
     TH1F* fh_theta_16O;
+    TH1F* fh_theta_16O_true;
     TH1F* fh_phi_16O;
+    TH1F* fh_phi_bc_cm;
+    TH1F* fh_phi_bc_cm_true;
     TH2F* fh_xfi23a_target_track;
     TH2F* fh_yfi23b_target_track;
     TH2F* fh_xy_target;

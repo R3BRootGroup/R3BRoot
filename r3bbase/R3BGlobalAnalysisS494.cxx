@@ -742,7 +742,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
     fh_phi_bc_cm = new TH1F("phi_bc_cm", "phi bc in cm-system", 360, 0., 360.);
     fh_phi_bc_cm->GetXaxis()->SetTitle("angle / degree");
     fh_phi_bc_cm->GetYaxis()->SetTitle("counts");
-
+    
     fh_phi_bc_cm_polar = new TH2F("phi_bc_cm_polar", "phi_bc_cm_polar", 360, 0., 360., 100, 0., 10.);
     fh_phi_bc_cm_polar->GetXaxis()->SetTitle("angle / degree");
     fh_phi_bc_cm_polar->GetYaxis()->SetTitle("counts");
@@ -1729,7 +1729,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     {
         mHe = 3.7273791e3;
         mC = 11.17486e3;
-        mO = 14.89508e3;
+        mO = 15.01235e3;//14.89508e3;
         amu = 0.931494028e3;
     }
 
@@ -1745,9 +1745,6 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
     vector<Double_t> posdetHe;
     vector<Double_t> posdetC;
     vector<Double_t> posdetO;
-
-    Double_t rot_thetay = 2.427e-3;  //rad
-    Double_t rot_thetaz = 1.571; //-2.356;  //rad
 
     Double_t tHetofd = -10000., tCtofd = -10000., tOtofd = -10000.;
 
@@ -1771,9 +1768,9 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 YHe = aTrack->GetY(); // cm
                 ZHe = aTrack->GetZ(); // cm
 
-                pHex0 = aTrack->GetPx(); //  + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx(); // MeV/c
-                pHey0 = aTrack->GetPy(); // + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx(); // MeV/c
-                pHez0 = aTrack->GetPz(); // MeV/c
+                pHex = aTrack->GetPx(); //  + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx(); // MeV/c
+                pHey = aTrack->GetPy(); // + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx(); // MeV/c
+                pHez = aTrack->GetPz(); // MeV/c
                 mtrackHe = aTrack->GetAoZ() * aTrack->GetQ();
 
                 chiHex = aTrack->GetChix();
@@ -1782,23 +1779,16 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 tHetofd = aTrack->GetTime();
 
                 is_alpha = true;
-                alpha0.SetPxPyPzE(
-                    pHex0, pHey0, pHez0, sqrt(pow(pHex0, 2) + pow(pHey0, 2) + pow(pHez0, 2) + pow(mHe, 2)));
+                alpha.SetPxPyPzE(
+                    pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(mHe, 2)));
                 if (mtrackHe > 2.4 && mtrackHe < 3.6)
                     helium3.SetPxPyPzE(
-                        pHex0, pHey0, pHez0, sqrt(pow(pHex0, 2) + pow(pHey0, 2) + pow(pHez0, 2) + pow(m3He, 2)));
-
-                alpha = alpha0;
-                alpha.RotateZ(-rot_thetaz);
-                alpha.RotateY(-rot_thetay);
-                pHex = alpha.Px();
-                pHey = alpha.Py();
-                pHez = alpha.Pz();
+                        pHex, pHey, pHez, sqrt(pow(pHex, 2) + pow(pHey, 2) + pow(pHez, 2) + pow(m3He, 2)));
 
                 LOG(debug) << "******************************************" << endl;
                 LOG(debug) << "Track In 4He"
                            << "x " << XHe << " y " << YHe << " z " << ZHe << endl;
-                LOG(debug) << "px " << pHex << " py " << pHey << " z " << pHez << endl;
+                LOG(debug) << "px " << pHex << " py " << pHey << " pz " << pHez << endl;
                 LOG(debug) << "chiHex " << chiHex << ", " << chiHey << endl;
             }
             if (aTrack->GetQ() == 6)
@@ -1809,9 +1799,9 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 ZC = aTrack->GetZ();
                 mtrackC = aTrack->GetAoZ() * aTrack->GetQ();
 
-                pCx0 = aTrack->GetPx(); // + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx();
-                pCy0 = aTrack->GetPy(); // + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx();
-                pCz0 = aTrack->GetPz();
+                pCx = aTrack->GetPx(); // + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx();
+                pCy = aTrack->GetPy(); // + ((std::rand() / (float)RAND_MAX) - 0.5)/100.* aTrack->GetPx();
+                pCz = aTrack->GetPz();
 
                 chiCx = aTrack->GetChix();
                 chiCy = aTrack->GetChiy();
@@ -1820,19 +1810,12 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 tCtofd = aTrack->GetTime();
 
                 is_carbon = true;
-                carbon0.SetPxPyPzE(pCx0, pCy0, pCz0, sqrt(pow(pCx0, 2) + pow(pCy0, 2) + pow(pCz0, 2) + pow(mC, 2)));
-
-                carbon = carbon0;
-                carbon.RotateZ(-rot_thetaz);
-                carbon.RotateY(-rot_thetay);
-                pHex = carbon.Px();
-                pHey = carbon.Py();
-                pHez = carbon.Pz();
+                carbon.SetPxPyPzE(pCx, pCy, pCz, sqrt(pow(pCx, 2) + pow(pCy, 2) + pow(pCz, 2) + pow(mC, 2)));
 
                 LOG(debug) << "******************************************" << endl;
                 LOG(debug) << "Track In 12C"
                            << "x " << XC << " y " << YC << " z " << ZC << endl;
-                LOG(debug) << "px " << pCx << " py " << pCy << " z " << pCz << endl;
+                LOG(debug) << "px " << pCx << " py " << pCy << " pz " << pCz << endl;
                 LOG(debug) << "chiCx " << chiCx << ", " << chiCy << endl;
             }
             if (aTrack->GetQ() == 8)

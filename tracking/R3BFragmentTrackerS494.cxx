@@ -319,11 +319,12 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_py_r = new TH1F("h_py_r", "momentum py right", 1000, -100., 100.);
     fh_pz_r = new TH1F("h_pz_r", "momentum pz right", 2000, 0., 20.);
 
-    fh_Erel = new TH1F("h_Erel", "Erel / MeV", 600, -10., 50);
+    fh_Erel = new TH1F("h_Erel", "Erel / MeV", 500, 0., 20);
+    fh_Erel_true = new TH1F("h_Erel_true", "Erel / MeV", 500, 0., 20);
     fh_psum = new TH1F("h_psum", "psum / MeV/c", 500, 16000., 18000.);
     fh_theta = new TH1F("h_theta", "theta / deg", 500, 0., 5);
 
-    fh_Erel0 = new TH1F("h_Erel0", "Erel / MeV for iretrack=0", 600, -10., 50);
+    fh_Erel0 = new TH1F("h_Erel0", "Erel / MeV for iretrack=0", 500, 0., 20);
     fh_psum0 = new TH1F("h_psum0", "psum / MeV/c for iretrack=0", 500, 16000., 18000.);
     fh_theta0 = new TH1F("h_theta0", "theta / deg for iretrack=0", 500, 0., 5);
 
@@ -333,10 +334,18 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_theta_16O = new TH1F("theta_16O", "theta of 6O ", 500, 0., 5.);
     fh_theta_16O->GetXaxis()->SetTitle("angle / degree");
     
-
     fh_phi_16O = new TH1F("phi_16O", "phi of 16O ", 360, 0., 360);
     fh_phi_16O->GetXaxis()->SetTitle("angle / degree");
 
+    fh_phi_bc_cm = new TH1F("phi_bc_cm", "phi_bc_cm ", 360, 0., 360);
+    fh_phi_bc_cm->GetXaxis()->SetTitle("angle / degree");
+
+    fh_theta_16O_true = new TH1F("theta_16O_true", "theta of 6O ", 500, 0., 5.);
+    fh_theta_16O_true->GetXaxis()->SetTitle("angle / degree");
+    
+    fh_phi_bc_cm_true = new TH1F("phi_bc_cm_true", "phi_bc_cm_true ", 360, 0., 360);
+    fh_phi_bc_cm_true->GetXaxis()->SetTitle("angle / degree");
+    
     Double_t ranges[] = { 10., 5., 5., 10., 10., 10., 10., 50 };
     Int_t bins[] = { 2000, 5000, 5000, 2000, 2000, 2000, 2000, 2000 };
     for (Int_t i = 0; i < 8; i++)
@@ -828,8 +837,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     */
     fNEvents_nonull += 1;
-      // cout<<" "<<endl;
-      // cout<<"*******Selected num events: "<<fNEvents_nonull<<endl;
+    //cout<<" "<<endl;
+    //cout<<"*******Selected num events: "<<fNEvents_nonull<<endl;
     // if(fNEvents_nonull > 11) return;
 
     // Start values
@@ -897,6 +906,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t pCx = -10000.0, pCy = -10000.0, pCz = -10000.0;
     Double_t pHex = -10000.0, pHey = -10000.0, pHez = -10000.0;
     Double_t Erel = -10.0;
+    Double_t Erel_true = -10.0;
     Double_t theta_26 = -10.0;
     Double_t psum = -10.0;
     Double_t pxmemtarget = 0.0;
@@ -910,13 +920,18 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t local_chi2 = 1.e+6;
     Double_t psum_cand = 0.0;
     Double_t px0_beam=0., py0_beam=0., px0_beam_mem=0., py0_beam_mem=0.;
-    Double_t theta_16O=0., phi_16O = 0.;
+    Double_t theta_16O=0., phi_16O = 0., phi_bc_cm=0.;
+    Double_t theta_16O_true=0., phi_bc_cm_true = 0.;
+    Double_t test_x_min=0., test_x_max=0., test_x_step=1.;
+    Double_t test_px_min=0., test_px_max=0., test_px_step=1.;
+    Double_t test_py_min=0., test_py_max=0., test_py_step=1.;
     vector<Double_t> posHe;
     vector<Double_t> posC;
     vector<Double_t> posO;
     TVector3 pos23a;
     TVector3 pos23b;
     TVector3 postofd;
+    TVector3 nominal(0.0,0.0,1.0);
     Int_t iplaneC, iplaneHe;
     Int_t ibarC, ibarHe;
 
@@ -1293,21 +1308,70 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             if (iretrack == 0)
             {
-                x0 = 0.0;
+                
                 // y0 = 0.0;
                 // x0 = x0C;
                 // y0 = y0C;
+               if(l < 2){
+				   x0 = 0.0;//x0C;//0.0;
+				   test_x_min = x0;//-1.2;//x0;//-1.2;
+				   test_x_max = x0;//1.2;// 1.2;
+				   test_x_step = (test_x_max-test_x_min)/6.;
+				   if(test_x_min == test_x_max) test_x_step = 1.;
+				   test_px_min = 0.0;//-0.2;
+				   test_px_max = 0.0;//0.2;
+				   test_px_step = (test_px_max-test_px_min)/4.;
+				   if(test_px_min == test_px_max) test_px_step = 1.;
+				   test_py_min = 0.0;//0.0;//-0.2;
+				   test_py_max = 0.0;//0.2;
+				   test_py_step = (test_py_max-test_py_min)/4.;
+				   if(test_py_min == test_py_max) test_py_step = 1.;
+			   }
+			   else
+				{
+				   x0 = xmem;
+				   y0 = ymem;
+				   test_x_min = xmem;
+				   test_x_max = xmem;
+				   test_x_step = 1.;
+				   test_px_min = px0_beam_mem;
+				   test_px_max = px0_beam_mem;
+				   test_px_step = 1.;
+				   test_py_min = py0_beam_mem;
+				   test_py_max = py0_beam_mem;
+				   test_py_step = 1.;
+				}
             }
             if (iretrack == 1 && l < 2 && psum_mem > 0.)
             {
                 // y0 = ymem;
-                x0 = xmem - (psum_mem - ps) / 978.518;              
-                //x0 = xmem - (psum_mem - ps) / 979.35519;
+               x0 = xmem - (psum_mem - ps) / 971.102; //978.518;   
+               test_x_min = x0;
+               test_x_max = x0;
+               test_x_step = (test_x_max-test_x_min)/4.; 
+			   if(test_x_min == test_x_max) test_x_step = 1.;            
+               test_px_min = 0.0;
+               test_px_max = 0.0;
+               test_px_step = (test_px_max-test_px_min)/4.;
+			   if(test_px_min == test_px_max) test_px_step = 1.;
+               test_py_min = 0.0;
+               test_py_max = 0.0;
+               test_py_step = (test_py_max-test_py_min)/4.;
+			   if(test_py_min == test_py_max) test_py_step = 1.;
             }
             if (l == 2)
             {
-                x0 = xmem;
-                y0 = ymem;
+               x0 = xmem;
+               y0 = ymem;
+			   test_x_min = xmem;
+			   test_x_max = xmem;
+			   test_x_step = 1.;
+               test_px_min = px0_beam_mem;
+               test_px_max = px0_beam_mem;
+               test_px_step = 1.;
+               test_py_min = py0_beam_mem;
+               test_py_max = py0_beam_mem;
+               test_py_step = 1.;
             }
 
             z0 = 0.0;
@@ -1493,6 +1557,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
                                 y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
+                                //y0 = y0C;
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
@@ -1526,155 +1591,155 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                     fi23a->LocalToGlobal(pos23a, fi23a->hits.at(ifi23a)->GetX(), 0.);
 
-                                    local_chi2 = 1.e+6;
-                                    for (Int_t ipstep = 0; ipstep < 1; ipstep++) // 11
+                                    local_chi2 = 1.e+30;
+                                    for (double test_x = test_x_min; test_x <= test_x_max; test_x += test_x_step)
                                     {
-                                        Double_t p0step = p0; //*(1. + 0.001*(double)(ipstep-5));
+										for (double test_px = test_px_min; test_px <= test_px_max; test_px += test_px_step)
+										{
+											if(abs(test_px) < 1.e-8) test_px = 0.;
+											for (double test_py = test_py_min; test_py <= test_py_max; test_py += test_py_step)
+											{											
+												if(abs(test_py) < 1.e-8) test_py = 0.;
+											//cout<<"Left side: "<<l<<", "<<test_px<<", "<<test_py<<endl;
+												if (l < 2)
+												{
+													x0 = test_x;
+													px0_beam = test_px;
+													py0_beam = test_py;
+													px0_cand = 0.0;
+													py0_cand = 0.0;
+													pz0_cand = p0;
+													Double_t ptot_cand =
+														sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
+													beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
-                                        if (l < 2)
-                                        {
-                                            /*py0_cand =
-                                                (pos23b.Y() - y0 + 0.000365) / pos23b.Z() * p0step;
-                                            px0_cand =
-                                                (pos23a.X() - x0 - 0.0093 * 1.) / pos23a.Z() * p0step;
-                                            pz0_cand = sqrt(p0step*p0step-py0_cand*py0_cand-px0_cand*px0_cand);*/
-                                            px0_beam = 0.;
-                                            py0_beam = 0.;
-                                            px0_cand = 0.0;
-                                            py0_cand = 0.0;
-                                            pz0_cand = p0step;
-                                            Double_t ptot_cand =
-                                                sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
-                                            beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
+													candidate = new R3BTrackingParticle(
+														charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam, py0_beam);
+												}
+												else if (l == 2)
+												{
+													px0_cand = 0.;
+													py0_cand = 0.;
+													pz0_cand = p0 ;
+													Double_t ptot_cand =
+														sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
+													beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
-                                            candidate = new R3BTrackingParticle(
-                                                charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam, py0_beam);
-                                        }
-                                        else if (l == 2)
-                                        {
-                                            px0_cand = -pxmem - px0_beam_mem;
-                                            py0_cand = -pymem - py0_beam_mem;
-                                            pz0_cand = sqrt(p0step * p0step - pxmem * pxmem - pymem * pymem);
-                                            Double_t ptot_cand =
-                                                sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
-                                            beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
+													candidate = new R3BTrackingParticle(
+														charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam_mem, py0_beam_mem);
+												}
 
-                                            candidate = new R3BTrackingParticle(
-                                                charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam_mem, py0_beam_mem);
-                                        }
+												if (debug_loopin)
+												{
+													cout << "left side of setup" << endl;
+													cout << "Charge requested: " << charge_requested << endl;
+													cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
+														 << " p0: " << p0 << " beta0: " << beta0_cand << " m0: " << m0
+														 << endl;
+													cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
+														 << " y: " << tof->hits.at(i)->GetY() << endl;
+													if (ifi23a > -1)
+														cout << " Fi23a left # " << ifi23a
+															 << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
+													if (ifi23b > -1)
+														cout << " left Fi23b # " << ifi23b
+															 << " y: " << fi23b->hits.at(ifi23b)->GetY() << endl;
+													if (ifi30 > -1)
+														cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX()
+															 << ", q: " << fi30->hits.at(ifi30)->GetEloss() << endl;
+													if (ifi32 > -1)
+														cout << " fi32 # " << ifi32 << " x: " << fi32->hits.at(ifi32)->GetX()
+															 << ", q: " << fi32->hits.at(ifi32)->GetEloss() << endl;
+													cout << "Hit target # "
+														 << " x: " << target->hits.at(0)->GetX() << endl;
+												}
+												// add points through which tracker has to go:
+												candidate->AddHit("target", 0);
+												candidate->AddHit("tofd", i);
+												candidate->AddHit("fi23a", ifi23a);
+												candidate->AddHit("fi23b", ifi23b);
+												candidate->AddHit("fi32", ifi32);
+												candidate->AddHit("fi30", ifi30);
 
-                                        if (debug_loopin)
-                                        {
-                                            cout << "left side of setup" << endl;
-                                            cout << "Charge requested: " << charge_requested << endl;
-                                            cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
-                                                 << " p0: " << p0step << " beta0: " << beta0_cand << " m0: " << m0
-                                                 << endl;
-                                            cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
-                                                 << " y: " << tof->hits.at(i)->GetY() << endl;
-                                            if (ifi23a > -1)
-                                                cout << " Fi23a left # " << ifi23a
-                                                     << " x: " << fi23a->hits.at(ifi23a)->GetX() << endl;
-                                            if (ifi23b > -1)
-                                                cout << " left Fi23b # " << ifi23b
-                                                     << " y: " << fi23b->hits.at(ifi23b)->GetY() << endl;
-                                            if (ifi30 > -1)
-                                                cout << " fi30 # " << ifi30 << " x: " << fi30->hits.at(ifi30)->GetX()
-                                                     << ", q: " << fi30->hits.at(ifi30)->GetEloss() << endl;
-                                            if (ifi32 > -1)
-                                                cout << " fi32 # " << ifi32 << " x: " << fi32->hits.at(ifi32)->GetX()
-                                                     << ", q: " << fi32->hits.at(ifi32)->GetEloss() << endl;
-                                            cout << "Hit target # "
-                                                 << " x: " << target->hits.at(0)->GetX() << endl;
-                                        }
-                                        // add points through which tracker has to go:
-                                        candidate->AddHit("target", 0);
-                                        candidate->AddHit("tofd", i);
-                                        candidate->AddHit("fi23a", ifi23a);
-                                        candidate->AddHit("fi23b", ifi23b);
-                                        candidate->AddHit("fi32", ifi32);
-                                        candidate->AddHit("fi30", ifi30);
+												fDetectors = fDetectorsLeft;
 
-                                        fDetectors = fDetectorsLeft;
+												Int_t status = 10;
+												if (fForward)
+												{
+													status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+												}
+												else
+												{
+													// status = fFitter->FitTrackBackward2D(candidate, fDetectors);
+													status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
+												}
+												if (debug_loopin)
+													cout << " Chi: " << candidate->GetChi2()
+														 << ", pstart.Mag:  " << candidate->GetStartMomentum().Mag()
+														 << ", dp.Mag2: "
+														 << (candidate->GetStartMomentum().Mag() - p0) *
+																(candidate->GetStartMomentum().Mag() - p0)
+														 << endl;
+												if (debug_loopin)
+													cout << "--------------------------------" << endl;
+												nCand += 1;
+												Icountleft += 1;
 
-                                        Int_t status = 10;
-                                        if (fForward)
-                                        {
-                                            status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
-                                        }
-                                        else
-                                        {
-                                            // status = fFitter->FitTrackBackward2D(candidate, fDetectors);
-                                            status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
-                                        }
-                                        if (debug_loopin)
-                                            cout << " Chi: " << candidate->GetChi2()
-                                                 << ", pstart.Mag:  " << candidate->GetStartMomentum().Mag()
-                                                 << ", dp.Mag2: "
-                                                 << (candidate->GetStartMomentum().Mag() - p0step) *
-                                                        (candidate->GetStartMomentum().Mag() - p0step)
-                                                 << endl;
-                                        if (debug_loopin)
-                                            cout << "--------------------------------" << endl;
-                                        nCand += 1;
-                                        Icountleft += 1;
+												//     cout << fNEvents<< ", LEFT SIDE: Charge: "<< charge<<", Momentum: " <<
+												//     candidate->GetMomentum().Mag()<<
+												//  ", Momentum Z: "<<candidate->GetMomentum().Z() <<
+												//   ", Momentum X: "<<candidate->GetMomentum().X()<< endl;
 
-                                        //     cout << fNEvents<< ", LEFT SIDE: Charge: "<< charge<<", Momentum: " <<
-                                        //     candidate->GetMomentum().Mag()<<
-                                        //  ", Momentum Z: "<<candidate->GetMomentum().Z() <<
-                                        //   ", Momentum X: "<<candidate->GetMomentum().X()<< endl;
+												if (TMath::IsNaN(candidate->GetMomentum().Z()))
+												{
+													delete candidate;
+													continue;
+												}
 
-                                        if (TMath::IsNaN(candidate->GetMomentum().Z()))
-                                        {
-                                            delete candidate;
-                                            continue;
-                                        }
+												if (10 > status)
+												{
+													if (fForward)
+													{
+														candidate->Reset();
+													}
+													else
+													{
+														// candidate->SetStartPosition(candidate->GetPosition());
+														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+														// candidate->SetStartBeta(beta0);
+														// candidate->UpdateMomentum();
 
-                                        if (10 > status)
-                                        {
-                                            if (fForward)
-                                            {
-                                                candidate->Reset();
-                                            }
-                                            else
-                                            {
-                                                // candidate->SetStartPosition(candidate->GetPosition());
-                                                // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                                // candidate->SetStartBeta(beta0);
-                                                // candidate->UpdateMomentum();
+														// candidate->SetStartPosition(candidate->GetPosition()); // @target
+														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+														// candidate->SetStartBeta(0.8328);
+														// candidate->SetStartBeta(beta0);
+														// candidate->UpdateMomentum();
+														candidate->Reset();
 
-                                                // candidate->SetStartPosition(candidate->GetPosition()); // @target
-                                                // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                                // candidate->SetStartBeta(0.8328);
-                                                // candidate->SetStartBeta(beta0);
-                                                // candidate->UpdateMomentum();
-                                                candidate->Reset();
-
-                                                // candidate->GetStartPosition().Print();
-                                                // candidate->GetStartMomentum().Print();
-                                                // cout << "chi2: " << candidate->GetChi2() << endl;
-                                                // status = FitFragment(candidate);
-                                            }
-                                            Double_t temp_pChi2 = (candidate->GetStartMomentum().Mag() - p0step) *
-                                                                  (candidate->GetStartMomentum().Mag() - p0step) /
-                                                                  (p0step * p0step * 0.001 * 0.001);
-                                            Double_t temp_chi2 = sqrt(candidate->GetChi2() * candidate->GetChi2() +
-                                                                      temp_pChi2 * temp_pChi2);
-                                            // if(temp_chi2 < local_chi2)
-                                            {
-                                                fFragments.push_back(candidate);
-                                                local_chi2 = candidate->GetChi2();
-                                            }
-                                            // else
-                                            {
-                                                //	delete candidate;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            delete candidate;
-                                        }
-                                    } // for p0step
+														// candidate->GetStartPosition().Print();
+														// candidate->GetStartMomentum().Print();
+														// cout << "chi2: " << candidate->GetChi2() << endl;
+														// status = FitFragment(candidate);
+													}
+													
+													Double_t temp_chi2 = candidate->GetChi2() ;
+													if(temp_chi2 < local_chi2)
+													{
+														fFragments.push_back(candidate);
+														local_chi2 = candidate->GetChi2();
+													}
+													else
+													{
+														delete candidate;
+													}
+												}
+												else
+												{
+													delete candidate;
+												}
+											} // for pybeam
+										} // for pxbeam
+									} // for x0
 
                                     // return;
                                     ifi23a += 1;
@@ -1769,15 +1834,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     continue;
                                 }
                                 fi23b->LocalToGlobal(pos23b, 0.0, fi23b->hits.at(ifi23b)->GetY());
-                                
-                                
+                                                               
 									Double_t y_tp =
 										(postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
 										(1. + fslope * ltofd / (z_tp - pos23b.Z()));
 									y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
-									
-								
-
+									//y0 = y0C;								
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
                                 {
@@ -1811,165 +1873,163 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                                     fi23a->LocalToGlobal(pos23a, fi23a->hits.at(ifi23a)->GetX(), 0.0);
 
-                                    local_chi2 = 1.e6;
-                                    for (Int_t ipstep = 0; ipstep < 1; ipstep++)
+                                    local_chi2 = 1.e30;                                     
+                                    for (double test_x = test_x_min; test_x <= test_x_max; test_x += test_x_step)
                                     {
+										for (double test_px = test_px_min; test_px <= test_px_max; test_px += test_px_step)
+										{
+											if(abs(test_px) < 1.e-8) test_px = 0.;
+											for (double test_py = test_py_min; test_py <= test_py_max; test_py += test_py_step)
+											{
+												if(abs(test_py) < 1.e-8) test_py = 0.;
+												//cout<<"Right side: "<<l<<", "<<test_px<<", "<<test_py<<endl;
+												if (l < 2)
+												{
+													x0 = test_x;
+													px0_beam = test_px;
+													py0_beam = test_py;
+													px0_cand = 0.0;
+													py0_cand = 0.0;
+													pz0_cand = p0;
+													Double_t ptot_cand =
+														sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
+													beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
-                                        Double_t p0step = p0; //*(1. + 0.001*(double)(ipstep-5));
+													candidate = new R3BTrackingParticle(
+														charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam, py0_beam);
+												}
+												else if (l == 2)
+												{
+													px0_cand = 0.;
+													py0_cand = 0.;
+													pz0_cand = p0;
+													Double_t ptot_cand =
+														sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
+													beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
 
-                                        if (l < 2)
-                                        {
-                                            /*py0_cand =
-                                                (pos23b.Y() - y0 + 0.000365) / pos23b.Z() * p0step;
-                                            px0_cand =
-                                                (pos23a.X() - x0 - 0.0093 * 1.) / pos23a.Z() * p0step;
-                                            pz0_cand = sqrt(p0step*p0step-py0_cand*py0_cand-px0_cand*px0_cand);*/
+													candidate = new R3BTrackingParticle(
+														charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam_mem, py0_beam_mem);
+												}
 
-                                            px0_beam = 0.;
-                                            py0_beam = 0.;
-                                            px0_cand = 0.0;
-                                            py0_cand = 0.0;
-                                            pz0_cand = p0step;
-                                            Double_t ptot_cand =
-                                                sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
-                                            beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
+												if (debug_loopin)
+												{
+													cout << "right side of setup" << endl;
+													cout << "Charge requested: " << charge_requested << endl;
+													cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
+														 << " p0: " << p0 << " beta0: " << beta0_cand << " m0: " << m0
+														 << endl;
+													cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
+														 << " y: " << tof->hits.at(i)->GetY() << endl;
 
-                                            candidate = new R3BTrackingParticle(
-                                                charge, x0, y0, z0, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam, py0_beam);
-                                        }
-                                        else if (l == 2)
-                                        {
-                                            px0_cand = -pxmem - px0_beam_mem;
-                                            py0_cand = -pymem - py0_beam_mem;
-                                            pz0_cand = sqrt(p0step * p0step - pxmem * pxmem - pymem * pymem);
-                                            Double_t ptot_cand =
-                                                sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
-                                            beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
+													if (ifi23a > -1)
+														cout << " Fi23a right # " << ifi23a
+															 << " x: " << fi23a->hits.at(ifi23a)->GetX()
+															 << ", q: " << fi23a->hits.at(ifi23a)->GetEloss() << endl;
+													if (ifi23b > -1)
+														cout << "right Fi23b # " << ifi23b
+															 << " y: " << fi23b->hits.at(ifi23b)->GetY()
+															 << ", q: " << fi23b->hits.at(ifi23b)->GetEloss() << endl;
+													if (ifi33 > -1)
+														cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX()
+															 << ", q: " << fi33->hits.at(ifi33)->GetEloss() << endl;
+													if (ifi31 > -1)
+														cout << "Fi31  # " << ifi31 << " x: " << fi31->hits.at(ifi31)->GetX()
+															 << ", q: " << fi31->hits.at(ifi31)->GetEloss() << endl;
+													cout << "Hit target # "
+														 << " x: " << target->hits.at(0)->GetX() << endl;
+												}
 
-                                            candidate = new R3BTrackingParticle(
-                                                charge, xmem, ymem, zmem, px0_cand, py0_cand, pz0_cand, beta0_cand, m0, px0_beam_mem, py0_beam_mem);
-                                        }
+												candidate->AddHit("target", 0);
+												candidate->AddHit("tofd", i);
+												candidate->AddHit("fi23a", ifi23a);
+												candidate->AddHit("fi23b", ifi23b);
+												candidate->AddHit("fi31", ifi31);
+												candidate->AddHit("fi33", ifi33);
 
-                                        if (debug_loopin)
-                                        {
-                                            cout << "right side of setup" << endl;
-                                            cout << "Charge requested: " << charge_requested << endl;
-                                            cout << "Start values to fit, x0: " << x0 << " y0: " << y0 << " z0: " << z0
-                                                 << " p0: " << p0step << " beta0: " << beta0_cand << " m0: " << m0
-                                                 << endl;
-                                            cout << "Hit Tofd # " << i << " x: " << tof->hits.at(i)->GetX()
-                                                 << " y: " << tof->hits.at(i)->GetY() << endl;
+												fDetectors = fDetectorsRight;
 
-                                            if (ifi23a > -1)
-                                                cout << " Fi23a right # " << ifi23a
-                                                     << " x: " << fi23a->hits.at(ifi23a)->GetX()
-                                                     << ", q: " << fi23a->hits.at(ifi23a)->GetEloss() << endl;
-                                            if (ifi23b > -1)
-                                                cout << "right Fi23b # " << ifi23b
-                                                     << " y: " << fi23b->hits.at(ifi23b)->GetY()
-                                                     << ", q: " << fi23b->hits.at(ifi23b)->GetEloss() << endl;
-                                            if (ifi33 > -1)
-                                                cout << "Fi33 # " << ifi33 << " x: " << fi33->hits.at(ifi33)->GetX()
-                                                     << ", q: " << fi33->hits.at(ifi33)->GetEloss() << endl;
-                                            if (ifi31 > -1)
-                                                cout << "Fi31  # " << ifi31 << " x: " << fi31->hits.at(ifi31)->GetX()
-                                                     << ", q: " << fi31->hits.at(ifi31)->GetEloss() << endl;
-                                            cout << "Hit target # "
-                                                 << " x: " << target->hits.at(0)->GetX() << endl;
-                                        }
+												Int_t status = 10;
+												if (fForward)
+												{
+													status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+												}
+												else
+												{
+													// status = fFitter->FitTrackBackward2D(candidate, fDetectors);
+													status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
+												}
+												if (debug_loopin)
+													cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
+														 << candidate->GetStartMomentum().Mag() << " dp.Mag2 "
+														 << (candidate->GetStartMomentum().Mag() - p0) *
+																(candidate->GetStartMomentum().Mag() - p0)
+														 << endl;
+												if (debug_loopin)
+													cout << "--------------------------------" << endl;
+												nCand += 1;
+												Icountright += 1;
 
-                                        candidate->AddHit("target", 0);
-                                        candidate->AddHit("tofd", i);
-                                        candidate->AddHit("fi23a", ifi23a);
-                                        candidate->AddHit("fi23b", ifi23b);
-                                        candidate->AddHit("fi31", ifi31);
-                                        candidate->AddHit("fi33", ifi33);
+												//    cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
+												//    candidate->GetMomentum().Mag()<<", Momentum Z:
+												//    "<<candidate->GetMomentum().Z()<<
+												//   ", Momentum X: "<<candidate->GetMomentum().X() << " status:
+												//   "<<status<<endl;
 
-                                        fDetectors = fDetectorsRight;
+												if (TMath::IsNaN(candidate->GetMomentum().Z()))
+												{
+													delete candidate;
+													continue;
+												}
 
-                                        Int_t status = 10;
-                                        if (fForward)
-                                        {
-                                            status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
-                                        }
-                                        else
-                                        {
-                                            // status = fFitter->FitTrackBackward2D(candidate, fDetectors);
-                                            status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
-                                        }
-                                        if (debug_loopin)
-                                            cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
-                                                 << candidate->GetStartMomentum().Mag() << " dp.Mag2 "
-                                                 << (candidate->GetStartMomentum().Mag() - p0step) *
-                                                        (candidate->GetStartMomentum().Mag() - p0step)
-                                                 << endl;
-                                        if (debug_loopin)
-                                            cout << "--------------------------------" << endl;
-                                        nCand += 1;
-                                        Icountright += 1;
+												if (10 > status)
+												{
+													if (fForward)
+													{
+														candidate->Reset();
+													}
+													else
+													{
+														// candidate->SetStartPosition(candidate->GetPosition());
+														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+														// candidate->SetStartBeta(beta0);
+														// candidate->UpdateMomentum();
 
-                                        //    cout <<fNEvents<<", RIGHT SIDE: Charge: "<< charge<<", Momentum: " <<
-                                        //    candidate->GetMomentum().Mag()<<", Momentum Z:
-                                        //    "<<candidate->GetMomentum().Z()<<
-                                        //   ", Momentum X: "<<candidate->GetMomentum().X() << " status:
-                                        //   "<<status<<endl;
+														// candidate->SetStartPosition(candidate->GetPosition());
+														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
+														// candidate->SetStartBeta(0.8328);
+														// candidate->SetStartBeta(beta0);
+														// candidate->UpdateMomentum();
 
-                                        if (TMath::IsNaN(candidate->GetMomentum().Z()))
-                                        {
-                                            delete candidate;
-                                            continue;
-                                        }
+														candidate->Reset();
 
-                                        if (10 > status)
-                                        {
-                                            if (fForward)
-                                            {
-                                                candidate->Reset();
-                                            }
-                                            else
-                                            {
-                                                // candidate->SetStartPosition(candidate->GetPosition());
-                                                // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                                // candidate->SetStartBeta(beta0);
-                                                // candidate->UpdateMomentum();
+														// candidate->GetStartPosition().Print();
+														// candidate->GetStartMomentum().Print();
+														// cout << "chi2: " << candidate->GetChi2() << endl;
+														// status = FitFragment(candidate);
+													}
 
-                                                // candidate->SetStartPosition(candidate->GetPosition());
-                                                // candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-                                                // candidate->SetStartBeta(0.8328);
-                                                // candidate->SetStartBeta(beta0);
-                                                // candidate->UpdateMomentum();
+													Double_t temp_chi2 = candidate->GetChi2() ;
+														  
+													// cout<<"In the loop - xChi2: "<<candidate->GetChi2()<<", pChi2:
+													// "<<temp_pChi2<<endl;
 
-                                                candidate->Reset();
-
-                                                // candidate->GetStartPosition().Print();
-                                                // candidate->GetStartMomentum().Print();
-                                                // cout << "chi2: " << candidate->GetChi2() << endl;
-                                                // status = FitFragment(candidate);
-                                            }
-
-                                            Double_t temp_pChi2 = (candidate->GetStartMomentum().Mag() - p0step) *
-                                                                  (candidate->GetStartMomentum().Mag() - p0step) /
-                                                                  (p0step * p0step * 0.01 * 0.01);
-                                            Double_t temp_chi2 = sqrt(candidate->GetChi2() * candidate->GetChi2() +
-                                                                      temp_pChi2 * temp_pChi2);
-                                            // cout<<"In the loop - xChi2: "<<candidate->GetChi2()<<", pChi2:
-                                            // "<<temp_pChi2<<endl;
-
-                                            //  if(temp_chi2 < local_chi2)
-                                            {
-                                                fFragments.push_back(candidate);
-                                                local_chi2 = candidate->GetChi2();
-                                            }
-                                            // else
-                                            {
-                                                //		delete candidate;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            delete candidate;
-                                        }
-                                    } // for p0step
+													if(temp_chi2 < local_chi2) //
+													{
+														fFragments.push_back(candidate);
+														local_chi2 = candidate->GetChi2();
+													}
+													else  //
+													{
+															delete candidate; //
+													}
+												}
+												else
+												{
+													delete candidate;
+												}
+											} // for pybeam
+										} // for pxbeam
+									} // for x0
 
                                     // return;
                                     ifi23a += 1;
@@ -2053,6 +2113,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             cout << "New 12C candidate with chi2=xchi2: " << xChi2 << "; pChi2: " << pChi2
                                  << ", pC: " << x->GetStartMomentum().X() * 1000. << "; "
                                  << x->GetStartMomentum().Y() * 1000. << ", " << x->GetStartMomentum().Z() * 1000.
+                                 <<", px/ybeam: "<<x->GetBeamMomentum().X()<<", "<<x->GetBeamMomentum().Y()
                                  << ", iretrack: " << iretrack << endl;
                         }
                     }
@@ -2079,6 +2140,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             // std::setprecision(10);
                             cout << "New 4He candidate with xchi2: " << xChi2 << "; pChi2: " << pChi2
                                  << ", pHe: " << pHex << ", " << pHey << ", " << pHez
+                                 <<", px/ybeam: "<<x->GetBeamMomentum().X()<<", "<<x->GetBeamMomentum().Y()
                                  << "psum newcandidates: " << psum_cand << ", chi2: " << parChi2
                                  << ", iretrack: " << iretrack << endl;
                         }
@@ -2322,16 +2384,70 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         // std::setprecision(10);
                         // cout<<"psum best candidates: "<<psum<<endl;
                         Oxygen = alphaP + carbonP; // excited oxygen
-                        Double_t pz0_beam = sqrt(psum*psum-px0_beam_mem*px0_beam_mem*1.e6-py0_beam_mem*py0_beam_mem*1.e6);
-						beamP.SetPxPyPzE(
-                        px0_beam_mem*1.e3, py0_beam_mem*1.e3, pz0_beam, sqrt(pow(px0_beam_mem*1.e3, 2) + pow(py0_beam_mem*1.e3, 2) + pow(pz0_beam, 2) + pow(massO*1.e3, 2)));
-						theta_16O = Oxygen.Angle(beamP.Vect()) * TMath::RadToDeg();
+                        Double_t pz0_beam = sqrt(ps*ps-px0_beam_mem*px0_beam_mem*1.e6-py0_beam_mem*py0_beam_mem*1.e6);
+						theta_16O = Oxygen.Theta() * TMath::RadToDeg();
 						phi_16O = Oxygen.Phi() * TMath::RadToDeg();
 						if (phi_16O < 0)
 							phi_16O += 360.;
-                        psum_res = (psum - ps) / ps * 100.0;
+						 
+						TLorentzVector alpha_cm = alphaP;
+						TLorentzVector carbon_cm = carbonP;
+						TLorentzVector oxygen_cm = Oxygen;
+						alpha_cm.Boost(-Oxygen.BoostVector());
+						carbon_cm.Boost(-Oxygen.BoostVector());
+						oxygen_cm.Boost(-Oxygen.BoostVector());
+						
+						phi_bc_cm = (Oxygen.Phi() - alpha_cm.Phi()) * TMath::RadToDeg();
+						if (phi_bc_cm < 0)
+							phi_bc_cm += 360.;
+								
+						psum_res = (psum - ps) / ps * 100.0;
                         if (iretrack == iretrack_max){
-                            fh_psum_res->Fill(psum_res);                           
+                            fh_psum_res->Fill(psum_res);  
+                                                       
+                        // corrected for incoming angle:
+                        TVector3 beam_vector(px0_beam_mem*1.e3, px0_beam_mem*1.e3, pz0_beam);
+						TVector3 beam_direction = beam_vector.Unit();
+
+						// Calculate the true scattering angle relative to the actual beam axis
+						theta_16O_true = Oxygen.Angle(beam_direction)* TMath::RadToDeg(); 
+						
+						// Rotate ALL lab vectors into the "Straight Beam" frame
+						// This strips away the incoming beam angle entirely
+						TVector3 alpha_straight  = p4He;
+						TVector3 carbon_straight = p12C;
+						TVector3 oxygen_straight = p4He+p12C;
+						TVector3 rot_axis = nominal.Cross(beam_direction);
+						Double_t rot_angle  = nominal.Angle(beam_direction);
+						if (rot_axis.Mag() > 1e-7) {
+							alpha_straight.Rotate(-rot_angle, rot_axis);
+							carbon_straight.Rotate(-rot_angle, rot_axis);
+							oxygen_straight.Rotate(-rot_angle, rot_axis);
+						}
+
+						// Now convert to TLorentzVectors using these "straightened" vectors
+						TLorentzVector alpha_4vec, carbon_4vec, oxygen_4vec;
+						Double_t E_alpha  = sqrt(alpha_straight.Mag2()  + massHe*massHe);
+						Double_t E_carbon = sqrt(carbon_straight.Mag2() + massC*massC);
+
+						alpha_4vec.SetVectM(alpha_straight, massHe);
+						carbon_4vec.SetVectM(carbon_straight, massC);
+						oxygen_4vec = alpha_4vec + carbon_4vec; // Total system in the straight-beam frame
+						
+						Double_t m_inva_corr = (alpha_4vec + carbon_4vec).M();                    // invariant mass
+                        Erel_true = m_inva_corr - massHe - massC;                              // relative Energy
+                       
+						// Boost the fragments into the Oxygen Center of Mass frame
+						TVector3 boost_vector = oxygen_4vec.BoostVector();
+						alpha_4vec.Boost(-boost_vector);
+						carbon_4vec.Boost(-boost_vector);
+
+						// Extract your pristine, un-smeared physics angles!
+						phi_bc_cm_true = (oxygen_4vec.Phi() - alpha_4vec.Phi()) * TMath::RadToDeg();
+						if (phi_bc_cm_true < 0)
+							phi_bc_cm_true += 360.;
+						//theta_CM = alpha_4vec.Theta();
+						                            
 						}
                     }
                 }
@@ -2352,6 +2468,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     {
                         fh_theta_16O->Fill(theta_16O);
                         fh_phi_16O->Fill(phi_16O);
+                        
                         fh_y0_vs_ytrack->Fill(y0, bestcandidate->GetStartPosition().Y());
                     }
                     psum = sqrt(pow(bestcandidate->GetStartMomentum().X() * 1000., 2) +
@@ -3071,7 +3188,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                  << ", Erel: " << Erel << ", psum: " << psum << ", x0: " << xmem << ", y0: " << ymem <<", ygeom: "<<ygeomC
                  << ", from selected NEvents: " << fNEvents_nonull << endl;
             cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << ", iretrack: "<<iretrack<<endl;
+            cout << "pCx, pCy: "<< p12C.X()<<", "<<p12C.Y()<<endl;
+            cout << "pHex, pHey: "<< p4He.X()<<", "<<p4He.Y()<<endl;
             cout<<"pbeam_mem: "<<px0_beam_mem*1.e3<<" "<<py0_beam_mem*1.e3<<" "<<psum<<endl;
+            cout<<"MC target: "<<x0C <<"; "<<y0C<<endl;
 
             if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10.)
             {
@@ -3094,7 +3214,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                  << ", Erel: " << Erel << ", psum: " << psum << ", x0: " << xmem << ", y0: " << ymem<<", ygeom: "<<ygeomC
                  << ", from selected NEvents: " << fNEvents_nonull << endl;
             cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << ", iretrack: "<<iretrack<<endl;
+            cout << "pCx, pCy: "<< p12C.X()<<", "<<p12C.Y()<<endl;
+            cout << "pHex, pHey: "<< p4He.X()<<", "<<p4He.Y()<<endl;
             cout<<"pbeam_mem: "<<px0_beam_mem*1.e3<<" "<<py0_beam_mem*1.e3<<" "<<psum<<endl;
+            cout<<"MC target: "<<x0C <<"; "<<y0C<<endl;
             cout << " " << endl;
 
             if (fWriteOut)
@@ -3109,6 +3232,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                 fh_theta->Fill(theta_26);
                 fh_theta_16O->Fill(theta_16O);
 				fh_phi_16O->Fill(phi_16O);	
+				fh_phi_bc_cm->Fill(phi_bc_cm);
+				fh_theta_16O_true->Fill(theta_16O_true);
+				fh_phi_bc_cm_true->Fill(phi_bc_cm_true);
+				fh_Erel_true->Fill(Erel_true);
             }
             fh_beam_py_vs_px->Fill(px0_beam_mem*1000.,py0_beam_mem*1000.);
             fh_beam_px_vs_x0->Fill(xmem,px0_beam_mem*1000.);
@@ -3290,12 +3417,16 @@ void R3BFragmentTrackerS494::Finish()
         fh_pyC_vs_pyHe->Write();
         fh_theta_16O->Write();
         fh_phi_16O->Write();
+		fh_phi_bc_cm->Write();
+		fh_theta_16O_true->Write();
+		fh_phi_bc_cm_true->Write();
         fh_xfi23a_target_track->Write();
         fh_yfi23b_target_track->Write();
         fh_xy_target->Write();
         fh_dxdy->Write();
         fh_mass_corel->Write();
         fh_Erel->Write();
+        fh_Erel_true->Write();
         fh_psum->Write();
         fh_theta->Write();
         fh_Erel0->Write();

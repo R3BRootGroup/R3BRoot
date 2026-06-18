@@ -250,7 +250,7 @@ class R3BGlobalAnalysisS494 : public FairTask
 	ULong64_t timeTS ;
     ULong64_t eventTS ;
     
-    TLorentzVector alpha, carbon, oxygen, helium3, alpha0, carbon0;
+    TLorentzVector alpha, carbon, oxygen, helium3;
     TLorentzVector alphaMC, carbonMC, oxygenMC;
     TLorentzVector alpha_cm, carbon_cm, oxygen_cm;
     TLorentzVector alphaMC_cm, carbonMC_cm, oxygenMC_cm;

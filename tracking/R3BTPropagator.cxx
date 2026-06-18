@@ -594,7 +594,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRK(R3BTrackingParticle* particle,
             // particle->GetPosition().Print();
             // cout<<"By: "<<field<<endl;
 
-            step = 20. / TMath::Abs(field); // 10.
+            step = 20. / TMath::Abs(field); // 20.
             // if(step < 0.1) step = 0.1;
 
             //  cout << "x: " << pos.X() << " y: " << pos.Y() << " z: " << pos.Z() <<
