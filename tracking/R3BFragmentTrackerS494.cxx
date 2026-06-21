@@ -1158,7 +1158,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         }
     }
 
-    Int_t iretrack_max = 1;
+    Int_t iretrack_max = 0;
     Double_t psum_mem = -10000.;
 
     for (Int_t iretrack = 0; iretrack < iretrack_max + 1; iretrack++)

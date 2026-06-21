@@ -22,7 +22,7 @@
 #include "TClonesArray.h"
 #include "TLine.h"
 #include "TMath.h"
-
+#include "TRotation.h"
 #include <iostream>
 
 using namespace std;
@@ -41,6 +41,7 @@ R3BTrackingDetector::R3BTrackingDetector(const char* detectorName,
     res_x = 1; // dummy values that allow calculating chi2
     res_y = 1;
     res_t = 1;
+    thickness = 1.;
 }
 
 R3BTrackingDetector::~R3BTrackingDetector() {}
@@ -77,13 +78,14 @@ InitStatus R3BTrackingDetector::Init()
 
     norm = ((pos1 - pos0).Cross(pos2 - pos0)).Unit();
 
-    cout << "In Tracking Detector: " << norm.X() << ", " << norm.Y() << ", " << norm.Z() << endl;
+   // cout << "In Tracking Detector: " << norm.X() << ", " << norm.Y() << ", " << norm.Z() << endl;
     pos0.Print();
     pos1.Print();
     pos2.Print();
 
     res_x = fGeo->GetSigmaX();
     res_y = fGeo->GetSigmaY();
+    thickness = fGeo->GetDimZ();
 
     // get access to hit data
     if (!fDataName.EqualTo(""))
@@ -149,6 +151,30 @@ void R3BTrackingDetector::TakeHitsFromBuffer(Int_t iev)
 
     // LOG(info) << "======= " << hits.size();
 }
+void R3BTrackingDetector::GlobalToLocalMomentum(const TVector3& p_global, TVector3& p_local)
+{
+    // Rotation matrix around the Y-axis
+    TRotation rot;
+    rot.RotateY(fGeo->GetRotY() * TMath::DegToRad());
+    
+    // Invert the rotation to transform from Global -> Local
+    rot.Invert(); 
+    
+    // Apply the inverted rotation to the vector
+    p_local = rot * p_global;
+    
+}
+void R3BTrackingDetector::LocalToGlobalMomentum(TVector3& p_global, TVector3 p_local)
+{
+    
+    // Rotation matrix around the Y-axis (Positive rotation for Local -> Global)
+    TRotation rot;
+    rot.RotateY(fGeo->GetRotY() * TMath::DegToRad());
+    
+    // Apply the rotation matrix to the vector
+    p_global = rot * p_local;
+    
+}
 
 void R3BTrackingDetector::GlobalToLocal(const TVector3& posGlobal, Double_t& x_local, Double_t& y_local)
 {
@@ -182,7 +208,7 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     Double_t density = fGeo->GetDensity();
     Double_t I = fGeo->GetI();
     // cout << "Ionization: " << I << endl;
-    Double_t Z1 = particle->GetCharge();
+    Double_t Z1 = abs(particle->GetCharge());
     const Double_t K = 0.307075;
     const Double_t me = 0.5109989461;
     Double_t beta = particle->GetBeta();
@@ -201,6 +227,8 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
                      (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta);
 
+	//cout<<"In energy loss: "<<Z1<<", "<<beta<<", "<<eloss<<", "<<density<<endl;
+    
     // cout << "Eloss: " << eloss << endl;
     //  if(fGeoParName.EqualTo("TargetGeoPar")) cout<<"Eloss in target: "<<eloss<<", for Z= "<<Z1<<", "<<beta<<endl;
 

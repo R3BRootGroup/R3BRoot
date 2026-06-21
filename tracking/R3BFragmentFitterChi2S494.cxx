@@ -421,7 +421,7 @@ double Chi2MomentumForward(const double* xx)
 
     return chi2;
 }
-
+/*
 double Chi2MomentumBackward(const double* xx)
 {
 
@@ -439,7 +439,7 @@ double Chi2MomentumBackward(const double* xx)
     TVector3 pos3;
     // LOG(debug3) << "Test: " << gCandidate->GetHitIndexByName("fi12") << "  " << gCandidate->GetHitIndexByName("fi10")
     // << endl;
-    /*
+    / *
         if (gCandidate->GetHitIndexByName("fi30") > -1)
         {
             auto fi30 = gSetup->GetByName("fi30");
@@ -454,7 +454,7 @@ double Chi2MomentumBackward(const double* xx)
         {
             return 10;
         }
-    */
+    * /
     Double_t px0 = xx[0];
     Double_t py0 = xx[1];
     Double_t pz0 = xx[2];
@@ -604,7 +604,7 @@ double Chi2MomentumBackward(const double* xx)
 
     return 0;
 }
-
+*/
 double Chi2Beta(const double* xx)
 {
 
@@ -679,7 +679,7 @@ double Chi2Beta(const double* xx)
 
     return 0;
 }
-
+/*
 double Chi2Backward(const double* xx)
 {
 
@@ -704,7 +704,7 @@ double Chi2Backward(const double* xx)
 
         if (i < (gSetup->GetArray().size() - 2))
         {
-            /*result = */ gProp->PropagateToDetectorBackward(gCandidate, det);
+            / *result = * / gProp->PropagateToDetectorBackward(gCandidate, det);
 
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
@@ -826,7 +826,7 @@ double Chi2Backward2D(const double* xx)
         if (i < (gSetup->GetArray().size() - 2))
         {
 
-            /*result = */ gProp->PropagateToDetectorBackward(gCandidate, det);
+            / *result = * / gProp->PropagateToDetectorBackward(gCandidate, det);
 
             // time += (gCandidate->GetLength() - prev_l) / (gCandidate->GetBeta() * SPEED_OF_LIGHT);
             // prev_l = gCandidate->GetLength();
@@ -876,7 +876,7 @@ double Chi2Backward2D(const double* xx)
 
     return 0;
 }
-
+*/
 R3BFragmentFitterChi2S494::R3BFragmentFitterChi2S494() {}
 
 R3BFragmentFitterChi2S494::~R3BFragmentFitterChi2S494() {}
@@ -889,7 +889,7 @@ void R3BFragmentFitterChi2S494::Init(R3BTPropagator* prop, Bool_t energyLoss)
     gEnergyLoss = energyLoss;
 
     // BACKWARD TRACKING:
-
+/*
     // fMinimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Migrad");
     fMinimum = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
 
@@ -904,7 +904,7 @@ void R3BFragmentFitterChi2S494::Init(R3BTPropagator* prop, Bool_t energyLoss)
     // a IMultiGenFunction type
     ROOT::Math::Functor* f = new ROOT::Math::Functor(&Chi2Backward2D, 1);
     fMinimum->SetFunction(*f);
-
+*/
     // FORWARD TRACKING:  
       
     //  minimum_m = ROOT::Math::Factory::CreateMinimizer("Minuit2", "Simplex");
@@ -1356,6 +1356,388 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
 Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
+    LOG(debug3) << "In track momentum backward" << endl;
+    gCandidate = particle;
+    gSetup = setup;
+
+    Double_t px0 = 0.;
+    Double_t py0 = 0.;
+    Double_t pz0 = 0.;
+    Double_t x0 = 0.;
+    Double_t y0 = 0.;
+    Double_t z0 = 0.;
+    Double_t y_tp = 0.;
+    Double_t foffset=0.441;
+    Double_t fslope=1.;
+    Double_t ltofd=0.;
+    Double_t ztp = 174.5851;
+    Double_t x_l=0., y_l=0.;
+    TVector3 pos0;
+    TVector3 pos1;
+    TVector3 pos2;
+    TVector3 pos3;
+    TVector3 pos23b;
+    TVector3 direction0;
+    TVector3 startPosition;
+    TVector3 startPosOptimized;
+    TVector3 startPositionOptimized;
+    TVector3 startMomentumOptimized;
+    TVector3 startMomentumLocal;
+    TVector3 p_l;
+    Int_t status = 0;
+    Double_t chi2 = 0.;
+    Int_t nchi2 = 0;
+    
+    if (gCandidate->GetHitIndexByName("tofd") > -1)
+    {
+        auto tofd = gSetup->GetByName("tofd");
+        tofd->LocalToGlobal(pos0,
+                            gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX(),
+                            gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY());
+        ltofd = sqrt((pos0.Z()-ztp)*(pos0.Z()-ztp) + pos0.X()*pos0.X()) ;
+    }
+    
+    if (gCandidate->GetHitIndexByName("fi23b") > -1)
+    {
+        auto fi23b = gSetup->GetByName("fi23b");
+        fi23b->LocalToGlobal(pos23b, 0.0, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
+    }
+ 
+ // Extrapolate y position between fi23b and tofd to fi3x:   
+    if (gCandidate->GetHitIndexByName("fi32") > -1 && gCandidate->GetHitIndexByName("fi30") > -1)
+    {
+        auto fi32 = gSetup->GetByName("fi32");
+        auto fi30 = gSetup->GetByName("fi30");
+        fi32->LocalToGlobal(pos2, gSetup->GetHit("fi32", gCandidate->GetHitIndexByName("fi32"))->GetX(), 0.);
+        fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
+        
+        fslope = 0.883;
+        y_tp = (pos0.Y()-foffset+fslope*ltofd*pos23b.Y()/(ztp-pos23b.Z()))/
+														 (1.+fslope*ltofd/(ztp-pos23b.Z()));  
+	    Double_t lfi30 = sqrt((pos3.Z()-ztp)*(pos3.Z()-ztp) + pos3.X()*pos3.X()) ;			
+		Double_t yfi30 = y_tp + lfi30/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
+		pos3.SetY(yfi30);
+	    
+	    Double_t lfi32 = sqrt((pos2.Z()-ztp)*(pos2.Z()-ztp) + pos2.X()*pos2.X()) ;			
+		Double_t yfi32 = y_tp + lfi32/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
+		pos2.SetY(yfi32);
+    }
+    else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
+    {
+        auto fi31 = gSetup->GetByName("fi31");
+        auto fi33 = gSetup->GetByName("fi33");
+        fi33->LocalToGlobal(pos2, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX(), 0.);
+        fi31->LocalToGlobal(pos3, gSetup->GetHit("fi31", gCandidate->GetHitIndexByName("fi31"))->GetX(), 0.);
+        
+        fslope = 0.901;
+        y_tp = (pos0.Y()-foffset+fslope*ltofd*pos23b.Y()/(ztp-pos23b.Z()))/
+														 (1.+fslope*ltofd/(ztp-pos23b.Z()));  
+	    Double_t lfi31 = sqrt((pos3.Z()-ztp)*(pos3.Z()-ztp) + pos3.X()*pos3.X()) ;			
+		Double_t yfi31 = y_tp + lfi31/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
+		pos3.SetY(yfi31);
+	    
+	    Double_t lfi33 = sqrt((pos2.Z()-ztp)*(pos2.Z()-ztp) + pos2.X()*pos2.X()) ;			
+		Double_t yfi33 = y_tp + lfi33/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
+		pos2.SetY(yfi33);
+    }
+    else
+    {
+        return 10;
+    }
+    
+    direction0 = (pos2 - pos0).Unit();
+
+    Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();
+    direction0.SetMag(mom);
+
+    //direction0.Print();
+    TVector3 startMomentum(direction0.X(), direction0.Y(), direction0.Z());
+
+    px0 = direction0.X();
+    py0 = direction0.Y();
+    pz0 = direction0.Z();
+
+    x0 = pos0.X();
+    y0 = pos0.Y();
+    z0 = pos0.Z();
+    
+    Double_t charge = gCandidate->GetCharge();
+    gCandidate->SetCharge(-charge);
+    gCandidate->SetStartPosition(pos0);
+    gCandidate->SetStartMomentum(startMomentum);
+	gCandidate->Reset();
+    
+    LOG(debug3) << "Start values momentum lab: " << px0 << "  " << py0 << "  " << pz0;
+    LOG(debug3) << "Start values position lab: " << x0 << "  " << y0 << "  " << z0;
+    
+    Double_t z_first=91.;
+	TVector3 pos23a;
+	if (gCandidate->GetHitIndexByName("fi23a") > -1)
+    {
+        auto fi23a = gSetup->GetByName("fi23a");
+        fi23a->LocalToGlobal(pos23a, gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX(), 0.0);
+        z_first = pos23a.X();
+    }
+        
+	if (gCandidate->GetHitIndexByName("tofd") > -1)
+    {
+        auto tofd = gSetup->GetByName("tofd");
+        tofd->GlobalToLocalMomentum(-startMomentum,startMomentumLocal);
+        x_l = gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX();
+        y_l = gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY();
+    }
+    
+    // --- BEFORE THE DETECTOR LOOP ---
+	TMatrixD x_state(5, 1);  // 5x1 Column Vector
+	TMatrixD P_cov(5, 5);    // 5x5 Covariance Matrix
+	
+	// Initialize local state at the tofd
+	x_state(0,0) = x_l; // initial x 
+	x_state(1,0) = y_l; // initial y
+	x_state(2,0) = startMomentumLocal.X() / startMomentumLocal.Z(); // initial slope dx/dz
+	x_state(3,0) = startMomentumLocal.Y() / startMomentumLocal.Z(); // initial slope dy/dz
+	x_state(4,0) = abs(gCandidate->GetCharge()) / startMomentum.Mag(); // q/p 
+
+	// Initialize starting uncertainties (high values mean "I trust the hits more than my guess")
+	P_cov.Zero();
+	P_cov(0,0) = 0.1 * 0.1;   // X uncertainty variance (e.g., 1 mm)
+	P_cov(1,1) = 0.1 * 0.1;   // Y uncertainty variance
+	P_cov(2,2) = 0.1 * 0.1; // Slope variance
+	P_cov(3,3) = 0.1 * 0.1; // Slope variance
+	P_cov(4,4) = 1.0; // Initialize with large uncertainty
+    Int_t measDim = 2;
+    Double_t dxerror = 1., dyerror = 1.; 		
+	for (Int_t i = gSetup->GetArray().size() - 1; i >= 1; i--) 
+	{
+        auto det = gSetup->GetArray().at(i);  
+       
+       // cout<<"starting to propagate to det: "<<det->GetDetectorName()<< endl;
+       // cout<<"Start velocity: "<<gCandidate->GetBeta()<<endl;
+       // cout<<"Start momentum: "<<gCandidate->GetMomentum().Mag()<<endl;       
+        
+       // hit data at a given detector; contains: detector Id, x and y positions of a particle 
+       // at the detector, as well asparticle's charge and time
+        R3BHit* hit = nullptr; 
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+        
+		if(hitIndex < 0) continue;
+		
+        if (hitIndex >= 0)
+        {
+            hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+        }
+
+        if (!hit) continue;
+
+		// ==========================================
+		// 1. THE PREDICT STEP (Extrapolation)
+		// ==========================================
+		// Your existing Runge-Kutta engine propagates the physical state backward!
+		TVector3 pos_before = gCandidate->GetPosition(); // Before propagation
+		//cout<<"It will be propagated to detector: "<<det->GetDetectorName()<<", "<<i<<endl;
+		
+		if(det->GetDetectorName() != "tofd") measDim = 1;
+		
+		if(det->GetDetectorName() == "tofd")
+		{
+			dxerror = det->res_x;
+			dyerror = det->res_y;
+		}
+		else if(det->GetDetectorName() ==  "fi30" || det->GetDetectorName() ==  "fi31" ||
+		       det->GetDetectorName() ==  "fi30" || det->GetDetectorName() ==  "fi31")
+		{
+			dxerror = det->res_x;
+			dyerror = 1.8;
+		}
+		else if(det->GetDetectorName() ==  "fi23b")
+		{
+			dxerror = 1.8;
+			dyerror = det->res_y;
+		}
+		else if(det->GetDetectorName() ==  "fi23a")
+		{
+			dxerror = det->res_x;
+			dyerror = 1.8;
+		}
+		//cout<<"Local positions: "<<hit->GetX()<<", "<<hit->GetY()<<endl;
+		
+		if(i < gSetup->GetArray().size() - 1)
+		{
+			gProp->PropagateToDetectorBackward(gCandidate, det, P_cov);
+			
+			 if (gEnergyLoss) // correct for energy loss in detector
+			{
+				Double_t weight = 1.;
+				if (kTarget == det->section)
+				{
+					weight = 0.5;
+				}
+			   // Update particle's momentum is due to energy loss in a detector:
+				gCandidate->PassThroughDetectorBackward(det, weight); 
+			 }
+		//	 cout<<"Velocity after passing through: "<<det->GetDetectorName()<<" " <<gCandidate->GetBeta()<<endl;
+        								 
+			// Convert the newly predicted gCandidate back into our 5D local state matrix
+			det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+			det->GlobalToLocalMomentum(-gCandidate->GetMomentum(),p_l);
+			
+			x_state(0,0) = x_l;
+			x_state(1,0) = y_l;
+			x_state(2,0) = p_l.X() / p_l.Z();
+			x_state(3,0) = p_l.Y() / p_l.Z();
+			x_state(4,0) = abs(gCandidate->GetCharge()) / p_l.Mag();
+			
+			// ==========================================
+			// 2. MULTIPLE COULOMB SCATTERING (Noise Q)
+			// ==========================================
+			// Calculate scattering angle using the Highland Formula based on detector material thickness
+			Double_t L_over_X0 = det->thickness / rad_length; 
+			Double_t p_tot = gCandidate->GetMomentum().Mag(); // in MeV/c or GeV/c
+			Double_t mass  = gCandidate->GetMass();          
+			// Calculate beta = p / E
+			Double_t E_tot = TMath::Sqrt(p_l.Mag() * p_l.Mag() + mass * mass);
+			Double_t beta  = p_l.Mag() / E_tot;
+			Double_t theta_scat = (0.0136 * x_state(4,0)/beta) * TMath::Sqrt(L_over_X0) * (1.0 + 0.038 * TMath::Log(L_over_X0));
+			Double_t var_scat = theta_scat * theta_scat;
+            
+		 // Inflate the predictive uncertainty because of scattering
+			P_cov(2,2) += var_scat; // Adds angular uncertainty to slope X
+			P_cov(3,3) += var_scat; // Adds angular uncertainty to slope Y
+
+		// ==========================================
+		// 3. THE UPDATE STEP (Filtering the Hit)
+		// ==========================================
+		    // We have to distinguish between detectors measuring only x, y or both
+			// Measurement vector z (what the detector actually saw)
+			TMatrixD z_meas(measDim, 1); z_meas.Zero();
+			// Measurement projection matrix H (maps 5D state down to the measured components x, y)
+			TMatrixD H_mat(measDim, 5); H_mat.Zero();
+			// Detector resolution matrix R
+			TMatrixD R_noise(measDim, measDim); R_noise.Zero();
+		/*	
+			H_mat(0,0) = 1.0; 
+			H_mat(1,1) = 1.0;
+			R_noise(0,0) = dxerror * dxerror;
+			R_noise(1,1) = dyerror * dyerror;
+			z_meas(0,0) = hit->GetX();
+			z_meas(1,0) = hit->GetY();
+        */
+		
+			if (det->GetDetectorName() == "tofd") // x and y measured
+			{
+				H_mat(0,0) = 1.0; 
+				H_mat(1,1) = 1.0;
+				R_noise(0,0) = det->res_x * det->res_x;
+				R_noise(1,1) = det->res_y * det->res_y;
+				z_meas(0,0) = hit->GetX();
+				z_meas(1,0) = hit->GetY();
+			}			
+			else if (det->GetDetectorName() == "fi23b")  // only y position measured
+			{
+				H_mat(0,1) = 1.0; // Maps to the y parameter of x_state
+				R_noise(0,0) = det->res_y * det->res_y;
+				z_meas(0,0) = hit->GetY();
+			}
+			else // fi3X and fi23a
+			{
+				H_mat(0,0) = 1.0; 
+				R_noise(0,0) = det->res_x * det->res_x;
+				z_meas(0,0) = hit->GetX();
+			}
+            
+			// Compute residual and its covariance matrix S 
+			// S = H * P * H^T + R
+			TMatrixD S_mat(measDim, measDim);
+			S_mat = H_mat * P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) + R_noise;
+						
+			// Residual: 
+			TMatrixD residual(measDim, 1);
+			residual = z_meas - (H_mat * x_state);
+
+			// Compute Kalman Gain: K = P * H^T * S^-1
+			TMatrixD K_gain(5, measDim);
+			TMatrixD S_inv = S_mat; S_inv.Invert();
+			K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;
+
+			// Update local state
+			x_state = x_state + (K_gain * residual);
+	
+	    	// Update the Covariance Matrix: P = (I - K * H) * P
+			TMatrixD I(5, 5); I.UnitMatrix();
+			P_cov = (I - (K_gain * H_mat)) * P_cov;
+
+			// Increment local chi2 safely using the measurement covariance matrix
+			TMatrixD chi2_increment = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;
+			chi2 += chi2_increment(0,0);
+			//cout<<"chi2 increm: "<<chi2_increment(0,0)<<endl;			
+			
+			// CRITICAL: Push the freshly updated Kalman position and slopes back into gCandidate 
+			// so the next Runge-Kutta step propagates the corrected trajectory!
+			
+			// 1. Reconstruct the new local momentum vector from the updated slopes
+			// We use the fact that p_x = ux * p_z and p_y = uy * p_z
+			Double_t ptot_new = abs(gCandidate->GetCharge()) / x_state(4,0);
+
+			// Use simple geometry to find the new local p_z component
+			Double_t x_new_local = x_state(0,0);
+			Double_t y_new_local = x_state(1,0);
+			Double_t ux_new = x_state(2,0);
+			Double_t uy_new = x_state(3,0);
+			Double_t pz_new_local = ptot_new / TMath::Sqrt(1.0 + ux_new*ux_new + uy_new*uy_new);
+
+			TVector3 p_new_local(ux_new * pz_new_local, uy_new * pz_new_local, pz_new_local);
+			
+			//cout<<"Optimized local positions: "<<x_new_local<<", "<<y_new_local<<endl;
+			//cout<<"Optimized local momenta: "<<p_new_local.X()<<", "<<p_new_local.Y()<<", "<<p_new_local.Z()<<endl;
+
+			// 2. Rotate the local momentum vector BACK into the global lab frame
+			TVector3 p_new_global;
+			det->LocalToGlobalMomentum(p_new_global, p_new_local); 
+			TVector3 pos_new_global;
+			det->LocalToGlobal(pos_new_global,x_new_local,y_new_local);
+			
+		//	cout<<"Optimized lab positions: "<<pos_new_global.X()<<", "<<pos_new_global.Y()<<", "<<pos_new_global.Z()<<endl;
+		//	cout<<"Optimized lab momenta: "<<p_new_global.X()<<", "<<p_new_global.Y()<<", "<<p_new_global.Z()<<endl;		
+		}
+	}
+		
+	 // 1. Kalman filter has finished at the first detector (fi23a/b)
+	// x_state now holds the perfect optimized local position and slopes.
+
+	// 2. Extrapolate from the first detector back to the target plane (z = 0)
+	// Since this region is field-free  the particle moves in a perfect straight line!
+	
+	Double_t dz_to_target = 0.0 - z_first; // Moving backward to z=0 means dz is negative
+
+	// Linear straight-line projection to the target vertex
+	Double_t x0_final = x_state(0,0) + x_state(2,0) * dz_to_target; // x + slope_x * dz
+	Double_t y0_final = x_state(1,0) + x_state(3,0) * dz_to_target; // y + slope_y * dz
+	Double_t ptot_final = abs(gCandidate->GetCharge()) / x_state(4,0);   
+	Double_t ux_final = x_state(2,0);
+	Double_t uy_final = x_state(3,0);
+	Double_t pz_final = ptot_final / TMath::Sqrt(1.0 + ux_final*ux_final + uy_final*uy_final);
+	TVector3 pos_final(x0_final,y0_final,0.0);
+	TVector3 mom_final(ux_final * pz_final, uy_final * pz_final, pz_final); 
+// at the target loc = glob	
+	gCandidate->SetStartMomentum(mom_final);
+	gCandidate->SetStartPosition(pos_final);
+	gCandidate->SetChi2(chi2);
+	charge = abs(gCandidate->GetCharge());
+	gCandidate->SetCharge(charge);
+	gCandidate->Reset();	
+    cout<<"*** New fragment ****** "<<endl;
+    cout<<"Charge: "<<gCandidate->GetCharge()<<endl;
+    cout<<"Position: "<<pos_final.X()<<", "<<pos_final.Y()<<", "<<pos_final.Z()<<endl;
+    cout<<"Momentum: "<<mom_final.X()<<", "<<mom_final.Y()<<", "<<mom_final.Z()<<endl;
+    cout<<"Beta: "<<gCandidate->GetBeta()<<endl;
+    cout<<"Chi2: "<<chi2<<endl;
+    if(chi2 > 1.e6) status = 10;
+
+    return status;
+}
+/*
+Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackwardOld(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
+{
     // LOG(debug3)
     cout << "In track momentum backward" << endl;
     gCandidate = particle;
@@ -1528,7 +1910,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
             }
         }
     }
-
+     
     // particle->UpdateMomentum();
     LOG(debug3) << "nach Energieverlust und invertieren";
     LOG(debug3) << "current momentum: " << -1. * gCandidate->GetMomentum().X() << "  "
@@ -1553,7 +1935,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 
     return status;
 }
-
+*/
 Int_t R3BFragmentFitterChi2S494::FitTrackBeta(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
     gCandidate = particle;

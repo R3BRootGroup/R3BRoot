@@ -61,6 +61,8 @@ class R3BTrackingDetector : public TObject
 
     void GlobalToLocal(const TVector3& posGlobal, Double_t& x_local, Double_t& y_local);
     void LocalToGlobal(TVector3& posGlobal, Double_t x_local, Double_t y_local);
+	void GlobalToLocalMomentum(const TVector3& momGlobal, TVector3& momLocal);
+    void LocalToGlobalMomentum(TVector3& momGlobal, TVector3 momLocal);
 
     const TString& GetDetectorName() const { return fDetectorName; }
 
@@ -91,6 +93,7 @@ class R3BTrackingDetector : public TObject
     Double_t res_x;
     Double_t res_y;
     Double_t res_t;
+    Double_t thickness;
 
     // TClonesArray of hits. Holding a detector dependent structure.
     // In the Exec() function the user has to copy the hit position

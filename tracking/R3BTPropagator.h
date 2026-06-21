@@ -17,6 +17,9 @@
 #include "TCanvas.h"
 #include "TObject.h"
 #include "TVector3.h"
+#include "TMatrixD.h"    
+#include "TMatrixDSym.h" 
+#include "TVectorD.h"    
 
 class R3BGladFieldMap;
 class FairRKPropagator;
@@ -36,25 +39,33 @@ class R3BTPropagator : public TObject
 
     Bool_t PropagateToDetector(R3BTrackingParticle* particle, R3BTrackingDetector* detector);
 
-    Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle, R3BTrackingDetector* detector);
+    Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c);
 
     Bool_t PropagateToPlane(R3BTrackingParticle* particle, const TVector3& v1, const TVector3& v2, const TVector3& v3);
 
     Bool_t PropagateToPlaneBackward(R3BTrackingParticle* particle,
                                     const TVector3& v1,
                                     const TVector3& v2,
-                                    const TVector3& v3);
+                                    const TVector3& v3,
+                                    TMatrixD& P_c);
 
     Bool_t PropagateToPlaneRK(R3BTrackingParticle* particle,
                               const TVector3& v1,
                               const TVector3& v2,
                               const TVector3& v3);
 
+    Bool_t PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
+                              const TVector3& v1,
+                              const TVector3& v2,
+                              const TVector3& v3,
+                                    TMatrixD& P_c);
+
     Bool_t LineIntersectPlane(const TVector3& pos,
                               const TVector3& mom,
                               const TVector3& v1,
                               const TVector3& normal,
                               TVector3& intersect);
+
 
     void SetVis(Bool_t vis = kTRUE) { fVis = vis; }
 

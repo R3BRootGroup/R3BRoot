@@ -21,6 +21,9 @@
 #include "Math/Minimizer.h"
 #include "Minuit2/Minuit2Minimizer.h"
 #include "Math/GenAlgoOptions.h"
+#include "TMatrixD.h"    
+#include "TMatrixDSym.h" 
+#include "TVectorD.h"    
 
 class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
 {
@@ -62,6 +65,7 @@ class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
     R3BTPropagator* fPropagator;
    	Double_t amu = 0.931494028;   // Gev/c**2
     TVector3 pinv;
+    Double_t rad_length = 40.; //radiation length in cm
 
     ClassDef(R3BFragmentFitterChi2S494, 1)
 };
