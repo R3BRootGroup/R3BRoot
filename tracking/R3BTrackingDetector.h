@@ -65,8 +65,10 @@ class R3BTrackingDetector : public TObject
     void LocalToGlobalMomentum(TVector3& momGlobal, TVector3 momLocal);
 
     const TString& GetDetectorName() const { return fDetectorName; }
-
+    
     Double_t GetEnergyLoss(const R3BTrackingParticle* particle);
+    
+    Double_t GetEnergyLossStraggling(const R3BTrackingParticle* particle);
 
     inline R3BTGeoPar* GetGeoPar() { return fGeo; }
 

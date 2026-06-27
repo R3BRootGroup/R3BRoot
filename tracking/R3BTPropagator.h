@@ -39,9 +39,17 @@ class R3BTPropagator : public TObject
 
     Bool_t PropagateToDetector(R3BTrackingParticle* particle, R3BTrackingDetector* detector);
 
+    Bool_t PropagateToDetectorForward(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c);
+
     Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c);
 
     Bool_t PropagateToPlane(R3BTrackingParticle* particle, const TVector3& v1, const TVector3& v2, const TVector3& v3);
+	
+	Bool_t PropagateToPlaneForward(R3BTrackingParticle* particle,
+                                    const TVector3& v1,
+                                    const TVector3& v2,
+                                    const TVector3& v3,
+                                    TMatrixD& P_c);
 
     Bool_t PropagateToPlaneBackward(R3BTrackingParticle* particle,
                                     const TVector3& v1,
@@ -60,6 +68,12 @@ class R3BTPropagator : public TObject
                               const TVector3& v3,
                                     TMatrixD& P_c);
 
+    Bool_t PropagateToPlaneRKForward(R3BTrackingParticle* particle,
+                              const TVector3& v1,
+                              const TVector3& v2,
+                              const TVector3& v3,
+                                    TMatrixD& P_c);
+
     Bool_t LineIntersectPlane(const TVector3& pos,
                               const TVector3& mom,
                               const TVector3& v1,
@@ -68,6 +82,12 @@ class R3BTPropagator : public TObject
 
 
     void SetVis(Bool_t vis = kTRUE) { fVis = vis; }
+    
+    TVector3 TransformGlobalToLocalPlane(const TVector3& globalVector,
+                                                     const TVector3& v1,
+                                                     const TVector3& v2,
+                                                     const TVector3& v3);
+
 
   private:
     FairRKPropagator* fFairProp;

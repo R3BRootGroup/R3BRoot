@@ -151,11 +151,14 @@ void R3BTrackingDetector::TakeHitsFromBuffer(Int_t iev)
 
     // LOG(info) << "======= " << hits.size();
 }
+
 void R3BTrackingDetector::GlobalToLocalMomentum(const TVector3& p_global, TVector3& p_local)
 {
     // Rotation matrix around the Y-axis
     TRotation rot;
-    rot.RotateY(fGeo->GetRotY() * TMath::DegToRad());
+    Double_t angle = fGeo->GetRotY();
+    if(abs(angle) > 180.) angle += 180.;
+    rot.RotateY(angle * TMath::DegToRad());
     
     // Invert the rotation to transform from Global -> Local
     rot.Invert(); 
@@ -169,7 +172,9 @@ void R3BTrackingDetector::LocalToGlobalMomentum(TVector3& p_global, TVector3 p_l
     
     // Rotation matrix around the Y-axis (Positive rotation for Local -> Global)
     TRotation rot;
-    rot.RotateY(fGeo->GetRotY() * TMath::DegToRad());
+    Double_t angle = fGeo->GetRotY();
+    if(abs(angle) > 180.) angle += 180.;
+    rot.RotateY(angle * TMath::DegToRad());
     
     // Apply the rotation matrix to the vector
     p_global = rot * p_local;
@@ -251,6 +256,24 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     return eloss;
 }
 
+Double_t R3BTrackingDetector::GetEnergyLossStraggling(const R3BTrackingParticle* particle)
+{
+
+    Double_t Z1 = abs(particle->GetCharge());
+	// 1. Calculate Bohr Straggling Variance (dE^2) in GeV^2
+	Double_t material_thickness_cm = 2. * fGeo->GetDimZ(); 
+	Double_t target_Z = fGeo->GetZ();
+	Double_t target_A = fGeo->GetA();
+	Double_t density = fGeo->GetDensity();
+
+	// Bohr constant factor ~ 0.1569 MeV*cm^2/g -> converted to GeV^2
+	Double_t bohr_constant = 0.1569 * 1.e-6; 
+	Double_t charge = particle->GetCharge();
+
+	Double_t sigma_E_squared = bohr_constant * (charge * charge) * (target_Z / target_A) * density * material_thickness_cm;
+	
+	return sigma_E_squared;
+}
 void R3BTrackingDetector::SetParContainers()
 {
     // fetch geometry and position of detector

@@ -350,11 +350,11 @@ InitStatus R3BFragmentTrackerS494::Init()
     Int_t bins[] = { 2000, 5000, 5000, 2000, 2000, 2000, 2000, 2000 };
     for (Int_t i = 0; i < 8; i++)
     {
-        fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d", i), bins[i], -ranges[i], ranges[i]);
-        fh_x_res0[i] = new TH1F(Form("h_x_res0%d", i), Form("x residual0 %d", i), bins[i], -ranges[i], ranges[i]);
+        fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d for He", i), bins[i], -ranges[i], ranges[i]);
+        fh_x_res0[i] = new TH1F(Form("h_x_res0%d", i), Form("x residual0 %d for C", i), bins[i], -ranges[i], ranges[i]);
         fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d", i), 40, -10., 10.);
-        fh_y_res[i] = new TH1F(Form("h_y_res%d", i), Form("y residual %d", i), bins[i], -ranges[i], ranges[i]);
-        fh_y_res0[i] = new TH1F(Form("h_y_res0%d", i), Form("y residual0 %d", i), bins[i], -ranges[i], ranges[i]);
+        fh_y_res[i] = new TH1F(Form("h_y_res%d", i), Form("y residual %d for He", i), bins[i], -ranges[i], ranges[i]);
+        fh_y_res0[i] = new TH1F(Form("h_y_res0%d", i), Form("y residual0 %d for C", i), bins[i], -ranges[i], ranges[i]);
         fh_y_pull[i] = new TH1F(Form("h_y_pull%d", i), Form("ypull %d", i), 40, -10., 10.);
     }
 
@@ -771,7 +771,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     }
 
-    if (tof->hits.size() > 0 && debug_loopout)
+    cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
+        if (tof->hits.size() > 0 && debug_loopout)
     {
         cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
         cout << "Hits ToFD: " << tof->hits.size() << endl;
@@ -1664,13 +1665,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												fDetectors = fDetectorsLeft;
 
 												Int_t status = 10;
-												if (fForward)
+												if (l == 2) // He
 												{
 													status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
 												}
-												else
+												else // C
 												{
-													// status = fFitter->FitTrackBackward2D(candidate, fDetectors);
 													status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
 												}
 												if (debug_loopin)
@@ -1698,29 +1698,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
 												if (10 > status)
 												{
-													if (fForward)
-													{
-														candidate->Reset();
-													}
-													else
-													{
-														// candidate->SetStartPosition(candidate->GetPosition());
-														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-														// candidate->SetStartBeta(beta0);
-														// candidate->UpdateMomentum();
-
-														// candidate->SetStartPosition(candidate->GetPosition()); // @target
-														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-														// candidate->SetStartBeta(0.8328);
-														// candidate->SetStartBeta(beta0);
-														// candidate->UpdateMomentum();
-														candidate->Reset();
-
-														// candidate->GetStartPosition().Print();
-														// candidate->GetStartMomentum().Print();
-														// cout << "chi2: " << candidate->GetChi2() << endl;
-														// status = FitFragment(candidate);
-													}
+													candidate->Reset();
 													
 													Double_t temp_chi2 = candidate->GetChi2() ;
 													if(temp_chi2 < local_chi2)
@@ -1949,11 +1927,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												fDetectors = fDetectorsRight;
 
 												Int_t status = 10;
-												if (fForward)
+												if (l == 2) // He
 												{
 													status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
 												}
-												else
+												else // C
 												{
 													// status = fFitter->FitTrackBackward2D(candidate, fDetectors);
 													status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
@@ -1983,30 +1961,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
 												if (10 > status)
 												{
-													if (fForward)
-													{
-														candidate->Reset();
-													}
-													else
-													{
-														// candidate->SetStartPosition(candidate->GetPosition());
-														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-														// candidate->SetStartBeta(beta0);
-														// candidate->UpdateMomentum();
-
-														// candidate->SetStartPosition(candidate->GetPosition());
-														// candidate->SetStartMomentum(-1. * candidate->GetMomentum());
-														// candidate->SetStartBeta(0.8328);
-														// candidate->SetStartBeta(beta0);
-														// candidate->UpdateMomentum();
-
-														candidate->Reset();
-
-														// candidate->GetStartPosition().Print();
-														// candidate->GetStartMomentum().Print();
-														// cout << "chi2: " << candidate->GetChi2() << endl;
-														// status = FitFragment(candidate);
-													}
+													candidate->Reset();
 
 													Double_t temp_chi2 = candidate->GetChi2() ;
 														  
@@ -2096,10 +2051,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     // parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
                     // parChi2 = xChi2;
 
-                    if (debug_loopout)
-                        cout << "For l = " << l << " xChi2 = " << xChi2 << ", pCHi2 = " << pChi2
-                             << ", parChi2 = " << parChi2 << ", p = " << x->GetStartMomentum().Mag() << endl;
-
+                    
                     fh_chiX_vs_chiP->Fill(xChi2, pChi2);
 
                     if (l < 2)
@@ -2131,9 +2083,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         pChi2 = (psum_cand - ps) * (psum_cand - ps) / (ps * ps * 0.01 * 0.01);
 
                         if(iretrack == 1) pChi2 = 0.;
-                        parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
+                       // parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
 
-                       // parChi2 = xChi2;
+                        parChi2 = xChi2;
 
                         if (debug_loopout)
                         {
@@ -2145,6 +2097,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                  << ", iretrack: " << iretrack << endl;
                         }
                     }
+                    
+                    if (debug_loopout)
+                        cout << "For l = " << l << " xChi2 = " << xChi2 << ", pCHi2 = " << pChi2
+                             << ", parChi2 = " << parChi2 << ", p = " << x->GetStartMomentum().Mag() << endl;
+
 
                     if (parChi2 < minChi2)
                     {
@@ -2849,9 +2806,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (debug_loopout)
                             cout << "selected particle had Q= " << eloss_hit[iDet] << endl;
 
-                        if (iretrack == iretrack_max)
+                        if (l == 2)
                             fh_x_res[iDet]->Fill(xres);
-                        if (iretrack == 0)
+                        if (l < 2)
                             fh_x_res0[iDet]->Fill(xres);
                         if (iretrack == iretrack_max)
                             fh_x_pull[iDet]->Fill(xres / det->res_x);
@@ -2889,9 +2846,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (debug_loopout)
                             cout << "selected particle had Q= " << eloss_hit[iDet] << endl;
 
-                        if (iretrack == iretrack_max)
+                        if (l == 2)
                             fh_y_res[iDet]->Fill(yres);
-                        if (iretrack == 0)
+                        if (l < 2)
                             fh_y_res0[iDet]->Fill(yres);
                         if (iretrack == iretrack_max)
                             fh_y_pull[iDet]->Fill(yres / det->res_y);
