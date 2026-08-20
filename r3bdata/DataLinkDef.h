@@ -61,6 +61,9 @@
 #pragma link C++ class R3BPWPreCalData+;
 #pragma link C++ class R3BPWCalData+;
 #pragma link C++ class R3BPWHitData+;
+#pragma link C++ class R3BDMMappedData+;
+#pragma link C++ class R3BDMCalData+;
+#pragma link C++ class R3BDMHitData+;
 
 #pragma link C++ class R3BWRData+;
 #pragma link C++ class R3BTrloiiData+;
