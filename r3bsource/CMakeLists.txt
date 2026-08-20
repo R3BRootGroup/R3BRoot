@@ -37,6 +37,7 @@ set(INCLUDE_DIRECTORIES
     rolu
     rpc
     pw
+    dm 
     sci2
     sci8
     sync_check
@@ -108,6 +109,7 @@ set(SRCS
     rpc/R3BRpcReader.cxx
     pw/R3BPWReader.cxx
     pw/R3BWhiterabbitPWReader.cxx
+    dm/R3BDMReader.cxx
     twim/R3BTwimReader.cxx
     tttx/R3BTttxReader.cxx
     musli/R3BMusliReader.cxx
@@ -188,6 +190,7 @@ set(STRUCT_HEADERS
     rpc/ext_h101_rpc.h
     pw/ext_h101_pw.h
     pw/ext_h101_wrpw.h
+    dm/ext_h101_dm.h
     sync_check/ext_h101_sync_check.h
     actaf/ext_h101_actaf2023.h
     actaf/ext_h101_actaf2025.h
@@ -257,6 +260,7 @@ set(HEADERS
     rpc/R3BRpcReader.h
     pw/R3BPWReader.h
     pw/R3BWhiterabbitPWReader.h
+    dm/R3BDMReader.h
     tttx/R3BTttxReader.h
     twim/R3BTwimReader.h
     musli/R3BMusliReader.h
@@ -286,6 +290,7 @@ set(DIRS
     rolu
     rpc
     pw
+    dm
     sci2
     sci8
     sync_check
