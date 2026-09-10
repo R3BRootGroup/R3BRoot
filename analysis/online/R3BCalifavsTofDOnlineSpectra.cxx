@@ -157,11 +157,12 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* /*option*/)
         auto hit = dynamic_cast<R3BTofdHitData*>(fHitItemsTofd->At(ihit));
         if (!hit)
             continue;
-        if (hit->GetDetId() == 1 && hit->GetEloss() > (fZselection - 0.5) && hit->GetEloss() < (fZselection + 0.5))
+        if (hit->GetPlaneId() == 1 && hit->GetEloss() > (fZselection - 0.5) && hit->GetEloss() < (fZselection + 0.5))
             fZminus1 = true;
     }
 
-    Int_t nHits = fHitItemsCalifa->GetEntriesFast();
+    UInt_t nHits = fHitItemsCalifa->GetEntriesFast();
+
     for (Int_t ihit = 0; ihit < nHits; ihit++)
     {
         auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));
@@ -179,9 +180,10 @@ void R3BCalifavsTofDOnlineSpectra::Exec(Option_t* /*option*/)
     if (fHitItemsCalifa && fZminus1 && fHitItemsCalifa->GetEntriesFast() > 0)
     {
         Double_t theta = 0., phi = 0.;
-        Double_t califa_theta[nHits];
-        Double_t califa_phi[nHits];
-        Double_t califa_e[nHits];
+        std::vector<double> califa_theta(nHits);
+        std::vector<double> califa_phi(nHits);
+        std::vector<double> califa_e(nHits);
+
         for (Int_t ihit = 0; ihit < nHits; ihit++)
         {
             auto hit = dynamic_cast<R3BCalifaClusterData*>(fHitItemsCalifa->At(ihit));

@@ -11,19 +11,22 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BTOFDHITDATA_H
-#define R3BTOFDHITDATA_H 1
+#pragma once
 
-#include "R3BHit.h"
+#include "Rtypes.h"
+#include <TObject.h>
+#include <cmath>
+#include <cstdint>
 
 // for the data analysis of the Tofd detectors.
 // Introduced by M.Heil, May 2016
+// Modified by Pablo González Rusell, Oct 2025
 
-class R3BTofdHitData : public R3BHit
+class R3BTofdHitData : public TObject
 {
   public:
     // Default Constructor
-    R3BTofdHitData();
+    R3BTofdHitData() = default;
 
     // Standard Constructor
     R3BTofdHitData(Double_t t,
@@ -32,24 +35,44 @@ class R3BTofdHitData : public R3BHit
                    Double_t Z,
                    Double_t tdiff,
                    Double_t ELoss = 0,
-                   Double_t ID = 0,
+                   UInt_t ID = 0,
                    UInt_t iBar = 0,
                    Double_t traw = -1000,
                    Double_t tof = 0.);
 
     // Destructor
-    virtual ~R3BTofdHitData() {}
+    virtual ~R3BTofdHitData() = default;
 
-    UInt_t GetBarId() const;
-    Double_t GetTimeRaw() const; // Get paddle time without trigger
-    Double_t GetTof() const;     // Time-of-flight with respect to LOS detector
+    [[nodiscard]] Double_t GetTime() const { return fTime; }
+    [[nodiscard]] Double_t GetX() const { return fXPos; }
+    [[nodiscard]] Double_t GetY() const { return fYPos; }
+    [[nodiscard]] Double_t GetChargeZ() const { return fZCharge; }
+    [[nodiscard]] Double_t GetTimeDiff() const { return fTimeDiff; }
+    [[nodiscard]] Double_t GetEloss() const { return fELoss; }
+    [[nodiscard]] UInt_t GetPlaneId() const { return fPlaneId; }
+    [[nodiscard]] UInt_t GetBarId() const { return fBarId; }
+    [[nodiscard]] Double_t GetTimeRaw() const { return fTimeRaw; }
+    [[nodiscard]] Double_t GetTof() const { return fTof; }
+
+    void SetEloss(const Double_t eloss) { fELoss = eloss; }
+    void SetTime(const Double_t time) { fTime = time; }
+
+    // Deprecated methods
+    [[deprecated("Use GetPlaneId() instead.")]] UInt_t GetDetId() const { return fPlaneId; }
+    [[deprecated]] UInt_t GetHitId() const { return -1; }
 
   private:
-    UInt_t fBarId;
-    Double_t fTimeRaw;
-    Double_t fTof;
+    Double_t fTime = std::nan("");
+    Double_t fXPos = std::nan("");
+    Double_t fYPos = std::nan("");
+    Double_t fZCharge = std::nan("");
+    Double_t fTimeDiff = std::nan("");
+    Double_t fELoss = std::nan("");
+    UInt_t fPlaneId = 0;
+    UInt_t fBarId = 0;
+    Double_t fTimeRaw = -1000;
+    Double_t fTof = 0.;
 
-    ClassDef(R3BTofdHitData, 3)
+  public:
+    ClassDef(R3BTofdHitData, 4);
 };
-
-#endif

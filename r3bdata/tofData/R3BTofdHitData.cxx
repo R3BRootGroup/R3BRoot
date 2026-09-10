@@ -15,12 +15,7 @@
 
 // for the data analysis of the Tofd detector.
 // Introduced by M.Heil, May 2016
-
-R3BTofdHitData::R3BTofdHitData()
-    : fBarId(0)
-    , fTof(0.)
-{
-}
+// Modified by Pablo González Rusell, Oct 2025
 
 R3BTofdHitData::R3BTofdHitData(Double_t t,
                                Double_t x,
@@ -28,21 +23,21 @@ R3BTofdHitData::R3BTofdHitData(Double_t t,
                                Double_t Z,
                                Double_t tdiff,
                                Double_t ELoss,
-                               Double_t ID,
+                               UInt_t ID,
                                UInt_t iBar,
                                Double_t traw,
                                Double_t tof)
-    : R3BHit(ID, x, y, ELoss, t)
+    : fTime(t)
+    , fXPos(x)
+    , fYPos(y)
+    , fZCharge(Z)
+    , fTimeDiff(tdiff)
+    , fELoss(ELoss)
+    , fPlaneId(ID)
     , fBarId(iBar)
     , fTimeRaw(traw)
     , fTof(tof)
 {
 }
-
-UInt_t R3BTofdHitData::GetBarId() const { return fBarId; }
-
-Double_t R3BTofdHitData::GetTimeRaw() const { return fTimeRaw; } // return bar time without trigger, needed for Rolu Tof
-
-Double_t R3BTofdHitData::GetTof() const { return fTof; }
 
 ClassImp(R3BTofdHitData)

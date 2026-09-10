@@ -11,8 +11,7 @@
  * or submit itself to any jurisdiction.                                      *
  ******************************************************************************/
 
-#ifndef R3BIncomingBeta_H
-#define R3BIncomingBeta_H 1
+#pragma once
 
 // ROOT header
 #include "TMath.h"
@@ -150,5 +149,3 @@ class R3BIncomingBeta : public FairTask
   public:
     ClassDef(R3BIncomingBeta, 1)
 };
-
-#endif /* R3BIncomingBeta_H */

@@ -1165,7 +1165,7 @@ void R3BTofDOnlineSpectra::Exec(Option_t* option)
             auto hitTofd = dynamic_cast<R3BTofdHitData*>(fHitItems->At(ihit));
             if (IS_NAN(hitTofd->GetTime()))
                 continue;
-            Int_t iPlane = hitTofd->GetDetId();
+            Int_t iPlane = hitTofd->GetPlaneId();
             Double_t randx = (std::rand() / (float)RAND_MAX) - 0.5;
             Int_t ictemp = iCounts[iPlane - 1];
             x[iPlane - 1][ictemp] = hitTofd->GetX() + 2.7 * randx;

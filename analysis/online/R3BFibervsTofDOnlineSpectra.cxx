@@ -235,7 +235,7 @@ void R3BFibervsTofDOnlineSpectra::Exec(Option_t* option)
             if (!hit)
                 continue;
             // Looking for the maximum
-            Int_t iPlane = hit->GetDetId() - 1;
+            Int_t iPlane = hit->GetPlaneId() - 1;
             if (hit->GetEloss() > tofdq[iPlane])
             {
                 tofdq[iPlane] = hit->GetEloss();
