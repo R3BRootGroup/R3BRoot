@@ -15,6 +15,7 @@
 #define R3BFRAGMENTFITTERGENERIC
 
 #include "Rtypes.h"
+#include "TMatrixD.h"    
 
 class R3BTrackingParticle;
 class R3BTrackingSetup;
@@ -35,10 +36,37 @@ class R3BFragmentFitterGeneric
     virtual Int_t FitTrackMomentumForward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
    
     virtual Int_t FitTrackMomentumBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
+   
+    virtual Int_t FitTrackMomentumKalmanFilter(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
 
     virtual Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
+
+    virtual Int_t FitTrackMomentumForwardMinuit(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
     
     virtual Int_t FitTrackBackward2D(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
+    
+   virtual void SetCarbonTargetCovariance(const TMatrixD& cov) {
+    fbestCarbonTargetCov.ResizeTo(5, 5); // FORCE 5x5 allocation!
+    
+    if (cov.GetNrows() == 5 && cov.GetNcols() == 5) {
+        fbestCarbonTargetCov = cov;
+    } else {
+        // Fallback: If passed matrix isn't 5x5, zero it out safely
+        fbestCarbonTargetCov.Zero();
+    }
+    fHasCarbonVertexCov = true; // Set flag to 1
+	}
+
+	virtual void ResetVertexCovariance() {
+		fbestCarbonTargetCov.ResizeTo(5, 5);
+		fbestCarbonTargetCov.Zero();
+		fHasCarbonVertexCov = false; // Reset flag to 0
+	}
+    
+    protected:
+    // Make these protected so R3BFragmentFitterChi2S494 can read them directly
+    TMatrixD fbestCarbonTargetCov; //! Do not stream to ROOT I/O
+    bool fHasCarbonVertexCov;      //! Do not stream to ROOT I/O
 
     ClassDef(R3BFragmentFitterGeneric, 1)
 };

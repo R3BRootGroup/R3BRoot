@@ -1353,6 +1353,908 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForwardMinuit(R3BTrackingPartic
 
     return status;
 }
+// ***********************************************************************************************************
+// =========================================================================
+// HELPER LAMBDAS
+// =========================================================================
+auto enforceSymmetry = [](TMatrixD& P) {
+    for (Int_t i = 0; i < 5; ++i) {
+        for (Int_t j = i + 1; j < 5; ++j) {
+            Double_t avg = 0.5 * (P(i, j) + P(j, i));
+            P(i, j) = avg;
+            P(j, i) = avg;
+        }
+    }
+};
+
+auto computeProcessNoise = [](TMatrixD& Q, Double_t L_over_X0, Double_t qOverP_abs, 
+                              Double_t beta, Double_t p_tot_GeV, Double_t mass, 
+                              Double_t sigma_E_sq, Double_t ux, Double_t uy, 
+                              Double_t det_thick) {
+    Q.Zero();
+    if (L_over_X0 <= 1e-7 || beta <= 0.0 || p_tot_GeV <= 0.0) return;
+
+    Double_t theta_scat = (0.0136 * qOverP_abs / beta) * TMath::Sqrt(L_over_X0) 
+                          * (1.0 + 0.038 * TMath::Log(L_over_X0));
+    Double_t var_scat = theta_scat * theta_scat;
+
+    Double_t xi = 1.0 + ux * ux + uy * uy;
+    Double_t var_ux = (1.0 + ux * ux) * xi * var_scat;
+    Double_t var_uy = (1.0 + uy * uy) * xi * var_scat;
+
+    Double_t var_pos = (det_thick * det_thick / 3.0) * var_scat;
+    Double_t cov_pos_slope = (det_thick / 2.0) * var_scat;
+
+    Double_t E_tot = TMath::Sqrt(p_tot_GeV * p_tot_GeV + mass * mass);
+    Double_t sigma_p_sq = (E_tot / p_tot_GeV) * (E_tot / p_tot_GeV) * sigma_E_sq;
+    Double_t var_qOverP = (qOverP_abs * qOverP_abs) * (sigma_p_sq / (p_tot_GeV * p_tot_GeV));
+
+    Q(0, 0) = var_pos;          Q(1, 1) = var_pos;
+    Q(2, 2) = var_ux;           Q(3, 3) = var_uy;
+    Q(0, 2) = cov_pos_slope;    Q(2, 0) = cov_pos_slope;
+    Q(1, 3) = cov_pos_slope;    Q(3, 1) = cov_pos_slope;
+    Q(4, 4) = var_qOverP;
+};
+
+auto josephFormUpdate = [](TMatrixD& P, const TMatrixD& K, const TMatrixD& H, const TMatrixD& R, auto& enforceSym) {
+    TMatrixD I(5, 5); I.UnitMatrix();
+    TMatrixD I_minus_KH = I - (K * H);
+    TMatrixD I_minus_KH_T(TMatrixD::kTransposed, I_minus_KH);
+    TMatrixD K_T(TMatrixD::kTransposed, K);
+
+    P = (I_minus_KH * P * I_minus_KH_T) + (K * R * K_T);
+    enforceSym(P);
+};
+
+auto calculatePulls = [](TMatrixD& Pull, const TMatrixD& residual, const TMatrixD& S_mat) {
+    Int_t measDim = residual.GetNrows(); 
+    Double_t var_x = S_mat(0, 0);
+    if (var_x > 0.0) Pull(0,0) = residual(0,0) / TMath::Sqrt(var_x);
+    if (measDim == 2) {
+        Double_t var_y = S_mat(1, 1);
+        if (var_y > 0.0) Pull(1,0) = residual(1,0) / TMath::Sqrt(var_y);
+    }
+};
+
+Int_t R3BFragmentFitterChi2S494::FitTrackMomentumKalmanFilter(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
+{
+    gCandidate = particle;
+    gSetup = setup;
+    Int_t status = 0;
+    Int_t measDim = 1;
+    Double_t chi2 = 0., chi2_first = 0., chi2_second = 0., chi2_third = 0.;
+    Double_t beta_target = 0.;
+    Double_t x0_start=0., y0_start=0.;
+    TVector3 pos0, pos2, pos3, pos23a, pos23b, direction0, inputPosition, inputMomentum;
+    TVector3 pos_target, mom_target, p_new_global, pos_new_global, p_l, inputMomentumLocal;
+    Double_t y_tp = 0.;
+    Double_t yfi30=-100.,yfi31=-100.,yfi32=-100.,yfi33=-100.;
+    Double_t foffset=0.441;
+    Double_t fslope=1.;
+    Double_t ltofd=0.;
+    Double_t ztp = 174.5851;
+    Double_t x_l = 0., y_l = 0.;
+    
+    TMatrixD x_state(5, 1);
+    TMatrixD P_cov(5, 5);
+    TMatrixD Q_mat(5, 5);
+
+    Bool_t dumpResiduesStep1 = false, dumpResiduesStep2 = false, dumpResiduesStep3 = false, dumpResiduesStep4 = true;
+    Double_t mass = gCandidate->GetMass();
+    Double_t charge = gCandidate->GetCharge();
+    Bool_t helium = (charge == 2.0);
+
+    Double_t x0 = gCandidate->GetStartPosition().X();
+    Double_t y0 = gCandidate->GetStartPosition().Y();
+    Double_t z0 = gCandidate->GetStartPosition().Z();
+    Double_t px0 = gCandidate->GetStartMomentum().X();
+    Double_t py0 = gCandidate->GetStartMomentum().Y();
+    Double_t pz0 = gCandidate->GetStartMomentum().Z();
+    Double_t ptot0 = TMath::Sqrt(px0 * px0 + py0 * py0 + pz0 * pz0);
+    
+    x0_start = x0;
+	y0_start = y0;
+	  
+    Double_t diffx = 0.0093 * 0.996;
+    Double_t diffy = 0.000365 * (-0.125);
+
+    if (gCandidate->GetHitIndexByName("fi23a") > -1) {
+        auto fi23a = gSetup->GetByName("fi23a");
+        fi23a->LocalToGlobal(pos23a, gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX() - diffx, 0.0);
+    }
+    if (gCandidate->GetHitIndexByName("fi23b") > -1) {
+        auto fi23b = gSetup->GetByName("fi23b");
+        fi23b->LocalToGlobal(pos23b, 0.0, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY() - diffy);
+    } 
+
+    pos0.SetXYZ(x0, y0, z0);
+    pos3.SetXYZ(pos23a.X(), pos23b.Y(), (pos23a.Z() + pos23b.Z()) / 2.0);   
+    direction0 = (pos3 - pos0).Unit() * ptot0;
+
+    inputMomentum = direction0;
+    inputPosition = pos0;
+    gCandidate->SetStartPosition(inputPosition);
+    gCandidate->SetStartMomentum(inputMomentum);   
+    gCandidate->Reset();    
+
+/*
+    if (gCandidate->GetHitIndexByName("tofd") > -1)
+    {
+        auto tofd = gSetup->GetByName("tofd");
+        tofd->LocalToGlobal(pos0,
+                            gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX(),
+                            gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY());
+        ltofd = sqrt((pos0.Z()-ztp)*(pos0.Z()-ztp) + pos0.X()*pos0.X()) ;
+    }
+    
+    if (gCandidate->GetHitIndexByName("fi23b") > -1)
+    {
+        auto fi23b = gSetup->GetByName("fi23b");
+        fi23b->LocalToGlobal(pos23b, 0.0, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
+    }
+ 
+ Double_t diffx = 0.;
+ // Extrapolate y position between fi23b and tofd to fi3x:   
+    if (gCandidate->GetHitIndexByName("fi32") > -1 && gCandidate->GetHitIndexByName("fi30") > -1)
+    {
+		diffx = 0.;//-0.7;
+        auto fi32 = gSetup->GetByName("fi32");
+        auto fi30 = gSetup->GetByName("fi30");
+        fi32->LocalToGlobal(pos2, gSetup->GetHit("fi32", gCandidate->GetHitIndexByName("fi32"))->GetX()-diffx, 0.);
+        fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
+        
+        fslope = 0.883;
+        y_tp = (pos0.Y()-foffset+fslope*ltofd*pos23b.Y()/(ztp-pos23b.Z()))/
+														 (1.+fslope*ltofd/(ztp-pos23b.Z()));  
+	    Double_t lfi30 = sqrt((pos3.Z()-ztp)*(pos3.Z()-ztp) + pos3.X()*pos3.X()) ;			
+		yfi30 = y_tp + lfi30/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
+		pos3.SetY(yfi30);
+	    
+	    Double_t lfi32 = sqrt((pos2.Z()-ztp)*(pos2.Z()-ztp) + pos2.X()*pos2.X()) ;			
+		yfi32 = y_tp + lfi32/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
+		pos2.SetY(yfi32);
+    }
+    else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
+    {
+        diffx = 0.;//0.53;
+        auto fi31 = gSetup->GetByName("fi31");
+        auto fi33 = gSetup->GetByName("fi33");
+        fi33->LocalToGlobal(pos2, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX()-diffx, 0.);
+        fi31->LocalToGlobal(pos3, gSetup->GetHit("fi31", gCandidate->GetHitIndexByName("fi31"))->GetX(), 0.);
+        
+        fslope = 0.901;
+        y_tp = (pos0.Y()-foffset+fslope*ltofd*pos23b.Y()/(ztp-pos23b.Z()))/
+														 (1.+fslope*ltofd/(ztp-pos23b.Z()));  
+	    Double_t lfi31 = sqrt((pos3.Z()-ztp)*(pos3.Z()-ztp) + pos3.X()*pos3.X()) ;			
+		yfi31 = y_tp + lfi31/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
+		pos3.SetY(yfi31);
+	    
+	    Double_t lfi33 = sqrt((pos2.Z()-ztp)*(pos2.Z()-ztp) + pos2.X()*pos2.X()) ;			
+		yfi33 = y_tp + lfi33/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
+		pos2.SetY(yfi33);
+    }
+    else
+    {
+        return 10;
+    }
+      Double_t ygeom = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (ztp - pos23b.Z());
+
+       // Pass inital candidate through detectors, correct for energy loss, and get start momentum at tofd:	
+		
+	for (Int_t i = 0; i < gSetup->GetArray().size();  i++) 
+	{
+		auto det = gSetup->GetArray().at(i); 
+		R3BHit* hit = nullptr; 
+		Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+		
+		if(hitIndex < 0) continue;
+		
+		if (hitIndex >= 0)
+		{
+			hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+		}
+
+		if (!hit) continue;
+		
+		Double_t weight = 1.;
+		if (kTarget == det->section || det->GetDetectorName() == "tofd")
+		{
+			weight = 0.5;
+		}
+	   // Update particle's momentum is due to energy loss in a detector:
+		gCandidate->PassThroughDetector(det, weight); 			
+	} 
+	
+	Double_t mom = gCandidate->GetMomentum().Mag();
+	direction0 = (pos2 - pos0);
+	
+	direction0 = direction0.Unit();
+	
+	direction0.SetMag(mom);
+	
+	inputMomentum = direction0;
+
+	px0 = inputMomentum.X();
+	py0 = inputMomentum.Y();
+	pz0 = inputMomentum.Z();
+
+	x0 = pos0.X();
+	y0 = pos0.Y();
+	z0 = pos0.Z();
+	
+	gCandidate->SetCharge(-charge);
+	gCandidate->SetStartPosition(pos0);
+	gCandidate->SetStartMomentum(inputMomentum);
+	gCandidate->Reset();
+	
+	if (gCandidate->GetHitIndexByName("tofd") > -1)
+	{
+		auto tofd = gSetup->GetByName("tofd");
+		tofd->GlobalToLocalMomentum(inputMomentum,inputMomentumLocal);
+		tofd->GlobalToLocal(pos0,x_l,y_l);
+	}
+	
+	// --- BEFORE THE DETECTOR LOOP ---
+	// Initialize local state at the tofd
+	x_state(0,0) = x_l; // initial x 
+	x_state(1,0) = y_l; // initial y
+	x_state(2,0) = inputMomentumLocal.X() / inputMomentumLocal.Z(); // initial slope dx/dz
+	x_state(3,0) = inputMomentumLocal.Y() / inputMomentumLocal.Z(); // initial slope dy/dz
+	x_state(4,0) = abs(gCandidate->GetCharge()) / inputMomentumLocal.Mag(); // q/p 
+	
+	
+	// Initialize starting uncertainties (high values mean "I trust the hits more than my guess")
+	Double_t x_err_targ = (helium ? 0.01 : 1.5);
+	Double_t y_err_targ = (helium ? 0.01 : 1.5);
+	P_cov.Zero();
+	Double_t x_err = 2.025 * 2. / sqrt(12.);
+	P_cov(0,0) = x_err * x_err; 
+	Double_t y_err = (helium ? 1. * 3. : 1.);
+	P_cov(1,1) = y_err * y_err; 
+	P_cov(2,2) = 5.e-2 * 5.e-2;//0.05 * 0.05 ;     
+	P_cov(3,3) = 5.e-2 * 5.e-2;//0.05 * 0.05 ;     
+	Double_t qp_err = (helium ? 0.03 : 0.01) * charge / inputMomentumLocal.Mag();
+    P_cov(4,4) = qp_err * qp_err;
+*/
+    
+    x_state(0,0) = x0;
+    x_state(1,0) = y0;
+    x_state(2,0) = inputMomentum.X() / inputMomentum.Z();
+    x_state(3,0) = inputMomentum.Y() / inputMomentum.Z();
+    x_state(4,0) = charge / inputMomentum.Mag();
+	
+    P_cov.Zero();
+    TMatrixD R_target(2,2); R_target.Zero();
+	Double_t x_err_targ = 0.5, y_err_targ = 0.5;
+	Double_t qp_err = (helium ? 0.03 : 0.01) * charge / inputMomentum.Mag();
+	if (!helium) 
+	{
+		x_err_targ = 0.5;
+		y_err_targ = 0.5;
+		P_cov(0,0) = x_err_targ * x_err_targ;
+		P_cov(1,1) = y_err_targ * y_err_targ;
+		P_cov(2,2) = 5.e-1 * 5.e-1;
+		P_cov(3,3) = 5.e-1 * 5.e-1;
+		P_cov(4,4) = qp_err * qp_err;
+		
+		R_target(0,0) = P_cov(0,0);
+		R_target(1,1) = P_cov(1,1);
+		R_target(0,1) = 0.;
+		R_target(1,0) = 0.;
+		
+	}
+	else
+	{
+		//cout<<"fHasCarbonVertexCov: "<<fHasCarbonVertexCov<<endl;
+		//cout<<"fbestCarbonTargetCov: "<<fbestCarbonTargetCov(0,0)<<" "<<fbestCarbonTargetCov(1,1)<<" "<<
+		//fbestCarbonTargetCov(2,2)<<" "<<fbestCarbonTargetCov(3,3)<<" "<<fbestCarbonTargetCov(4,4)<<endl;
+		if (fHasCarbonVertexCov) {
+			// Set spatial uncertainties directly from Carbon's stored vertex error
+			P_cov(0, 0) = fbestCarbonTargetCov(0, 0); // Var(x)
+			P_cov(0, 1) = fbestCarbonTargetCov(0, 1); // Cov(x, y)
+			P_cov(1, 0) = fbestCarbonTargetCov(1, 0); // Cov(y, x)
+			P_cov(1, 1) = fbestCarbonTargetCov(1, 1); // Var(y)
+
+			// Set initial direction / momentum variances
+			P_cov(2,2) = 5.e-1 * 5.e-1;
+			P_cov(3,3) = 5.e-1 * 5.e-1;
+			P_cov(4,4) = qp_err * qp_err;
+
+			// Target measurement noise R for Helium
+			R_target(0, 0) = fbestCarbonTargetCov(0, 0);
+			R_target(0, 1) = fbestCarbonTargetCov(0, 1);
+			R_target(1, 0) = fbestCarbonTargetCov(1, 0);
+			R_target(1, 1) = fbestCarbonTargetCov(1, 1);
+		}
+	}
+	
+    // --- STEP 1: FORWARD PASS ---
+
+    //cout<<"FIRST STEP FOR CHARGE: "<<charge<<endl;
+    
+    for (Int_t i = 0; i < (Int_t)gSetup->GetArray().size(); i++) {
+        auto det = gSetup->GetArray().at(i);          
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());        
+        if (hitIndex < 0) continue;
+        R3BHit* hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+        if (!hit) continue;        
+
+        measDim = (det->GetDetectorName() == "tofd" || kTarget == det->section) ? 2 : 1;
+        TMatrixD z_meas(measDim, 1), H_mat(measDim, 5), R_noise(measDim, measDim);
+        z_meas.Zero(); H_mat.Zero(); R_noise.Zero();
+
+        if (det->GetDetectorName() == "tofd") {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+            R_noise(1,1) = det->res_y * det->res_y * (helium ? 9.0 : 1.0);
+            z_meas(0,0) = hit->GetX(); z_meas(1,0) = hit->GetY();
+        } else if (kTarget == det->section) {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = R_target(0,0);
+			R_noise(0,1) = R_target(0,1);
+			R_noise(1,1) = R_target(1,1);
+			R_noise(1,0) = R_target(1,0);
+			z_meas(0,0) = gCandidate->GetStartPosition().X();
+            z_meas(1,0) = gCandidate->GetStartPosition().Y();             
+        } else if (det->GetDetectorName() == "fi23b") {
+            H_mat(0,1) = 1.0;
+            R_noise(0,0) = det->res_y * det->res_y * 4./12.;
+            z_meas(0,0) = hit->GetY();
+        } else {
+            H_mat(0,0) = 1.0; 
+            R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+            z_meas(0,0) = hit->GetX();
+        }         
+
+        gProp->PropagateToDetectorForward(gCandidate, det, P_cov);         
+        Double_t weight = (kTarget == det->section || det->GetDetectorName() == "tofd") ? 0.5 : 1.0;
+        Double_t sigma_E_squared = 0.0;
+        if (gEnergyLoss) {
+            sigma_E_squared = weight * det->GetEnergyLossStraggling(gCandidate);
+            gCandidate->PassThroughDetector(det, weight); 
+        }                                       
+
+        det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+        det->GlobalToLocalMomentum(gCandidate->GetMomentum(), p_l);     
+        x_state(0,0) = x_l; 
+        x_state(1,0) = y_l;
+        x_state(2,0) = p_l.X() / p_l.Z(); 
+        x_state(3,0) = p_l.Y() / p_l.Z();
+        x_state(4,0) = TMath::Abs(charge) / p_l.Mag();
+        
+        if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        enforceSymmetry(P_cov);
+
+        Double_t L_over_X0 = weight * det->thickness / rad_length;
+        Double_t p_tot = gCandidate->GetMomentum().Mag();
+        Double_t E_tot = TMath::Sqrt(p_tot * p_tot + mass * mass);
+        computeProcessNoise(Q_mat, L_over_X0, x_state(4,0), p_tot / E_tot, p_tot, mass, 
+                            sigma_E_squared, x_state(2,0), x_state(3,0), det->thickness);
+        P_cov += Q_mat;     
+
+        TMatrixD S_mat = H_mat * P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) + R_noise;                     
+        TMatrixD residual = z_meas - (H_mat * x_state);         
+        TMatrixD pulls(measDim, 1);
+        calculatePulls(pulls, residual, S_mat);     
+
+        if (dumpResiduesStep1) {
+            if (measDim == 2) {
+                gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pulls(0,0), pulls(1,0));
+            } else {
+                if (det->GetDetectorName() == "fi23b") gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pulls(0,0));
+                else gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pulls(0,0), 0.);
+            }
+        }           
+
+        TMatrixD S_inv = S_mat; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(S_inv)) {
+			// Inversion failed due to degenerate/noisy data in this event!
+			// Safely skip this update step, drop this track candidate, or return false.
+			continue; 
+		}
+        //S_inv.Invert();
+        TMatrixD K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;
+        x_state += (K_gain * residual);
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        josephFormUpdate(P_cov, K_gain, H_mat, R_noise, enforceSymmetry);
+
+        //TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;
+        TMatrixD R_inv = R_noise; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(R_inv)) {
+			continue; 
+		}
+		//R_inv.Invert();
+        TMatrixD residual_updated = z_meas - (H_mat * x_state);         
+        TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual_updated) * R_inv * residual_updated;
+        chi2_first += chi2_inc(0,0);         
+
+        Double_t ptot_new = TMath::Abs(charge) / x_state(4,0);
+        Double_t ux_new = x_state(2,0), uy_new = x_state(3,0);
+        Double_t pz_new_local = ptot_new / TMath::Sqrt(1.0 + ux_new * ux_new + uy_new * uy_new);
+        TVector3 p_new_local(ux_new * pz_new_local, uy_new * pz_new_local, pz_new_local);         
+
+        det->LocalToGlobalMomentum(p_new_global, p_new_local); 
+        det->LocalToGlobal(pos_new_global, x_state(0,0), x_state(1,0));         
+        gCandidate->SetPosition(pos_new_global);
+        gCandidate->SetMomentum(p_new_global);
+        gCandidate->SetBeta(p_new_global.Mag() / TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass));  
+    } 
+    
+    //cout<<"SECOND STEP FOR CHARGE: "<<charge<<endl;  
+
+    // --- STEP 2: BACKWARD PASS ---
+    gCandidate->SetMomentum(-p_new_global);
+    gCandidate->SetPosition(pos_new_global);
+    gCandidate->SetCharge(-charge);        
+
+    for (Int_t i = (Int_t)gSetup->GetArray().size() - 1; i >= 0; i--) {
+        auto det = gSetup->GetArray().at(i);  
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());      
+        if (hitIndex < 0) continue;
+        R3BHit* hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+        if (!hit) continue;     
+
+        gProp->PropagateToDetectorBackward(gCandidate, det, P_cov);         
+        Double_t weight = (kTarget == det->section || det->GetDetectorName() == "tofd") ? 0.5 : 1.0;
+        Double_t sigma_E_squared = 0.0;
+        if (gEnergyLoss) {
+            sigma_E_squared = weight * det->GetEnergyLossStraggling(gCandidate);
+            gCandidate->PassThroughDetectorBackward(det, weight);               
+        }                                                   
+
+        det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+        det->GlobalToLocalMomentum(gCandidate->GetMomentum(), p_l);         
+        x_state(0,0) = x_l; x_state(1,0) = y_l;
+        x_state(2,0) = p_l.X() / p_l.Z(); x_state(3,0) = p_l.Y() / p_l.Z();
+        x_state(4,0) = TMath::Abs(charge) / p_l.Mag();
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        enforceSymmetry(P_cov);                 
+
+        Double_t L_over_X0 = weight * det->thickness / rad_length;
+        Double_t p_tot = gCandidate->GetMomentum().Mag();
+        Double_t E_tot = TMath::Sqrt(p_tot * p_tot + mass * mass);
+        computeProcessNoise(Q_mat, L_over_X0, x_state(4,0), p_tot / E_tot, p_tot, mass, 
+                            sigma_E_squared, x_state(2,0), x_state(3,0), det->thickness);           
+        P_cov += Q_mat;                             
+
+        measDim = (i == 0 || det->GetDetectorName() == "tofd") ? 2 : 1;
+        TMatrixD z_meas(measDim, 1), H_mat(measDim, 5), R_noise(measDim, measDim);
+        z_meas.Zero(); H_mat.Zero(); R_noise.Zero();
+
+        if (det->GetDetectorName() == "tofd") {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+            R_noise(1,1) = det->res_y * det->res_y * (helium ? 9.0 : 1.0);
+            z_meas(0,0) = hit->GetX(); z_meas(1,0) = hit->GetY();
+        } else if (kTarget == det->section) {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+			R_noise(0,0) = R_target(0,0);
+			R_noise(0,1) = R_target(0,1);
+			R_noise(1,1) = R_target(1,1);
+			R_noise(1,0) = R_target(1,0);
+            z_meas(0,0) = x0_start; z_meas(1,0) = y0_start;
+        } else if (det->GetDetectorName() == "fi23b") {
+            H_mat(0,1) = 1.0;
+            R_noise(0,0) = det->res_y * det->res_y * 4./12.;
+            z_meas(0,0) = hit->GetY();
+        } else {
+            H_mat(0,0) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+            z_meas(0,0) = hit->GetX();
+        }           
+
+        TMatrixD S_mat = H_mat * P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) + R_noise;                     
+        TMatrixD residual = z_meas - (H_mat * x_state);                                 
+        TMatrixD pulls(measDim, 1);
+        calculatePulls(pulls, residual, S_mat);     
+
+        if (dumpResiduesStep2) {
+            if (measDim == 2) {
+                gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pulls(0,0), pulls(1,0));
+            } else {
+                if (det->GetDetectorName() == "fi23b") gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pulls(0,0));
+                else gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pulls(0,0), 0.);
+            }
+        }                       
+
+        TMatrixD S_inv = S_mat; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(S_inv)) {
+			// Inversion failed due to degenerate/noisy data in this event!
+			// Safely skip this update step, drop this track candidate, or return false.
+			continue;
+		}
+        //S_inv.Invert();
+        TMatrixD K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;
+        x_state += (K_gain * residual);
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        josephFormUpdate(P_cov, K_gain, H_mat, R_noise, enforceSymmetry);
+
+        //TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;          
+        TMatrixD R_inv = R_noise; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(R_inv)) {
+			continue; 
+		}
+		//R_inv.Invert();
+        TMatrixD residual_updated = z_meas - (H_mat * x_state);         
+        TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual_updated) * R_inv * residual_updated;
+        chi2_second += chi2_inc(0,0);           
+
+        Double_t ptot_new = TMath::Abs(charge) / x_state(4,0);
+        Double_t ux_new = x_state(2,0), uy_new = x_state(3,0);
+        Double_t pz_new_local = ptot_new / TMath::Sqrt(1.0 + ux_new * ux_new + uy_new * uy_new);
+        TVector3 p_new_local(ux_new * pz_new_local, uy_new * pz_new_local, pz_new_local);     
+
+        det->LocalToGlobalMomentum(p_new_global, p_new_local);          
+        det->LocalToGlobal(pos_new_global, x_state(0,0), x_state(1,0));
+        Double_t beta = p_new_global.Mag() / TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass);
+        gCandidate->SetPosition(pos_new_global);
+        gCandidate->SetMomentum(-p_new_global); 
+        gCandidate->SetBeta(beta);          
+
+        if (i == 0) {
+            if(!helium) pos_target = pos_new_global;
+            if(helium) pos_target.SetXYZ(x0_start,y0_start,0.);
+            mom_target = p_new_global;
+            beta_target = beta;
+        }                           
+    }
+    
+   // cout<<"THIRD STEP FOR CHARGE: "<<charge<<endl;
+    
+    // --- RE-INITIALIZE AT TARGET (CLEAN PASS 3 & 4) ---
+    gCandidate->SetStartMomentum(mom_target);
+    gCandidate->SetStartPosition(pos_target);
+    gCandidate->SetStartBeta(beta_target);
+    gCandidate->SetCharge(charge);
+    gCandidate->Reset();
+
+    // Reset covariances safely (diagonal constraint + clear correlations)
+    P_cov.Zero(); R_target.Zero();
+    qp_err = (helium ? 0.03 : 0.01) * charge / gCandidate->GetMomentum().Mag();
+ /*   
+    for (int r = 0; r < 5; ++r) {
+        for (int c = 0; c < 5; ++c) {
+            if (r != c) P_cov(r, c) = 0.0;
+        }
+    }
+*/
+    if (!helium) 
+	{
+		x_err_targ = 0.1;
+		y_err_targ = 0.1;
+		P_cov(0,0) = x_err_targ * x_err_targ;
+		P_cov(1,1) = y_err_targ * y_err_targ;
+		P_cov(2,2) = 1.e-1 * 1.e-1;
+		P_cov(3,3) = 1.e-1 * 1.e-1;
+		P_cov(4,4) = qp_err * qp_err;
+		
+		R_target(0,0) = P_cov(0,0);
+		R_target(1,1) = P_cov(1,1);
+		R_target(0,1) = 0.;
+		R_target(1,0) = 0.;
+		
+	}
+	else
+	{
+		// Set spatial uncertainties directly from Carbon's stored vertex error
+		if (fHasCarbonVertexCov) {
+			P_cov(0, 0) = fbestCarbonTargetCov(0, 0); // Var(x)
+			P_cov(0, 1) = fbestCarbonTargetCov(0, 1); // Cov(x, y)
+			P_cov(1, 0) = fbestCarbonTargetCov(1, 0); // Cov(y, x)
+			P_cov(1, 1) = fbestCarbonTargetCov(1, 1); // Var(y)
+
+			// Set initial direction / momentum variances
+			P_cov(2,2) = 1.e-1 * 1.e-1;
+			P_cov(3,3) = 1.e-1 * 1.e-1;
+			P_cov(4,4) = qp_err * qp_err;
+
+			// Target measurement noise R for Helium
+			R_target(0, 0) = fbestCarbonTargetCov(0, 0);
+			R_target(0, 1) = fbestCarbonTargetCov(0, 1);
+			R_target(1, 0) = fbestCarbonTargetCov(1, 0);
+			R_target(1, 1) = fbestCarbonTargetCov(1, 1);
+		}
+	}
+
+    // --- STEP 3: FORWARD FILTER ---
+    for (Int_t i = 0; i < (Int_t)gSetup->GetArray().size(); ++i) {
+        auto det = gSetup->GetArray().at(i);  
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+        if (hitIndex < 0) continue;
+        R3BHit* hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+        if (!hit) continue;
+
+        gProp->PropagateToDetectorForward(gCandidate, det, P_cov);
+        Double_t weight = (kTarget == det->section || det->GetDetectorName() == "tofd") ? 0.5 : 1.0;
+        Double_t sigma_E_squared = 0.0;
+        if (gEnergyLoss) {
+            sigma_E_squared = weight * det->GetEnergyLossStraggling(gCandidate);
+            gCandidate->PassThroughDetector(det, weight); 
+        }
+
+        det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+        det->GlobalToLocalMomentum(gCandidate->GetMomentum(), p_l);
+        x_state(0,0) = x_l; x_state(1,0) = y_l;
+        x_state(2,0) = p_l.X() / p_l.Z(); x_state(3,0) = p_l.Y() / p_l.Z();
+        x_state(4,0) = TMath::Abs(charge) / p_l.Mag();
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        enforceSymmetry(P_cov);
+
+        Double_t L_over_X0 = weight * det->thickness / rad_length;
+        Double_t p_tot = gCandidate->GetMomentum().Mag();
+        Double_t E_tot = TMath::Sqrt(p_tot * p_tot + mass * mass);
+        computeProcessNoise(Q_mat, L_over_X0, x_state(4,0), p_tot / E_tot, p_tot, mass, 
+                            sigma_E_squared, x_state(2,0), x_state(3,0), det->thickness);
+        P_cov += Q_mat;
+
+        measDim = (det->GetDetectorName() == "tofd" || kTarget == det->section) ? 2 : 1;
+        TMatrixD z_meas(measDim, 1), H_mat(measDim, 5), R_noise(measDim, measDim);
+        z_meas.Zero(); H_mat.Zero(); R_noise.Zero();
+
+        if (det->GetDetectorName() == "tofd") {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4.0 / 12.0;
+            R_noise(1,1) = det->res_y * det->res_y * (helium ? 9.0 : 1.0);
+            z_meas(0,0) = hit->GetX(); z_meas(1,0) = hit->GetY();
+        } else if (kTarget == det->section) {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = R_target(0,0);
+			R_noise(0,1) = R_target(0,1);
+			R_noise(1,1) = R_target(1,1);
+			R_noise(1,0) = R_target(1,0);
+            z_meas(0,0) = gCandidate->GetStartPosition().X();
+            z_meas(1,0) = gCandidate->GetStartPosition().Y();             
+        } else if (det->GetDetectorName() == "fi23b") {
+            H_mat(0,1) = 1.0;
+            R_noise(0,0) = det->res_y * det->res_y * 4.0 / 12.0;
+            z_meas(0,0) = hit->GetY();
+        } else {
+            H_mat(0,0) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4.0 / 12.0;
+            z_meas(0,0) = hit->GetX();
+        }
+
+        TMatrixD S_mat = H_mat * P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) + R_noise; 
+        TMatrixD residual = z_meas - (H_mat * x_state);  
+        TMatrixD pulls(measDim, 1);
+        calculatePulls(pulls, residual, S_mat);     
+
+        if (dumpResiduesStep3) {
+            if (measDim == 2) {
+                gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pulls(0,0), pulls(1,0));
+            } else {
+                if (det->GetDetectorName() == "fi23b") gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pulls(0,0));
+                else gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pulls(0,0), 0.);
+            }
+        }
+
+        TMatrixD S_inv = S_mat; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(S_inv)) {
+			// Inversion failed due to degenerate/noisy data in this event!
+			// Safely skip this update step, drop this track candidate, or return false.
+			continue;
+		}
+        //S_inv.Invert();
+        TMatrixD K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;          
+        x_state += (K_gain * residual);
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        josephFormUpdate(P_cov, K_gain, H_mat, R_noise, enforceSymmetry);
+
+        //TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;
+        TMatrixD R_inv = R_noise;
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(R_inv)) {
+			continue; 
+		}
+		//R_inv.Invert();
+        TMatrixD residual_updated = z_meas - (H_mat * x_state);         
+        TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual_updated) * R_inv * residual_updated;
+        chi2_third += chi2_inc(0,0);
+
+        Double_t ptot_new = TMath::Abs(charge) / x_state(4,0);
+        Double_t ux_new = x_state(2,0), uy_new = x_state(3,0);
+        Double_t pz_new_local = ptot_new / TMath::Sqrt(1.0 + ux_new * ux_new + uy_new * uy_new);
+        TVector3 p_new_local(ux_new * pz_new_local, uy_new * pz_new_local, pz_new_local);
+
+        det->LocalToGlobalMomentum(p_new_global, p_new_local); 
+        det->LocalToGlobal(pos_new_global, x_state(0,0), x_state(1,0));
+        gCandidate->SetPosition(pos_new_global);
+        gCandidate->SetMomentum(p_new_global);
+        gCandidate->SetBeta(p_new_global.Mag() / TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass));
+    }
+    
+   // cout<<"FOURTH STEP FOR CHARGE: "<<charge<<endl;
+    
+    // --- STEP 4: BACKWARD FILTER ---
+    gCandidate->SetMomentum(-p_new_global);
+    gCandidate->SetPosition(pos_new_global);
+    gCandidate->SetBeta(p_new_global.Mag() / TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass));
+    gCandidate->SetCharge(-charge);
+    TMatrixD P_cov_at_target(5,5); P_cov_at_target.Zero();
+
+    for (Int_t i = (Int_t)gSetup->GetArray().size() - 1; i >= 0; --i) {
+        auto det = gSetup->GetArray().at(i);  
+        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+        if (hitIndex < 0) continue;
+        R3BHit* hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+        if (!hit) continue;
+
+        gProp->PropagateToDetectorBackward(gCandidate, det, P_cov);
+        Double_t weight = (kTarget == det->section || det->GetDetectorName() == "tofd") ? 0.5 : 1.0;
+        Double_t sigma_E_squared = 0.0;
+        if (gEnergyLoss) {
+            sigma_E_squared = weight * det->GetEnergyLossStraggling(gCandidate);
+            gCandidate->PassThroughDetectorBackward(det, weight); 
+        }
+
+        det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+        det->GlobalToLocalMomentum(gCandidate->GetMomentum(), p_l);
+        x_state(0,0) = x_l; x_state(1,0) = y_l;
+        x_state(2,0) = p_l.X() / p_l.Z(); x_state(3,0) = p_l.Y() / p_l.Z();
+        x_state(4,0) = TMath::Abs(charge) / p_l.Mag();
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        enforceSymmetry(P_cov);
+
+        Double_t L_over_X0 = weight * det->thickness / rad_length;
+        Double_t p_tot_GeV = gCandidate->GetMomentum().Mag();
+        Double_t E_tot = TMath::Sqrt(p_tot_GeV * p_tot_GeV + mass * mass);
+        computeProcessNoise(Q_mat, L_over_X0, x_state(4,0), p_tot_GeV / E_tot, p_tot_GeV, mass, 
+                            sigma_E_squared, x_state(2,0), x_state(3,0), det->thickness);
+        P_cov += Q_mat;
+
+        measDim = (det->GetDetectorName() == "tofd" || kTarget == det->section) ? 2 : 1;
+        TMatrixD z_meas(measDim, 1), H_mat(measDim, 5), R_noise(measDim, measDim);
+        z_meas.Zero(); H_mat.Zero(); R_noise.Zero();
+
+        if (det->GetDetectorName() == "tofd") {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4.0 / 12.0;
+            R_noise(1,1) = det->res_y * det->res_y * (helium ? 9.0 : 1.0);
+            z_meas(0,0) = hit->GetX(); z_meas(1,0) = hit->GetY();
+        } else if (kTarget == det->section) {
+            H_mat(0,0) = 1.0; H_mat(1,1) = 1.0;
+            R_noise(0,0) = R_target(0,0);
+			R_noise(0,1) = R_target(0,1);
+			R_noise(1,1) = R_target(1,1);
+			R_noise(1,0) = R_target(1,0);
+            z_meas(0,0) = pos_target.X(); z_meas(1,0) = pos_target.Y();
+        } else if (det->GetDetectorName() == "fi23b") {
+            H_mat(0,1) = 1.0;
+            R_noise(0,0) = det->res_y * det->res_y * 4.0 / 12.0;
+            z_meas(0,0) = hit->GetY();
+        } else {
+            H_mat(0,0) = 1.0;
+            R_noise(0,0) = det->res_x * det->res_x * 4.0 / 12.0;
+            z_meas(0,0) = hit->GetX();
+        }
+
+        TMatrixD S_mat = H_mat * P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) + R_noise; 
+        TMatrixD residual = z_meas - (H_mat * x_state);
+        TMatrixD pulls(measDim, 1);
+        calculatePulls(pulls, residual, S_mat);     
+
+        if (dumpResiduesStep4) {
+            if (measDim == 2) {
+                gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pulls(0,0), pulls(1,0));
+               // cout<<"Residuals at detector: "<<det->GetDetectorName()<<" "<<residual(0,0)<<" "<< residual(1,0)<<" "<< pulls(0,0)<<" "<< pulls(1,0)<<endl;
+            } else {
+                if (det->GetDetectorName() == "fi23b") 
+                {
+					gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pulls(0,0));
+					//cout<<"Residuals at detector: "<<det->GetDetectorName()<<" "<<residual(0,0)<<" "<< pulls(0,0)<<endl;
+				}
+                else 
+                {
+					gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pulls(0,0), 0.);
+					//cout<<"Residuals at detector: "<<det->GetDetectorName()<<" "<<residual(0,0)<<" "<< pulls(0,0)<<endl;
+				}
+            }
+        }
+
+        TMatrixD S_inv = S_mat; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(S_inv)) {
+			// Inversion failed due to degenerate/noisy data in this event!
+			// Safely skip this update step, drop this track candidate, or return false.
+			continue; 
+		}
+        //S_inv.Invert();
+        	
+	//Update		
+        TMatrixD K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;          
+        x_state += (K_gain * residual);
+         if (std::abs(x_state(4,0)) < 1e-6 || std::abs(x_state(2,0)) > 5.0 || std::abs(x_state(3,0)) > 5.0) {
+			return 10;
+		}
+        josephFormUpdate(P_cov, K_gain, H_mat, R_noise, enforceSymmetry);
+        
+        //TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;
+        TMatrixD R_inv = R_noise; 
+        // Perform safe inversion check
+		if (!SafeInvertMatrix(R_inv)) {
+			continue; 
+		}
+		//R_inv.Invert();
+        TMatrixD residual_updated = z_meas - (H_mat * x_state);         
+        TMatrixD chi2_inc = TMatrixD(TMatrixD::kTransposed, residual_updated) * R_inv * residual_updated;
+        chi2 += chi2_inc(0,0);
+       	
+        Double_t chi2temp = 0.;
+        TMatrixD residual1 = z_meas - (H_mat * x_state);
+        if (det->GetDetectorName() == "tofd" || kTarget == det->section)
+        {
+            chi2temp = TMath::Power(residual1(0,0),2) / R_noise(0,0);
+            chi2temp = chi2temp + TMath::Power(residual1(1,0),2) / R_noise(1,1);
+         }
+         else
+         {
+			chi2temp = TMath::Power(residual1(0,0),2) / R_noise(0,0);
+		 }
+ //       chi2 += chi2temp;
+
+        Double_t ptot_new = TMath::Abs(charge) / x_state(4,0);
+        Double_t ux_new = x_state(2,0), uy_new = x_state(3,0);
+        Double_t pz_new_local = ptot_new / TMath::Sqrt(1.0 + ux_new * ux_new + uy_new * uy_new);
+        TVector3 p_new_local(ux_new * pz_new_local, uy_new * pz_new_local, pz_new_local);
+
+        det->LocalToGlobalMomentum(p_new_global, p_new_local); 
+        det->LocalToGlobal(pos_new_global, x_state(0,0), x_state(1,0));
+        Double_t beta = p_new_global.Mag() / TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass);
+        gCandidate->SetPosition(pos_new_global);
+        gCandidate->SetMomentum(-p_new_global); 
+        gCandidate->SetBeta(beta);
+
+        if (i == 0) {
+            pos_target = pos_new_global;
+            mom_target = p_new_global;
+            beta_target = beta;
+            P_cov_at_target = P_cov;
+        }
+    }
+    gCandidate->SetTargetCovariance(P_cov_at_target);
+   // cout<<"P_cov_at_target: "<<P_cov_at_target(0,0)<<" "<<P_cov_at_target(1,1)<<" "<<P_cov_at_target(2,2)<<" "<<
+   // P_cov_at_target(3,3)<<" "<<P_cov_at_target(4,4)<<endl;
+
+    // --- FINAL REGISTRATION ---
+    gCandidate->SetStartPosition(pos_target);
+    gCandidate->SetStartMomentum(mom_target);
+    gCandidate->SetCharge(TMath::Abs(charge));
+    gCandidate->SetStartBeta(beta_target);
+    gCandidate->SetChi2(chi2);
+    gCandidate->Reset();
+/*	
+	cout<<"*** New fragment ****** "<<endl;
+    cout<<"*** Charge: "<<gCandidate->GetCharge()<<endl;
+    cout<<"*** Position: "<<gCandidate->GetStartPosition().X()<<", "<<gCandidate->GetStartPosition().Y()<<", "<<gCandidate->GetStartPosition().Z()<<endl;
+    cout<<"*** Momentum: "<<gCandidate->GetStartMomentum().X()<<", "<<gCandidate->GetStartMomentum().Y()<<", "<<gCandidate->GetStartMomentum().Z()<<endl;
+    cout<<"*** Beta: "<<gCandidate->GetStartBeta()<<endl;
+    cout<<"*** Chi2: "<<chi2<<", "<<chi2_first<<", "<<chi2_second<<", "<<chi2_third<<endl;
+*/
+    //cout<<"FINISHED IN KF FOR CHARGE: "<<charge<<endl;
+    if (chi2 > 1.e6) status = 10;
+    return status;
+}
+
+// ***********************************************************************************************************
 
 Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* particle, R3BTrackingSetup* setup)
 {
@@ -1390,15 +2292,21 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     Double_t ptot0 = sqrt(px0 * px0 + py0 * py0 + pz0 * pz0);
     Double_t mass = gCandidate->GetMass();
     
+    Double_t diffx = 0.0093 * 0.996 ;      // standard field
+    Double_t diffy = 0.000365 * (-0.125) ; 
+    
+    Bool_t helium = false;
+    if(gCandidate->GetCharge() == 4) helium = true;
+    
     if (gCandidate->GetHitIndexByName("fi23a") > -1)
     {
         auto fi23a = gSetup->GetByName("fi23a");
-        fi23a->LocalToGlobal(pos23a,gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX(),0.0);
+        fi23a->LocalToGlobal(pos23a,gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX()-diffx,0.0);
     }
     if (gCandidate->GetHitIndexByName("fi23b") > -1)
     {
         auto fi23b = gSetup->GetByName("fi23b");
-        fi23b->LocalToGlobal(pos23b, 0.0, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
+        fi23b->LocalToGlobal(pos23b, 0.0, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY()-diffy);
     }
     
     pos0.SetX(x0);
@@ -1410,7 +2318,10 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     Double_t zfi23 = (pos23a.Z() + pos23b.Z()) / 2.;
     pos3.SetZ(zfi23);
     
-    direction0 = pos3 - pos0;
+    direction0 = pos3 - pos0;   
+    cout<<"**** Tracking particle with charge = "<<gCandidate->GetCharge()<<endl;
+	direction0 = direction0.Unit();
+    
     direction0.SetMag(ptot0);
     
     px0 = direction0.X();
@@ -1430,22 +2341,22 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
     
 	gCandidate->Reset();
     
-    px0 = direction0.X();
-    py0 = direction0.Y();
-    pz0 = direction0.Z();
+    px0 = gCandidate->GetMomentum().X();
+    py0 = gCandidate->GetMomentum().Y();
+    pz0 =gCandidate->GetMomentum().Z();
 
-    x0 = pos0.X();
-    y0 = pos0.Y();
-    z0 = pos0.Z();
+    x0 = gCandidate->GetPosition().X();
+    y0 = gCandidate->GetPosition().Y();
+    z0 = gCandidate->GetPosition().Z();
     
     if(writeout){
 		cout << "Start values momentum lab: " << px0 << "  " << py0 << "  " << pz0 <<endl;
 		cout << "Start values position lab: " << x0 << "  " << y0 << "  " << z0 <<endl;
 	}
     
+    // We start at the target, thus local = global
     x_l = x0;
     y_l = y0;
-    // We start at the target, thus local = global
     TVector3 startMomentumLocal = inputMomentum;
     
     // --- BEFORE THE DETECTOR LOOP ---
@@ -1461,14 +2372,18 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 
 	// Initialize starting uncertainties (high values mean "I trust the hits more than my guess")
 	P_cov.Zero();
-	P_cov(0,0) = 1.5 * 1.5 / 12.;//0.01 * 0.01;   // Allow the filter to shift X by cms if needed
-	P_cov(1,1) = 1.5 * 1.5 / 12.;//0.01 * 0.01;   // Allow it to shift Y
-	P_cov(2,2) = 0.01 * 0.01;   // Open up the injection slopes completely!
-	P_cov(3,3) = 0.01 * 0.01;   
-	P_cov(4,4) = 0.01 * 0.01;
+	P_cov(0,0) = 1.5 * 1.5 ;//0.01 * 0.01;   // Allow the filter to shift X by cms if needed
+	P_cov(1,1) = 1.5 * 1.5 ;//0.01 * 0.01;   // Allow it to shift Y
+	P_cov(2,2) = 50.e-3 * 50.e-3;//0.05 * 0.05;   // Open up the injection slopes completely!
+	P_cov(3,3) = 10.e-3 * 10.e-3;//0.05 * 0.05;   
+	if(!helium) P_cov(4,4) = (0.01 * gCandidate->GetCharge() / startMomentumLocal.Mag()) *
+	             (0.01 * gCandidate->GetCharge() / startMomentumLocal.Mag());// 0.07 * 0.07;
+	if(helium) P_cov(4,4) = (0.03 * gCandidate->GetCharge() / startMomentumLocal.Mag()) *
+	             (0.03 * gCandidate->GetCharge() / startMomentumLocal.Mag());// 0.07 * 0.07;
 	
 	if(writeout){
 		cout<<"Forward tracking starting values:"<<endl;
+		cout<<"Charge: "<<gCandidate->GetCharge()<<endl;
 		cout<<"Position: "<<x0<<" "<<y0<<" "<<z0<<endl;
 		cout<<"Momentum: "<<inputMomentum.X()<<" "<<inputMomentum.Y()<<" "<<inputMomentum.Z()<<endl;
 		cout<<"State values at init: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<x_state(4,0)<<endl;
@@ -1478,8 +2393,8 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 	Double_t sigma_E_squared = 0.;
     Int_t measDim = 1;
     Double_t dxerror = 1., dyerror = 1.; 	
-	
-	for (Int_t i = 0 ; i<= gSetup->GetArray().size() - 1; i++) 
+	Int_t n_ghost_track = 0;
+	for (Int_t i = 0 ; i < gSetup->GetArray().size() ; i++) 
 	{
         auto det = gSetup->GetArray().at(i);  
         
@@ -1503,48 +2418,71 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 		// Your existing Runge-Kutta engine propagates the physical state backward!
 		TVector3 pos_before = gCandidate->GetPosition(); // Before propagation
 		
-		if(det->GetDetectorName() == "tofd")
-		{
-			dxerror = det->res_x;
-			dyerror = det->res_y;
-			//measDim = 2;
-		}
-		else if(det->GetDetectorName() ==  "fi30" || det->GetDetectorName() ==  "fi31" ||
-		       det->GetDetectorName() ==  "fi32" || det->GetDetectorName() ==  "fi33")
-		{
-			dxerror = det->res_x;
-			dyerror = 25.;
-			//measDim = 1.;
-		}
-		else if(det->GetDetectorName() ==  "fi23b")
-		{
-			dxerror = 5;
-			dyerror = det->res_y;
-			//measDim = 1.;
-		}
-		else if(det->GetDetectorName() ==  "fi23a")
-		{
-			dxerror = det->res_x;
-			dyerror = 5;
-			//measDim = 1.;
-		}
+		   
+		   if(det->GetDetectorName() == "tofd" || kTarget == det->section) measDim = 2;
+		   else measDim = 1;
 		
-		if(i > 0)
+		    // We have to distinguish between detectors measuring only x, y or both
+			// Measurement vector z (what the detector actually saw)
+			TMatrixD z_meas(measDim, 1); z_meas.Zero();
+			// Measurement projection matrix H (maps 5D state down to the measured components x, y)
+			TMatrixD H_mat(measDim, 5); H_mat.Zero();
+			// Detector resolution matrix R
+			TMatrixD R_noise(measDim, measDim); R_noise.Zero();
+		
+			if (det->GetDetectorName() == "tofd") // x and y measured
+			{
+				H_mat(0,0) = 1.0; 
+				H_mat(1,1) = 1.0;
+				// det->res_x is fibre_width/2.; for KF R_noise ist width/sqrt(12)
+				R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+				R_noise(1,1) = det->res_y * det->res_y ;
+				if(helium) R_noise(1,1) = R_noise(1,1) * 9.;
+				z_meas(0,0) = hit->GetX();
+				z_meas(1,0) = hit->GetY();
+			}
+			else if(kTarget == det->section)
+			{
+				H_mat(0,0) = 1.0; 
+				H_mat(1,1) = 1.0;
+				R_noise(0,0) = 1.5 * 1.5 * 4./12.;
+				R_noise(1,1) = 1.5 * 1.5 * 4./12.;
+				z_meas(0,0) = gCandidate->GetStartPosition().X();
+				z_meas(1,0) = gCandidate->GetStartPosition().Y();				
+			}			
+			else if (det->GetDetectorName() == "fi23b")  // only y position measured
+			{
+				H_mat(0,1) = 1.0; // Maps to the y parameter of x_state
+				R_noise(0,0) = det->res_y * det->res_y * 4./12.;
+				z_meas(0,0) = hit->GetY();
+			}
+			else // fi3X and fi23a
+			{
+				H_mat(0,0) = 1.0; 
+				R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+				z_meas(0,0) = hit->GetX();
+			}
+        		
+		if(i >= 0)
 		{ 
 			if(writeout){
 					cout<<"#### Propagation forward to det: "<<det->GetDetectorName()<<" will be started ##"<<endl;
-					cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
-					cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
-					cout<<"State values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
-					cout<<"P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
-				}
+					}
 				
 			gProp->PropagateToDetectorForward(gCandidate, det, P_cov);
 			
-			if (gEnergyLoss && det->GetDetectorName()!= "tofd") // correct for energy loss in detector
+			if(writeout){
+					cout<<"Det: "<<det->GetDetectorName()<<" has been reached"<<endl;
+					cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
+					cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
+					det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+					cout<<"State values: "<<x_l<<" "<<y_l<<endl;
+					cout<<"P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
+				}
+			Double_t weight = 1.;
+			if (gEnergyLoss ) // correct for energy loss in detector
 			{
-				Double_t weight = 1.;
-				if (kTarget == det->section)
+				if (kTarget == det->section || det->GetDetectorName() == "tofd")
 				{
 					weight = 0.5;
 				}
@@ -1557,15 +2495,24 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
 			det->GlobalToLocalMomentum(gCandidate->GetMomentum(),p_l);
 		
-		// update local state with values after propagation through a detector; at the same time P_cov is update	
+		// update local state with values after propagation through a detector	
 			x_state(0,0) = x_l;
 			x_state(1,0) = y_l;
 			x_state(2,0) = p_l.X() / p_l.Z();
 			x_state(3,0) = p_l.Y() / p_l.Z();
 			x_state(4,0) = gCandidate->GetCharge() / p_l.Mag();
-			
-			if(writeout){
+			// Force exact symmetry after propagation step
+			for (Int_t ij = 0; ij < 5; ++ij) {
+				for (Int_t jj = ij + 1; jj < 5; ++jj) {
+					Double_t avg = 0.5 * (P_cov(ij, jj) + P_cov(jj, ij));
+					P_cov(ij, jj) = avg;
+					P_cov(jj, ij) = avg;
+				}
+			}
+			if(writeout)
+			{
 					cout<<"After going through det: "<<det->GetDetectorName()<<endl;
+					cout<<"Energy loss: "<<det->GetEnergyLoss(gCandidate)<<", sigma_E_squared: "<<sigma_E_squared<<endl;
 					cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
 					cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
 					cout<<"State values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
@@ -1576,7 +2523,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			// 2. MULTIPLE COULOMB SCATTERING AND ENERGY-LOSS STRAGGLING (Noise Q)
 			// ==========================================
 			// Calculate scattering angle using the Highland Formula based on detector material thickness
-			Double_t L_over_X0 = det->thickness / rad_length; 
+			Double_t L_over_X0 = weight * det->thickness / rad_length; 
 			Double_t p_tot = gCandidate->GetMomentum().Mag(); // in MeV/c or GeV/c
 			mass  = gCandidate->GetMass();          
 			// Calculate beta = p / E
@@ -1595,59 +2542,17 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			Double_t qOverP = gCandidate->GetCharge() / p_tot;
 			Double_t sigma_qOverP_squared = TMath::Power(qOverP / p_tot, 2) * sigma_p_squared;
 			
-		 // Inflate the predictive uncertainty because of scattering, except at tofd
-		   if(i < (gSetup->GetArray().size() - 1)){			   
-				Q_mat.UnitMatrix(); // clear matrix
-				Q_mat(2, 2) = var_scat;
-				Q_mat(3, 3) = var_scat;
-				Q_mat(4, 4) = sigma_qOverP_squared; 
-				// Add process noise to the track covariance matrix
-				P_cov = P_cov + Q_mat;
-			}
-           
+		 // Inflate the predictive uncertainty because of scattering, except at tofd		   
+			Q_mat.Zero(); // clear matrix
+			Q_mat(2, 2) = var_scat;
+			Q_mat(3, 3) = var_scat;
+			Q_mat(4, 4) = sigma_qOverP_squared; 
+			// Add process noise to the track covariance matrix
+			P_cov = P_cov + Q_mat;
+			
 		// ==========================================
 		// 3. THE UPDATE STEP (Filtering the Hit)
 		// ==========================================
-		   measDim = 2;
-		   if(det->GetDetectorName() != "tofd") measDim = 1;
-		
-		    // We have to distinguish between detectors measuring only x, y or both
-			// Measurement vector z (what the detector actually saw)
-			TMatrixD z_meas(measDim, 1); z_meas.Zero();
-			// Measurement projection matrix H (maps 5D state down to the measured components x, y)
-			TMatrixD H_mat(measDim, 5); H_mat.Zero();
-			// Detector resolution matrix R
-			TMatrixD R_noise(measDim, measDim); R_noise.Zero();
-		/*	
-			H_mat(0,0) = 1.0; 
-			H_mat(1,1) = 1.0;
-			R_noise(0,0) = dxerror * dxerror;
-			R_noise(1,1) = dyerror * dyerror;
-			z_meas(0,0) = hit->GetX();
-			z_meas(1,0) = hit->GetY();
-		*/	
-			if (det->GetDetectorName() == "tofd") // x and y measured
-			{
-				H_mat(0,0) = 1.0; 
-				H_mat(1,1) = 1.0;
-				R_noise(0,0) = det->res_x * det->res_x;
-				R_noise(1,1) = det->res_y * det->res_y;
-				z_meas(0,0) = hit->GetX();
-				z_meas(1,0) = hit->GetY();
-			}			
-			else if (det->GetDetectorName() == "fi23b")  // only y position measured
-			{
-				H_mat(0,1) = 1.0; // Maps to the y parameter of x_state
-				R_noise(0,0) = det->res_y * det->res_y;
-				z_meas(0,0) = hit->GetY();
-			}
-			else // fi3X and fi23a
-			{
-				H_mat(0,0) = 1.0; 
-				R_noise(0,0) = det->res_x * det->res_x;
-				z_meas(0,0) = hit->GetX();
-			}
-        
         
 			// Compute residual and its covariance matrix S 
 			// S = H * P * H^T + R
@@ -1657,6 +2562,89 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			// Residual: 
 			TMatrixD residual(measDim, 1);
 			residual = z_meas - (H_mat * x_state);
+			
+			// Scaling the Kalman Gain if residual < det_res: instead of forcing a zero, 
+			// we damp the residual smoothly when it falls deep inside the resolution boundary. 
+			// This prevents mathematical discontinuities
+/*
+			Double_t res_val, resolution, pull, damping_factor;
+			if(measDim == 1)
+			{				
+				res_val = residual(0,0);
+				if(det->GetDetectorName() == "fi23b") resolution = det->res_y;
+				else resolution = det->res_x;
+
+				// Calculate how many "sigmas" the track is from the hit
+				pull = TMath::Abs(res_val) / resolution;
+
+				if (pull < 1.0) 
+				{
+					// If inside 1 sigma of detector resolution, smoothly damp the residual.
+					// At pull = 0, factor is 0. At pull = 1, factor is 1.
+					damping_factor = pull * pull; // Smooth parabolic scaling
+					residual(0,0) = res_val * damping_factor;
+				}
+			}
+			else
+			{
+				res_val = residual(0,0);
+				resolution = sqrt(R_noise(0,0));//det->res_x;
+				// Calculate how many "sigmas" the track is from the hit
+				pull = TMath::Abs(res_val) / resolution;
+				if (pull < 1.0) 
+				{
+					// If inside 1 sigma of detector resolution, smoothly damp the residual.
+					// At pull = 0, factor is 0. At pull = 1, factor is 1.
+					damping_factor = pull * pull; // Smooth parabolic scaling
+					residual(0,0) = res_val * damping_factor;
+				}
+				
+				res_val = residual(1,0);
+				resolution = sqrt(R_noise(1,1));//det->res_y;
+				// Calculate how many "sigmas" the track is from the hit
+				pull = TMath::Abs(res_val) / resolution;
+				if (pull < 1.0) 
+				{
+					// If inside 1 sigma of detector resolution, smoothly damp the residual.
+					// At pull = 0, factor is 0. At pull = 1, factor is 1.
+					damping_factor = pull * pull; // Smooth parabolic scaling
+					residual(1,0) = res_val * damping_factor;
+				}	
+			}		
+*/
+			// Extract Pulls for measured coordinates
+			Double_t pull_x = 0.0;
+			Double_t pull_y = 0.0;
+
+			if (measDim == 1) {
+				Double_t var_x = S_mat(0, 0); // Total variance in X
+				if (var_x > 0.0) {
+					pull_x = residual(0,0) / sqrt(var_x);
+				}
+			}
+			else {
+				Double_t var_x = S_mat(0, 0); // Total variance in X
+				if (var_x > 0.0) {
+					pull_x = residual(0,0) / sqrt(var_x);
+				}
+				Double_t var_y = S_mat(1, 1); // Total variance in y
+				if (var_y > 0.0) {
+					pull_y = residual(1,0) / sqrt(var_y);
+				}				
+			}
+		
+			if (measDim == 2) {
+				gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pull_x, pull_y);
+			} 
+			else {
+				// 1D measurement (determine whether it's X or Y based on det type)
+				if (det->GetDetectorName() == "fi23b") {
+					gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pull_x);
+				} 
+				else {
+					gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pull_x, 0.);
+				}
+			}
 
 			// Compute Kalman Gain: K = P * H^T * S^-1
 			TMatrixD K_gain(5, measDim);
@@ -1668,16 +2656,54 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			
 			if(writeout){
 				cout<<"Det: "<<det->GetDetectorName()<<" after noise"<<endl;
-				cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
-				cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
-				cout<<"Updated state values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
+				if(kTarget == det->section || det->GetDetectorName() == "tofd")
+				{
+					cout <<"Residues: "<<residual(0,0)<<", "<<residual(1,0)<<endl;
+					cout <<"Measurem: "<<z_meas(0,0)<<", "<<z_meas(1,0)<<endl;
+				}
+				else
+				{
+					cout <<"Residues: "<<residual(0,0)<<endl;
+					cout <<"Measurem: "<<z_meas(0,0)<<endl;
+				}
+								
+				cout<<"Noise: "<<var_scat<<", "<<sigma_qOverP_squared<<endl;
+				cout<<"K_gain: "<<K_gain(0,0)<<" "<<K_gain(1,0)<<" "<<K_gain(2,0)<<" "<<K_gain(3,0)<<" "<<K_gain(4,0)<<endl;
 				cout<<"P_cov values with noise: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
-			}
-	
+				cout<<"Updated state values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
+			}	
 	        
 	        // Update the Covariance Matrix: P = (I - K * H) * P
-			TMatrixD I(5, 5); I.UnitMatrix();
-			P_cov = (I - (K_gain * H_mat)) * P_cov;
+			// 1. Construct Identity Matrix
+			TMatrixD I(5, 5);
+			I.UnitMatrix();
+
+			// 2. Compute (I - K * H)
+			TMatrixD I_minus_KH = I - (K_gain * H_mat);
+
+			// 3. Compute Transpose (I - K * H)^T
+			TMatrixD I_minus_KH_T(TMatrixD::kTransposed, I_minus_KH);
+
+			// 4. Compute First Term: (I - KH) * P * (I - KH)^T
+			TMatrixD P_updated = I_minus_KH * P_cov * I_minus_KH_T;
+
+			// 5. Compute Transpose of K_gain
+			TMatrixD K_gain_T(TMatrixD::kTransposed, K_gain);
+
+			// 6. Compute Second Term: K * R * K^T
+			TMatrixD KRK_T = K_gain * R_noise * K_gain_T;
+
+			// 7. Complete Joseph Form Update
+			P_cov = P_updated + KRK_T;
+
+			// 8. Explicitly Enforce Matrix Symmetry (Numerical Safeguard)
+			for (Int_t ij = 0; ij; ++ij) {
+				for (Int_t jj = ij + 1; jj < 5; ++jj) {
+					Double_t avg = 0.5 * (P_cov(ij, jj) + P_cov(jj, ij));
+					P_cov(ij, jj) = avg;
+					P_cov(jj, ij) = avg;
+				}
+			}
 			if(writeout) cout<<"Updated P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
 	
 			// Increment local chi2 safely using the measurement covariance matrix
@@ -1689,7 +2715,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			
 			// 1. Reconstruct the new local momentum vector from the updated slopes
 			// We use the fact that p_x = ux * p_z and p_y = uy * p_z
-			ptot_new = abs(gCandidate->GetCharge()) / x_state(4,0);
+			ptot_new = gCandidate->GetCharge() / x_state(4,0);
 
 			// Use simple geometry to find the new local p_z component
 			x_new_local = x_state(0,0);
@@ -1710,10 +2736,12 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			E_tot = TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass);
 			beta  = p_new_global.Mag() / E_tot;
 			gCandidate->SetBeta(beta);
-			if(writeout){
+			if(writeout)
+			{
 				cout<<"Updated candidate at det: "<<det->GetDetectorName()<<endl;
 				cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
 				cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
+			    cout<<"chi2: "<<chi2_increment(0,0)<<endl;
 			}	
 		}
 	}
@@ -1737,14 +2765,20 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 		
 		if(writeout){
 			cout<<"!!! Turning back toward target:"<<endl;
-			cout<<"Position: "<<gCandidate->GetStartPosition().X()<<" "<<gCandidate->GetStartPosition().Y()<<" "<<gCandidate->GetStartPosition().Z()<<endl;
-			cout<<"Momentum: "<<gCandidate->GetStartMomentum().X()<<" "<<gCandidate->GetStartMomentum().Y()<<" "<<gCandidate->GetStartMomentum().Z()<<endl;
+			cout<<"Charge: "<<charge<<endl;
+			cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
+			cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
 		}
-	
-	   for (Int_t i = gSetup->GetArray().size() - 1; i >= 0; i--) 
-	   {
+		measDim = 2;
+		dxerror = 1.;
+	    dyerror = 1.; 
+		sigma_E_squared = 0.;	
+		n_ghost_track = 0;	
+		Double_t chi2_loc = 0.;
+		for (Int_t i = gSetup->GetArray().size() - 1; i >= 0; i--) 
+		{
 			auto det = gSetup->GetArray().at(i);  
-		   
+			//cout<<"PROPAGATE TO DETECTOR: "<<det->GetDetectorName()<<endl;
 		   // hit data at a given detector; contains: detector Id, x and y positions of a particle 
 		   // at the detector, as well asparticle's charge and time
 			R3BHit* hit = nullptr; 
@@ -1758,64 +2792,356 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumForward(R3BTrackingParticle* pa
 			}
 
 			if (!hit) continue;
-
+			
 			// ==========================================
 			// 1. THE PREDICT STEP (Extrapolation)
 			// ==========================================
 			// Your existing Runge-Kutta engine propagates the physical state backward!
 			TVector3 pos_before = gCandidate->GetPosition(); // Before propagation
-	
-			if(i < gSetup->GetArray().size() - 1)
+			
+			if(writeout)
 			{
-				if(writeout){
-					cout<<"#### Propagation to det: "<<det->GetDetectorName()<<" will be started ##"<<endl;
-					cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
-					cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
-				}
-				
+				cout<<"Backward propagation to det: "<<det->GetDetectorName()<<" will be started ##"<<endl;
+			}
+	   
+			if(i < gSetup->GetArray().size())
+			{
 				gProp->PropagateToDetectorBackward(gCandidate, det, P_cov);
 				
-    		    if (gEnergyLoss) // correct for energy loss in detector
+				if(writeout)
 				{
-					Double_t weight = 1.;
-					if (kTarget == det->section)
+					cout<<"Det: "<<det->GetDetectorName()<<" has been reached"<<endl;
+					cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
+					cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
+					det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+					cout<<"State values: "<<x_l<<" "<<y_l<<endl;
+					cout<<"P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
+				}
+				 Double_t weight = 1.;
+				if (gEnergyLoss ) // correct for energy loss in detector
+				{
+					if (kTarget == det->section || det->GetDetectorName() == "tofd")
 					{
 						weight = 0.5;
 					}
-					
-					// Update particle's momentum is due to energy loss in a detector:
+					sigma_E_squared = weight * det->GetEnergyLossStraggling(gCandidate);
+				   // Update particle's momentum is due to energy loss in a detector:
 					gCandidate->PassThroughDetectorBackward(det, weight); 				
 				 }
+															 
+				// Convert the newly predicted gCandidate back into our 5D local state matrix
+				det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
+				det->GlobalToLocalMomentum(gCandidate->GetMomentum(),p_l);
 				
-				if(writeout){
-					cout<<"Det: "<<det->GetDetectorName()<<" passed through"<<endl;
+				x_state(0,0) = x_l;
+				x_state(1,0) = y_l;
+				x_state(2,0) = p_l.X() / p_l.Z();
+				x_state(3,0) = p_l.Y() / p_l.Z();
+				x_state(4,0) = abs(gCandidate->GetCharge()) / p_l.Mag();
+				// Force exact symmetry after propagation step
+				for (Int_t ij = 0; ij < 5; ++ij) {
+					for (Int_t jj = ij + 1; jj < 5; ++jj) {
+						Double_t avg = 0.5 * (P_cov(ij, jj) + P_cov(jj, ij));
+						P_cov(ij, jj) = avg;
+						P_cov(jj, ij) = avg;
+					}
+				}
+				if(writeout)
+				{
+					cout<<"Backward: Det: "<<det->GetDetectorName()<<" passed through"<<endl;
+					cout<<"Energy loss: "<<det->GetEnergyLoss(gCandidate)<<", sigma_E_squared: "<<sigma_E_squared<<endl;
 					cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
 					cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
+					cout<<"State values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
+					cout<<"P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
+				}			
+				
+				// ==========================================
+				// 2. MULTIPLE COULOMB SCATTERING (Noise Q)
+				// ==========================================
+				// Calculate scattering angle using the Highland Formula based on detector material thickness
+				Double_t L_over_X0 = weight * det->thickness / rad_length; 
+				Double_t p_tot = gCandidate->GetMomentum().Mag(); // in MeV/c or GeV/c
+				mass  = gCandidate->GetMass();          
+				// Calculate beta = p / E
+				Double_t E_tot = TMath::Sqrt(p_tot * p_tot + mass * mass);
+				Double_t beta  = p_tot / E_tot;
+				Double_t theta_scat = (0.0136 * x_state(4,0)/beta) * TMath::Sqrt(L_over_X0) * (1.0 + 0.038 * TMath::Log(L_over_X0));
+				Double_t var_scat = theta_scat * theta_scat;
+				
+				// 2. Convert Energy Variance (\sigma_E^2) to q/p Variance (\sigma_{q/p}^2)
+				// Using relativistic kinematics: E^2 = p^2 + m^2 -> dE = (p/E) * dp
+				// dp = (E/p) * dE
+				Double_t sigma_p_squared = (E_tot / p_tot) * (E_tot / p_tot) * sigma_E_squared;
+
+				// Since state variable is q/p, d(q/p)/dp = -q / p^2
+				// Therefore: var(q/p) = (q / p^2)^2 * var(p)
+				Double_t qOverP = abs(gCandidate->GetCharge()) / p_tot;
+				Double_t sigma_qOverP_squared = TMath::Power(qOverP / p_tot, 2) * sigma_p_squared;
+					   
+				Q_mat.Zero(); // clear matrix
+				Q_mat(2, 2) = var_scat;
+				Q_mat(3, 3) = var_scat;
+				Q_mat(4, 4) = sigma_qOverP_squared;
+				// Add process noise to the track covariance matrix
+				P_cov = P_cov + Q_mat;
+								
+				// We have to distinguish between detectors measuring only x, y or both
+				// Measurement vector z (what the detector actually saw)
+				if(i == 0 || det->GetDetectorName() == "tofd") measDim = 2;
+				else measDim = 1;
+	
+				TMatrixD z_meas(measDim, 1); z_meas.Zero();
+				// Measurement projection matrix H (maps 5D state down to the measured components x, y)
+				TMatrixD H_mat(measDim, 5); H_mat.Zero();
+				// Detector resolution matrix R
+				TMatrixD R_noise(measDim, measDim); R_noise.Zero();
+			
+				if (det->GetDetectorName() == "tofd") // x and y measured
+				{
+					H_mat(0,0) = 1.0; 
+					H_mat(1,1) = 1.0;
+					R_noise(0,0) = det->res_x * det->res_x * 4./12.;
+					R_noise(1,1) = det->res_y * det->res_y;
+					if(helium) R_noise(1,1) = R_noise(1,1) * 9.;
+					z_meas(0,0) = hit->GetX();
+					z_meas(1,0) = hit->GetY();
+				}
+				else if(kTarget == det->section)
+				{
+					H_mat(0,0) = 1.0; 
+					H_mat(1,1) = 1.0;
+					R_noise(0,0) = 1.5 * 1.5 * 4./12.;
+					R_noise(1,1) = 1.5 * 1.5 * 4./12.;
+					z_meas(0,0) = gCandidate->GetStartPosition().X();
+					z_meas(1,0) = gCandidate->GetStartPosition().Y();				
+				}			
+				else if (det->GetDetectorName() == "fi23b")  // only y position measured
+				{
+					H_mat(0,1) = 1.0; // Maps to the y parameter of x_state
+					R_noise(0,0) = det->res_y * det->res_y  * 4./12.;
+					z_meas(0,0) = hit->GetY();
+				}
+				else  // only x position measured
+				{
+					H_mat(0,0) = 1.0; // Maps to the y parameter of x_state
+					R_noise(0,0) = det->res_x * det->res_x  * 4./12.;
+					z_meas(0,0) = hit->GetX();
 				}
 				
-				if(i == 0){
-				// We have reached the target, and save the candidate
-					TVector3 pos_target = gCandidate->GetPosition();
-					TVector3 mom_target = gCandidate->GetMomentum();
-					charge = abs(gCandidate->GetCharge());
-					gCandidate->SetStartPosition(pos_target);
-					gCandidate->SetStartMomentum(-mom_target);
-					gCandidate->SetCharge(charge);
-					gCandidate->SetStartBeta(gCandidate->GetBeta());
-					gCandidate->SetChi2(chi2);
-					gCandidate->Reset();
+
+			// ==========================================
+			// 3. THE UPDATE STEP (Filtering the Hit)
+			// ==========================================
+					
+			// Compute residual and its covariance matrix S 
+			// S = H * P * H^T + R
+			TMatrixD S_mat(measDim, measDim);
+			S_mat = H_mat * P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) + R_noise;
+						
+			// Residual: 
+			TMatrixD residual(measDim, 1);
+			residual = z_meas - (H_mat * x_state);
+/*				
+			Double_t res_val, resolution, pull, damping_factor;
+			if(measDim == 1)
+			{				
+				res_val = residual(0,0);
+				if(det->GetDetectorName() == "fi23b") resolution = det->res_y;
+				else resolution = det->res_x;
+
+				// Calculate how many "sigmas" the track is from the hit
+				pull = TMath::Abs(res_val) / resolution;
+
+				if (pull < 1.0) 
+				{
+					// If inside 1 sigma of detector resolution, smoothly damp the residual.
+					// At pull = 0, factor is 0. At pull = 1, factor is 1.
+					damping_factor = pull * pull; // Smooth parabolic scaling
+					residual(0,0) = res_val * damping_factor;
+				}
+			}
+			else
+			{
+				res_val = residual(0,0);
+				resolution = sqrt(R_noise(0,0));//det->res_x;
+				// Calculate how many "sigmas" the track is from the hit
+				pull = TMath::Abs(res_val) / resolution;
+				if (pull < 1.0) 
+				{
+					// If inside 1 sigma of detector resolution, smoothly damp the residual.
+					// At pull = 0, factor is 0. At pull = 1, factor is 1.
+					damping_factor = pull * pull; // Smooth parabolic scaling
+					residual(0,0) = res_val * damping_factor;
+				}
+				
+				res_val = residual(1,0);
+				resolution = sqrt(R_noise(1,1));//det->res_y;
+				// Calculate how many "sigmas" the track is from the hit
+				pull = TMath::Abs(res_val) / resolution;
+				if (pull < 1.0) 
+				{
+					// If inside 1 sigma of detector resolution, smoothly damp the residual.
+					// At pull = 0, factor is 0. At pull = 1, factor is 1.
+					damping_factor = pull * pull; // Smooth parabolic scaling
+					residual(1,0) = res_val * damping_factor;
 				}	
+			}
+*/			
+
+/*
+			// Extract Pulls for measured coordinates
+			Double_t pull_x = 0.0;
+			Double_t pull_y = 0.0;
+
+			if (measDim == 1) {
+				Double_t var_x = S_mat(0, 0); // Total variance in X
+				if (var_x > 0.0) {
+					pull_x = residual(0,0) / sqrt(var_x);
+				}
+			}
+			else {
+				Double_t var_x = S_mat(0, 0); // Total variance in X
+				if (var_x > 0.0) {
+					pull_x = residual(0,0) / sqrt(var_x);
+				}
+				Double_t var_y = S_mat(1, 1); // Total variance in y
+				if (var_y > 0.0) {
+					pull_y = residual(1,0) / sqrt(var_y);
+				}				
+			}
+		
+			if (measDim == 2) {
+				gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pull_x, pull_y);
+			} 
+			else {
+				// 1D measurement (determine whether it's X or Y based on det type)
+				if (det->GetDetectorName() == "fi23b") {
+					gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pull_x);
+				} 
+				else {
+					gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pull_x, 0.);
+				}
+			}
+			
+			*/
+			
+				// Compute Kalman Gain: K = P * H^T * S^-1
+				TMatrixD K_gain(5, measDim);
+				TMatrixD S_inv = S_mat; S_inv.Invert();
+				K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;
+				
+				// Update local state
+				x_state = x_state + (K_gain * residual);	
+				
+				if(writeout){
+					cout<<"Det: "<<det->GetDetectorName()<<" after noise"<<endl;
+					if(kTarget == det->section || det->GetDetectorName() == "tofd")
+					{
+						cout <<"Residues: "<<residual(0,0)<<", "<<residual(1,0)<<endl;
+						cout <<"Measurem: "<<z_meas(0,0)<<", "<<z_meas(1,0)<<endl;
+					}
+					else
+					{
+						cout <<"Residues: "<<residual(0,0)<<endl;
+						cout <<"Measurem: "<<z_meas(0,0)<<endl;
+					}
+					
+					cout<<"Noise: "<<var_scat<<", "<<sigma_qOverP_squared<<endl;
+					cout<<"K_gain: "<<K_gain(0,0)<<" "<<K_gain(1,0)<<" "<<K_gain(2,0)<<" "<<K_gain(3,0)<<" "<<K_gain(4,0)<<endl;
+					cout<<"P_cov values with noise: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
+					cout<<"Updated state values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
+				}
+				
+		
+				// Update the Covariance Matrix: P = (I - K * H) * P
+			// 1. Construct Identity Matrix
+			TMatrixD I(5, 5);
+			I.UnitMatrix();
+
+			// 2. Compute (I - K * H)
+			TMatrixD I_minus_KH = I - (K_gain * H_mat);
+
+			// 3. Compute Transpose (I - K * H)^T
+			TMatrixD I_minus_KH_T(TMatrixD::kTransposed, I_minus_KH);
+
+			// 4. Compute First Term: (I - KH) * P * (I - KH)^T
+			TMatrixD P_updated = I_minus_KH * P_cov * I_minus_KH_T;
+
+			// 5. Compute Transpose of K_gain
+			TMatrixD K_gain_T(TMatrixD::kTransposed, K_gain);
+
+			// 6. Compute Second Term: K * R * K^T
+			TMatrixD KRK_T = K_gain * R_noise * K_gain_T;
+
+			// 7. Complete Joseph Form Update
+			P_cov = P_updated + KRK_T;
+
+			// 8. Explicitly Enforce Matrix Symmetry (Numerical Safeguard)
+			for (Int_t ij = 0; ij; ++ij) {
+				for (Int_t jj = ij + 1; jj < 5; ++jj) {
+					Double_t avg = 0.5 * (P_cov(ij, jj) + P_cov(jj, ij));
+					P_cov(ij, jj) = avg;
+					P_cov(jj, ij) = avg;
+				}
+			}
+				if(writeout) cout<<"Updated P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
+		
+				// Increment local chi2 safely using the measurement covariance matrix
+				TMatrixD chi2_increment = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;
+				//cout<<"chi2_increment: "<<chi2_increment(0,0)<<endl;
+								
+				chi2_loc += chi2_increment(0,0);
+				
+				// CRITICAL: Push the freshly updated Kalman position and slopes back into gCandidate 
+				// so the next Runge-Kutta step propagates the corrected trajectory!
+				
+				// 1. Reconstruct the new local momentum vector from the updated slopes
+				// We use the fact that p_x = ux * p_z and p_y = uy * p_z
+				ptot_new = abs(gCandidate->GetCharge()) / x_state(4,0);
+
+				// Use simple geometry to find the new local p_z component
+				x_new_local = x_state(0,0);
+				y_new_local = x_state(1,0);
+				ux_new = x_state(2,0);
+				uy_new = x_state(3,0);
+				pz_new_local = ptot_new / TMath::Sqrt(1.0 + ux_new*ux_new + uy_new*uy_new);
+
+				TVector3 p_new_local(ux_new * pz_new_local, uy_new * pz_new_local, pz_new_local);
+				
+				// 2. Rotate the local momentum vector BACK into the global lab frame
+				det->LocalToGlobalMomentum(p_new_global, p_new_local); 
+				
+				det->LocalToGlobal(pos_new_global,x_new_local,y_new_local);
+				E_tot = TMath::Sqrt(p_new_global.Mag() * p_new_global.Mag() + mass * mass);
+				beta  = p_new_global.Mag() / E_tot;
+				gCandidate->SetPosition(pos_new_global);
+				gCandidate->SetMomentum(-p_new_global);  // this is ok; slopes are preserved
+				gCandidate->SetBeta(beta);
+				
+				
+				if(writeout)
+				{
+					cout<<"Updated candidate position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
+					cout<<"Updated candidate momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;				    
+				    cout<<"chi2_det: "<<chi2_increment(0,0)<<endl;
+				}				
 			}
 		}
 
-    		
+	gCandidate->SetStartPosition(gCandidate->GetPosition());
+	gCandidate->SetStartMomentum(-gCandidate->GetMomentum());
+	gCandidate->SetCharge(abs(gCandidate->GetCharge()));
+	gCandidate->SetStartBeta(gCandidate->GetBeta());
+	gCandidate->SetChi2(chi2);
+	gCandidate->Reset();
+   
     cout<<"*** New fragment ****** "<<endl;
     cout<<"*** Charge: "<<gCandidate->GetCharge()<<endl;
-    cout<<"*** Position from C: "<<x0<<", "<<y0<<", "<<z0<<endl;
-    cout<<"*** Position from He: "<<gCandidate->GetStartPosition().X()<<", "<<gCandidate->GetStartPosition().Y()<<", "<<gCandidate->GetStartPosition().Z()<<endl;
+    cout<<"*** Position: "<<gCandidate->GetStartPosition().X()<<", "<<gCandidate->GetStartPosition().Y()<<", "<<gCandidate->GetStartPosition().Z()<<endl;
     cout<<"*** Momentum: "<<gCandidate->GetStartMomentum().X()<<", "<<gCandidate->GetStartMomentum().Y()<<", "<<gCandidate->GetStartMomentum().Z()<<endl;
     cout<<"*** Beta: "<<gCandidate->GetStartBeta()<<endl;
-    cout<<"*** Chi2: "<<chi2<<endl;
+    cout<<"*** Chi2: "<<chi2<<", "<<chi2_loc<<endl;
     if(chi2 > 1.e6) status = 10;
 
     return status;
@@ -1827,6 +3153,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     gCandidate = particle;
     gSetup = setup;
 
+    Int_t status = 0;
     Double_t px0 = 0.;
     Double_t py0 = 0.;
     Double_t pz0 = 0.;
@@ -1834,12 +3161,16 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     Double_t y0 = 0.;
     Double_t z0 = 0.;
     Double_t y_tp = 0.;
+    Double_t yfi30=-100.,yfi31=-100.,yfi32=-100.,yfi33=-100.;
     Double_t foffset=0.441;
     Double_t fslope=1.;
     Double_t ltofd=0.;
     Double_t ztp = 174.5851;
     Double_t x_l=0., y_l=0.;
 	Double_t pz_new_local = 0., ptot_new=0.;
+    Double_t chi2 = 0.;
+    Double_t beta_target;
+    Bool_t writeout = false;
     TVector3 pos0;
     TVector3 pos1;
     TVector3 pos2;
@@ -1851,11 +3182,17 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
     TVector3 startPositionOptimized;
     TVector3 startMomentumOptimized;
     TVector3 startMomentumLocal;
+    TVector3 pos_target;
+    TVector3 mom_target;
     TVector3 p_l;
-    Int_t status = 0;
-    Double_t chi2 = 0.;
-    Int_t nchi2 = 0;
-    Bool_t writeout = false;
+    TMatrixD x_state(5, 1);  // 5x1 Column Vector
+	TMatrixD P_cov(5, 5);    // 5x5 Covariance Matrix
+	TMatrixD Q_mat(5,5);  // 5x5 Noise matrix
+	
+	Double_t x0true = gCandidate->GetStartPosition().X();
+	Double_t y0true = gCandidate->GetStartPosition().Y();
+	Double_t z0true = gCandidate->GetStartPosition().Z();
+	
     
     if (gCandidate->GetHitIndexByName("tofd") > -1)
     {
@@ -1872,165 +3209,164 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
         fi23b->LocalToGlobal(pos23b, 0.0, gSetup->GetHit("fi23b", gCandidate->GetHitIndexByName("fi23b"))->GetY());
     }
  
+ Double_t diffx = 0.;
  // Extrapolate y position between fi23b and tofd to fi3x:   
     if (gCandidate->GetHitIndexByName("fi32") > -1 && gCandidate->GetHitIndexByName("fi30") > -1)
     {
+		diffx = -0.7;
         auto fi32 = gSetup->GetByName("fi32");
         auto fi30 = gSetup->GetByName("fi30");
-        fi32->LocalToGlobal(pos2, gSetup->GetHit("fi32", gCandidate->GetHitIndexByName("fi32"))->GetX(), 0.);
+        fi32->LocalToGlobal(pos2, gSetup->GetHit("fi32", gCandidate->GetHitIndexByName("fi32"))->GetX()-diffx, 0.);
         fi30->LocalToGlobal(pos3, gSetup->GetHit("fi30", gCandidate->GetHitIndexByName("fi30"))->GetX(), 0.);
         
         fslope = 0.883;
         y_tp = (pos0.Y()-foffset+fslope*ltofd*pos23b.Y()/(ztp-pos23b.Z()))/
 														 (1.+fslope*ltofd/(ztp-pos23b.Z()));  
 	    Double_t lfi30 = sqrt((pos3.Z()-ztp)*(pos3.Z()-ztp) + pos3.X()*pos3.X()) ;			
-		Double_t yfi30 = y_tp + lfi30/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
+		yfi30 = y_tp + lfi30/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
 		pos3.SetY(yfi30);
 	    
 	    Double_t lfi32 = sqrt((pos2.Z()-ztp)*(pos2.Z()-ztp) + pos2.X()*pos2.X()) ;			
-		Double_t yfi32 = y_tp + lfi32/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
+		yfi32 = y_tp + lfi32/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
 		pos2.SetY(yfi32);
     }
     else if (gCandidate->GetHitIndexByName("fi31") > -1 && gCandidate->GetHitIndexByName("fi33") > -1)
     {
+        diffx = 0.53;
         auto fi31 = gSetup->GetByName("fi31");
         auto fi33 = gSetup->GetByName("fi33");
-        fi33->LocalToGlobal(pos2, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX(), 0.);
+        fi33->LocalToGlobal(pos2, gSetup->GetHit("fi33", gCandidate->GetHitIndexByName("fi33"))->GetX()-diffx, 0.);
         fi31->LocalToGlobal(pos3, gSetup->GetHit("fi31", gCandidate->GetHitIndexByName("fi31"))->GetX(), 0.);
         
         fslope = 0.901;
         y_tp = (pos0.Y()-foffset+fslope*ltofd*pos23b.Y()/(ztp-pos23b.Z()))/
 														 (1.+fslope*ltofd/(ztp-pos23b.Z()));  
 	    Double_t lfi31 = sqrt((pos3.Z()-ztp)*(pos3.Z()-ztp) + pos3.X()*pos3.X()) ;			
-		Double_t yfi31 = y_tp + lfi31/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
+		yfi31 = y_tp + lfi31/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset; 
 		pos3.SetY(yfi31);
 	    
 	    Double_t lfi33 = sqrt((pos2.Z()-ztp)*(pos2.Z()-ztp) + pos2.X()*pos2.X()) ;			
-		Double_t yfi33 = y_tp + lfi33/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
+		yfi33 = y_tp + lfi33/(ztp-pos23b.Z())*(y_tp-pos23b.Y())*fslope + foffset;
 		pos2.SetY(yfi33);
     }
     else
     {
         return 10;
     }
-    
-    direction0 = (pos2 - pos0).Unit();
+      Double_t ygeom = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (ztp - pos23b.Z());
 
-    Double_t mom = gCandidate->GetMass() * gCandidate->GetStartBeta() * gCandidate->GetStartGamma();
-    direction0.SetMag(mom);
+       // Pass inital candidate through detectors, correct for energy loss, and get start momentum at tofd:	
+		
+	for (Int_t i = 0; i < gSetup->GetArray().size();  i++) 
+	{
+		auto det = gSetup->GetArray().at(i); 
+		R3BHit* hit = nullptr; 
+		Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+		
+		if(hitIndex < 0) continue;
+		
+		if (hitIndex >= 0)
+		{
+			hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+		}
 
-    //direction0.Print();
-    TVector3 startMomentum(direction0.X(), direction0.Y(), direction0.Z());
+		if (!hit) continue;
+		
+		Double_t weight = 1.;
+		if (kTarget == det->section || det->GetDetectorName() == "tofd")
+		{
+			weight = 0.5;
+		}
+	   // Update particle's momentum is due to energy loss in a detector:
+		gCandidate->PassThroughDetector(det, weight); 
+			
+	} 
+	Double_t mom = gCandidate->GetMomentum().Mag();
+	direction0 = (pos2 - pos0);
+	
+	direction0 = direction0.Unit();
+	
+	direction0.SetMag(mom);
+	
+	TVector3 startMomentum(direction0.X(), direction0.Y(), direction0.Z());
 
-    px0 = direction0.X();
-    py0 = direction0.Y();
-    pz0 = direction0.Z();
+	px0 = direction0.X();
+	py0 = direction0.Y();
+	pz0 = direction0.Z();
 
-    x0 = pos0.X();
-    y0 = pos0.Y();
-    z0 = pos0.Z();
-    
-    Double_t charge = gCandidate->GetCharge();
-    gCandidate->SetCharge(-charge);
-    gCandidate->SetStartPosition(pos0);
-    gCandidate->SetStartMomentum(startMomentum);
+	x0 = pos0.X();
+	y0 = pos0.Y();
+	z0 = pos0.Z();
+	
+	Double_t charge = gCandidate->GetCharge();
+	gCandidate->SetCharge(-charge);
+	gCandidate->SetStartPosition(pos0);
+	gCandidate->SetStartMomentum(startMomentum);
 	gCandidate->Reset();
-    
-    Double_t z_first=91.;
-	TVector3 pos23a;
-	if (gCandidate->GetHitIndexByName("fi23a") > -1)
-    {
-        auto fi23a = gSetup->GetByName("fi23a");
-        fi23a->LocalToGlobal(pos23a, gSetup->GetHit("fi23a", gCandidate->GetHitIndexByName("fi23a"))->GetX(), 0.0);
-        z_first = pos23a.X();
-    }
-        
+	
 	if (gCandidate->GetHitIndexByName("tofd") > -1)
-    {
-        auto tofd = gSetup->GetByName("tofd");
-        tofd->GlobalToLocalMomentum(startMomentum,startMomentumLocal);
-        x_l = gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetX();
-        y_l = gSetup->GetHit("tofd", gCandidate->GetHitIndexByName("tofd"))->GetY();
-    }
-    
-    // --- BEFORE THE DETECTOR LOOP ---
-	TMatrixD x_state(5, 1);  // 5x1 Column Vector
-	TMatrixD P_cov(5, 5);    // 5x5 Covariance Matrix
-	TMatrixD Q_mat(5,5);  // 5x5 Noise matrix
+	{
+		auto tofd = gSetup->GetByName("tofd");
+		tofd->GlobalToLocalMomentum(startMomentum,startMomentumLocal);
+		tofd->GlobalToLocal(pos0,x_l,y_l);
+	}
+	
+	// --- BEFORE THE DETECTOR LOOP ---
 	// Initialize local state at the tofd
 	x_state(0,0) = x_l; // initial x 
 	x_state(1,0) = y_l; // initial y
 	x_state(2,0) = startMomentumLocal.X() / startMomentumLocal.Z(); // initial slope dx/dz
 	x_state(3,0) = startMomentumLocal.Y() / startMomentumLocal.Z(); // initial slope dy/dz
-	x_state(4,0) = abs(gCandidate->GetCharge()) / startMomentum.Mag(); // q/p 
+	x_state(4,0) = abs(gCandidate->GetCharge()) / startMomentumLocal.Mag(); // q/p 
 	
 	
 	// Initialize starting uncertainties (high values mean "I trust the hits more than my guess")
 	P_cov.Zero();
-	P_cov(0,0) = 2.025 * 2.025 / 12.; // Keep TOFD spatial resolution as is
-	P_cov(1,1) = 1.0 * 1.0 / 12.;     
-	P_cov(2,2) = 0.01 * 0.01;     // Open up initial injection slopes!
-	P_cov(3,3) = 0.01 * 0.01;     
-	P_cov(4,4) = 0.01 * 0.01;     // Open the momentum valve wide!
+	P_cov(0,0) = 2. * 2. * 4./12.; 
+	P_cov(1,1) = 1. * 1.; 
+	P_cov(2,2) = 5.e-2 * 5.e-2;//0.05 * 0.05 ;     
+	P_cov(3,3) = 5.e-2 * 5.e-2;//0.05 * 0.05 ;     
+	P_cov(4,4) = (0.005 * abs(gCandidate->GetCharge()) / startMomentumLocal.Mag()) *
+	           (0.005 * abs(gCandidate->GetCharge()) / startMomentumLocal.Mag());//0.07 * 0.07;     
 	
-	if(writeout){
+	if(writeout)
+	{
 		cout<<"Backward tracking starting values:"<<endl;
 		cout<<"Position: "<<pos0.X()<<" "<<pos0.Y()<<" "<<pos0.Z()<<endl;
 		cout<<"Momentum: "<<startMomentum.X()<<" "<<startMomentum.Y()<<" "<<startMomentum.Z()<<endl;
 		cout<<"State values at init: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<x_state(4,0)<<endl;
 		cout<<"P_cov values at init: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
 	}
-    
-    Int_t measDim = 2;
-    Double_t dxerror = 1., dyerror = 1.; 
-    Double_t sigma_E_squared = 0.;		
+	
+	Int_t measDim = 2;
+	Double_t dxerror = 1., dyerror = 1.; 
+	Double_t sigma_E_squared = 0.;	
+	Int_t n_ghost_track = 0;	
 	for (Int_t i = gSetup->GetArray().size() - 1; i >= 0; i--) 
 	{
-        auto det = gSetup->GetArray().at(i);  
-        
-       // hit data at a given detector; contains: detector Id, x and y positions of a particle 
-       // at the detector, as well asparticle's charge and time
-        R3BHit* hit = nullptr; 
-        Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
-        
+		auto det = gSetup->GetArray().at(i);  
+	   // hit data at a given detector; contains: detector Id, x and y positions of a particle 
+	   // at the detector, as well asparticle's charge and time
+		R3BHit* hit = nullptr; 
+		Int_t hitIndex = gCandidate->GetHitIndexByName(det->GetDetectorName().Data());
+		
 		if(hitIndex < 0) continue;
 		
-        if (hitIndex >= 0)
-        {
-            hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
-        }
+		if (hitIndex >= 0)
+		{
+			hit = gSetup->GetHit(det->GetDetectorName().Data(), hitIndex);
+		}
 
-        if (!hit) continue;
-        
+		if (!hit) continue;
+		
 		// ==========================================
 		// 1. THE PREDICT STEP (Extrapolation)
 		// ==========================================
 		// Your existing Runge-Kutta engine propagates the physical state backward!
 		TVector3 pos_before = gCandidate->GetPosition(); // Before propagation
 		
-		if(det->GetDetectorName() == "tofd")
+		if(writeout)
 		{
-			dxerror = det->res_x;
-			dyerror = det->res_y;
-		}
-		else if(det->GetDetectorName() ==  "fi30" || det->GetDetectorName() ==  "fi31" ||
-		       det->GetDetectorName() ==  "fi32" || det->GetDetectorName() ==  "fi33")
-		{
-			dxerror = det->res_x;
-			dyerror = 0.8;
-		}
-		else if(det->GetDetectorName() ==  "fi23b")
-		{
-			dxerror = 0.8;
-			dyerror = det->res_y;
-		}
-		else if(det->GetDetectorName() ==  "fi23a")
-		{
-			dxerror = det->res_x;
-			dyerror = 0.8;
-		}
-		
-		if(writeout){
 			cout<<"#### Propagation to det: "<<det->GetDetectorName()<<" will be started ##"<<endl;
 			cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
 			cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
@@ -2038,14 +3374,14 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 			cout<<"P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
 		}
    
-		if(i < gSetup->GetArray().size() - 1)
+		if(i < gSetup->GetArray().size() )
 		{
 			gProp->PropagateToDetectorBackward(gCandidate, det, P_cov);
 			
-			 if (gEnergyLoss ) // correct for energy loss in detector
+			Double_t weight = 1.;
+			if (gEnergyLoss ) // correct for energy loss in detector
 			{
-				Double_t weight = 1.;
-				if (kTarget == det->section)
+				if (kTarget == det->section || det->GetDetectorName() == "tofd")
 				{
 					weight = 0.5;
 				}
@@ -2053,8 +3389,7 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 			   // Update particle's momentum is due to energy loss in a detector:
 				gCandidate->PassThroughDetectorBackward(det, weight); 				
 			 }
-			
-										 
+														 
 			// Convert the newly predicted gCandidate back into our 5D local state matrix
 			det->GlobalToLocal(gCandidate->GetPosition(), x_l, y_l);
 			det->GlobalToLocalMomentum(gCandidate->GetMomentum(),p_l);
@@ -2064,105 +3399,127 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 			x_state(2,0) = p_l.X() / p_l.Z();
 			x_state(3,0) = p_l.Y() / p_l.Z();
 			x_state(4,0) = abs(gCandidate->GetCharge()) / p_l.Mag();
-			
-			if(writeout){
+			// Force exact symmetry after propagation step
+			for (Int_t ij = 0; ij < 5; ++ij) {
+				for (Int_t jj = ij + 1; jj < 5; ++jj) {
+					Double_t avg = 0.5 * (P_cov(ij, jj) + P_cov(jj, ij));
+					P_cov(ij, jj) = avg;
+					P_cov(jj, ij) = avg;
+				}
+			}
+			if(writeout)
+			{
 				cout<<"Det: "<<det->GetDetectorName()<<" passed through"<<endl;
 				cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
 				cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
 				cout<<"State values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
 				cout<<"P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
 			}
-            if(i == 0){
-				// We have reached the target, and save the candidate. We don't include target in chi2 calcul
-					TVector3 pos_target(gCandidate->GetPosition().X(), gCandidate->GetPosition().Y(), 0.);
-					TVector3 mom_target = gCandidate->GetMomentum();
-					charge = abs(gCandidate->GetCharge());
-					gCandidate->SetStartPosition(pos_target);
-					gCandidate->SetStartMomentum(-mom_target);
-					gCandidate->SetCharge(charge);
-					gCandidate->SetStartBeta(gCandidate->GetBeta());
-					gCandidate->SetChi2(chi2);
-					gCandidate->Reset();
-					if(writeout){
-						cout<<"Target reached and candidate will be collected"<<endl;
-						cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
-						cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
-					}
-				continue;	
-			}
+		
 			
 			// ==========================================
 			// 2. MULTIPLE COULOMB SCATTERING (Noise Q)
 			// ==========================================
-			// Calculate scattering angle using the Highland Formula based on detector material thickness
-			Double_t L_over_X0 = det->thickness / rad_length; 
-			Double_t p_tot = gCandidate->GetMomentum().Mag(); // in MeV/c or GeV/c
-			Double_t mass  = gCandidate->GetMass();          
-			// Calculate beta = p / E
-			Double_t E_tot = TMath::Sqrt(p_tot * p_tot + mass * mass);
-			Double_t beta  = p_tot / E_tot;
-			Double_t theta_scat = (0.0136 * x_state(4,0)/beta) * TMath::Sqrt(L_over_X0) * (1.0 + 0.038 * TMath::Log(L_over_X0));
-			Double_t var_scat = theta_scat * theta_scat;
-           	
-            // 2. Convert Energy Variance (\sigma_E^2) to q/p Variance (\sigma_{q/p}^2)
-			// Using relativistic kinematics: E^2 = p^2 + m^2 -> dE = (p/E) * dp
-			// dp = (E/p) * dE
-			Double_t sigma_p_squared = (E_tot / p_tot) * (E_tot / p_tot) * sigma_E_squared;
-
-			// Since state variable is q/p, d(q/p)/dp = -q / p^2
-			// Therefore: var(q/p) = (q / p^2)^2 * var(p)
-			Double_t qOverP = abs(gCandidate->GetCharge()) / p_tot;
-			Double_t sigma_qOverP_squared = TMath::Power(qOverP / p_tot, 2) * sigma_p_squared;
 				   
-			Q_mat.UnitMatrix(); // clear matrix
-			Q_mat(2, 2) = var_scat;
-			Q_mat(3, 3) = var_scat;
-			Q_mat(4, 4) = sigma_qOverP_squared; 
+			Q_mat.Zero(); // Clear process noise matrix
+
+			Double_t p_tot_GeV = gCandidate->GetMomentum().Mag(); // Make sure this is GeV/c
+			Double_t mass = gCandidate->GetMass(); // GeV/c^2       
+			Double_t E_tot     = TMath::Sqrt(p_tot_GeV * p_tot_GeV + mass * mass);
+			Double_t beta      = p_tot_GeV / E_tot;
+					
+			if (!(det->thickness <= 0.0 || rad_length <= 0.0 || p_tot_GeV <= 0.0)) 
+			{
+				// Effective radiation length step taking tilt/weight into account
+				Double_t L_over_X0 = weight * det->thickness / rad_length; 
+				
+				// Protect against log of very small numbers
+				if (L_over_X0 > 1e-7) 
+				{
+					
+					// 1. Highland Formula for Multiple Scattering Angle (radians)
+					Double_t qOverP_abs = TMath::Abs(x_state(4,0)); // |q/p| in 1/GeV
+					Double_t theta_scat = (0.0136 * qOverP_abs / beta) * TMath::Sqrt(L_over_X0) * (1.0 + 0.038 * TMath::Log(L_over_X0));
+					Double_t var_scat   = theta_scat * theta_scat;
+
+					// 2. Slope variance projection
+					Double_t ux = x_state(2,0);
+					Double_t uy = x_state(3,0);
+					Double_t xi = 1.0 + ux * ux + uy * uy;
+					Double_t var_ux = (1.0 + ux * ux) * xi * var_scat;
+					Double_t var_uy = (1.0 + uy * uy) * xi * var_scat;
+
+					// 3. Finite detector thickness correlations
+					Double_t var_pos = (det->thickness * det->thickness / 3.0) * var_scat;
+					Double_t cov_pos_slope = (det->thickness / 2.0) * var_scat;
+					
+					// 4. Energy straggling conversion from sigma_p^2 to Var(q/p)
+					Double_t sigma_p_squared = (E_tot / p_tot_GeV) * (E_tot / p_tot_GeV) * sigma_E_squared;
+					Double_t var_qOverP      = (qOverP_abs * qOverP_abs) * (sigma_p_squared / (p_tot_GeV * p_tot_GeV));
+
+					// Populate 5x5 Q matrix
+					Q_mat(0, 0) = var_pos;
+					Q_mat(1, 1) = var_pos;
+					Q_mat(2, 2) = var_ux;
+					Q_mat(3, 3) = var_uy;
+					
+					Q_mat(0, 2) = cov_pos_slope;
+					Q_mat(2, 0) = cov_pos_slope;
+					Q_mat(1, 3) = cov_pos_slope;
+					Q_mat(3, 1) = cov_pos_slope;
+					
+					Q_mat(4, 4) = var_qOverP;
+				}
+			}
 			// Add process noise to the track covariance matrix
 			P_cov = P_cov + Q_mat;
-
-		// ==========================================
-		// 3. THE UPDATE STEP (Filtering the Hit)
-		// ==========================================
+							
 			// We have to distinguish between detectors measuring only x, y or both
 			// Measurement vector z (what the detector actually saw)
-			if(det->GetDetectorName() != "tofd") measDim = 1;
+			if(i == 0 || det->GetDetectorName() == "tofd") measDim = 2;
+			else measDim = 1;
 		
 			TMatrixD z_meas(measDim, 1); z_meas.Zero();
 			// Measurement projection matrix H (maps 5D state down to the measured components x, y)
 			TMatrixD H_mat(measDim, 5); H_mat.Zero();
 			// Detector resolution matrix R
 			TMatrixD R_noise(measDim, measDim); R_noise.Zero();
-		/*	
-			H_mat(0,0) = 1.0; 
-			H_mat(1,1) = 1.0;
-			R_noise(0,0) = dxerror * dxerror;
-			R_noise(1,1) = dyerror * dyerror;
-			z_meas(0,0) = hit->GetX();
-			z_meas(1,0) = hit->GetY();
-		*/	
+		
 			if (det->GetDetectorName() == "tofd") // x and y measured
 			{
 				H_mat(0,0) = 1.0; 
 				H_mat(1,1) = 1.0;
-				R_noise(0,0) = det->res_x * det->res_x;
+				R_noise(0,0) = det->res_x * det->res_x  * 4./12.;
 				R_noise(1,1) = det->res_y * det->res_y;
 				z_meas(0,0) = hit->GetX();
 				z_meas(1,0) = hit->GetY();
+			}
+			else if(kTarget == det->section) // target
+			{
+				H_mat(0,0) = 1.0; 
+				H_mat(1,1) = 1.0;
+				R_noise(0,0) = 0.5 * 0.5;
+				R_noise(1,1) = 0.5 * 0.5;
+				z_meas(0,0) = x0true;
+				z_meas(1,0) = y0true;
 			}			
 			else if (det->GetDetectorName() == "fi23b")  // only y position measured
 			{
 				H_mat(0,1) = 1.0; // Maps to the y parameter of x_state
-				R_noise(0,0) = det->res_y * det->res_y;
+				R_noise(0,0) = det->res_y * det->res_y * 4./12.;
 				z_meas(0,0) = hit->GetY();
 			}
-			else // fi3X and fi23a
+			else  // only x position measured
 			{
-				H_mat(0,0) = 1.0; 
-				R_noise(0,0) = det->res_x * det->res_x;
+				H_mat(0,0) = 1.0; // Maps to the y parameter of x_state
+				R_noise(0,0) = det->res_x * det->res_x  * 4./12.;
 				z_meas(0,0) = hit->GetX();
-			}
-				
+			}			
+
+			// ==========================================
+			// 3. THE UPDATE STEP (Filtering the Hit)
+			// ==========================================
+					
 			// Compute residual and its covariance matrix S 
 			// S = H * P * H^T + R
 			TMatrixD S_mat(measDim, measDim);
@@ -2171,17 +3528,65 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 			// Residual: 
 			TMatrixD residual(measDim, 1);
 			residual = z_meas - (H_mat * x_state);
+									
+			// Extract Pulls for measured coordinates
+			Double_t pull_x = 0.0;
+			Double_t pull_y = 0.0;
+
+			if (measDim == 1) {
+				Double_t var_x = S_mat(0, 0); // Total variance in X
+				if (var_x > 0.0) {
+					pull_x = residual(0,0) / sqrt(var_x);
+				}
+			}
+			else {
+				Double_t var_x = S_mat(0, 0); // Total variance in X
+				if (var_x > 0.0) {
+					pull_x = residual(0,0) / sqrt(var_x);
+				}
+				Double_t var_y = S_mat(1, 1); // Total variance in y
+				if (var_y > 0.0) {
+					pull_y = residual(1,0) / sqrt(var_y);
+				}				
+			}
+		
+			if (measDim == 2) {
+				gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), residual(1,0), pull_x, pull_y);
+			} 
+			else {
+				// 1D measurement (determine whether it's X or Y based on det type)
+				if (det->GetDetectorName() == "fi23b") {
+					gCandidate->SetResidual(det->GetDetectorName(), 0.0, residual(0,0), 0., pull_x);
+				} 
+				else {
+					gCandidate->SetResidual(det->GetDetectorName(), residual(0,0), 0.0, pull_x, 0.);
+				}
+			}
 
 			// Compute Kalman Gain: K = P * H^T * S^-1
 			TMatrixD K_gain(5, measDim);
 			TMatrixD S_inv = S_mat; S_inv.Invert();
 			K_gain = P_cov * TMatrixD(TMatrixD::kTransposed, H_mat) * S_inv;
-
+			
 			// Update local state
 			x_state = x_state + (K_gain * residual);	
 			
-			if(writeout){
+			if(writeout)
+			{
 				cout<<"Det: "<<det->GetDetectorName()<<" after noise"<<endl;
+				if(kTarget == det->section || det->GetDetectorName() == "tofd")
+				{
+					cout <<"Residues: "<<residual(0,0)<<", "<<residual(1,0)<<endl;
+					cout <<"Measurem: "<<z_meas(0,0)<<", "<<z_meas(1,0)<<endl;
+				}
+				else
+				{
+					cout <<"Residues: "<<residual(0,0)<<endl;
+					cout <<"Measurem: "<<z_meas(0,0)<<endl;
+				}
+				
+				//cout<<"Noise: "<<var_scat<<", "<<sigma_qOverP_squared<<endl;
+				cout<<"K_gain: "<<K_gain(0,0)<<" "<<K_gain(1,0)<<" "<<K_gain(2,0)<<" "<<K_gain(3,0)<<" "<<K_gain(4,0)<<endl;
 				cout<<"Position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
 				cout<<"Momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
 				cout<<"Updated state values: "<<x_state(0,0)<<" "<<x_state(1,0)<<" "<<x_state(2,0)<<" "<<x_state(3,0)<<" "<<x_state(4,0)<<endl;
@@ -2189,12 +3594,41 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 			}
 	
 			// Update the Covariance Matrix: P = (I - K * H) * P
-			TMatrixD I(5, 5); I.UnitMatrix();
-			P_cov = (I - (K_gain * H_mat)) * P_cov;
+			// 1. Construct Identity Matrix
+			TMatrixD I(5, 5);
+			I.UnitMatrix();
+
+			// 2. Compute (I - K * H)
+			TMatrixD I_minus_KH = I - (K_gain * H_mat);
+
+			// 3. Compute Transpose (I - K * H)^T
+			TMatrixD I_minus_KH_T(TMatrixD::kTransposed, I_minus_KH);
+
+			// 4. Compute First Term: (I - KH) * P * (I - KH)^T
+			TMatrixD P_updated = I_minus_KH * P_cov * I_minus_KH_T;
+
+			// 5. Compute Transpose of K_gain
+			TMatrixD K_gain_T(TMatrixD::kTransposed, K_gain);
+
+			// 6. Compute Second Term: K * R * K^T
+			TMatrixD KRK_T = K_gain * R_noise * K_gain_T;
+
+			// 7. Complete Joseph Form Update
+			P_cov = P_updated + KRK_T;
+
+			// 8. Explicitly Enforce Matrix Symmetry (Numerical Safeguard)
+			for (Int_t ij = 0; ij < 5; ++ij) {
+				for (Int_t jj = ij + 1; jj < 5; ++jj) {
+					Double_t avg = 0.5 * (P_cov(ij, jj) + P_cov(jj, ij));
+					P_cov(ij, jj) = avg;
+					P_cov(jj, ij) = avg;
+				}
+			}
 			if(writeout) cout<<"Updated P_cov values: "<<P_cov(0,0)<<" "<<P_cov(1,1)<<" "<<P_cov(2,2)<<" "<<P_cov(3,3)<<" "<<P_cov(4,4)<<endl;
 	
 			// Increment local chi2 safely using the measurement covariance matrix
 			TMatrixD chi2_increment = TMatrixD(TMatrixD::kTransposed, residual) * S_inv * residual;
+			
 			chi2 += chi2_increment(0,0);
 			
 			// CRITICAL: Push the freshly updated Kalman position and slopes back into gCandidate 
@@ -2225,16 +3659,33 @@ Int_t R3BFragmentFitterChi2S494::FitTrackMomentumBackward(R3BTrackingParticle* p
 			gCandidate->SetMomentum(-p_new_global);  // this is ok; slopes are preserved
 			gCandidate->SetBeta(beta);
 			
-			if(writeout){
+			if(i == 0)
+			{
+				pos_target = pos_new_global;
+				mom_target = p_new_global;
+				beta_target = beta;
+			}
+			
+			if(writeout)
+			{
 				cout<<"Updated candidate position: "<<gCandidate->GetPosition().X()<<" "<<gCandidate->GetPosition().Y()<<" "<<gCandidate->GetPosition().Z()<<endl;
-				cout<<"Updated candidate momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;
+				cout<<"Updated candidate momentum: "<<gCandidate->GetMomentum().X()<<" "<<gCandidate->GetMomentum().Y()<<" "<<gCandidate->GetMomentum().Z()<<endl;				    
 			}				
 		}
 	}
-    		
+
+	gCandidate->SetStartPosition(pos_target);
+	gCandidate->SetStartMomentum(mom_target);
+	gCandidate->SetCharge(abs(gCandidate->GetCharge()));
+	gCandidate->SetStartBeta(beta_target);
+	gCandidate->SetChi2(chi2);
+	gCandidate->Reset();
+								
     cout<<"*** New fragment ****** "<<endl;
     cout<<"*** Charge: "<<gCandidate->GetCharge()<<endl;
     cout<<"*** Position: "<<gCandidate->GetStartPosition().X()<<", "<<gCandidate->GetStartPosition().Y()<<", "<<gCandidate->GetStartPosition().Z()<<endl;
+    cout<<"*** y0geom: "<<ygeom<<endl;
+	cout<<"*** Target true position: "<<x0true<<" "<<y0true<<endl;
     cout<<"*** Momentum: "<<gCandidate->GetStartMomentum().X()<<", "<<gCandidate->GetStartMomentum().Y()<<", "<<gCandidate->GetStartMomentum().Z()<<endl;
     cout<<"*** Beta: "<<gCandidate->GetStartBeta()<<endl;
     cout<<"*** Chi2: "<<chi2<<endl;

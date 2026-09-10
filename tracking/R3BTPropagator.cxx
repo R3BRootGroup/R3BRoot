@@ -287,6 +287,7 @@ Bool_t R3BTPropagator::PropagateToPlaneForward(R3BTrackingParticle* particle,
     Bool_t crossed;
     Bool_t result = false;
     Bool_t writeout = false;
+    //if(particle->GetCharge() == 2.) writeout = true;
     
     TMatrixD F_linear(5, 5);
     TMatrixD F_accumulator(5, 5);
@@ -308,8 +309,8 @@ Bool_t R3BTPropagator::PropagateToPlaneForward(R3BTrackingParticle* particle,
     // if (TMath::Abs((particle->GetPosition() - v1).Dot(norm)) < 1e-6)
     if (TMath::Abs(diff) < 1.e-6)
     {
-        LOG(debug2) << "Already at plane!" << endl;
-        TMatrixD F_unit;
+        if(writeout) cout << "Already at plane!" << endl;
+        TMatrixD F_unit(5, 5);
         F_unit.UnitMatrix();
         P_cov = F_unit * P_cov;
         return kTRUE;
@@ -328,7 +329,7 @@ Bool_t R3BTPropagator::PropagateToPlaneForward(R3BTrackingParticle* particle,
     // Here crossed == 0, as field map starts before the target, fPlane1[0].Z()~ -116cm; if crossed == 1, something is wrong.
     if (crossed)
     {
-        if(writeout) cout<<"In front of glad - should not happen!: "<<particle->GetPosition().Z()<<", "<<particle->GetMomentum().Z()<<endl;
+        if(writeout) cout<<"In front of magnetic field - should not happen!: "<<particle->GetPosition().Z()<<", "<<particle->GetMomentum().Z()<<endl;
           
         if ((v1 - particle->GetPosition()).Mag() < (fPlane1[0] - particle->GetPosition()).Mag())
         {
@@ -507,15 +508,6 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
     // Define the normal to the detector plane (oriented backward toward the target)
     TVector3 norm = ((v2 - v1).Cross(v3 - v1)).Unit(); 
     
-    // Check if the particle is already on the target plane to avoid division by zero
-    if (TMath::Abs((particle->GetPosition() - v1).Dot(norm)) < 1e-6)
-    {
-        TMatrixD F_unit;
-        F_unit.UnitMatrix();
-        P_cov = F_unit * P_cov;
-        return kTRUE;
-    }
-
     TVector3 pos_start = particle->GetPosition();
     TVector3 intersect;
     TVector3 pos_end;
@@ -529,8 +521,18 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
 	F_accumulator.UnitMatrix();
     
     Bool_t writeout = false;
-    //if(abs(particle->GetCharge()) == 2) writeout = true;
-    
+   // if(abs(particle->GetCharge()) == 2) writeout = true;
+
+    // Check if the particle is already on the target plane to avoid division by zero
+    if (TMath::Abs((particle->GetPosition() - v1).Dot(norm)) < 1e-6)
+    {
+        if(writeout) cout << "Already at plane!" << endl;
+        TMatrixD F_unit(5, 5);
+        F_unit.UnitMatrix();
+        P_cov = F_unit * P_cov;
+        return kTRUE;
+    }
+        
     if(writeout) cout << "**** Entered PropagateToPlaneBackward ******" << endl;
     if(writeout) cout<<"norm vector: "<<norm.X()<<" "<<norm.Y()<<" "<<norm.Z()<<endl;
     if(writeout) cout<<"v1 vector: "<<v1.X()<<" "<<v1.Y()<<" "<<v1.Z()<<endl;
@@ -645,6 +647,7 @@ Bool_t R3BTPropagator::PropagateToPlaneBackward(R3BTrackingParticle* particle,
         // If the detector plane resides inside the magnet volume
         if ((v1 - particle->GetPosition()).Mag() < (fPlane1[0] - particle->GetPosition()).Mag())
         {
+			
             if(writeout) cout << "Propagating to detector-plane using RK4 .";
             result = PropagateToPlaneRKBackward(particle, v1, v2, v3, F_accumulator);
             
@@ -895,7 +898,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
     TVector3 intersect;
     Bool_t crossed;
     Bool_t writeout = false;
-   // if(abs(particle->GetCharge()) == 2) writeout = true;
+    //if(abs(particle->GetCharge()) == 6) writeout = true;
     Double_t distance;
 
 	F_accumulator.UnitMatrix();
@@ -924,6 +927,8 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
     Double_t length = 0.;
     Double_t res = 10000.;
     Double_t res_old = 10000.;
+    Double_t byold=0., bynew=0.;
+    Double_t stepsum=0., lengthsum = 0.;
     while (kTRUE)
     {
       	
@@ -943,11 +948,15 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
 		if(writeout) cout<<"Particle position before RK step: "<<particle->GetPosition().X()<<" "<<particle->GetPosition().Y()<<" "<<particle->GetPosition().Z()<<endl;
 		if(writeout) cout<<"Particle momentum before RK step: "<<particle->GetMomentum().X()<<" "<<particle->GetMomentum().Y()<<" "<<particle->GetMomentum().Z()<<endl;
 		if(writeout) cout<<"Particle charge before RK step: "<<particle->GetCharge()<<endl;     
+        if(writeout) cout<<"Particle lenght before RK step: "<<particle->GetLength()<<endl;
         
         length = fFairProp->OneStepRungeKutta(particle->GetCharge(), step, vecRKIn, vecOut);
         
+		lengthsum += length;
+		stepsum += step;
 		
 		Double_t dz_step = vecOut[2] - vecRKIn[2];
+		Double_t dx_step = vecOut[0] - vecRKIn[0];
         
         for (Int_t ii = 0; ii < 7; ii++)
         {
@@ -961,31 +970,40 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
 		Double_t bz = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBz(xyz.X(), xyz.Y(), xyz.Z());
 		TVector3 bf(bx,by,bz);
 		
+		byold = by;
+		
         particle->SetPosition(vecOut);
         particle->SetCosines(&vecOut[3]);
-        particle->AddStep(length);
+        
+		particle->AddStep(length);
         if(writeout) cout<<"RK length: "<<length<<endl; 
 		if(writeout) cout<<"Particle position after RK length: "<<particle->GetPosition().X()<<" "<<particle->GetPosition().Y()<<" "<<particle->GetPosition().Z()<<endl;
 		if(writeout) cout<<"Particle momentum  after RK length: "<<particle->GetMomentum().X()<<" "<<particle->GetMomentum().Y()<<" "<<particle->GetMomentum().Z()<<endl;
 		if(writeout) cout<<"Particle charge  after RK length: "<<particle->GetCharge()<<endl;     
-       
+        if(writeout) cout<<"Particle lenght before RK step: "<<particle->GetLength()<<endl;
+        if(writeout) cout<<"By: "<<by<<endl;
+        
         TVector3 pos_after = particle->GetPosition();
-       
+        bynew = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(pos_after.X(), pos_after.Y(), pos_after.Z());
+		
         // =====================================================================
         // KALMAN MICROSTEPPING DEPLOYMENT WITH NUMERICAL MOMENTUM COUPLING
         // =====================================================================
         
         TVector3 pos_diff = pos_after - pos_before;
         TVector3 pos_def_local = TransformGlobalToLocalPlane(pos_diff, v1, v2, v3);
-
+        if(writeout) cout<<"pos dif after/before in lab: "<<pos_diff.X()<<" "<<pos_diff.Y()<<" "<<pos_diff.Z()<<endl;
+        if(writeout) cout<<"pos dif after/before in loc: "<<pos_def_local.X()<<" "<<pos_def_local.Y()<<" "<<pos_def_local.Z()<<endl;
+        
+        
 		// 1. Core tracking parameters
 		Double_t qOverP_real   = abs(particle->GetCharge()) / mom.Mag();
-		Double_t qOverP_shadow = qOverP_real * 1.01;
+		Double_t qOverP_shadow = qOverP_real * 1.001;
 		Double_t dqOverP       = qOverP_real - qOverP_shadow;
 
 		Double_t vecShadowOut[7];
 
-		Double_t shadow_charge_factor = particle->GetCharge() * 1.01; 
+		Double_t shadow_charge_factor = particle->GetCharge() * 1.001; 
 		fFairProp->OneStepRungeKutta(shadow_charge_factor, step, vecRKShadowIn, vecShadowOut);
 
 		// 2. Extract local spatial step components
@@ -998,13 +1016,16 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
 		// Check if the real particle is moving backward globally (p_z < 0)
 		// If it is, force the shadow vector's magnitude to be negative to keep it pointing upstream!
 		Double_t p_mag_real = particle->GetMomentum().Mag(); // e.g., 12.9 GeV/c
-		Double_t p_mag_shadow = p_mag_real / 1.01; // The correct scalar value for the shadow track
+		Double_t p_mag_shadow = p_mag_real / 1.001; // The correct scalar value for the shadow track
 		Double_t p_mag_signed = p_mag_shadow;
-		if (particle->GetMomentum().Z() < 0 && shadow_mom_global.Z() > 0.) {
-			p_mag_signed = -p_mag_shadow;
-		}		
-		// Scale the shadow vector with the signed magnitude
-		shadow_mom_global = shadow_mom_global.Unit() * (p_mag_signed / 1.01);
+		
+		if (particle->GetMomentum().Z() < 0 && shadow_mom_global.Z() > 0.0) {
+    // Physically reverse the direction vector so it points upstream (z < 0)
+			shadow_mom_global = -shadow_mom_global.Unit() * p_mag_shadow;
+		} 
+		else {
+			shadow_mom_global = shadow_mom_global.Unit() * p_mag_shadow;
+        }
 		TVector3 local_mom_shadow = TransformGlobalToLocalPlane(shadow_mom_global, v1, v2, v3);
 
 		// Compute exact local slopes (u_x = p_x / p_z, u_y = p_y / p_z)
@@ -1021,7 +1042,7 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
 		F_micro.UnitMatrix();
 		F_micro(0, 2) = pos_def_local.Z(); // Local coordinate step delta-z
 		F_micro(1, 3) = pos_def_local.Z();
-
+        
 		if (TMath::Abs(by) > 0.01) 
 		{
 			F_micro(0, 4) = local_pos_delta.X() / dqOverP; 
@@ -1030,7 +1051,8 @@ Bool_t R3BTPropagator::PropagateToPlaneRKBackward(R3BTrackingParticle* particle,
 			F_micro(3, 4) = dSlopeY_dqOverP;
 		}
 
-		// Accumulate the microstep into the total transport matrix chain
+		if (writeout) cout << "PropagateToPlaneRKBackward Det(F_micro) = " << F_micro.Determinant() << endl;
+        // Accumulate the microstep into the total transport matrix chain
 		F_accumulator = F_micro * F_accumulator;
 		
         nStep += 1;
@@ -1207,12 +1229,12 @@ Bool_t R3BTPropagator::PropagateToPlaneRKForward(R3BTrackingParticle* particle,
 
 		// 1. Core tracking parameters
 		Double_t qOverP_real   = particle->GetCharge() / mom.Mag();
-		Double_t qOverP_shadow = qOverP_real * 1.01;
+		Double_t qOverP_shadow = qOverP_real * 1.001;
 		Double_t dqOverP       = qOverP_real - qOverP_shadow;
 
 		Double_t vecShadowOut[7];
 
-		Double_t shadow_charge_factor = particle->GetCharge() * 1.01; 
+		Double_t shadow_charge_factor = particle->GetCharge() * 1.001; 
 		fFairProp->OneStepRungeKutta(shadow_charge_factor, step, vecRKShadowIn, vecShadowOut);
 
 		// 2. Extract local spatial step components
@@ -1223,10 +1245,10 @@ Bool_t R3BTPropagator::PropagateToPlaneRKForward(R3BTrackingParticle* particle,
 		TVector3 local_mom_real = TransformGlobalToLocalPlane(particle->GetMomentum(), v1, v2, v3);			
 		TVector3 shadow_mom_global(vecShadowOut[3], vecShadowOut[4], vecShadowOut[5]); // Rebuild shadow mom
 		Double_t p_mag_real = particle->GetMomentum().Mag(); 
-		Double_t p_mag_shadow = p_mag_real / 1.01; // The correct scalar value for the shadow track
+		Double_t p_mag_shadow = p_mag_real / 1.001; // The correct scalar value for the shadow track
 		
 		// Scale the shadow vector with the signed magnitude
-		shadow_mom_global = shadow_mom_global.Unit() * (p_mag_shadow / 1.01);
+		shadow_mom_global = shadow_mom_global.Unit() * p_mag_shadow ;
 		TVector3 local_mom_shadow = TransformGlobalToLocalPlane(shadow_mom_global, v1, v2, v3);
 
 		// Compute exact local slopes (u_x = p_x / p_z, u_y = p_y / p_z)
@@ -1252,9 +1274,11 @@ Bool_t R3BTPropagator::PropagateToPlaneRKForward(R3BTrackingParticle* particle,
 			F_micro(3, 4) = dSlopeY_dqOverP;
 		}
 
-		// Accumulate the microstep into the total transport matrix chain
+		if (writeout) cout << "PropagateToPlaneRKForward Det(F_micro) = " << F_micro.Determinant() << endl;
+        
+        // Accumulate the microstep into the total transport matrix chain
 		F_accumulator = F_micro * F_accumulator;
- 
+                
         nStep += 1;
 
         crossed = LineIntersectPlane(particle->GetPosition(), particle->GetMomentum(), v1, norm, intersect);

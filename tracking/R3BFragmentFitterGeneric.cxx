@@ -15,8 +15,12 @@
 
 ClassImp(R3BFragmentFitterGeneric)
 
-    R3BFragmentFitterGeneric::R3BFragmentFitterGeneric()
+R3BFragmentFitterGeneric::R3BFragmentFitterGeneric()
+    : fbestCarbonTargetCov(5, 5)
+    , fHasCarbonVertexCov(false)
 {
+    fbestCarbonTargetCov.ResizeTo(5, 5);
+    fbestCarbonTargetCov.Zero();
 }
 
 R3BFragmentFitterGeneric::~R3BFragmentFitterGeneric() {}

@@ -319,8 +319,8 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_py_r = new TH1F("h_py_r", "momentum py right", 1000, -100., 100.);
     fh_pz_r = new TH1F("h_pz_r", "momentum pz right", 2000, 0., 20.);
 
-    fh_Erel = new TH1F("h_Erel", "Erel / MeV", 500, 0., 20);
-    fh_Erel_true = new TH1F("h_Erel_true", "Erel / MeV", 500, 0., 20);
+    fh_Erel = new TH1F("h_Erel", "Erel / MeV", 400, 0., 20);
+    fh_Erel_true = new TH1F("h_Erel_true", "Erel / MeV", 400, 0., 20);
     fh_psum = new TH1F("h_psum", "psum / MeV/c", 500, 16000., 18000.);
     fh_theta = new TH1F("h_theta", "theta / deg", 500, 0., 5);
 
@@ -352,10 +352,12 @@ InitStatus R3BFragmentTrackerS494::Init()
     {
         fh_x_res[i] = new TH1F(Form("h_x_res%d", i), Form("x residual %d for He", i), bins[i], -ranges[i], ranges[i]);
         fh_x_res0[i] = new TH1F(Form("h_x_res0%d", i), Form("x residual0 %d for C", i), bins[i], -ranges[i], ranges[i]);
-        fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d", i), 40, -10., 10.);
+        fh_x_pull[i] = new TH1F(Form("h_x_pull%d", i), Form("x pull %d for He", i), 1000, -10., 10.);
+        fh_x_pull0[i] = new TH1F(Form("h_x_pull0%d", i), Form("x pull %d for C", i), 1000, -10., 10.);
         fh_y_res[i] = new TH1F(Form("h_y_res%d", i), Form("y residual %d for He", i), bins[i], -ranges[i], ranges[i]);
         fh_y_res0[i] = new TH1F(Form("h_y_res0%d", i), Form("y residual0 %d for C", i), bins[i], -ranges[i], ranges[i]);
-        fh_y_pull[i] = new TH1F(Form("h_y_pull%d", i), Form("ypull %d", i), 40, -10., 10.);
+        fh_y_pull[i] = new TH1F(Form("h_y_pull%d", i), Form("ypull %d for He", i), 1000, -10., 10.);
+        fh_y_pull0[i] = new TH1F(Form("h_y_pull0%d", i), Form("ypull %d for C", i), 1000, -10., 10.);
     }
 
     fh_xy_target = new TH2F("h_xy_target_track", "xy target track ", 200, -1, 1, 200, -1, 1);
@@ -370,10 +372,15 @@ InitStatus R3BFragmentTrackerS494::Init()
     fh_yC_vs_yC_target->GetYaxis()->SetTitle("y_dreisatz / cm");
     fh_yC_vs_yC_target->GetXaxis()->SetTitle("y_target / cm");
 
-    fh_yC_vs_yHe_target_geom =
-        new TH2F("h_yC_vs_yHe_target_geom", "target yHe_dreisatz vs yC_dreisatz ", 200, -10, 10, 200, -10, 10);
-    fh_yC_vs_yHe_target_geom->GetYaxis()->SetTitle("y / cm");
-    fh_yC_vs_yHe_target_geom->GetXaxis()->SetTitle("y / cm");
+    fh_yC_vs_yHe_target =
+        new TH2F("h_yC_vs_yHe_target", "target yC_ vs yHe ", 200, -2, 2, 200, -2, 2);
+    fh_yC_vs_yHe_target->GetYaxis()->SetTitle("yC / cm");
+    fh_yC_vs_yHe_target->GetXaxis()->SetTitle("yHe / cm");
+
+    fh_xC_vs_xHe_target =
+        new TH2F("h_xC_vs_xHe_target", "target xC_ vs xHe ", 200, -2, 2, 200, -2, 2);
+    fh_xC_vs_xHe_target->GetYaxis()->SetTitle("xC / cm");
+    fh_xC_vs_xHe_target->GetXaxis()->SetTitle("xHe / cm");
 
     fh_dxdy = new TH2F("h_dxdy_track_MC", "dxdy track vs MC", 200, -1, 1, 200, -1, 1);
     fh_dxdy->GetXaxis()->SetTitle("xMC-xtarget / cm");
@@ -753,7 +760,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     R3BTrackingDetector* fi33 = fDetectorsRight->GetByName("fi33");
     R3BTrackingDetector* tof = fDetectorsLeft->GetByName("tofd");
 
-
+    fFitter->ResetVertexCovariance();
+    
     if (fPairs)
     {
         if (tof->hits.size() < 2)
@@ -771,7 +779,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     }
 
-    cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
+    //cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
         if (tof->hits.size() > 0 && debug_loopout)
     {
         cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
@@ -865,6 +873,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t pz0He = 0.0;
     Double_t pHe = 0.0;
     Double_t massHe = 0.0;
+    Double_t y0tracked_He = 0., x0tracked_He = 0.;
 
     Double_t betaC = 0.0;
     Double_t x0C = 0.0;
@@ -875,6 +884,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
     Double_t pz0C = 0.0;
     Double_t pC = 0.0;
     Double_t massC = 0.0;
+    Double_t y0tracked_C = 0., x0tracked_C = 0.;
 
     Double_t betaO = 0.0;
     Double_t x0O = 0.0;
@@ -1211,7 +1221,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
         if (debug_loopout)
             cout << "********** LOOP STEP: " << iretrack << endl;
 
-        R3BTrackingParticle* bestcandidate;
+        R3BTrackingParticle* bestcandidate = nullptr;
 
         if (iretrack == 1)
         {
@@ -1309,12 +1319,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
             if (iretrack == 0)
             {
-                
-                // y0 = 0.0;
-                // x0 = x0C;
-                // y0 = y0C;
+ 
                if(l < 2){
-				   x0 = 0.0;//x0C;//0.0;
+				   y0 = 0.0;
+				   x0 = 0.0;
 				   test_x_min = x0;//-1.2;//x0;//-1.2;
 				   test_x_max = x0;//1.2;// 1.2;
 				   test_x_step = (test_x_max-test_x_min)/6.;
@@ -1504,10 +1512,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if (ifi32 >= 0)
                             fh_eloss_fi32_mc->Fill(1000.0 * fi32->hits.at(ifi32)->GetEloss()); // MeV
 
+						if (debug_loopin) cout<<"Fi32 hit: "<<fi32->hits.at(ifi32)->GetEloss()<<" "<<
+						fi32->hits.at(ifi32)->GetX()<<" "<<ifi32<<" "<<fi32->free_hit[ifi32]<<endl;
                         if ((ifi32 >= 0 && !fi32->free_hit[ifi32]) ||
                             charge_requested != fi32->hits.at(ifi32)->GetEloss() ||
                             (l == 2 && std::abs(det_hit_xC[5] - fi32->hits.at(ifi32)->GetX()) <
-                                           0.1060)) // if the hit was used already, continue
+                                           0.1024)) // if the hit was used already, continue
                         {
                             if (debug_loopin)
                                 cout << "Fi32 hit already used or not correct charge " << charge_requested << ", "
@@ -1519,11 +1529,13 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         {
                             if (ifi30 >= 0)
                                 fh_eloss_fi30_mc->Fill(1000.0 * fi30->hits.at(ifi30)->GetEloss()); // MeV
-
+							if (debug_loopin) cout<<"Fi30 hit: "<<fi30->hits.at(ifi30)->GetEloss()<<" "<<
+							fi30->hits.at(ifi30)->GetX()<<" "<<ifi30<<" "<<fi30->free_hit[ifi30]<<endl;
+                            
                             if ((ifi30 >= 0 && !fi30->free_hit[ifi30]) ||
                                 charge_requested != fi30->hits.at(ifi30)->GetEloss() ||
                                 (l == 2 && std::abs(det_hit_xC[3] - fi30->hits.at(ifi30)->GetX()) <
-                                               0.1060)) // if the hit was used already, continue
+                                               0.1034)) // if the hit was used already, continue
                             {
                                 if (debug_loopin)
                                     cout << "Fi30 hit already used or not correct charge " << charge_requested << ", "
@@ -1535,11 +1547,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             {
                                 if (ifi23b >= 0)
                                     fh_eloss_fi23b_mc->Fill(1000.0 * fi23b->hits.at(ifi23b)->GetEloss()); // MeV
+								if (debug_loopin) cout<<"Fi23b hit: "<<" "<<
+								fi23b->hits.at(ifi23b)->GetY()<<" "<<ifi23b<<" "<<fi23b->free_hit[ifi23b]<<endl;
+							
                                 if ((l > 0 && abs(fi23b->hits.at(ifi23b)->GetY()) < fyfibcut) ||
                                     (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                     (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                                 abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
-                                                    dfib)) || abs(fi23b->hits.at(ifi23b)->GetY()) > 4.) // if the hit was used already, continue
+                                                    dfib))) // if the hit was used already, continue
                                 {
                                     if (debug_loopin)
                                         cout << "left - Fi23b hit : " << l << "; " << fi23b->hits.at(ifi23b)->GetY()
@@ -1558,7 +1573,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     (postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
                                     (1. + fslope * ltofd / (z_tp - pos23b.Z()));
                                 y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
-                                //y0 = y0C;
+                              //  y0 = y0C;
+                               // y0 = 0.;
 
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
@@ -1570,6 +1586,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                 {
                                     if (ifi23a >= 0)
                                         fh_eloss_fi23a_mc->Fill(1000.0 * fi23a->hits.at(ifi23a)->GetEloss()); // MeV
+									if (debug_loopin) cout<<"Fi23a hit: "<<" "<<
+									fi23a->hits.at(ifi23a)->GetX()<<" "<<ifi23a<<" "<<fi23a->free_hit[ifi23a]<<endl;
+								
                                     if ((l > 0 && abs(fi23a->hits.at(ifi23a)->GetX()) < fxfibcut) ||
                                         (l < 2 && ifi23a >= 0 && !fi23a->free_hit[ifi23a]) ||
                                         (l == 2 &&
@@ -1619,9 +1638,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												}
 												else if (l == 2)
 												{
-													px0_cand = 0.;
-													py0_cand = 0.;
-													pz0_cand = p0 ;
+													px0_cand = 0.;//-pxmem;//0.;
+													py0_cand = 0.;//-pymem;// 0.;
+													pz0_cand = sqrt(p0*p0 - px0_cand*px0_cand - py0_cand*py0_cand);
 													Double_t ptot_cand =
 														sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
 													beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
@@ -1667,11 +1686,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												Int_t status = 10;
 												if (l == 2) // He
 												{
-													status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
 												}
 												else // C
 												{
-													status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
 												}
 												if (debug_loopin)
 													cout << " Chi: " << candidate->GetChi2()
@@ -1765,7 +1787,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         if ((ifi33 >= 0 && !fi33->free_hit[ifi33]) ||
                             charge_requested != fi33->hits.at(ifi33)->GetEloss() ||
                             (l == 2 && std::abs(det_hit_xC[6] - fi33->hits.at(ifi33)->GetX()) <
-                                           0.1060)) // if the hit was used already, continue
+                                           2.*0.0514)) // if the hit was used already, continue
                         {
                             if (debug_loopin)
                                 cout << "Fi33 hit already used or not correct charge " << charge_requested << ", "
@@ -1780,7 +1802,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             if ((ifi31 >= 0 && !fi31->free_hit[ifi31]) ||
                                 charge_requested != fi31->hits.at(ifi31)->GetEloss() ||
                                 (l == 2 && std::abs(det_hit_xC[4] - fi31->hits.at(ifi31)->GetX()) <
-                                               0.1060)) // if the hit was used already, continue
+                                               2.*0.05165)) // if the hit was used already, continue
                             {
                                 if (debug_loopin)
                                     cout << "Fi31 hit already used or not correct charge " << charge_requested << ", "
@@ -1797,7 +1819,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                     (l < 2 && ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                     (l == 2 && ((ifi23b >= 0 && !fi23b->free_hit[ifi23b]) ||
                                                 abs(det_hit_yC[2] - fi23b->hits.at(ifi23b)->GetY()) <
-                                                    dfib)) || abs(fi23b->hits.at(ifi23b)->GetY()) > 4.) // if the hit was used already, continue
+                                                    dfib)) ) // if the hit was used already, continue
                                 {
                                     if (debug_loopin)
                                         cout << "right - Fi23b hit : " << l << "; " << fi23b->hits.at(ifi23b)->GetY()
@@ -1817,7 +1839,8 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 										(postofd.Y() - foffset + fslope * ltofd * pos23b.Y() / (z_tp - pos23b.Z())) /
 										(1. + fslope * ltofd / (z_tp - pos23b.Z()));
 									y0 = pos23b.Y() - pos23b.Z() * (y_tp - pos23b.Y()) / (z_tp - pos23b.Z());
-									//y0 = y0C;								
+									//y0 = y0C;	
+									//y0 = 0.;							
                                 // reject fib23b hits that don't correspond to tofdy:
                                 if (abs(y0) > 1.4)
                                 {
@@ -1878,9 +1901,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												}
 												else if (l == 2)
 												{
-													px0_cand = 0.;
-													py0_cand = 0.;
-													pz0_cand = p0;
+													px0_cand = 0.;//-pxmem;//0.;
+													py0_cand = 0.;//-pymem;// 0.;
+													pz0_cand = sqrt(p0*p0 - px0_cand*px0_cand - py0_cand*py0_cand);
 													Double_t ptot_cand =
 														sqrt(px0_cand * px0_cand + py0_cand * py0_cand + pz0_cand * pz0_cand);
 													beta0_cand = sqrt(1.0 / (1.0 + (m0 / ptot_cand) * (m0 / ptot_cand)));
@@ -1929,12 +1952,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												Int_t status = 10;
 												if (l == 2) // He
 												{
-													status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
 												}
 												else // C
 												{
-													// status = fFitter->FitTrackBackward2D(candidate, fDetectors);
-													status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
+													// status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
+													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
 												}
 												if (debug_loopin)
 													cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "
@@ -2083,9 +2108,9 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                         pChi2 = (psum_cand - ps) * (psum_cand - ps) / (ps * ps * 0.01 * 0.01);
 
                         if(iretrack == 1) pChi2 = 0.;
-                       // parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
+                        //parChi2 = sqrt(pChi2 * pChi2 + xChi2 * xChi2);
 
-                        parChi2 = xChi2;
+                         parChi2 = xChi2;
 
                         if (debug_loopout)
                         {
@@ -2315,6 +2340,10 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     zmem = bestcandidate->GetStartPosition().Z();
                     px0_beam_mem = bestcandidate->GetBeamMomentum().X();
                     py0_beam_mem = bestcandidate->GetBeamMomentum().Y();
+                    TMatrixD carbon_P_cov = bestcandidate->GetTargetCovariance();
+                    //cout<<"Best candidate P_Cov: "<<carbon_P_cov(0,0)<<" "<<carbon_P_cov(1,1)<<" "<<
+                    //carbon_P_cov(2,2)<<" "<<carbon_P_cov(3,3)<<" "<<carbon_P_cov(4,4)<<endl;
+                    fFitter->SetCarbonTargetCovariance(carbon_P_cov);
                     
                     pCx = bestcandidate->GetStartMomentum().X() * 1000.0;
                     pCy = bestcandidate->GetStartMomentum().Y() * 1000.0;
@@ -2457,6 +2486,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 if (iretrack == iretrack_max)
                 {
+					if(l == 1){
+						y0tracked_C = bestcandidate->GetStartPosition().Y();
+						x0tracked_C = bestcandidate->GetStartPosition().X();
+					}
+					if(l == 2){
+						y0tracked_He = bestcandidate->GetStartPosition().Y();
+						x0tracked_He = bestcandidate->GetStartPosition().X();
+					}
                     fh_A_reco2->Fill(mass_check); // bestcandidate->GetMass() / amu);
                     fh_A_overZ->Fill(AoverZ, Charge);
                     if (l == 1)
@@ -2573,15 +2610,27 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                 //  cout<<"***************** FINAL PROPAGATION"<<endl;
                 // Double_t By_sum = 0.;
+                //gSetup->GetArray().size()
+                //TMatrixD P_cov_tmp(5,5); P_cov_tmp.Zero();
                 for (auto const& det : fDetectors->GetArray())
                 {
+                    
+                    R3BHit* hit = nullptr;
+                    Int_t hitIndex = bestcandidate->GetHitIndexByName(det->GetDetectorName().Data());
+                    //cout<<"hitIndex: "<<hitIndex<<endl;
+                    
+                    if (hitIndex >= 0)
+                        hit = fDetectors->GetHit(det->GetDetectorName().Data(), hitIndex);
+                    else continue;
+                    
                     if (debug_loopout)
                         cout << "Best track at detector: " << det->GetDetectorName() << endl;
                     if (kTarget != det->section)
                     {
                         if (debug_loopout)
                             cout << "Propagate to " << det->GetDetectorName() << endl;
-                        fPropagator->PropagateToDetector(bestcandidate, det);
+                      // fPropagator->PropagateToDetectorForward(bestcandidate, det, P_cov_tmp);
+                      
                     }
 
                     if (det->GetDetectorName().EqualTo("fi23a"))
@@ -2626,7 +2675,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 
                     if (det->GetDetectorName().EqualTo("fi33"))
                     { // fi33
-                        Double_t eloss = det->GetEnergyLoss(bestcandidate);
+                       Double_t eloss = det->GetEnergyLoss(bestcandidate);
                         if (iretrack == iretrack_max)
                             fh_eloss_fi33->Fill(eloss);
                         iDet = 6;
@@ -2636,10 +2685,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     { // tofd
                         iDet = 7;
                     }
-
+					//cout<<"iDet, eloss: "<<iDet<<" "<<det->GetEnergyLoss(bestcandidate)<<endl;
+					//cout<<"Beta before passing through: "<<bestcandidate->GetBeta()<<endl;
                     if (fEnergyLoss)
                     {
-                        if (kTof != det->section)
+                       // we have to go through 1/2 of target, as FairRunSim does it
                         {
                             Double_t weight = 1.;
                             if (kTarget == det->section)
@@ -2649,20 +2699,33 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             bestcandidate->PassThroughDetector(det, weight);
                         }
                     }
+					//cout<<"Beta after passing through: "<<bestcandidate->GetBeta()<<endl;
                     //   Double_t posX = bestcandidate->GetPosition().X();
                     //   Double_t posY = bestcandidate->GetPosition().Y();
                     //   Double_t posZ = bestcandidate->GetPosition().Z();
 
                     //   Double_t field = ((R3BGladFieldMap*)FairRunAna::Instance()->GetField())->GetBy(posX, posY,
                     //   posZ); By_sum = By_sum + field;
-
-                    // Convert global track coordinates into local on the det plane
-                    det->GlobalToLocal(bestcandidate->GetPosition(), x_l[iDet], y_l[iDet]);
-                    R3BHit* hit = nullptr;
-                    Int_t hitIndex = bestcandidate->GetHitIndexByName(det->GetDetectorName().Data());
-                    if (hitIndex >= 0)
-                        hit = fDetectors->GetHit(det->GetDetectorName().Data(), hitIndex);
-
+               
+                    // Get residues:
+                    auto res = bestcandidate->GetResidual(det->GetDetectorName());
+                    Double_t xres = 0., yres = 0., xpull = 0., ypull = 0.;
+                    if (det->res_x > 1e-6)
+                    {
+						xres = res.res_x;
+						x_l[iDet] = hit->GetX() - xres;
+						xpull = res.pull_x; // xres / det->res_x;
+						//cout<<"xres, xpull: "<<xres<<", "<<x_l[iDet]<<" "<<xpull<<endl;
+					}
+                    if (det->res_y > 1e-6)
+                    {
+						yres = res.res_y;
+						y_l[iDet] = hit->GetY() - yres;
+						ypull = res.pull_y; //yres / det->res_y
+						//cout<<"yres, ypull: "<<yres<<", "<<y_l[iDet]<<" "<<ypull<<endl;
+					}
+                   
+                    
                     if (hit)
                     {
                         det_hit_x[iDet] = hit->GetX();
@@ -2777,17 +2840,20 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             fh_pyC_vs_pyHe->Fill(pCy, bestcandidate->GetStartMomentum().Y() * 1000.0);
                             fh_yC_vs_yHe_Tofd_exp->Fill(yCexp, det_hit_y[iDet]);
                             fh_xC_vs_xHe_Tofd_exp->Fill(det_hit_xC[iDet], det_hit_x[iDet]);
-                            fh_yC_vs_yHe_target_geom->Fill(ygeomC, ygeom);
+                            fh_yC_vs_yHe_target->Fill(y0tracked_He, y0tracked_C);
+                            fh_xC_vs_xHe_target->Fill(x0tracked_He, x0tracked_C);
                         }
                     }
 
                     if (hit && det->res_x > 1e-6)
                     {
-                        Double_t xres = x_l[iDet] - det_hit_x[iDet];
-                        if (TMath::Abs(x_l[iDet] - det_hit_x[iDet]) < det->res_x && iDet > 1)
+                        //Double_t xres = x_l[iDet] - det_hit_x[iDet];
+                        
+                        
+                      /*  if (TMath::Abs(x_l[iDet] - det_hit_x[iDet]) < det->res_x && iDet > 1)
                         {
                             xres = 0.0;
-                        }
+                        }*/
                         //  if (iDet == 1)
                         if (debug_loopout)
                         {
@@ -2810,8 +2876,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             fh_x_res[iDet]->Fill(xres);
                         if (l < 2)
                             fh_x_res0[iDet]->Fill(xres);
-                        if (iretrack == iretrack_max)
-                            fh_x_pull[iDet]->Fill(xres / det->res_x);
+                       // if (iretrack == iretrack_max)
+                        if (l == 2)
+                            fh_x_pull[iDet]->Fill(xpull);
+                        if (l < 2)
+                            fh_x_pull0[iDet]->Fill(xpull);
                         if (iDet == 7)
                         {
                             if (iAoverZ == 2 && abs(det_hit_x[1]) > fxfibcut && abs(det_hit_y[2]) > fyfibcut &&
@@ -2827,11 +2896,12 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                     }
                     if (hit && det->res_y > 1e-6)
                     {
-                        Double_t yres = y_l[iDet] - det_hit_y[iDet];
-                        if (TMath::Abs(y_l[iDet] - det_hit_y[iDet]) < det->res_y && iDet > 2)
+                        //Double_t yres = det_hit_y[iDet] - y_l[iDet];
+                                                
+                    /*    if (TMath::Abs(y_l[iDet] - det_hit_y[iDet]) < det->res_y && iDet > 2)
                         {
                             yres = 0.;
-                        }
+                        }*/
 
                         if (debug_loopout)
                             cout << "For charge: " << charge_requested
@@ -2839,7 +2909,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                                  << bestcandidate->GetPosition().Y() << "  " << bestcandidate->GetPosition().Z()
                                  << endl;
 
-                        if (debug_loopout)
+                       if (debug_loopout)
                             cout << "Residuals y - iDet: " << iDet << ", Det: " << det->GetDetectorName().Data()
                                  << ", tracked local-y:  " << y_l[iDet] << ", local hit_y: " << det_hit_y[iDet]
                                  << ", dev: " << yres << endl;
@@ -2850,8 +2920,11 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
                             fh_y_res[iDet]->Fill(yres);
                         if (l < 2)
                             fh_y_res0[iDet]->Fill(yres);
-                        if (iretrack == iretrack_max)
-                            fh_y_pull[iDet]->Fill(yres / det->res_y);
+                        //if (iretrack == iretrack_max)
+                        if(l == 2) 
+                            fh_y_pull[iDet]->Fill(ypull);
+                        if(l < 2) 
+                            fh_y_pull0[iDet]->Fill(ypull);
                         if (iDet == 7 && (iretrack == iretrack_max))
                         {
                             if (iAoverZ == 2 && abs(det_hit_x[1]) > fxfibcut && abs(det_hit_y[2]) > fyfibcut)
@@ -3147,7 +3220,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << ", iretrack: "<<iretrack<<endl;
             cout << "pCx, pCy: "<< p12C.X()<<", "<<p12C.Y()<<endl;
             cout << "pHex, pHey: "<< p4He.X()<<", "<<p4He.Y()<<endl;
-            cout<<"pbeam_mem: "<<px0_beam_mem*1.e3<<" "<<py0_beam_mem*1.e3<<" "<<psum<<endl;
+            cout<<"theta26: "<<theta_26<<endl;
             cout<<"MC target: "<<x0C <<"; "<<y0C<<endl;
 
             if (sqrt(minChi2 * minChi2 + minChi2_12C * minChi2_12C) < 10.)
@@ -3173,7 +3246,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             cout << "pC: " << p12C.Mag() << ", pHe: " << p4He.Mag() << ", iretrack: "<<iretrack<<endl;
             cout << "pCx, pCy: "<< p12C.X()<<", "<<p12C.Y()<<endl;
             cout << "pHex, pHey: "<< p4He.X()<<", "<<p4He.Y()<<endl;
-            cout<<"pbeam_mem: "<<px0_beam_mem*1.e3<<" "<<py0_beam_mem*1.e3<<" "<<psum<<endl;
+            cout<<"theta26: "<<theta_26<<endl;
             cout<<"MC target: "<<x0C <<"; "<<y0C<<endl;
             cout << " " << endl;
 
@@ -3316,9 +3389,11 @@ void R3BFragmentTrackerS494::Finish()
             fh_x_res[i]->Write();
             fh_x_res0[i]->Write();
             fh_x_pull[i]->Write();
+            fh_x_pull0[i]->Write();
             fh_y_res[i]->Write();
             fh_y_res0[i]->Write();
             fh_y_pull[i]->Write();
+            fh_y_pull0[i]->Write();
         }
         fh_vz_res->Write();
         fh_beta_res->Write();
@@ -3414,7 +3489,8 @@ void R3BFragmentTrackerS494::Finish()
         fh_ptot_vs_ntrack->Write();
         fh_y0_vs_ytrack->Write();
         fh_yC_vs_yC_target->Write();
-        fh_yC_vs_yHe_target_geom->Write();
+        fh_yC_vs_yHe_target->Write();
+        fh_xC_vs_xHe_target->Write();
         fh_beam_py_vs_px->Write();
         fh_beam_px_vs_x0->Write();
         fh_beam_py_vs_y0->Write();

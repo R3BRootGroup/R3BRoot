@@ -27,6 +27,7 @@ R3BTrackingParticle::R3BTrackingParticle()
     , fLength(0.)
     , fChi2(0.)
     , fBeamMomentum(0.,0.,17.391)
+    , fTargetCov(5,5)
 {
 }
 
@@ -52,6 +53,7 @@ R3BTrackingParticle::R3BTrackingParticle(Double_t charge,
     , fLength(0.)
     , fChi2(0.)
     , fBeamMomentum(px_beam, py_beam, 17.391)
+    , fTargetCov(5,5)
 {
 }
 

@@ -14,11 +14,14 @@
 #ifndef R3B_TRACKING_PARTICLE
 #define R3B_TRACKING_PARTICLE
 
-#include "TMath.h"
-#include "TObject.h"
-#include "TVector3.h"
-#include <utility>
+#include "TString.h"
+#include <map>
 #include <vector>
+#include <utility>
+#include "TObject.h"
+#include "TMath.h"
+#include "TVector3.h"
+#include "TMatrixD.h"
 
 class R3BTrackingDetector;
 
@@ -40,6 +43,40 @@ class R3BTrackingParticle : public TObject
                         Double_t py_beam);
 
     virtual ~R3BTrackingParticle();
+    
+    struct DetectorResidual {
+		Double_t res_x;
+		Double_t res_y;
+		Double_t pull_x;
+		Double_t pull_y;
+	};
+
+	std::map<TString, DetectorResidual> fResiduals;
+
+	void SetResidual(const TString& detName, Double_t rx, Double_t ry, Double_t px=0, Double_t py=0) {
+		fResiduals[detName] = {rx, ry, px, py};
+	}
+
+	DetectorResidual GetResidual(const TString& detName) const {
+		auto it = fResiduals.find(detName);
+		if (it != fResiduals.end()) return it->second;
+		return {0., 0., 0., 0.};
+	}
+	
+    // Setter: Save the 5x5 covariance matrix into this particle instance
+    void SetTargetCovariance(const TMatrixD& cov) {
+        if (cov.GetNrows() == 5 && cov.GetNcols() == 5) {
+            fTargetCov = cov;
+        }
+    }
+    // Getter: Retrieve the 5x5 covariance matrix from this particle
+    const TMatrixD& GetTargetCovariance() const {
+        return fTargetCov;
+    }
+    // Helper getter: Check if this particle has a valid non-zero covariance stored
+    bool HasTargetCovariance() const {
+        return (fTargetCov(0,0) > 0.0);
+    }
 
     Double_t GetCharge() const { return fCharge; }
     void SetCharge(Double_t charge) { fCharge = charge; }
@@ -151,6 +188,8 @@ class R3BTrackingParticle : public TObject
     TVector3 fStartMomentum;
     Double_t fStartBeta;
     Double_t fMass;
+    // Target Covariance Matrix Storage ---
+    TMatrixD fTargetCov; //! Do not stream to disk (transient memory for tracking)
 
     TVector3 fPosition;
     TVector3 fMomentum;

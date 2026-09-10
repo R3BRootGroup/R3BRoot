@@ -25,7 +25,7 @@
 #include <TLorentzVector.h>
 #include <cstdlib>
 #include "Rtypes.h"
-
+#include "TMatrixD.h"    
 #include <TVector3.h>
 class TClonesArray;
 class R3BFieldPar;
@@ -199,8 +199,6 @@ class R3BFragmentTrackerS494 : public FairTask
 	Double_t beta_beam = 0.7593209;           
     
     Double_t dfib = 0.084;
-    Double_t cut_yfib23 = 0.21; //0.1512
-    Double_t cut_xfib23 = 0.21; //0.1512
     
 	Double_t x_l[8];
     Double_t y_l[8];
@@ -252,9 +250,11 @@ class R3BFragmentTrackerS494 : public FairTask
     TH1F* fh_x_res[8];
     TH1F* fh_x_res0[8];
     TH1F* fh_x_pull[8];
+    TH1F* fh_x_pull0[8];
     TH1F* fh_y_res[8];
     TH1F* fh_y_res0[8];
     TH1F* fh_y_pull[8];
+    TH1F* fh_y_pull0[8];
     TH1F* fh_A_reco1;
     TH1F* fh_A_reco2;
     TH1F* fh_psum_res;
@@ -358,7 +358,8 @@ class R3BFragmentTrackerS494 : public FairTask
     TH2F* fh_ptot_vs_ntrack;
     TH2F* fh_y0_vs_ytrack;
     TH2F* fh_yC_vs_yC_target;
-    TH2F* fh_yC_vs_yHe_target_geom;
+    TH2F* fh_yC_vs_yHe_target;
+    TH2F* fh_xC_vs_xHe_target;
     TH2F* fh_xFi23a_tofd_track;
     TH2F* fh_chiX_vs_chiP;
     TH2F* fh_beam_py_vs_px;

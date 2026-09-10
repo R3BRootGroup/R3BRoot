@@ -25,27 +25,33 @@
 #include "TMatrixDSym.h" 
 #include "TVectorD.h"    
 
+class R3BTrackingParticle;
+class R3BTrackingSetup;
+class R3BTPropagator;
+
 class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
 {
   public:
     R3BFragmentFitterChi2S494();
-    ~R3BFragmentFitterChi2S494();
-
-    void Init(R3BTPropagator* prop = nullptr, Bool_t energyLoss = kTRUE);
-
-    Int_t FitTrack(R3BTrackingParticle*, R3BTrackingSetup*);
+    virtual ~R3BFragmentFitterChi2S494();
     
-    Int_t FitTrackBeta(R3BTrackingParticle*, R3BTrackingSetup*);
+    virtual void Init(R3BTPropagator* prop = nullptr, Bool_t energyLoss = kTRUE);
 
-    Int_t FitTrackMomentumForward(R3BTrackingParticle*, R3BTrackingSetup*);
+    virtual Int_t FitTrack(R3BTrackingParticle*, R3BTrackingSetup*);
     
-    Int_t FitTrackMomentumForwardMinuit(R3BTrackingParticle*, R3BTrackingSetup*);
-    
-    Int_t FitTrackMomentumBackward(R3BTrackingParticle*, R3BTrackingSetup*);
+    virtual Int_t FitTrackBeta(R3BTrackingParticle*, R3BTrackingSetup*);
 
-    Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*);
+    virtual Int_t FitTrackMomentumForward(R3BTrackingParticle*, R3BTrackingSetup*);
+
+    virtual Int_t FitTrackMomentumKalmanFilter(R3BTrackingParticle*, R3BTrackingSetup*);
+     
+    virtual Int_t FitTrackMomentumForwardMinuit(R3BTrackingParticle*, R3BTrackingSetup*);
     
-    Int_t FitTrackBackward2D(R3BTrackingParticle*, R3BTrackingSetup*);
+    virtual Int_t FitTrackMomentumBackward(R3BTrackingParticle*, R3BTrackingSetup*);
+
+    virtual Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*);
+    
+    virtual Int_t FitTrackBackward2D(R3BTrackingParticle*, R3BTrackingSetup*);
 
     Double_t TrackFragment(R3BTrackingParticle* particle,
                            Bool_t energyLoss,
@@ -64,6 +70,34 @@ class R3BFragmentFitterChi2S494 : public R3BFragmentFitterGeneric
     ROOT::Math::Minimizer* fMinimum;
     ROOT::Math::Minimizer* minimum_m;
     ROOT::Math::Minimizer* minimum_g;
+    
+    /**
+	 * Safely inverts a square TMatrixD in-place.
+	 * 
+	 * @param mat Matrix to be inverted in-place.
+	 * @param detThreshold Minimum absolute determinant value to consider non-singular (default 1e-12).
+	 * @return true if inversion succeeded and matrix is valid, false if singular/invalid.
+	 */
+	bool SafeInvertMatrix(TMatrixD& mat, Double_t detThreshold = 1e-12)
+	{
+		// Quick check: Matrix must be square
+		if (mat.GetNrows() != mat.GetNcols() || mat.GetNrows() == 0) {
+			return false;
+		}
+
+		Double_t det = 0.0;
+		
+		// ROOT inverts in-place and stores determinant in 'det'
+		mat.Invert(&det);
+
+		// Guard against zero, NaN, Inf, or near-singular determinants
+		if (std::isnan(det) || std::isinf(det) || std::abs(det) < detThreshold) {
+			return false;
+		}
+
+		return true;
+	}
+    
     R3BTPropagator* fPropagator;
    	Double_t amu = 0.931494028;   // Gev/c**2
     TVector3 pinv;

@@ -301,10 +301,12 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_chiy_vs_chix_nc;
     TH2F* fh_chiy_vs_chix;
     TH2F* fh_phibccm_vs_phi16O;
-    TH2F* fh_psum_vs_theta26_nc;
+    TH2F* fh_Erel_vs_theta26_nc;
     TH2F* fh_Erel_vs_psum;
     TH2F* fh_phiMC_bc_cm_polar;
     TH2F* fh_thetacm_vs_Erel;
+    TH2F* fh_phibccm_vs_theta26_nc;
+    TH2F* fh_phibccm_vs_theta26;
 
     TH1F* fh_dx;
     TH1F* fh_dy;
@@ -340,6 +342,10 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_p_p;
     TH2F* fh_Erel_vs_phibcMC;
     TH2F* fh_Erel_vs_event;  
+    TH2F* fh_thetax_px_simu;
+    TH2F* fh_thetay_py_simu;
+    TH2F* fh_thetax_py_simu;
+    TH2F* fh_thetay_px_simu;
     
     TH2F* fh_thetax_px;
     TH2F* fh_thetay_py;
@@ -347,7 +353,7 @@ class R3BGlobalAnalysisS494 : public FairTask
     TH2F* fh_thetay_px;
     
     TH2F* fh_pHe_vs_theta26;
-    TH2F* fh_psum_vs_theta26;
+    TH2F* fh_Erel_vs_theta26;
     
     TH2F* fh_theta26_vs_chi;  
     TH2F* fh_Erel_vs_chi; 
@@ -399,6 +405,9 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH2F* fh_ErelB_vs_theta16O;
 	TH2F* fh_Erel_vs_theta16O_3He12C;
 	TH2F* fh_Erel_vs_thetaMC;
+	TH2F* fh_Erel_vs_thetaMC_nc;
+	TH2F* fh_phibccm_vs_thetaMC;
+	TH2F* fh_phibccm_vs_thetaMC_nc;
 	TH2F* fh_Erel_vs_y0;
 	TH2F* fh_Erel_vs_x0;
 	TH2F* fh_Erel_vs_yfi23;
