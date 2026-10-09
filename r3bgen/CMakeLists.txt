@@ -33,8 +33,8 @@ set(INCLUDE_DIRECTORIES
     ${R3BROOT_SOURCE_DIR}/field ${R3BROOT_SOURCE_DIR}/generators ${R3BROOT_SOURCE_DIR}/r3bgen
     ${R3BROOT_SOURCE_DIR}/r3bdata ${Geant4_INCLUDE_DIRS})
 
-include_directories(${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories(${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES ${ROOT_LIBRARY_DIR} ${FairLogger_LIBDIR} ${FAIRROOT_LIBRARY_DIR}
                      ${Geant4_LIBRARY_DIR})
@@ -71,16 +71,38 @@ change_file_extension(*.cxx *.h HEADERS "${SRCS}")
 
 set(LINKDEF R3BGenLinkDef.h)
 set(LIBRARY_NAME R3BGen)
-set(DEPENDENCIES
-    FairTools
-    Field
-    Gen
-    R3BData
-    G4materials
-    Boost::iostreams
-    Boost::filesystem)
+#set(DEPENDENCIES
+#    FairTools
+#    Field
+#    Gen
+#    R3BData
+#    )
 
-generate_library()
+set(DEPENDENCIES
+    Field
+    R3BData
+    )
+#generate_library()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES}
+    PRIVATE_DEPENDENCIES
+    Geant4::G4materials
+    Boost::iostreams
+    Boost::filesystem
+)
 
 # Testing
 add_subdirectory(test)

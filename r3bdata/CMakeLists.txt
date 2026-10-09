@@ -21,42 +21,40 @@ set(SYSTEM_INCLUDE_DIRECTORIES ${SYSTEM_INCLUDE_DIRECTORIES} ${BASE_INCLUDE_DIRE
 
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/xballData
+#${R3BROOT_SOURCE_DIR}/r3bdata/xballData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trloiiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
-${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
-${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
-${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
+#${R3BROOT_SOURCE_DIR}/r3bdata/dhcData
+#${R3BROOT_SOURCE_DIR}/r3bdata/gfiData
+#${R3BROOT_SOURCE_DIR}/r3bdata/mtofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
+#${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
 ${R3BROOT_SOURCE_DIR}/r3bdata/vetoData
 ${R3BROOT_SOURCE_DIR}/r3bdata/lumonData
 ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
+#${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
+#${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
-${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
-${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
+#${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
+#${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
+#${R3BROOT_SOURCE_DIR}/r3bdata/mfiData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
-${R3BROOT_SOURCE_DIR}/r3bdata/pspData
-${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
-${R3BROOT_SOURCE_DIR}/r3bdata/actarData
+#${R3BROOT_SOURCE_DIR}/r3bdata/pspData
+#${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+#${R3BROOT_SOURCE_DIR}/r3bdata/actarData
 #${R3BROOT_SOURCE_DIR}/r3bdata/strawtubesData
-${R3BROOT_SOURCE_DIR}/r3bdata/amsData
-${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
-${R3BROOT_SOURCE_DIR}/r3bdata/musicData
-${R3BROOT_SOURCE_DIR}/r3bdata/sampData
+#${R3BROOT_SOURCE_DIR}/r3bdata/amsData
+#${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+#${R3BROOT_SOURCE_DIR}/r3bdata/sampData
 #${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
-${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+#${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 )
 
-include_directories(${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories(${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES ${ROOT_LIBRARY_DIR} ${FAIRROOT_LIBRARY_DIR})
 
@@ -74,18 +72,18 @@ R3BHit.cxx
 R3BTrack.cxx
 R3BTrackData.cxx
 R3BDouble.cxx
-xballData/R3BXBallPoint.cxx
-xballData/R3BXBallCrystalHit.cxx
-xballData/R3BXBallCrystalHitSim.cxx
+#xballData/R3BXBallPoint.cxx
+#xballData/R3BXBallCrystalHit.cxx
+#xballData/R3BXBallCrystalHitSim.cxx
 califaData/R3BCalifaCrystalCalData.cxx
 califaData/R3BCalifaClusterData.cxx
 califaData/R3BCalifaMappedData.cxx
 califaData/R3BCalifaPoint.cxx
-dchData/R3BDchPoint.cxx
-dchData/R3BDchFullPoint.cxx
-gfiData/R3BGfiPoint.cxx
-mtofData/R3BmTofPoint.cxx
-mtofData/R3BmTofDigi.cxx
+#dchData/R3BDchPoint.cxx
+#dchData/R3BDchFullPoint.cxx
+#gfiData/R3BGfiPoint.cxx
+#mtofData/R3BmTofPoint.cxx
+#mtofData/R3BmTofDigi.cxx
 tofData/R3BTofPoint.cxx
 vetoData/R3BVetoPoint.cxx
 lumonData/ELILuMonPoint.cxx
@@ -93,57 +91,57 @@ trackerData/R3BTraPoint.cxx
 trackerData/R3BTraHit.cxx
 trackerData/R3BSitrackerHit.cxx
 trackerData/R3BTrackerHit.cxx
-startrackData/R3BStartrackPoint.cxx
-startrackData/R3BStartrackHit.cxx
+#startrackData/R3BStartrackPoint.cxx
+#startrackData/R3BStartrackHit.cxx
 #startrackData/R3BStartrackerHit.cxx
-startrackData/R3BStartrackerDigitHit.cxx
-startrackData/R3BStartrackMappedData.cxx
-startrackData/R3BStartrackCalData.cxx
-landData/R3BLandPoint.cxx
-landData/R3BLandDigi.cxx
-landData/R3BLandFirstHits.cxx
-landData/R3BLandHit.cxx
-landData/R3BPaddleCrystalHit.cxx
-landData/R3BNeutronTrack.cxx
-dchData/R3BDchDigi.cxx
-dchData/R3BDch2pDigi.cxx
+#startrackData/R3BStartrackerDigitHit.cxx
+#startrackData/R3BStartrackMappedData.cxx
+#startrackData/R3BStartrackCalData.cxx
+#landData/R3BLandPoint.cxx
+#landData/R3BLandDigi.cxx
+#landData/R3BLandFirstHits.cxx
+#landData/R3BLandHit.cxx
+#landData/R3BPaddleCrystalHit.cxx
+#landData/R3BNeutronTrack.cxx
+#dchData/R3BDchDigi.cxx
+#dchData/R3BDch2pDigi.cxx
 tofData/R3BTofDigi.cxx
 tofData/R3BTof2pDigi.cxx
-gfiData/R3BGfiDigi.cxx
+#gfiData/R3BGfiDigi.cxx
 trackerData/R3BTraDigi.cxx
 trackerData/R3BTra2pDigi.cxx
 trackerData/R3BTraFraDigi.cxx
 trackerData/R3BTargetDigi.cxx
 trackerData/R3BTarget2pDigi.cxx
-mfiData/R3BMfiPoint.cxx
-mfiData/R3BMfiDigi.cxx
-pspData/R3BPspPoint.cxx
-pspData/R3BPspDigi.cxx
-neulandData/R3BNeulandTacquilaMappedData.cxx
-neulandData/R3BNeulandCalData.cxx
-neulandData/R3BNeulandPoint.cxx
-neulandData/R3BNeulandHit.cxx
-neulandData/R3BNeulandMultiplicity.cxx
-neulandData/R3BNeulandCluster.cxx
-neulandData/R3BNeulandNeutron.cxx
-pspData/R3BPspxMappedData.cxx
-pspData/R3BPspxPrecalData.cxx
-pspData/R3BPspxCalData.cxx
-pspData/R3BPspxHitData.cxx
+#mfiData/R3BMfiPoint.cxx
+#mfiData/R3BMfiDigi.cxx
+#pspData/R3BPspPoint.cxx
+#pspData/R3BPspDigi.cxx
+#neulandData/R3BNeulandTacquilaMappedData.cxx
+#neulandData/R3BNeulandCalData.cxx
+#neulandData/R3BNeulandPoint.cxx
+#neulandData/R3BNeulandHit.cxx
+#neulandData/R3BNeulandMultiplicity.cxx
+#neulandData/R3BNeulandCluster.cxx
+#neulandData/R3BNeulandNeutron.cxx
+#pspData/R3BPspxMappedData.cxx
+#pspData/R3BPspxPrecalData.cxx
+#pspData/R3BPspxCalData.cxx
+#pspData/R3BPspxHitData.cxx
 losData/R3BLosMappedData.cxx
 losData/R3BLosCalData.cxx
 losData/R3BLosHitData.cxx
 roluData/R3BRoluMappedData.cxx
 roluData/R3BRoluCalData.cxx
 roluData/R3BRoluHitData.cxx
-sci2Data/R3BSci2MappedData.cxx
-sci2Data/R3BSci2TcalData.cxx
-sci2Data/R3BSci2CalData.cxx
-sci2Data/R3BSci2HitData.cxx
-sci8Data/R3BSci8MappedData.cxx
+#sci2Data/R3BSci2MappedData.cxx
+#sci2Data/R3BSci2TcalData.cxx
+#sci2Data/R3BSci2CalData.cxx
+#sci2Data/R3BSci2HitData.cxx
+#sci8Data/R3BSci8MappedData.cxx
 sci8Data/R3BSci8CalData.cxx
-sci8Data/R3BSci8HitData.cxx
-actarData/R3BActarPoint.cxx
+#sci8Data/R3BSci8HitData.cxx
+#actarData/R3BActarPoint.cxx
 #strawtubesData/R3BStrawtubesMappedData.cxx
 #strawtubesData/R3BStrawtubesCalData.cxx
 #strawtubesData/R3BStrawtubesHitData.cxx
@@ -159,9 +157,9 @@ tofData/R3BTofdPoint.cxx
 tofData/R3BTofdDigi.cxx
 tofData/R3BTofiPoint.cxx
 tofData/R3BPtofHit.cxx
-pdcData/R3BPdcMappedData.cxx
-pdcData/R3BPdcCalData.cxx
-pdcData/R3BPdcHitData.cxx
+#pdcData/R3BPdcMappedData.cxx
+#pdcData/R3BPdcCalData.cxx
+#pdcData/R3BPdcHitData.cxx
 fibData/R3BBunchedFiberCalData.cxx
 fibData/R3BBunchedFiberHitData.cxx
 fibData/R3BBunchedFiberMappedData.cxx
@@ -174,20 +172,20 @@ fibData/R3BFi4HitItem.cxx
 fibData/R3BFibMappedData.cxx
 fibData/R3BFibCalData.cxx
 fibData/R3BFibPoint.cxx
-amsData/R3BAmsMappedData.cxx
-amsData/R3BAmsStripCalData.cxx
+#amsData/R3BAmsMappedData.cxx
+#amsData/R3BAmsStripCalData.cxx
 amsData/R3BAmsHitData.cxx
 beammonitorData/R3BBeamMonitorMappedData.cxx
 trloiiData/R3BTrloiiData.cxx
-musicData/R3BMusicPoint.cxx
-musicData/R3BMusicMappedData.cxx
-musicData/R3BMusicCalData.cxx
-musicData/R3BMusicHitData.cxx
+#musicData/R3BMusicPoint.cxx
+#musicData/R3BMusicMappedData.cxx
+#musicData/R3BMusicCalData.cxx
+#musicData/R3BMusicHitData.cxx
 sampData/R3BSamplerMappedData.cxx
 #sfibData/R3BSfibMappedData.cxx
 #sfibData/R3BSfibCalData.cxx
 #sfibData/R3BSfibHitData.cxx
-frsData/R3BFrsData.cxx
+#frsData/R3BFrsData.cxx
 )
 
 # fill list of header files from list of source files by exchanging the file extension
@@ -196,6 +194,22 @@ set(HEADERS ${HEADERS} R3BDetectorList.h)
 
 set(LINKDEF R3BDataLinkDef.h)
 set(LIBRARY_NAME R3BData)
-set(DEPENDENCIES Base FairTools)
+set(DEPENDENCIES FairRoot::Base R3BBase)
 
-generate_library()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+    
+#generate_library()

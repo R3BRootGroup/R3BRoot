@@ -15,24 +15,11 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES 
-${SYSTEM_INCLUDE_DIRECTORIES}
-${BASE_INCLUDE_DIRECTORIES}
-)
-
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/field 
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
-
-set(LINK_DIRECTORIES
-${ROOT_LIBRARY_DIR}
-${FAIRROOT_LIBRARY_DIR}
-)
- 
-link_directories( ${LINK_DIRECTORIES})
+link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
 R3BFieldConst.cxx     
@@ -51,7 +38,20 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF FieldLinkDef.h)
 set(LIBRARY_NAME Field)
 set(DEPENDENCIES
-    Base)
+    FairRoot::Base)
 
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES     
+    ${DEPENDENCIES})
+#GENERATE_LIBRARY()
 

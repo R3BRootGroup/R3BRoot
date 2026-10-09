@@ -37,8 +37,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${Geant4_INCLUDE_DIRS}
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories( ${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
@@ -71,7 +71,21 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF TrackingLinkDef.h)
 Set(LIBRARY_NAME R3BTracking)
 Set(DEPENDENCIES
-    Base ParBase TrkBase R3Bbase Minuit R3BData)
+    FairRoot::Base FairRoot::TrackBase R3BBase Minuit R3BData Field)
 
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+#GENERATE_LIBRARY()
 

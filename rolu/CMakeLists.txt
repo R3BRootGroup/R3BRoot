@@ -38,8 +38,8 @@ ${R3BROOT_SOURCE_DIR}/r3bdata/trackerData
 ${R3BROOT_SOURCE_DIR}/tcal
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories( ${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
@@ -61,7 +61,22 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF RoluLinkDef.h)
 Set(LIBRARY_NAME R3BRolu)
 Set(DEPENDENCIES
-    R3Bbase R3BData R3BPassive R3BTCal)
+    R3BBase R3BData R3BPassive R3BTCal)
 
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+    
+#GENERATE_LIBRARY()
 

@@ -407,6 +407,15 @@ InitStatus R3BGlobalAnalysisS494::Init()
         fh_dz = new TH1F("tracker_dz", "tracker dz ", 200, -5., 5.);
         fh_dz->GetXaxis()->SetTitle("dz / cm");
         fh_dz->GetYaxis()->SetTitle("counts");
+        
+        fh_dtx_C = new TH1F("tracker_dtx_C", "tracker dtx Carbin", 500, -5,5);
+        fh_dtx_C->GetXaxis()->SetTitle("dtx / mrad");
+        fh_dty_C = new TH1F("tracker_dty_C", "tracker dty Carbon", 500, -5,5);   
+        fh_dty_C->GetXaxis()->SetTitle("dtx / mrad");    
+        fh_dtx_He = new TH1F("tracker_dtx_He", "tracker dtx Helium", 500, -5,5);
+        fh_dtx_He->GetXaxis()->SetTitle("dtx / mrad");
+        fh_dty_He = new TH1F("tracker_dty_He", "tracker dty Helium", 500, -5,5);   
+        fh_dty_He->GetXaxis()->SetTitle("dtx / mrad");    
 
         fh_dpxO = new TH1F("tracker_dpxO", "tracker dpx O", 10000, -1000, 1000);
         fh_dpxO->GetXaxis()->SetTitle("dpx / percent");
@@ -590,7 +599,7 @@ InitStatus R3BGlobalAnalysisS494::Init()
 
         fh_dtheta = new TH1F("dtheta26_cm", "delta theta ", 1000, -5., 5.);
         fh_dtheta->GetYaxis()->SetTitle("counts");
-        fh_dtheta->GetXaxis()->SetTitle("Delta theta / deg");
+        fh_dtheta->GetXaxis()->SetTitle("Delta theta / mrad");
 
         fh_Erel_vs_thetaMC = new TH2F("Erel_vs_thetaMC", "Erel vs. theta26 MC with istracked", 250, 0., 5, 400, 0., 20);
         fh_Erel_vs_thetaMC->GetXaxis()->SetTitle("angle / deg");
@@ -673,10 +682,11 @@ InitStatus R3BGlobalAnalysisS494::Init()
         fh_pHe_vs_x0_mc = new TH2F("fh_pHe_vs_x0_mc", "pzHe_MC vs x0MC", 600, -1.5, 1.5, 200, 3000., 5000);
 
         fh_dpHe_vs_dx0 = new TH2F("fh_dpHe_vs_dx0", "pzHe-pzHe_MC vs x0track-x0MC", 600, -3., 3., 2000, -1000, 1000);
+	
+		fh_dErel = new TH1F("dErel", "delta Erel ", 4000, -10, 10); // 400, -100, 100.);
+		fh_dErel->GetYaxis()->SetTitle("counts");
+		fh_dErel->GetXaxis()->SetTitle("Delta Erel / %");
     }
-    fh_dErel = new TH1F("dErel", "delta Erel ", 4000, -10, 10); // 400, -100, 100.);
-    fh_dErel->GetYaxis()->SetTitle("counts");
-    fh_dErel->GetXaxis()->SetTitle("Delta Erel / %");
 
     fh_thetax_px = new TH2F("thethax_px", "theta_x vs px ", 500, -500, 500, 200, -100., 100.);
     fh_thetax_px->GetXaxis()->SetTitle("px / MeV/c");
@@ -3008,7 +3018,7 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
 
             if (is_tracked)
             {
-                fh_dtheta->Fill(theta_26MC - theta_26);               
+                fh_dtheta->Fill((theta_26MC - theta_26)*TMath::DegToRad()*1000.);               
 				fh_Erel_vs_thetaMC->Fill(theta_26MC, ErelMC);
 				fh_phibccm_vs_thetaMC->Fill(theta_26MC,phiMC_bc_cm);
 
@@ -3036,6 +3046,11 @@ void R3BGlobalAnalysisS494::Exec(Option_t* option)
                 fh_dpHe->Fill((paMC.Mag() - pa.Mag()) / paMC.Mag() * 100.);
                 fh_dp->Fill(((paMC + pcMC).Mag() - (pa + pc).Mag()) / ((paMC + pcMC).Mag()) * 100.);
                 fh_dErel->Fill((ErelMC - Erel) / ErelMC * 100.);
+                fh_dtx_C->Fill(atan(pCx_mc/pCz_mc)*1.e3 - atan(pCx/pCz)*1.e3);
+                fh_dtx_He->Fill(atan(pHex_mc/pHez_mc)*1.e3 - atan(pHex/pHez)*1.e3);
+                fh_dty_C->Fill(atan(pCy_mc/pCz_mc)*1.e3 - atan(pCy/pCz)*1.e3);
+                fh_dty_He->Fill(atan(pHey_mc/pHez_mc)*1.e3 - atan(pHey/pHez)*1.e3);
+                
 
                 Double_t diff =
                     sqrt(pCx_mc * pCx_mc + pCy_mc * pCy_mc + pCz_mc * pCz_mc) - sqrt(pCx * pCx + pCy * pCy + pCz * pCz);
@@ -3566,6 +3581,10 @@ void R3BGlobalAnalysisS494::FinishTask()
 		fh_thetay_py_simu->Write();
 		fh_thetax_py_simu->Write();
 		fh_thetay_px_simu->Write();
+		fh_dtx_C->Write();
+		fh_dty_C->Write();
+		fh_dtx_He->Write();
+		fh_dty_He->Write();
     }
     fh_dErel->Write();
 

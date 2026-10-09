@@ -38,6 +38,8 @@ class R3BFragmentFitterGeneric
     virtual Int_t FitTrackMomentumBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
    
     virtual Int_t FitTrackMomentumKalmanFilter(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
+   
+    virtual Int_t FitTrackMomentumKalmanFilterRTS(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
 
     virtual Int_t FitTrackBackward(R3BTrackingParticle*, R3BTrackingSetup*) = 0;
 

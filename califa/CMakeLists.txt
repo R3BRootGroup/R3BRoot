@@ -15,11 +15,11 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES
-${SYSTEM_INCLUDE_DIRECTORIES}
-${BASE_INCLUDE_DIRECTORIES}
-${Boost_INCLUDE_DIR}
-)
+#Set(SYSTEM_INCLUDE_DIRECTORIES
+#${SYSTEM_INCLUDE_DIRECTORIES}
+#${BASE_INCLUDE_DIRECTORIES}
+#${Boost_INCLUDE_DIR}
+#)
 
 set(INCLUDE_DIRECTORIES
 #put here all directories where header files are located
@@ -35,17 +35,10 @@ ${R3BROOT_SOURCE_DIR}/califa/sim
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
 ${R3BROOT_SOURCE_DIR}/r3bdata
 ${R3BROOT_SOURCE_DIR}/r3bdata/wrData
+${Boost_INCLUDE_DIR}
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
-
-set(LINK_DIRECTORIES
-${ROOT_LIBRARY_DIR}
-${FAIRROOT_LIBRARY_DIR}
-)
-
-link_directories( ${LINK_DIRECTORIES})
+link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
 set(SRCS
 #Put here your sourcefiles
@@ -77,13 +70,26 @@ set(LINKDEF CalifaLinkDef.h)
 set(LIBRARY_NAME R3BCalifa)
 
 set(DEPENDENCIES
-  Spectrum R3Bbase R3BData R3BPassive R3BTracking Boost::regex)
-#  Spectrum R3Bbase R3BData R3BPassive R3BTracking ${Boost_REGEX_LIBRARY})
+   ROOT::Spectrum R3BBase R3BData R3BPassive R3BTracking Boost::regex)
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES
     ${DEPENDENCIES} FairDB)
 endif(FAIRDB_FOUND)
 
-
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+    
+#GENERATE_LIBRARY()

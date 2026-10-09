@@ -41,7 +41,9 @@ class R3BTPropagator : public TObject
 
     Bool_t PropagateToDetectorForward(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c);
 
-    Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c);
+    Bool_t PropagateToDetectorForwardRTS(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c, TMatrixD& F_net_out);
+
+	Bool_t PropagateToDetectorBackward(R3BTrackingParticle* particle, R3BTrackingDetector* detector, TMatrixD& P_c);
 
     Bool_t PropagateToPlane(R3BTrackingParticle* particle, const TVector3& v1, const TVector3& v2, const TVector3& v3);
 	
@@ -50,6 +52,13 @@ class R3BTPropagator : public TObject
                                     const TVector3& v2,
                                     const TVector3& v3,
                                     TMatrixD& P_c);
+
+    Bool_t PropagateToPlaneForwardRTS(R3BTrackingParticle* particle,
+                                    const TVector3& v1,
+                                    const TVector3& v2,
+                                    const TVector3& v3,
+                                    TMatrixD& P_c,
+                                    TMatrixD& F_net_out);
 
     Bool_t PropagateToPlaneBackward(R3BTrackingParticle* particle,
                                     const TVector3& v1,
@@ -84,6 +93,11 @@ class R3BTPropagator : public TObject
     void SetVis(Bool_t vis = kTRUE) { fVis = vis; }
     
     TVector3 TransformGlobalToLocalPlane(const TVector3& globalVector,
+                                                     const TVector3& v1,
+                                                     const TVector3& v2,
+                                                     const TVector3& v3);
+    
+    TVector3 TransformLocalToGlobalPlane(const TVector3& localVector,
                                                      const TVector3& v1,
                                                      const TVector3& v2,
                                                      const TVector3& v3);

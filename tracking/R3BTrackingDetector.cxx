@@ -24,6 +24,7 @@
 #include "TMath.h"
 #include "TRotation.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -206,20 +207,26 @@ void R3BTrackingDetector::LocalToGlobal(TVector3& posGlobal, Double_t x_local, D
 
 Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
 {
+    // Energy loss is in MeV
+    
     TVector3 mom_track = particle->GetMomentum().Unit();
 
     Double_t Z2 = fGeo->GetZ();
     Double_t A2 = fGeo->GetA();
     Double_t density = fGeo->GetDensity();
     Double_t I = fGeo->GetI();
+    Double_t dx = 2. * fGeo->GetDimZ() * density;
     // cout << "Ionization: " << I << endl;
     Double_t Z1 = abs(particle->GetCharge());
     const Double_t K = 0.307075;
     const Double_t me = 0.5109989461;
     Double_t beta = particle->GetBeta();
     Double_t gamma = particle->GetGamma();
+    Double_t bg2 = (beta * gamma) * (beta * gamma);
     Double_t m = particle->GetMass() * 1000.;
-    Double_t dx = 2. * fGeo->GetDimZ() * density;
+    Double_t p_total = particle->GetMomentum().Mag() * 1.e3;
+    Double_t E_total = std::sqrt(p_total * p_total + m * m);
+    
     //    Double_t Tmax = 2. * me * TMath::Power(beta * gamma, 2);
     Double_t Tmax = 2. * me * TMath::Power(beta * gamma, 2) / (1. + (2. * gamma * me) / m + TMath::Power(me / m, 2));
     // cout << "Test: " << Tmax << endl;
@@ -231,27 +238,21 @@ Double_t R3BTrackingDetector::GetEnergyLoss(const R3BTrackingParticle* particle)
     */
     Double_t eloss = dx * K * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) *
                      (0.5 * TMath::Log(2 * me * beta * beta * gamma * gamma * Tmax / (I * I)) - beta * beta);
-
-	//cout<<"In energy loss: "<<Z1<<", "<<beta<<", "<<eloss<<", "<<density<<endl;
     
-    // cout << "Eloss: " << eloss << endl;
-    //  if(fGeoParName.EqualTo("TargetGeoPar")) cout<<"Eloss in target: "<<eloss<<", for Z= "<<Z1<<", "<<beta<<endl;
+    const double xi = (K / 2.0) * TMath::Power(Z1, 2) * Z2 / A2 / TMath::Power(beta, 2) * dx;
 
-    //    Double_t eloss = dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
-    //    (0.5*TMath::Log(2*me*beta*beta*gamma*gamma*Tmax/(I*I)) - beta*beta);
+    // Compute Most Probable Value (Delta E_MPV)
+    // Formula: xi * [ ln( (2 * m_e * c^2 * beta^2 * gamma^2 * xi) / I^2 ) + 0.200 - beta^2 ]
+    const double log_term = std::log((2.0 * me * me * bg2 * xi) / (I * I));
+    double deltaE_MPV = xi * (log_term + 0.200 - beta * beta);
 
-    //    if(fGeoParName.EqualTo("TargetGeoPar"))
-    //    {
-    //        Z2 = 6.45628;
-    //        A2 = 12.8772;
-    //        density = 1.39;
-    //        I = 78.7;
-    //        dx = 2. * 0.005 * density;
-    //        h_omega = 28.816*1e-6*TMath::Sqrt(density*Z2/A2);
-    //        eloss += dx * K * TMath::Power(Z1,2) * Z2/A2 / TMath::Power(beta,2) *
-    //        (TMath::Log(2*me*beta*beta*gamma*gamma/I) - beta*beta - (TMath::Log(h_omega/I) + TMath::Log(beta*gamma) -
-    //        0.5));
-    //    }
+    // Physical safeguard: energy loss cannot be negative or exceed total kinetic energy
+    const double T_kin = E_total - m;
+    if (deltaE_MPV < 0.0) deltaE_MPV = 0.0;
+    if (deltaE_MPV > T_kin) deltaE_MPV = T_kin;
+    
+    //cout<<"ELOSS TEST: "<<eloss<<" "<<deltaE_MPV<<endl;
+    //eloss = deltaE_MPV;
 
     return eloss;
 }
@@ -266,7 +267,7 @@ Double_t R3BTrackingDetector::GetEnergyLossStraggling(const R3BTrackingParticle*
 	Double_t target_A = fGeo->GetA();
 	Double_t density = fGeo->GetDensity();
 
-	// Bohr constant factor ~ 0.1569 MeV*cm^2/g -> converted to GeV^2
+	// Bohr constant factor ~ 0.1569 MeV²*cm^2/g -> converted to GeV^2
 	Double_t bohr_constant = 0.1569 * 1.e-6; 
 	Double_t charge = particle->GetCharge();
 
@@ -274,6 +275,8 @@ Double_t R3BTrackingDetector::GetEnergyLossStraggling(const R3BTrackingParticle*
 	
 	return sigma_E_squared;
 }
+
+
 void R3BTrackingDetector::SetParContainers()
 {
     // fetch geometry and position of detector

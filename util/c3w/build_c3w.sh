@@ -116,8 +116,10 @@ TARCMD="tar cf /data.local1/kelic/c3w.tar --exclude \*.o --exclude \*.d --exclud
 echo will run $TARCMD
 time $TARCMD || die "tar failed."
 rsync /data.local1/kelic/c3w.tar lustre.hpc.gsi.de:${C3WTARREAL}
+#cp /data.local1/kelic/c3w.tar /lustre/land/kelic/s494/rootfiles/cw3
 SCRIPT1=$(echo $C3WTAR | sed 's/.tar$/.sh/' )
 rsync $SCRIPT lustre.hpc.gsi.de:${SCRIPT1}
+#cp $SCRIPT /lustre/land/kelic/s494/rootfiles/cw3
 rm -f /data.local1/kelic/c3w.tar
 rm -f $SCRIPT
 

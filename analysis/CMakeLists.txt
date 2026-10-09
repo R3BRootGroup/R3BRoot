@@ -26,34 +26,34 @@ ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/analysis
 ${R3BROOT_SOURCE_DIR}/los
 ${R3BROOT_SOURCE_DIR}/rolu
-${R3BROOT_SOURCE_DIR}/sci2
-${R3BROOT_SOURCE_DIR}/sci8
+#${R3BROOT_SOURCE_DIR}/sci2
+#${R3BROOT_SOURCE_DIR}/sci8
 ${R3BROOT_SOURCE_DIR}/tof
 ${R3BROOT_SOURCE_DIR}/tcal
 ${R3BROOT_SOURCE_DIR}/fiber
 ${R3BROOT_SOURCE_DIR}/r3bdata
-${R3BROOT_SOURCE_DIR}/r3bdata/landData
+#${R3BROOT_SOURCE_DIR}/r3bdata/landData
 ${R3BROOT_SOURCE_DIR}/r3bdata/beammonitorData
-${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
+#${R3BROOT_SOURCE_DIR}/r3bdata/neulandData
 ${R3BROOT_SOURCE_DIR}/r3bdata/califaData
-${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
+#${R3BROOT_SOURCE_DIR}/r3bdata/startrackData
 ${R3BROOT_SOURCE_DIR}/r3bdata/losData
 ${R3BROOT_SOURCE_DIR}/r3bdata/roluData
-${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
-${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
+#${R3BROOT_SOURCE_DIR}/r3bdata/sci2Data
+#${R3BROOT_SOURCE_DIR}/r3bdata/sci8Data
 ${R3BROOT_SOURCE_DIR}/r3bdata/tofData
-${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
-${R3BROOT_SOURCE_DIR}/r3bdata/pspData
+#${R3BROOT_SOURCE_DIR}/r3bdata/pdcData
+#${R3BROOT_SOURCE_DIR}/r3bdata/pspData
 ${R3BROOT_SOURCE_DIR}/r3bdata/fibData
-${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
+#${R3BROOT_SOURCE_DIR}/r3bdata/ptofData
 ${R3BROOT_SOURCE_DIR}/r3bdata/sampData
-${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
-${R3BROOT_SOURCE_DIR}/r3bdata/musicData
-${R3BROOT_SOURCE_DIR}/r3bdata/frsData
+#${R3BROOT_SOURCE_DIR}/r3bdata/sfibData
+#${R3BROOT_SOURCE_DIR}/r3bdata/musicData
+#${R3BROOT_SOURCE_DIR}/r3bdata/frsData
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories( ${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
@@ -68,9 +68,23 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF R3BAnaLinkDef.h)
 
 Set(DEPENDENCIES
-    GeoBase ParBase MbsAPI Base FairTools R3BData Core Geom GenVector Physics Matrix MathCore)
+    R3BData R3BLos R3BCalifa R3BTof  R3BBunchedFiber)
 
 Set(LIBRARY_NAME R3BAnalysis)
 
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+#GENERATE_LIBRARY()
 

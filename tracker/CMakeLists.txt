@@ -40,8 +40,8 @@ ${R3BROOT_SOURCE_DIR}/tracker/unpackams
 ${R3BROOT_SOURCE_DIR}/r3bdata/amsData
 )
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories( ${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
@@ -83,15 +83,28 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF TraLinkDef.h)
 set(LIBRARY_NAME R3BTra)
 set(DEPENDENCIES
-    Spectrum R3Bbase R3BData)
+    Spectrum R3BBase R3BData)
 
 if(FAIRDB_FOUND)
 set(DEPENDENCIES
     ${DEPENDENCIES} FairDB)
 endif(FAIRDB_FOUND)
 
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
 
-
-GENERATE_LIBRARY()
+#GENERATE_LIBRARY()
 
 

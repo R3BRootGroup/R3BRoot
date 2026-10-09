@@ -28,8 +28,8 @@ ${R3BROOT_SOURCE_DIR}/gconfig
 )
 
 
-Include_Directories(${INCLUDE_DIRECTORIES})
-Include_Directories(SYSTEM  ${SYSTEM_INCLUDE_DIRECTORIES})
+#Include_Directories(${INCLUDE_DIRECTORIES})
+#Include_Directories(SYSTEM  ${SYSTEM_INCLUDE_DIRECTORIES})
 
 link_directories(${FAIRROOT_LIBRARY_DIR} ${ROOT_LIBRARY_DIR})
 
@@ -45,4 +45,19 @@ Set(LINKDEF GConfigLinkDef.h)
 Set(LIBRARY_NAME R3BGConfig)
 Set(DEPENDENCIES Base FairTools)
 
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+    
+#GENERATE_LIBRARY()

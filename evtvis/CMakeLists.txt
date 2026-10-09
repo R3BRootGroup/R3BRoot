@@ -30,8 +30,8 @@ ${R3BROOT_SOURCE_DIR}/evtvis
 )
 
 
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
+#include_directories( ${INCLUDE_DIRECTORIES})
+#include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
@@ -56,7 +56,23 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 set(LINKDEF R3BEventDisplayLinkDef.h)
 set(LIBRARY_NAME R3BEvtVis)
 set(DEPENDENCIES
-    Field R3BData R3BCalifa Geane EventDisplay)
+    Field R3BData R3BCalifa ROOT::Eve  FairRoot::EventDisplay)
 
-GENERATE_LIBRARY()
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${INCLUDE_DIRECTORIES}
+    ${SYSTEM_INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
+    
+#GENERATE_LIBRARY()
+
 

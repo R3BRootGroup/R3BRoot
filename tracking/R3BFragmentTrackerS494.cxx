@@ -779,7 +779,7 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
             return;
     }
 
-    //cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
+    cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
         if (tof->hits.size() > 0 && debug_loopout)
     {
         cout << "*************** NEW EVENT ****" << fNEvents << ", " << fNEvents_nonull << endl;
@@ -1688,12 +1688,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												{
 													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
 													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumKalmanFilterRTS(candidate, fDetectors);
 												}
 												else // C
 												{
 													//status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
 													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
 													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumKalmanFilterRTS(candidate, fDetectors);
 												}
 												if (debug_loopin)
 													cout << " Chi: " << candidate->GetChi2()
@@ -1954,12 +1956,14 @@ void R3BFragmentTrackerS494::Exec(const Option_t*)
 												{
 													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
 													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumKalmanFilterRTS(candidate, fDetectors);
 												}
 												else // C
 												{
 													// status = fFitter->FitTrackMomentumBackward(candidate, fDetectors);
 													//status = fFitter->FitTrackMomentumForward(candidate, fDetectors);
 													status = fFitter->FitTrackMomentumKalmanFilter(candidate, fDetectors);
+													//status = fFitter->FitTrackMomentumKalmanFilterRTS(candidate, fDetectors);
 												}
 												if (debug_loopin)
 													cout << "Chi: " << candidate->GetChi2() << "  pstart.Mag "

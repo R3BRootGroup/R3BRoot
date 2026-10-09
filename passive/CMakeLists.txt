@@ -15,19 +15,16 @@
 # the array .
 # The extension is already found.  Any number of sources could be listed here.
 
-Set(SYSTEM_INCLUDE_DIRECTORIES
-${SYSTEM_INCLUDE_DIRECTORIES}
-${BASE_INCLUDE_DIRECTORIES}
-)
+#Set(SYSTEM_INCLUDE_DIRECTORIES
+#${SYSTEM_INCLUDE_DIRECTORIES}
+#${BASE_INCLUDE_DIRECTORIES}
+#)
 
 set(INCLUDE_DIRECTORIES
 ${R3BROOT_SOURCE_DIR}/r3bbase
 ${R3BROOT_SOURCE_DIR}/field
 ${R3BROOT_SOURCE_DIR}/passive
 ${R3BROOT_SOURCE_DIR}/tracking )
-
-include_directories( ${INCLUDE_DIRECTORIES})
-include_directories(SYSTEM ${SYSTEM_INCLUDE_DIRECTORIES})
 
 set(LINK_DIRECTORIES
 ${ROOT_LIBRARY_DIR}
@@ -62,6 +59,21 @@ CHANGE_FILE_EXTENSION(*.cxx *.h HEADERS "${SRCS}")
 Set(LINKDEF PassiveLinkDef.h)
 Set(LIBRARY_NAME R3BPassive)
 Set(DEPENDENCIES
-    R3Bbase Field R3BTracking)
+    R3BBase Field R3BTracking)
+    
+add_library_with_dictionary(
+    LIBNAME
+    ${LIBRARY_NAME}
+    LINKDEF
+    ${LINKDEF}
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${INCLUDE_DIRECTORIES}
+    DEPENDENCIES
+    ${DEPENDENCIES})
 
-GENERATE_LIBRARY()
+#GENERATE_LIBRARY()

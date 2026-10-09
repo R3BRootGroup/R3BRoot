@@ -16,14 +16,24 @@
 # binary directory of the project as ${R3BROOT_BINARY_DIR} or ${CMAKE_BINARY_DIR}. This difference
 # is is important for the base classes which are in R3BROOT and PANDAROOT.
 
+if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
+    message(FATAL_ERROR "In-source builds are not supported, please, create a folder build.")
+endif()
+
 # Check if cmake has the required version
-cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 
 # set cmake policies
-cmake_policy(VERSION 3.11...3.20)
+cmake_policy(VERSION 3.27...4.3)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
 project(R3BROOT LANGUAGES C CXX Fortran)
+
+# Ensures .pcm dictionary files land in the main build/lib folder for c3w tarballs
+set(CMAKE_ROOTCLING_STAGE_DIR "${CMAKE_BINARY_DIR}/lib")
+
+# use default gnu install convention:
+include(GNUInstallDirs)
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/macros")
     message(FATAL_ERROR
@@ -42,56 +52,120 @@ IF(NOT DEFINED ENV{FAIRROOTPATH})
 ENDIF(NOT DEFINED ENV{FAIRROOTPATH})
 SET(FAIRROOTPATH $ENV{FAIRROOTPATH})
 
-STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
 
-set(CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules" ${CMAKE_MODULE_PATH})
-set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules" ${CMAKE_MODULE_PATH})
+#STRING(REGEX MATCHALL "[^:]+" PATH $ENV{PATH})
+
+include(cmake/utils/create_library_with_dictionary.cmake)
+include(cmake/scripts/set_ld_library_dir.cmake)
+set(GRAPHVIZ_EXTERNAL_LIBS FALSE)
+
+list(APPEND CMAKE_PREFIX_PATH ${SIMPATH})
+list(APPEND CMAKE_PREFIX_PATH ${FAIRROOTPATH})
+
+list(APPEND CMAKE_MODULE_PATH "${FAIRROOTPATH}/share/fairbase/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/scripts")
+
+# For CMakeLists that still use the old way
+set(ROOT_FOUND_VERSION 600000)
+set(LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
+set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+set(FairRoot_ROOT "${FAIRROOTPATH}")
 
 Set(CheckSrcDir "${FAIRROOTPATH}/share/fairbase/cmake/checks")
 
-find_package(FairCMakeModules 0.1 QUIET)
-if(FairCMakeModules_FOUND)
-  include(FairFindPackage2)
-else()
-  message(STATUS "Could not find FairCMakeModules. "
-          "It is recommended to install https://github.com/FairRootGroup/FairCMakeModules")
+# Set option(s)
+option(BUILD_GEOMETRY "Build all ROOT geometries" ON)
+option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used." OFF)
+option(WITH_UCESB "Build UCESB" OFF)
+option(WITH_EPICS "Build EPICS" OFF)
+option(WITH_ATIMA "Build ATIMA" OFF)
+option(WITH_SOFIA "Build SOFIA" OFF)
+option(WITH_GTPC "Build GTPC" OFF)
+option(WITH_FRS "Build FRS" OFF)
+option(WITH_ASYEOS "Build ASYEOS" OFF)
+option(BUILD_C3W "Build C3W" ON)
+
+find_package(FairCMakeModules CONFIG REQUIRED)
+if(NOT FairCMakeModules_FOUND)
+    message(FATAL_ERROR "Could not find FairCMakeModules! ")
 endif()
 
-if(COMMAND find_package2)
-  find_package2(PUBLIC FairRoot)
-else()
-  find_package(FairRoot)
-endif()
+include(FairFindPackage2)
+include(FairFormattedOutput)
+include(FetchAllContents)
+
+find_package2(PUBLIC FairRoot CONFIG REQUIRED)
 
 # FairRoot_VERSION is eventually set by find_package, for now let's set it explicitly
 execute_process(
-  COMMAND ${FAIRROOTPATH}/bin/fairroot-config --version
-  COMMAND sed "s/^v//"
-  OUTPUT_VARIABLE FairRoot_VERSION
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-if( "${FairRoot_VERSION}"  VERSION_LESS 18.2.1 )
-  Message(FATAL_ERROR "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later")
-else()
-  message(STATUS "You seem to be using FairRoot ${FairRoot_VERSION}.")
+    COMMAND bash -c "${FAIRROOTPATH}/bin/fairroot-config --version | sed 's/^v//'"
+    OUTPUT_VARIABLE FairRoot_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+if("${FairRoot_VERSION}" VERSION_LESS 18.2.1)
+    message(
+        FATAL_ERROR
+            "Incompatible FairRoot version detected: ${FairRoot_VERSION}. R3BRoot requires FairRoot v18.2.1 or later"
+    )
 endif()
+
 
 # added a variable to point to r3broot path in the system
 set(R3BROOTPATH ${CMAKE_INSTALL_PREFIX})
 
-if(SIMPATH)
-  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
-endif()
+#if(SIMPATH)
+#  set(CMAKE_PREFIX_PATH ${SIMPATH} ${CMAKE_PREFIX_PATH})
+#endif()
 
 # Load some basic macros which are needed later on
 include(FairMacros)
 
-list(APPEND required_root_components RIO)
+set(required_root_components
+    RIO
+    Geom
+    Physics
+    Matrix
+    Hist
+    Graf
+    Gpad
+    Net
+    Imt
+    Core
+    MathCore
+    RHTTP
+    Spectrum)
+#list(APPEND required_root_components RIO)
 list(APPEND optional_root_components opengl)
 list(APPEND optional_root_components gdml vmc)
-find_package2(PUBLIC ROOT  VERSION 6.10.00 REQUIRED
-  COMPONENTS ${required_root_components}
-  OPTIONAL_COMPONENTS ${optional_root_components})
+
+find_package2(
+  PUBLIC 
+  ROOT 
+  CONFIG 
+  REQUIRED
+  COMPONENTS 
+  ${required_root_components}
+  OPTIONAL_COMPONENTS 
+  ${optional_root_components})
+  
+# --- FIX FOR DEBIAN 13 ROOT LIBRARY & MINUIT LOOKUP ---
+if(TARGET ROOT::Core)
+    get_target_property(ROOT_CORE_LIB ROOT::Core LOCATION)
+    get_filename_component(ROOT_LIBRARY_DIR "${ROOT_CORE_LIB}" DIRECTORY)
+endif()
+
+if(TARGET FairRoot::Base)
+    get_target_property(FAIRROOT_BASE_LIB FairRoot::Base LOCATION)
+    get_filename_component(FAIRROOT_LIBRARY_DIR "${FAIRROOT_BASE_LIB}" DIRECTORY)
+endif()
+
+# Now ROOT_LIBRARY_DIR is valid! Pass it globally to all subdirectories:
+link_directories(
+    ${ROOT_LIBRARY_DIR}
+    ${FAIRROOT_LIBRARY_DIR}
+    ${CMAKE_BINARY_DIR}/lib
+)
+# -----------------------------------------------------
 
 if("${ROOT_vmc_FOUND}" MATCHES "no")
   find_package2(PUBLIC VMC REQUIRED)
@@ -103,66 +177,128 @@ endif()
 include(R3BMacros)
 include(WriteConfigFile_r3b)
 include(WriteEnvCache)
-include(Dart)
 include(CheckCompiler)
 include(ROOTMacros)
 
-find_package2(PUBLIC FairLogger  VERSION 1.6.0 REQUIRED)
+find_package2(
+	PUBLIC 
+	FairLogger  
+	VERSION 
+	1.6.0 
+	REQUIRED)
 
 foreach(dep IN LISTS FairLogger_PACKAGE_DEPENDENCIES)
-  if(NOT dep STREQUAL "Boost")
-    find_package2(PUBLIC ${dep} REQUIRED VERSION ${FairLogger_${dep}_VERSION})
-  endif()
+    if(NOT dep STREQUAL "Boost")
+        find_package2(
+            PUBLIC
+            ${dep}
+            REQUIRED
+            VERSION
+            ${FairLogger_${dep}_VERSION})
+    endif()
 endforeach()
 
 if( "${FairRoot_VERSION}"  VERSION_GREATER 18.6.4 )
   add_definitions(-DACTIVATEOVERRIDE)
 
-#  find_package2(PUBLIC FairMQ VERSION 1.4.0)
+  find_package2(PUBLIC FairMQ VERSION 1.4.0 REQUIRED)
 
   find_package2(PUBLIC DDS)
 
-#If(FAIRSOFT_EXTERN)
-#  set(BOOST_ROOT ${SIMPATH})
-#  set(GSL_DIR ${SIMPATH})
-#Else(FAIRSOFT_EXTERN)
-#  set(BOOST_ROOT ${SIMPATH}/basics/boost)
-#  set(GSL_DIR ${SIMPATH}/basics/gsl)
-#EndIf(FAIRSOFT_EXTERN)
+if(FAIRSOFT_EXTERN)
+        set(Boost_ROOT ${SIMPATH})
+        set(GSL_DIR ${SIMPATH})
+    else(FAIRSOFT_EXTERN)
+        set(Boost_ROOT ${SIMPATH}/basics/boost)
+        set(GSL_DIR ${SIMPATH}/basics/gsl)
+    endif(FAIRSOFT_EXTERN)
 
-#if(NOT DEFINED Boost_NO_SYSTEM_PATHS)
-#  Set(Boost_NO_SYSTEM_PATHS TRUE)
-#endif()
-#if(NOT DEFINED Boost_NO_BOOST_CMAKE AND CMAKE_VERSION VERSION_LESS 3.15)
-#  Set(Boost_NO_BOOST_CMAKE TRUE)
-#endif()
-#if(Boost_NO_BOOST_CMAKE)
-  # If an older version of boost is found both of the variables below are
-  # cached and in a second cmake run, a good boost version is found even
-  # if the version is to old.
-  # To overcome this problem both variables are cleared before checking
-  # for boost.
-#  Unset(Boost_INCLUDE_DIR CACHE)
-#  Unset(Boost_LIBRARY_DIRS CACHE)
-#endif()
+    if(NOT DEFINED Boost_NO_SYSTEM_PATHS)
+        set(Boost_NO_SYSTEM_PATHS TRUE)
+    endif()
+    if(NOT DEFINED Boost_NO_BOOST_CMAKE AND CMAKE_VERSION VERSION_LESS 3.15)
+        set(Boost_NO_BOOST_CMAKE TRUE)
+    endif()
+    if(Boost_NO_BOOST_CMAKE)
+        # If an older version of boost is found both of the variables below are
+        # cached and in a second cmake run, a good boost version is found even
+        # if the version is to old.
+        # To overcome this problem both variables are cleared before checking
+        # for boost.
+        unset(Boost_INCLUDE_DIR CACHE)
+        unset(Boost_LIBRARY_DIRS CACHE)
+    endif()
 
-#list(APPEND boost_dependencies filesystem serialization)
+    list(
+        APPEND
+        boost_dependencies
+        thread
+        timer
+        program_options
+        random
+        filesystem
+        chrono
+        exception
+        iostreams
+        regex
+        serialization
+        log
+        atomic)
 
-#if(BUILD_UNITTESTS)
-# list(APPEND boost_dependencies unit_test_framework)
-#endif()
+    find_package2(
+        PUBLIC
+        Boost
+        VERSION
+        1.67
+        COMPONENTS
+        ${boost_dependencies}
+        ADD_REQUIREMENTS_OF
+        FairMQ)
+    #  If (FairMQ_FOUND AND Boost_FOUND)
+    #    add_subdirectory(base/MQ)
+    #    add_subdirectory(parmq)
+    #  Else ()
+    #    Message(STATUS "base/MQ and parmq will not be built, because FairMQ and/or Boost was not found.")
+    #  EndIf ()
+else()
+    set(Boost_NO_SYSTEM_PATHS TRUE)
+    set(Boost_NO_BOOST_CMAKE TRUE)
 
-#  find_package2(PUBLIC Boost
-#  VERSION 1.67
-#  COMPONENTS ${boost_dependencies}
-#  )
-#  If (FairMQ_FOUND AND Boost_FOUND)
-#    add_subdirectory(base/MQ)
-#    add_subdirectory(parmq)
-#  Else ()
-#    Message(STATUS "base/MQ and parmq will not be built, because FairMQ and/or Boost was not found.")
-#  EndIf ()
-Endif()
+    if(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+        set(Boost_ROOT ${SIMPATH})
+        set(GSL_DIR ${SIMPATH})
+    else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+        set(Boost_ROOT ${SIMPATH}/basics/boost)
+        set(GSL_DIR ${SIMPATH}/basics/gsl)
+    endif(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
+    
+    unset(Boost_INCLUDE_DIR CACHE)
+    unset(Boost_LIBRARY_DIRS CACHE)
+    find_package2(
+        PUBLIC
+        Boost
+        VERSION
+        1.67
+        ${FairMQ_Boost_VERSION}
+        COMPONENTS
+        thread
+        system
+        timer
+        program_options
+        random
+        filesystem
+        chrono
+        exception
+        iostreams
+        regex
+        serialization
+        log
+        log_setup
+        atomic
+        date_time
+        ${FairMQ_Boost_COMPONENTS}
+        REQUIRED)
+endif()
 
 find_package2(PUBLIC Pythia6)
 find_package2(PUBLIC Pythia8)
@@ -191,7 +327,7 @@ if(Geant4VMC_FOUND)
 Endif()
 
 #find_package(CLHEP)
-find_package(HEPMC)
+#find_package(HEPMC)
 
 find_package2(PUBLIC IWYU)
 
@@ -222,6 +358,27 @@ set(EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
 set(INCLUDE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/include")
 set(VMCWORKDIR ${CMAKE_SOURCE_DIR})
 
+# Display SUPPORTED_CXX_STANDARDS
+set(SUPPORTED_CXX_STANDARDS "")
+foreach(version 14 17 20 23)
+    string(CONCAT flag "cxx_std_" ${version})
+    if(flag IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+        list(APPEND SUPPORTED_CXX_STANDARDS ${version})
+    endif()
+endforeach()
+
+if(SUPPORTED_CXX_STANDARDS)
+    message(STATUS "${Cyan}Supported C++ standards:${CR} ${SUPPORTED_CXX_STANDARDS}")
+    message(STATUS "${Cyan}CMake is using C++ standard:${CR} ${BGreen}${CMAKE_CXX_STANDARD}${CR}")
+else()
+    message(WARNING "No supported C++ standards found!")
+endif()
+
+# Display configurations
+message(STATUS "CMake C++ Flags: ${CMAKE_CXX_FLAGS}")
+message(STATUS "Library Output Directory: ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+message(STATUS "Runtime Output Directory: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+
 option(USE_PATH_INFO "Information from PATH and LD_LIBRARY_PATH are used." OFF)
 if(USE_PATH_INFO)
     set(PATH $ENV{PATH})
@@ -248,26 +405,8 @@ if (COMMAND check_external_package_install_dir)
   check_external_package_install_dir()
 endif()
 
-set(Boost_NO_SYSTEM_PATHS TRUE)
-set(Boost_NO_BOOST_CMAKE TRUE)
-
-If(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
-  set(BOOST_ROOT ${SIMPATH})
-  set(GSL_DIR ${SIMPATH})
-Else(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
-  set(BOOST_ROOT ${SIMPATH}/basics/boost)
-  set(GSL_DIR ${SIMPATH}/basics/gsl)
-EndIf(${ROOT_LIBRARY_DIR} MATCHES /lib/root)
-
-unset(Boost_INCLUDE_DIR CACHE)
-unset(Boost_LIBRARY_DIRS CACHE)
-find_package2(PUBLIC Boost
-  VERSION 1.67 ${FairMQ_Boost_VERSION}
-  COMPONENTS thread system timer program_options random filesystem chrono exception iostreams regex serialization log log_setup atomic date_time ${FairMQ_Boost_COMPONENTS}
-  REQUIRED
-)
 if(Boost_FOUND)
-  set(Boost_Avail 1)
+    set(Boost_Avail 1)
 else(Boost_FOUND)
     set(Boost_Avail 0)
 endif(Boost_FOUND)
@@ -329,28 +468,30 @@ else()
     " to a ucesb installation to fix this.${CR}")
 endif(ucesb_FOUND)
 
-find_package(EPICS)
+find_package2(PUBLIC EPICS)
 if(EPICS_FOUND)
-  set(WITH_EPICS true)
-  set(LD_LIBRARY_PATH ${EPICS_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+    set(WITH_EPICS ON)
+    set(epics_summary "${BGreen}YES${CR}       ${BMagenta}${EPICS_LIBRARY_DIR}${CR}")
+    set(LD_LIBRARY_PATH ${EPICS_LIBRARY_DIR} ${LD_LIBRARY_PATH})
+else(EPICS_FOUND)
+    set(epics_summary "${BYellow}NO${CR}")
 endif(EPICS_FOUND)
 
-find_package(Atima)
+find_package2(PUBLIC Atima)
+if(ATIMA_FOUND)
+    set(WITH_ATIMA ON)
+    set(atima_summary "${BGreen}YES${CR}       ${BMagenta}$ENV{ATIMAPATH}${CR}")
+else(ATIMA_FOUND)
+    set(atima_summary "${BYellow}NO${CR}")
+endif(ATIMA_FOUND)
 
-find_package(Garfield)
-
-if(GARFIELD_FOUND)
-    set(WITH_ACTAR true)
-    set(LD_LIBRARY_PATH ${GARFIELD_LIBRARY_DIR} ${LD_LIBRARY_PATH})
-endif(GARFIELD_FOUND)
-
-if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-    message("Building SOFIA framework...")
-    set(WITH_SOFIA true)
-    add_definitions(-DSOFIA)
-else(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
-      message("${BYellow}SOFIA framework not found${CR}")
-endif(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+#if(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+#    message("Building SOFIA framework...")
+#    set(WITH_SOFIA true)
+#    add_definitions(-DSOFIA)
+#else(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
+#      message("${BYellow}SOFIA framework not found${CR}")
+#endif(EXISTS "${R3BROOT_SOURCE_DIR}/sofia/")
 
 if(EXISTS "${R3BROOT_SOURCE_DIR}/NeuLAND_DNN/")
     message("Building NeuLAND DNN framework...")
@@ -413,66 +554,66 @@ if(NOT MODULE)
     set(ENV{VMCWORKDIR} ${CMAKE_CURRENT_SOURCE_DIR})
     add_subdirectory(passive)
     add_subdirectory(califa)
-    add_subdirectory(xball)
-    add_subdirectory(dch)
-    add_subdirectory(gfi)
+#    add_subdirectory(xball)
+#    add_subdirectory(dch)
+#    add_subdirectory(gfi)
     add_subdirectory(fiber)
-    add_subdirectory(fi0)
-    add_subdirectory(fi1a)
-    add_subdirectory(fi1b)
-    add_subdirectory(fi2a)
-    add_subdirectory(fi2b)
-    add_subdirectory(fi3a)
-    add_subdirectory(fi3b)
-    add_subdirectory(fi4)
-    add_subdirectory(fi5)
-    add_subdirectory(fi6)
-    add_subdirectory(fi7)
-    add_subdirectory(fi8)
-    add_subdirectory(fi9)
-    add_subdirectory(fi10)
-    add_subdirectory(fi11)
-    add_subdirectory(fi12)
-    add_subdirectory(fi13)
+#    add_subdirectory(fi0)
+#    add_subdirectory(fi1a)
+#    add_subdirectory(fi1b)
+#    add_subdirectory(fi2a)
+#    add_subdirectory(fi2b)
+#    add_subdirectory(fi3a)
+#    add_subdirectory(fi3b)
+#    add_subdirectory(fi4)
+#    add_subdirectory(fi5)
+#    add_subdirectory(fi6)
+#    add_subdirectory(fi7)
+#    add_subdirectory(fi8)
+#    add_subdirectory(fi9)
+#    add_subdirectory(fi10)
+#    add_subdirectory(fi11)
+#    add_subdirectory(fi12)
+#    add_subdirectory(fi13)
     add_subdirectory(fi23a)
     add_subdirectory(fi23b)
     add_subdirectory(fi30)
     add_subdirectory(fi31)
     add_subdirectory(fi32)
     add_subdirectory(fi33)    
-    add_subdirectory(fi60)    
-    add_subdirectory(fi61)    
-    add_subdirectory(fi62)    
-    add_subdirectory(fi63)    
-    add_subdirectory(sfi)
-    add_subdirectory(land)
-    add_subdirectory(neuland)
+#    add_subdirectory(fi60)    
+#    add_subdirectory(fi61)    
+#    add_subdirectory(fi62)    
+#    add_subdirectory(fi63)    
+#    add_subdirectory(sfi)
+#    add_subdirectory(land)
+#    add_subdirectory(neuland)
     add_subdirectory(los)
     add_subdirectory(rolu)
-    add_subdirectory(sci2)
-    add_subdirectory(sci8)
+#    add_subdirectory(sci2)
+#    add_subdirectory(sci8)
 #    add_subdirectory(sfib)
-    add_subdirectory(mtof)
+#    add_subdirectory(mtof)
     add_subdirectory(tof)
     add_subdirectory(tracker)
-    add_subdirectory(startrack)
+#    add_subdirectory(startrack)
 #    add_subdirectory(strawtubes)
-    add_subdirectory(music)
+#    add_subdirectory(music)
     add_subdirectory(r3bdata)
     add_subdirectory(field)
     add_subdirectory(macros)
     add_subdirectory(r3bgen)
     add_subdirectory(lumon)
     add_subdirectory(evtvis)
-    add_subdirectory(mfi)
-    add_subdirectory(psp)
+#    add_subdirectory(mfi)
+#    add_subdirectory(psp)
     add_subdirectory(timestitcher)
     add_subdirectory(compilehelper)
     add_subdirectory(tcal)
     add_subdirectory(tracking)
-    add_subdirectory(analysis)
+#    add_subdirectory(analysis)
     add_subdirectory(tracker_rene)
-    add_subdirectory(pdc)
+#    add_subdirectory(pdc)
     if(WITH_ACTAR)
         add_subdirectory(actar)
     endif(WITH_ACTAR)
@@ -504,18 +645,18 @@ Else()
   Set(R3BROOT_GIT_VERSION v${R3BROOT_MAJOR_VERSION}.${R3BROOT_MINOR_VERSION}.${R3BROOT_PATCH_VERSION})
 EndIf()
 
-execute_process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
-                OUTPUT_VARIABLE EveIsBuild
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+#execute_process(COMMAND ${ROOT_CONFIG_EXECUTABLE} --has-opengl
+#                OUTPUT_VARIABLE EveIsBuild
+#                OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-if(${EveIsBuild} STREQUAL yes)
-    message("Build the eventdisplay.")
-    if(NOT FAIRROOT_FOUND)
-        add_subdirectory(eventdisplay)
-    endif(NOT FAIRROOT_FOUND)
-else(${EveIsBuild} STREQUAL yes)
-    message("The eventdisplay is not build, there is no OpenGL support.")
-endif(${EveIsBuild} STREQUAL yes)
+#if(${EveIsBuild} STREQUAL yes)
+#    message("Build the eventdisplay.")
+#    if(NOT FAIRROOT_FOUND)
+#        add_subdirectory(eventdisplay)
+#    endif(NOT FAIRROOT_FOUND)
+#else(${EveIsBuild} STREQUAL yes)
+#    message("The eventdisplay is not build, there is no OpenGL support.")
+#endif(${EveIsBuild} STREQUAL yes)
 
 option(BUILD_DOXYGEN "Build Doxygen" OFF)
 if(BUILD_DOXYGEN)
@@ -530,6 +671,15 @@ if(RULE_CHECKER_FOUND)
                       DEPENDS $ENV{ALL_RULES})
 
 endif(RULE_CHECKER_FOUND)
+
+# Automatically collect all module header paths for ROOT_INCLUDE_PATH
+set(R3B_ALL_INCLUDE_PATHS "${FAIRROOTPATH}/include" "${CMAKE_BINARY_DIR}/include")
+file(GLOB R3B_SUBDIRS RELATIVE ${CMAKE_SOURCE_DIR} *)
+foreach(subdir ${R3B_SUBDIRS})
+    if(IS_DIRECTORY "${CMAKE_SOURCE_DIR}/${subdir}" AND EXISTS "${CMAKE_SOURCE_DIR}/${subdir}/CMakeLists.txt")
+        list(APPEND R3B_ALL_INCLUDE_PATHS "${CMAKE_SOURCE_DIR}/${subdir}")
+    endif()
+endforeach()
 
 write_config_file(config.sh)
 write_config_file(config.csh)
@@ -562,10 +712,10 @@ if(CMAKE_CONFIGURATION_TYPES)
   foreach(type IN LISTS CMAKE_CONFIGURATION_TYPES)
    string(TOUPPER "${type}" type_upper)
    if(type_upper STREQUAL selected_type)
-     pad("${type}" 18 " " type_padded)
+     fair_pad("${type}" 18 " " type_padded)
      message(STATUS "${BGreen}* ${type_padded}${CMAKE_CXX_FLAGS_${type_upper}}${CR}")
    else()
-     pad("${type}" 18 " " type_padded)
+     fair_pad("${type}" 18 " " type_padded)
      message(STATUS "  ${BWhite}${type_padded}${CR}${CMAKE_CXX_FLAGS_${type_upper}}")
    endif()
    unset(type_padded)
@@ -597,11 +747,11 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
     if(PROJECT_${dep}_VERSION)
       set(version_req_str " (>= ${PROJECT_${dep}_VERSION})")
     endif()
-    pad(${dep} 20 " " dep_padded)
+    fair_pad(${dep} 20 " " dep_padded)
     if(DISABLE_COLOR)
-      pad("${version_str}${version_req_str}" 25 " " version_padded)
+      fair_pad("${version_str}${version_req_str}" 25 " " version_padded)
     else()
-      pad("${version_str}${version_req_str}" 25 " " version_padded COLOR 1)
+      fair_pad("${version_str}${version_req_str}" 25 " " version_padded COLOR 1)
     endif()
     set(prefix ${${dep}_PREFIX})
     if(${dep} STREQUAL Boost)
@@ -664,7 +814,7 @@ if(PROJECT_PACKAGE_DEPENDENCIES)
     endif()
     if(${dep} STREQUAL Geant4)
       foreach(dataset IN LISTS Geant4_DATASETS)
-        pad(${Geant4_DATASET_${dataset}_ENVVAR} 20 " " envvar_padded LEFT)
+        fair_pad(${Geant4_DATASET_${dataset}_ENVVAR} 20 " " envvar_padded LEFT)
         message(STATUS "                          ${envvar_padded}: ${Geant4_DATASET_${dataset}_PATH}")
       endforeach()
     endif()

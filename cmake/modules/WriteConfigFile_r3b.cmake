@@ -5,7 +5,7 @@
  #              GNU Lesser General Public Licence (LGPL) version 3,             #  
  #                  copied verbatim in the file "LICENSE"                       #
  ################################################################################
-MACRO (WRITE_CONFIG_FILE filename)
+macro(WRITE_CONFIG_FILE filename)
 
   String(REGEX REPLACE "^.*(install).*$" "\\1" INSTALL_VERSION ${filename})
   String(COMPARE EQUAL "install" "${INSTALL_VERSION}" INSTALL_TRUE)
@@ -157,10 +157,17 @@ MACRO (WRITE_CONFIG_FILE filename)
   CONVERT_LIST_TO_STRING(${PYTHONPATH})
   SET(MY_PYTHONPATH ${output})
 
-  SET (PATH ${ROOTSYS}/bin ${PATH})
-  UNIQUE(PATH "${PATH}")
-  CONVERT_LIST_TO_STRING(${PATH})
-  Set(MY_PATH ${output})
+   SET (PATH ${ROOTSYS}/bin ${PATH})
+#  UNIQUE(PATH "${PATH}")
+#  CONVERT_LIST_TO_STRING(${PATH})
+#  Set(MY_PATH ${output})
+# TODO: this should change to CMAKE_INSTALL_PREFIX/bin in the future
+    list(APPEND PATH ${ROOT_BINDIR})
+    list(APPEND PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    unique(PATH "${PATH}")
+    convert_list_to_string(${PATH})
+    set(MY_PATH ${output})
+
 
   If(FAIRSOFT_EXTERN)
     Set(PYTHIA8DATA "${SIMPATH}/share/pythia8/xmldoc")
@@ -170,6 +177,10 @@ MACRO (WRITE_CONFIG_FILE filename)
 
   CONVERT_LIST_TO_STRING($ENV{NEW_CLASSPATH})
   Set(MY_CLASSPATH ${output})
+  
+  # --- ADD ROOT_INCLUDE_PATH DEFINITION HERE ---
+  list(APPEND ROOT_INCLUDE_PATH ${R3B_ALL_INCLUDE_PATHS})
+  # --------------------------------------------------
 
   CONVERT_LIST_TO_STRING(${ROOT_INCLUDE_PATH})
   Set(ROOT_INCLUDE_PATH ${output})

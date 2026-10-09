@@ -615,7 +615,10 @@ class R3BGlobalAnalysisS494 : public FairTask
 	TH1F* fh_Erel_cutTofd3;
 	TH1F* fh_Erel_cutTofd4;
 	
-	
+	TH1F* fh_dtx_C;
+	TH1F* fh_dty_C;
+	TH1F* fh_dtx_He;
+	TH1F* fh_dty_He;
 	
   public:
     ClassDef(R3BGlobalAnalysisS494, 1)
