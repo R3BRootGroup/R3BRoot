@@ -20,6 +20,7 @@
 
 #define TACQUILA_CLOCK_MHZ 40.002903
 #define VFTX_CLOCK_MHZ 200
+#define TDCV4_CLOCK_MHZ 300
 #define CTDC_16_CLOCK_MHZ 150
 
 #include "R3BTCalPar.h"
@@ -98,6 +99,8 @@ class R3BTCalEngine : public TObject
      * To be called from FinishTask() method of an analysis task.
      */
     void CalculateParamVFTX();
+    /** A method to calculate calibration parameters for FaRICH electronics **/
+    void CalculateParamTDCV4();
 
   protected:
     /**

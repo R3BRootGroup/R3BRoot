@@ -70,7 +70,6 @@ void R3BTCalPar::clear()
 void R3BTCalPar::printParams()
 {
     R3BLOG(info, GetName() << " Time Calib. Parameters");
-
     R3BLOG(info, "Number of TCal Parameters " << fTCalParams->GetEntries());
     for (Int_t i = 0; i < fTCalParams->GetEntries(); i++)
     {
@@ -85,36 +84,40 @@ void R3BTCalPar::printParams()
 
 R3BTCalModulePar* R3BTCalPar::GetModuleParAt(Int_t plane, Int_t paddle, Int_t side)
 {
-    if (!fMapInit)
-    {
-        fIndexMap.clear();
-        Int_t index = 0;
-        for (size_t i = 0; i < fTCalParams->GetEntriesFast(); i++)
+
+    if (fTCalParams->GetEntriesFast() > 0)
+
+        if (!fMapInit)
         {
-            auto par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
-            if (NULL == par)
+            fIndexMap.clear();
+            Int_t index = 0;
+            for (size_t i = 0; i < fTCalParams->GetEntriesFast(); i++)
             {
-                continue;
+                auto par = dynamic_cast<R3BTCalModulePar*>(fTCalParams->At(i));
+                if (NULL == par)
+                {
+                    continue;
+                }
+                auto tplane = par->GetPlane();
+                auto tpaddle = par->GetPaddle();
+                auto tside = par->GetSide();
+                if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX || tside < 1 ||
+                    tside > N_SIDE_MAX)
+                {
+                    R3BLOG(error,
+                           "error in plane/paddle/side indexing. " << tplane << " / " << tpaddle << " / " << tside);
+                    continue;
+                }
+                index = (tplane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (tpaddle - 1) * N_SIDE_MAX + tside - 1;
+                if (fIndexMap.find(index) != fIndexMap.end())
+                {
+                    R3BLOG(error, "parameter found more than once. " << tplane << " / " << tpaddle << " / " << tside);
+                    continue;
+                }
+                fIndexMap[index] = i;
             }
-            auto tplane = par->GetPlane();
-            auto tpaddle = par->GetPaddle();
-            auto tside = par->GetSide();
-            if (tplane < 1 || tplane > N_PLANE_MAX || tpaddle < 1 || tpaddle > N_PADDLE_MAX || tside < 1 ||
-                tside > N_SIDE_MAX)
-            {
-                R3BLOG(error, "error in plane/paddle/side indexing. " << tplane << " / " << tpaddle << " / " << tside);
-                continue;
-            }
-            index = (tplane - 1) * N_PADDLE_MAX * N_SIDE_MAX + (tpaddle - 1) * N_SIDE_MAX + tside - 1;
-            if (fIndexMap.find(index) != fIndexMap.end())
-            {
-                R3BLOG(error, "parameter found more than once. " << tplane << " / " << tpaddle << " / " << tside);
-                continue;
-            }
-            fIndexMap[index] = i;
+            fMapInit = kTRUE;
         }
-        fMapInit = kTRUE;
-    }
 
     if (plane < 1 || plane > N_PLANE_MAX || paddle < 1 || paddle > N_PADDLE_MAX || side < 1 || side > N_SIDE_MAX)
     {

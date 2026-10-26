@@ -114,6 +114,9 @@ set(SRCS
     dmData/R3BDMMappedData.cxx
     dmData/R3BDMCalData.cxx
     dmData/R3BDMHitData.cxx
+    hfibData/R3BHFIBMappedData.cxx
+    hfibData/R3BHFIBCalData.cxx
+    hfibData/R3BHFIBHitData.cxx
     sampData/R3BSamplerMappedData.cxx
     sampData/R3BSampLosMappedData.cxx
     sci2Data/R3BSci2CalData.cxx
@@ -258,6 +261,9 @@ set(HEADERS
     dmData/R3BDMMappedData.h
     dmData/R3BDMCalData.h
     dmData/R3BDMHitData.h
+    hfibData/R3BHFIBMappedData.h
+    hfibData/R3BHFIBCalData.h
+    hfibData/R3BHFIBHitData.h
     sampData/R3BSamplerMappedData.h
     sampData/R3BSampLosMappedData.h
     sci2Data/R3BSci2CalData.h
@@ -326,6 +332,7 @@ set(DIRS
     rpcData
     pwData
     dmData
+    hfibData
     sampData
     sci2Data
     sci8Data

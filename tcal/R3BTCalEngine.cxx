@@ -57,8 +57,8 @@ void R3BTCalEngine::Fill(Int_t plane, Int_t paddle, Int_t side, Int_t tdc)
     }
     fhData[plane - 1][paddle - 1][side - 1]->Fill(tdc);
 
-    //  LOG(info) << "R3BTCalEngine:: " << plane << " " << paddle<< " "<<side<<" "<< fhData[plane - 1][paddle - 1][side
-    //  - 1]->GetEntries();
+    LOG(info) << "R3BTCalEngine:: " << plane << " " << paddle << " " << side << " "
+              << fhData[plane - 1][paddle - 1][side - 1]->GetEntries();
 }
 
 void R3BTCalEngine::CalculateParamClockTDC(enum CTDCVariant a_variant)
@@ -270,6 +270,7 @@ void R3BTCalEngine::CalculateParamTacquila()
 
 void R3BTCalEngine::CalculateParamVFTX()
 {
+
     fClockFreq = 1. / VFTX_CLOCK_MHZ * 1000.;
     R3BLOG(info, "Num Det: " << N_PLANE_MAX << ", Num Paddles: " << N_PADDLE_MAX);
 
@@ -339,6 +340,80 @@ void R3BTCalEngine::CalculateParamVFTX()
                 fhTime[i][j][k]->Write();
 
                 R3BLOG(info, "Module: " << (i + 1) << " / " << (j + 1) << " / " << (k + 1) << " is calibrated.");
+            }
+        }
+    }
+    fCal_Par->setChanged();
+}
+
+void R3BTCalEngine::CalculateParamTDCV4()
+{
+    fClockFreq = 1. / TDCV4_CLOCK_MHZ * 1000.;
+
+    for (Int_t i = 0; i < N_PLANE_MAX; i++)
+    {
+        // FaRICH TDCs
+        for (Int_t j = 0; j < 33; j++)
+        {
+            // leading/falling
+            for (Int_t k = 0; k < N_SIDE_MAX; k++)
+            {
+                if (NULL == fhData[i][j][k])
+                {
+                    continue;
+                }
+                if (fhData[i][j][k]->GetEntries() < fMinStats)
+                {
+                    R3BLOG(info, " fMinStatus: " << fhData[i][j][k]->GetEntries() << ", " << fMinStats);
+                    continue;
+                }
+
+                // Define range of channels
+                Int_t ic, iMin, iMax;
+                FindRange(fhData[i][j][k], ic, iMin, iMax);
+                if (iMin < 0 || iMax > 4097)
+                {
+                    R3BLOG(warn, "Out of range, Min: " << iMin << " , Max: " << iMax);
+                    return;
+                }
+                R3BLOG(info, "Range of channels: " << iMin << " - " << iMax);
+
+                Double_t total = fhData[i][j][k]->Integral(iMin, iMax);
+                for (Int_t ii = iMin; ii <= iMax; ii++)
+                {
+                    fhTime[i][j][k]->SetBinContent(ii, fhData[i][j][k]->Integral(iMin, ii) / total * fClockFreq);
+                }
+
+                Int_t nparam = 0;
+
+                auto pTCal = new R3BTCalModulePar();
+                pTCal->SetPlane(i + 1);
+                pTCal->SetPaddle(j + 1);
+                pTCal->SetSide(k + 1);
+
+                for (Int_t ibin = iMin; ibin <= iMax; ibin++)
+                {
+                    Double_t time = fhData[i][j][k]->Integral(iMin, ibin) / total;
+                    if (time > 1.)
+                    {
+                        LOG(fatal) << "Integration error.";
+                    }
+                    time *= fClockFreq;
+
+                    pTCal->SetBinLowAt(ibin, nparam);
+                    pTCal->SetOffsetAt(time, nparam);
+                    pTCal->IncrementNofChannels();
+                    nparam += 1;
+                }
+
+                fCal_Par->AddModulePar(pTCal);
+
+                R3BLOG(info, "Number of parameters: " << nparam);
+
+                fhData[i][j][k]->Write();
+                fhTime[i][j][k]->Write();
+
+                R3BLOG(info, "Fiber: " << (i + 1) << " / " << (j + 1) << " / " << (k + 1) << " is calibrated.");
             }
         }
     }
