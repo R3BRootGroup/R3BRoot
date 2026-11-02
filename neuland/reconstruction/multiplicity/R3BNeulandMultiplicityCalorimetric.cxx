@@ -49,7 +49,7 @@ auto R3BNeulandMultiplicityCalorimetric::Init() -> InitStatus
         throw R3B::runtime_error("R3BNeulandMultiplicityCalorimetric::Init: No R3BNeulandMultiplicityCalorimetricPar!");
     }
     // FIXME: FairRuntimeDB needs to be forced to load the Data from the second file with Run Id 1
-    rtdb->initContainers(rtdb->getCurrentRun()->getRunId(), 1);
+    [[maybe_unused]] auto res = rtdb->initContainers(rtdb->getCurrentRun()->getRunId(), 1);
 
     return kSUCCESS;
 }

@@ -14,6 +14,7 @@
 #ifndef R3BMusliCal2Hit_H
 #define R3BMusliCal2Hit_H 1
 
+#include <cmath>
 #include "TArrayD.h"
 
 #include "FairTask.h"

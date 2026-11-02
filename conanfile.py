@@ -8,7 +8,7 @@ class CompressorRecipe(ConanFile):
     def requirements(self):
         self.requires("ms-gsl/4.0.0")  # type: ignore
         self.requires("range-v3/0.12.0")  # type: ignore
-        self.requires("gtest/cci.20210126")  # type: ignore
+        self.requires("gtest/1.18.0")  # type: ignore
         self.requires("nlohmann_json/3.12.0")  # type: ignore
         self.requires("magic_enum/0.9.7")  # type: ignore
         self.requires("cli11/2.5.0")  # type: ignore

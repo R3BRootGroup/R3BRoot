@@ -116,7 +116,7 @@ namespace
         //  Search for min ToF:
         double minHitToF = MIN_TOF_DEFAULT;
 
-        for (const auto [map_point, map_track] : point_to_track_map)
+        for (const auto& [map_point, map_track] : point_to_track_map)
         {
             // Only look at points traced back to this track:
             // AND where a hit is registered

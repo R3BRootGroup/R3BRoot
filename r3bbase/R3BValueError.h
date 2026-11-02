@@ -50,7 +50,8 @@ namespace R3B
         {
         }
 
-        constexpr explicit ValueError(DataType val)
+        // NOLINTNEXTLINE (google-explicit-constructor)
+        constexpr ValueError(DataType val)
             : ValueError{ val, DataType{} }
         {
         }

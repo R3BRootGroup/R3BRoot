@@ -171,14 +171,14 @@ namespace R3B::Neuland::Calibration
         {
         }
 
-        template <>
-        void add_signals<MillepedeCalibrationMode::offset_effective_c>(const DataBufferType& processed_data,
-                                                                       const TrackFitResult& fit_coeff);
-        template <>
-        void add_signals<MillepedeCalibrationMode::tsync>(const DataBufferType& processed_data,
-                                                          const TrackFitResult& fit_coeff);
-
         auto select_t_sync_signal(const std::vector<MilleCalData>& plane_data);
     };
 
+    template <>
+    void MillepedeEngine::add_signals<MillepedeCalibrationMode::offset_effective_c>(
+        const DataBufferType& processed_data,
+        const TrackFitResult& fit_coeff);
+    template <>
+    void MillepedeEngine::add_signals<MillepedeCalibrationMode::tsync>(const DataBufferType& processed_data,
+                                                                       const TrackFitResult& fit_coeff);
 } // namespace R3B::Neuland::Calibration

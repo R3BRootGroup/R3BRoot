@@ -229,6 +229,7 @@ namespace R3B::Neuland::Calibration
                 case GlobalLabel::effective_c:
                     return module_num + num_of_module;
                 default:
+                    return -1;
             }
         }
         throw R3B::logic_error(fmt::format("cal mode {} is not implemented!", magic_enum::enum_name(config_.cal_mode)));

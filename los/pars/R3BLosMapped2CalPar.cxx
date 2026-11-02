@@ -151,11 +151,11 @@ void R3BLosMapped2CalPar::FinishTask()
     R3BLOG(debug, "Calibration of LOS detector");
     for (Int_t i = 0; i < 16; i++)
     {
-        for (size_t i = 0; i < fNofChannels; i++)
+        for (size_t num_of_channel = 0; num_of_channel < fNofChannels; num_of_channel++)
         {
             for (size_t k = 0; k < fNofTypes; k++)
             {
-                R3BLOG(debug, "Channel: " << i + 1 << ", Type: " << k << ", Count: " << Icount[i][k]);
+                R3BLOG(debug, "Channel: " << num_of_channel + 1 << ", Type: " << k << ", Count: " << Icount[num_of_channel][k]);
             }
         }
     }

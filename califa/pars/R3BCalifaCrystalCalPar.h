@@ -19,6 +19,7 @@
 #include <TObjArray.h>
 #include <TObjString.h>
 #include <TObject.h>
+#include <algorithm>
 #include <cassert>
 
 class FairParamList;

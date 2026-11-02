@@ -14,6 +14,7 @@
 #pragma once
 
 #include <FairParGenericSet.h>
+#include <cmath>
 
 class FairParamList;
 
