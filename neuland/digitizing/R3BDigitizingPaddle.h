@@ -30,7 +30,7 @@ namespace R3B::Digitizing
         Type right{};
         LRPair(Type p_left, Type p_right)
             : left(p_left)
-            , right(p_right){};
+            , right(p_right) {};
         LRPair() = default;
     };
 

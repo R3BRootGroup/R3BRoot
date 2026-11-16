@@ -270,7 +270,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
     {
         // WIP: ToF Calculation -> Should respect other origin than 0,0,0,0.
         const Double_t s2 = std::pow(npnip->GetX(), 2) + std::pow(npnip->GetY(), 2) + std::pow(npnip->GetZ(), 2); // cm²
-        const Double_t v2 = s2 / std::pow(npnip->GetTime(), 2); // ns²
+        const Double_t v2 = s2 / std::pow(npnip->GetTime(), 2);                                                   // ns²
 
         const Double_t c2 = 898.75517873681758374898; // cm²/ns²
         const Double_t massNeutron = 939.565379;      // MeV/c²
@@ -318,7 +318,7 @@ void R3BNeulandMCMon::Exec(Option_t*)
                 }
                 // Get Energy py particle where the mother is a primary neutron
                 fhmEPdg[mcTrack->GetPdgCode()]->Fill(point->GetLightYield() * 1000.); // point->GetEnergyLoss()*1000.);
-            }                                                                         // end primary neutron mother
+            } // end primary neutron mother
 
             // Sum energy per particle type per event
             if (!EtotPDG[mcTrack->GetPdgCode()])

@@ -68,7 +68,7 @@ class R3BEventHeader : public FairEventHeader
 
     [[nodiscard]] double GetTnext() const { return fTnext; }
 
-    void Register(bool Persistance = true) override{};
+    void Register(bool Persistance = true) override {};
 
     auto operator=(const TNamed& obj) -> R3BEventHeader&
     {

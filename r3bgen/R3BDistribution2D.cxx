@@ -75,17 +75,15 @@ R3BDistribution<Dim> R3BDistribution2D::Gaussian(const Arr means, const Arr sigm
 R3BDistribution<Dim> R3BDistribution2D::Square(const Arr center, const Double_t edgeLength)
 {
     return R3BDistribution<Dim>(
-        [center, edgeLength](const Arr values) -> Arr {
-            return { center[0] + edgeLength * (values[0] - 0.5), center[1] + edgeLength * (values[1] - 0.5) };
-        });
+        [center, edgeLength](const Arr values) -> Arr
+        { return { center[0] + edgeLength * (values[0] - 0.5), center[1] + edgeLength * (values[1] - 0.5) }; });
 }
 
 R3BDistribution<Dim> R3BDistribution2D::Rectangle(const Arr center, const Arr edgeLengths)
 {
     return R3BDistribution<Dim>(
-        [center, edgeLengths](const Arr values) -> Arr {
-            return { center[0] + edgeLengths[0] * (values[0] - 0.5), center[1] + edgeLengths[1] * (values[1] - 0.5) };
-        });
+        [center, edgeLengths](const Arr values) -> Arr
+        { return { center[0] + edgeLengths[0] * (values[0] - 0.5), center[1] + edgeLengths[1] * (values[1] - 0.5) }; });
 }
 
 R3BDistribution<Dim> R3BDistribution2D::Circle(const Arr center, const Double_t radius)

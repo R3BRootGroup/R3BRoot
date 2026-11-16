@@ -164,7 +164,7 @@ Bool_t R3BTofdReader::R3BRead()
             }
 
         } // for side
-    }     // for planes
+    } // for planes
 
     // TAMEX trigger times.
     if (fArrayTrigger)

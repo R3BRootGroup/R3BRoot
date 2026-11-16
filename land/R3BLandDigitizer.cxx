@@ -322,7 +322,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
                 }
             }
         } //! eloss
-    }     //! MC hits
+    } //! MC hits
 
     Double_t temp[1500][3];
 
@@ -401,7 +401,7 @@ void R3BLandDigitizer::Exec(Option_t* opt)
                 {
                     triggerTime = PM_res[i][j + 1].Ltime;
                 } // find minimum
-            }     // if above threshold
+            } // if above threshold
 
             PM_res[i][j + 1].Renergy = lambda * PM_res[i][j + 1].RlightCFD;
             PM_res[i][j + 1].Renergy =
@@ -414,9 +414,9 @@ void R3BLandDigitizer::Exec(Option_t* opt)
                 {
                     triggerTime = PM_res[i][j + 1].Rtime;
                 } // find minimum
-            }     // if above threshold
-        }         // digis
-    }             // paddles
+            } // if above threshold
+        } // digis
+    } // paddles
 
     //  Double_t temp[1500][3];
     for (Int_t i = 0; i < npaddles; i++)

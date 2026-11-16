@@ -427,7 +427,7 @@ Int_t R3BNeutronTracker2D::AdvancedMethod()
             fNofTracks += 1;
             break;
         } // clusters
-    }     // nNeut
+    } // nNeut
 
     return nOutput;
 }

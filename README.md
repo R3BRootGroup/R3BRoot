@@ -46,9 +46,9 @@ R3BRoot delivers various project templates that can be used as a starting point 
 
 First, you will need to install FairSoft and FairRoot. For more details:
 
-1. Install [FairSoft](https://github.com/FairRootGroup/FairSoft), required version jan24p1 or later
+1. Install [FairSoft](https://github.com/FairRootGroup/FairSoft), required version jan24p6 or later
 
-2. Install [FairRoot](http://fairroot.gsi.de), required version 18.8.1 or later
+2. Install [FairRoot](http://fairroot.gsi.de), required version 18.8.2 or later
 
 ### Configure and Compile
 
@@ -84,7 +84,7 @@ Please ask your questions, request features, and report issues by [creating a gi
 
 ## Code Formatting
 
-The R3BRoot project uses clang-format-16 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
+The R3BRoot project uses clang-format-19 to ensure a common code formatting. The script "clang-format-all.sh" can be used for this purpose: 
 ~~~bash
 . util/clang-format-all.sh
 ~~~

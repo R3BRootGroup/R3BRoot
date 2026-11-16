@@ -90,7 +90,7 @@ class R3BScalersOnlineSpectra : public FairTask
      */
     void FinishTask() override;
 
-    void SetParContainers() override{};
+    void SetParContainers() override {};
 
     /**
      * Method for setting the fTpat

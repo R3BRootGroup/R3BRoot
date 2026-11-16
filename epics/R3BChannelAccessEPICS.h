@@ -46,9 +46,9 @@ class R3BChannelAccessEPICS : public R3BChannelAccess
     chtype GetType() const;
     void Set(double);
 
-    ClassDef(R3BChannelAccessEPICS, 1)
+  ClassDef(R3BChannelAccessEPICS, 1)
 
-        private : TString fName;
+      private : TString fName;
     double fValue;
     chid fId;
     chtype fType;
@@ -63,9 +63,9 @@ class R3BChannelAccessGroupEPICS : public R3BChannelAccessGroup
     bool Commit();
     bool Fetch();
 
-    ClassDef(R3BChannelAccessGroupEPICS, 1)
+  ClassDef(R3BChannelAccessGroupEPICS, 1)
 
-        private : bool PendIO(char const*);
+      private : bool PendIO(char const*);
     bool Search();
 
     TClonesArray fChannelArray;
@@ -79,9 +79,9 @@ class R3BChannelAccessMasterEPICS : public R3BChannelAccessMaster
     ~R3BChannelAccessMasterEPICS();
     R3BChannelAccessGroup* CreateGroup();
 
-    ClassDef(R3BChannelAccessMasterEPICS, 1)
+  ClassDef(R3BChannelAccessMasterEPICS, 1)
 
-        private : TClonesArray fGroupArray;
+      private : TClonesArray fGroupArray;
 };
 
 #endif

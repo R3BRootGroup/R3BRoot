@@ -480,7 +480,7 @@ void R3BOnlineSpectraSci2::Exec(Option_t* option)
                 multTcal[iDet * fNbChannels + iCh]++;
                 iRawTimeNs[iDet * fNbChannels + iCh] = hittcal->GetRawTimeNs();
             } // --- end of loop over Tcal data --- //
-        }     //--- end of if Tcal data --- //
+        } //--- end of if Tcal data --- //
 
         // --- ----------------------------------------- --- //
         // --- filling some histogramms outside the loop --- //

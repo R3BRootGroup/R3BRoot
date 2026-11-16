@@ -124,9 +124,8 @@ R3BAmsStripCalData* R3BAmsDigitizer::AddCal(Int_t detid, Int_t sideid, Int_t str
 
     R3BLOG_IF(info,
               fVerbose,
-              "Adding StripCalData "
-                  << " with unique identifier " << detid << " strip " << stripid << " side " << sideid
-                  << " energy=" << energy);
+              "Adding StripCalData " << " with unique identifier " << detid << " strip " << stripid << " side "
+                                     << sideid << " energy=" << energy);
 
     return new (clref[size]) R3BAmsStripCalData(detid, sideid, stripid, energy);
 }
