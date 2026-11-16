@@ -92,13 +92,9 @@ jobs:
         # Here are the groups of repositories that need to be downloaded inside
         # r3broot. Each group is used by only one job.
         repos: [ r3broot, sofia-frs-asy-glad-tpc, r3broot-conan ]
-        os: [ debian11, debian12 ]
+        os: [ debian12 ]
         fsv: [ jan24p5 ]
         cpp: [ 17 ]
-        exclude:
-          - os: debian11
-            fsv: jan24p5
-            repos: r3broot-conan
 
         # The list under "include" defines some properties for each group:
         #
