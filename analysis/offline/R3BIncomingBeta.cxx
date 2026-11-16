@@ -518,7 +518,7 @@ void R3BIncomingBeta::Exec(Option_t*)
                         if (!fUseMultHit)
                             break;
                     }
-                }             // end: if (num_tof_candidates == 0 && fHeader->GetExpId() == 509)
+                } // end: if (num_tof_candidates == 0 && fHeader->GetExpId() == 509)
                 if (fUseTref) // Tref defines when the trigger time is. And only one hit is recorded.
                     break;
             } // End of loop with LOS mult

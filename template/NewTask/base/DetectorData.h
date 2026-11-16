@@ -24,7 +24,7 @@ namespace R3B
     {
       public:
         explicit DetectorData(std::string_view name = "DefaultName")
-            : TNamed(name.data(), ""){};
+            : TNamed(name.data(), "") {};
 
         int module_num = 0; // starts from 1
         int module_id = 0;  // starts from 0

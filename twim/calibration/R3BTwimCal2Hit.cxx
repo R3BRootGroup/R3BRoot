@@ -526,7 +526,7 @@ void R3BTwimCal2Hit::S4551()
                         AddHitData(i + 1, theta, zhit, dt_ref, offset, Esum_mean);
                 }
             } // loop nba>8
-        }     // loop NumSec
+        } // loop NumSec
         if (CalDat)
             delete[] CalDat;
         if (HitTofW)

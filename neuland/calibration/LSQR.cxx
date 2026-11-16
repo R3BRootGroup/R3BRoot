@@ -767,9 +767,9 @@ void lsqr(lsqr_input* input,
         if ((term_iter < term_iter_max) && (output->num_iters < input->max_iter))
             output->term_flag = 0;
     } /* end while loop */
-      /*
-       *  Finish computing the standard error estimates vector se.
-       */
+    /*
+     *  Finish computing the standard error estimates vector se.
+     */
     temp = 1.0;
 
     if (input->num_rows > input->num_cols)

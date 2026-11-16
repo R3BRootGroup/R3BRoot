@@ -751,8 +751,8 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                                         Traw[sta * fNbPmts + 2]);
                                     cpt++;
                                 } // end of if mult = 1
-                            }     // end of loop over stop FrsSci
-                        }         // end of loop over start FrsSco
+                            } // end of loop over stop FrsSci
+                        } // end of loop over start FrsSco
                     }
                 }
             } // --- end of if Tcal->GetEntries() >0 --- //
@@ -777,8 +777,8 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                         fh1_Cal_PosRaw[iDet]->Fill(hitposcal->GetRawPosNs());
                         fh1_Cal_PosCal[iDet]->Fill(hitposcal->GetCalPosMm());
                     } // end of loop over pos cal data
-                }     // --- end of if fPosCal->GetEntries() >0 --- //
-            }         // end of if fPosCal
+                } // --- end of if fPosCal->GetEntries() >0 --- //
+            } // end of if fPosCal
             if (fTofCal)
             {
                 if (fTofCal->GetEntriesFast() > 0)
@@ -803,8 +803,8 @@ void R3BOnlineSpectraFrsSci::Exec(Option_t* option)
                         fh2_Cal_AoQVsPosSta[iRank]->Fill(hittofcal->GetCalPosStaMm(), hittofcal->GetAoQ());
                         fh2_Cal_AoQVsPosSto[iRank]->Fill(hittofcal->GetCalPosStoMm(), hittofcal->GetAoQ());
                     } // end of loop over tof cal data
-                }     // --- end of if fTofCal->GetEntries() >0 --- //
-            }         // end of if fTofCal
+                } // --- end of if fTofCal->GetEntries() >0 --- //
+            } // end of if fTofCal
 
         } // end of if Tcal
 

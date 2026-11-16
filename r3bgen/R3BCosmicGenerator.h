@@ -43,7 +43,7 @@ class R3BCosmicGenerator : public FairGenerator
     R3BCosmicGenerator(const Int_t pdgid = 13, const Int_t mult = 1, const UInt_t seed = 0U);
 
     /** Destructor **/
-    virtual ~R3BCosmicGenerator(){};
+    virtual ~R3BCosmicGenerator() {};
 
     /** Modifiers **/
     void SetPDGType(const Int_t pdg) { fPDGType = pdg; };

@@ -47,7 +47,7 @@ class R3BReader : public TNamed
     /* Return actual name of the reader */
 
     // actions when closed
-    virtual void Close(){};
+    virtual void Close() {};
 
   private:
     R3B::UcesbMap extra_conditions_ = R3B::UcesbMap::zero;

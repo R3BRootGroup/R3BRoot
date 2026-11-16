@@ -214,7 +214,7 @@ void R3BSci2Tcal2Hit::Exec(Option_t* option)
             }
             // end of hit loop
         } // end of loop over the number of detectors
-    }     // end of if Tcal data
+    } // end of if Tcal data
     return;
 }
 

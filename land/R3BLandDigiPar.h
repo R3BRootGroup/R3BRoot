@@ -29,8 +29,8 @@ class R3BLandDigiPar : public FairParGenericSet
     R3BLandDigiPar(const char* name = "R3BLandDigiParTest",
                    const char* title = "Tutorial  parameter",
                    const char* context = "TestDefaultContext");
-    ~R3BLandDigiPar(void){};
-    void clear(void){};
+    ~R3BLandDigiPar(void) {};
+    void clear(void) {};
     void putParams(FairParamList* list);
     Bool_t getParams(FairParamList* list);
 

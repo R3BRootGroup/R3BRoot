@@ -18,14 +18,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
-      - name: Code formatting
-        run: |
-          cd $GITHUB_WORKSPACE
+    - uses: actions/checkout@v6
+    - name: Check code formatting
+      run: |
+        if ! command -v clang-format-19 >/dev/null 2>&1; then
+          echo "Installing clang-format-19..."
           sudo apt-get update
-          sudo apt-get install clang-format-16
-          ./util/clang-format-check.sh clang-format-16
-        shell: bash
+          sudo apt-get install -y clang-format-19
+        else
+          echo "clang-format-19 is already installed."
+        fi
+        clang-format-19 --version
+        ./util/clang-format-check.sh clang-format-19
+      shell: bash
         
   clang-tidy:
     runs-on: ubuntu-latest
