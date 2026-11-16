@@ -24,6 +24,6 @@ cdash_build()
 
 cdash_test()
 
-cdash_submit()
+#cdash_submit()
 
 print_error()
