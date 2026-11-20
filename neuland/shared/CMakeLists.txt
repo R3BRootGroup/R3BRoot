@@ -43,23 +43,21 @@ set(HEADERS
     Validated.h
 )
 
-add_library(R3BNeulandShared SHARED ${SRCS})
-target_include_directories(R3BNeulandShared PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(
-    R3BNeulandShared
-    PUBLIC
-        R3BData
-        Boost::program_options
-        Microsoft.GSL::GSL
-        range-v3::range-v3
-        nlohmann_json::nlohmann_json
-)
-
-root_generate_dictionary(
-    R3BNeulandShared_dict
-    ${HEADERS}
-    MODULE
+add_library_with_dictionary(
+    LIBNAME
     R3BNeulandShared
     LINKDEF
     NeulandSharedLinkDef.h
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    R3BData
+    Boost::program_options
+    Microsoft.GSL::GSL
+    range-v3::range-v3
+    nlohmann_json::nlohmann_json
 )

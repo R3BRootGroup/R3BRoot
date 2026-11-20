@@ -21,7 +21,8 @@ set(SRCS
     R3BNeulandMapToCalParTask.cxx
     R3BNeulandMapToCalTask.cxx
     R3BTrigIDMappingFinder.cxx
-    R3BTrigIDMappingFinder.cxx)
+    R3BTrigIDMappingFinder.cxx
+)
 
 set(HEADERS
     # cmake-format: sortable
@@ -31,18 +32,21 @@ set(HEADERS
     R3BNeulandMapToCalPar.h
     R3BNeulandMapToCalParTask.h
     R3BNeulandMapToCalTask.h
-    R3BTrigIDMappingFinder.h)
+    R3BTrigIDMappingFinder.h
+)
 
-add_library(R3BNeulandMapToCal SHARED ${SRCS})
-target_include_directories(R3BNeulandMapToCal PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-
-target_link_libraries(R3BNeulandMapToCal PUBLIC R3BNeulandCalibrationShare
-                                                nlohmann_json::nlohmann_json)
-
-root_generate_dictionary(
-    R3BNeulandMapToCal_dict
-    ${HEADERS}
-    MODULE
+add_library_with_dictionary(
+    LIBNAME
     R3BNeulandMapToCal
     LINKDEF
-    NeulandMapToCalLinkDef.h)
+    NeulandMapToCalLinkDef.h
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    R3BNeulandCalibrationShare
+    nlohmann_json::nlohmann_json
+)

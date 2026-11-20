@@ -21,16 +21,20 @@ set(HEADERS
     R3BNeulandCalibrationTask.h
     R3BNeulandParDirCreator.h
     R3BNeulandParSet.h
-    R3BNeulandTriggerTypes.h)
+    R3BNeulandTriggerTypes.h
+)
 
-add_library(R3BNeulandCalibrationShare SHARED ${SRCS})
-target_include_directories(R3BNeulandCalibrationShare PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_definitions(R3BNeulandCalibrationShare PUBLIC JSON_USE_IMPLICIT_CONVERSIONS=0)
-target_link_libraries(R3BNeulandCalibrationShare PUBLIC R3BNeulandShared)
-root_generate_dictionary(
-    R3BNeulandCalibrationShare_dict
-    ${HEADERS}
-    MODULE
+add_library_with_dictionary(
+    LIBNAME
     R3BNeulandCalibrationShare
     LINKDEF
-    NeulandCalShareLinkDef.h)
+    NeulandCalShareLinkDef.h
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    R3BNeulandShared
+)

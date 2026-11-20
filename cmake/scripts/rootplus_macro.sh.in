@@ -9,25 +9,8 @@
 # to be passed to root.
 
 # Setup the needed environment
-export LD_LIBRARY_PATH=@MY_LD_LIBRARY_PATH@:$LD_LIBRARY_PATH
-export DYLD_LIBRARY_PATH=@MY_LD_LIBRARY_PATH@:$DYLD_LIBRARY_PATH
-export PATH=@SIMPATH@/bin:$PATH:@Geant4_DIR@
-export ROOTSYS=@ROOTSYS@
-export ROOTEXE=@ROOT_INSTALL_DIR@/bin/root.exe
-export ROOT_INCLUDE_PATH=@Geant3_INCLUDE_DIRS@:@MY_ROOT_INCLUDE_PATH@
-export FAIRROOTPATH="@FAIRROOTPATH@"
-export VMCWORKDIR=@VMCWORKDIR@
-export Geant4VMC_MACRO_DIR=@Geant4VMC_MACRO_DIR@
-export USE_VGM=1
-export BOOST=@Boost_Avail@
 
-@Geant4Data_Variables_sh@
-
-export G3SYS="@Geant3_SYSTEM_DIR@"
-export PYTHIA8DATA="@PYTHIA8DATA@"
-if [ -e @Geant4_DIR@/env.sh ]; then
-  . @Geant4_DIR@/env.sh
-fi
+source @CMAKE_BINARY_DIR@/config.sh
 
 # Concatenate all parameters given on the command line to one
 # comma separated string
@@ -44,4 +27,4 @@ cd @new_path@
 ROOT_INCLUDE_PATH+=:$(echo $(  find  "$VMCWORKDIR/" -iname \*.h | xargs dirname | sort | uniq ) |  sed 's/ /:/g')
 
 # execute root with the defined macro and the command line parameters
-$ROOTEXE -q -b @my_script_name@+g\($parameters\)
+root -q -b @my_script_name@\($parameters\)

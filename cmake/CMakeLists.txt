@@ -14,5 +14,5 @@
 install(DIRECTORY
   modules
   scripts
-  DESTINATION ${PROJECT_INSTALL_DATADIR}/cmake
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/cmake
 )

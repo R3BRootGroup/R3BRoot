@@ -28,7 +28,8 @@ set(SRCS
     # neutrons/R3BNeulandNeutronsKeras.cxx
     R3BNeulandReconstructionContFact.cxx
     R3BNeulandNeutronReconstructionMon.cxx
-    R3BNeulandNeutronReconstructionStatistics.cxx)
+    R3BNeulandNeutronReconstructionStatistics.cxx
+)
 set(HEADERS
     multiplicity/R3BNeulandMultiplicityBayes.h
     multiplicity/R3BNeulandMultiplicityBayesPar.h
@@ -45,10 +46,22 @@ set(HEADERS
     # neutrons/R3BNeulandNeutronsKeras.h
     R3BNeulandReconstructionContFact.h
     R3BNeulandNeutronReconstructionMon.h
-    R3BNeulandNeutronReconstructionStatistics.h)
+    R3BNeulandNeutronReconstructionStatistics.h
+)
 
-add_library(R3BNeulandReconstruction SHARED ${SRCS})
-target_include_directories(R3BNeulandReconstruction PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} multiplicity neutrons)
-target_link_libraries(R3BNeulandReconstruction PUBLIC R3BNeulandShared)
-root_generate_dictionary(R3BNeulandReconstruction_dict ${HEADERS} MODULE R3BNeulandReconstruction LINKDEF
-                         NeulandReconstructionLinkDef.h)
+add_library_with_dictionary(
+    LIBNAME
+    R3BNeulandReconstruction
+    LINKDEF
+    NeulandReconstructionLinkDef.h
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    multiplicity 
+    neutrons
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    R3BNeulandShared
+)

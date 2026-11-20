@@ -50,8 +50,7 @@ add_library_with_dictionary(
     SRCS
     ${SRCS}
     INCLUDEDIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}/Muon
+    Muon
     HEADERS
     ${HEADERS}
     DEPENDENCIES
