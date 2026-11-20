@@ -15,7 +15,7 @@ if [ $same_system -eq 1 ]; then
 	export FAIRROOTPATH="@FAIRROOTPATH@"
 	export UCESB_DIR="@UCESBPATH@"
 	export UCESB_BASE="@UCESBPATH@"
-	export R3BROOTPATH="@R3BROOTPATH@"
+	export R3BROOTPATH="@MY_R3BROOTPATH@"
   if (@FULL_CONFIG_FILE@); then
     export Geant4_INCLUDE_DIRS="@Geant4_INCLUDE_DIRS@"
     export Geant4VMC_INCLUDE_DIRS="@Geant4VMC_INCLUDE_DIRS@"
@@ -40,6 +40,7 @@ if [ $same_system -eq 1 ]; then
   export ROOT_INCLUDE_PATH="@Geant3_INCLUDE_DIRS@:@ROOT_INCLUDE_PATH@"
   export VMCWORKDIR="@VMCWORKDIR@"
   export FAIRLIBDIR="@FAIRLIBDIR@"
+  export ROOT_LIBRARY_PATH="@FAIRLIBDIR@"
   export PYTHONPATH="@MY_PYTHONPATH@"
 	case $1 in
 		-r | --replace )

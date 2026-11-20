@@ -27,13 +27,27 @@ cmake_minimum_required(VERSION 3.27 FATAL_ERROR)
 cmake_policy(VERSION 3.27...4.2)
 
 # Set name of our project to "R3BROOT". Has to be done after check of cmake version
-project(R3BROOT LANGUAGES C CXX Fortran)
+project(R3BRoot LANGUAGES C CXX Fortran)
 
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
 # use default gnu install convention:
 include(GNUInstallDirs)
+
+if(APPLE)
+    set(BASE_DIR "@loader_path")
+else()
+    set(BASE_DIR "$ORIGIN")
+endif()
+
+file(
+    RELATIVE_PATH
+    relDir
+    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}
+    ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}
+)
+set(CMAKE_INSTALL_RPATH ${BASE_DIR} ${BASE_DIR}/${relDir})
 
 option(BUILD_LAND_DIR "Build old land module" ON)
 option(WITH_DOX "Generate doxygen documentation" OFF)
@@ -78,6 +92,7 @@ set(FAIRROOTPATH $ENV{FAIRROOTPATH})
 include(cmake/utils/create_library_with_dictionary.cmake)
 include(cmake/scripts/set_ld_library_dir.cmake)
 set(GRAPHVIZ_EXTERNAL_LIBS FALSE)
+set_property(GLOBAL PROPERTY R3BROOT_BUILD_TREE_INCLUDE_DIRS "")
 
 list(APPEND CMAKE_PREFIX_PATH ${SIMPATH})
 list(APPEND CMAKE_PREFIX_PATH ${FAIRROOTPATH})
@@ -546,7 +561,7 @@ else(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 endif(EXISTS "${R3BROOT_SOURCE_DIR}/asyeos/")
 
 configure_file(${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfigVersion.cmake.in
-               "${CMAKE_BINARY_DIR}/R3BRootConfigVersion.cmake" @ONLY)
+        "${CMAKE_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake" @ONLY)
 
 # r3b_generate_version_info()
 
@@ -652,6 +667,7 @@ if(NOT MODULE)
     #================================================================================
     # TODO: Since other dependencies still use the old cmake configurations, include(ROOTMacros) has to be used. Please change them using CMake targets ASAP.
     include(ROOTMacros)
+    include(RootCTest)
     if(EXISTS "${PROJECT_SOURCE_DIR}/R3BFileSource")
         add_subdirectory(R3BFileSource)
     endif(EXISTS "${PROJECT_SOURCE_DIR}/R3BFileSource")
@@ -694,6 +710,49 @@ if(EXISTS ${CMAKE_SOURCE_DIR}/c3w.conf)
 else()
     set(c3w_summary "${BYellow}NO${CR}")
 endif()
+
+# Install ######################################################################
+include(CMakePackageConfigHelpers)
+
+set(cmakeModulesDir cmake)
+
+configure_package_config_file(
+    ${CMAKE_SOURCE_DIR}/cmake/scripts/R3BRootConfig.cmake.in
+    ${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    PATH_VARS cmakeModulesDir
+    NO_SET_AND_CHECK_MACRO
+    NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+
+install(
+    EXPORT R3BRootLibs
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+    NAMESPACE ${PROJECT_NAME}::
+    FILE ${PROJECT_NAME}Config-targets.cmake
+)
+
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(
+    FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/check_system.sh
+        ${CMAKE_CURRENT_BINARY_DIR}/check_system.csh
+    DESTINATION "${CMAKE_INSTALL_BINDIR}"
+)
+
+
+install(
+    DIRECTORY 
+        ${PROJECT_SOURCE_DIR}/geometry
+        ${PROJECT_SOURCE_DIR}/gconfig
+    DESTINATION "${CMAKE_INSTALL_DATADIR}/${PROJECT_NAME}"
+)
 
 # Summary ######################################################################
 if(CMAKE_CXX_FLAGS)

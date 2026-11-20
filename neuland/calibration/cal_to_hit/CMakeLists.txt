@@ -45,10 +45,19 @@ set(ROOT_HEADERS # cmake-format: sortable
     R3BNeulandCalToHitPar.h
 )
 
-add_library(R3BNeulandCalToHit SHARED ${SRCS})
+add_library(R3BNeulandCalToHit SHARED)
+
+target_sources(
+    R3BNeulandCalToHit
+    PRIVATE ${SRCS}
+    PUBLIC FILE_SET HEADERS FILES ${HEADERS} ${ROOT_HEADERS}
+)
 target_include_directories(
     R3BNeulandCalToHit
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} engine
+    PUBLIC
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/engine>"
+        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/engine>"
 )
 target_link_libraries(
     R3BNeulandCalToHit
@@ -63,4 +72,13 @@ root_generate_dictionary(
     R3BNeulandCalToHit
     LINKDEF
     NeulandCalToHitLinkDef.h
+    OPTIONS -noIncludePaths
 )
+
+set_property(
+    GLOBAL
+    APPEND
+    PROPERTY R3BROOT_BUILD_TREE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/engine
+)
+
+install(TARGETS R3BNeulandCalToHit EXPORT R3BRootLibs FILE_SET HEADERS)

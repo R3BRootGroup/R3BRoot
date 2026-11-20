@@ -47,20 +47,18 @@ if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
     )
 endif()
 
-add_library(R3BNeulandOnline SHARED ${SRCS})
-target_include_directories(
-    R3BNeulandOnline
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} canvases
-)
-target_link_libraries(
-    R3BNeulandOnline
-    PUBLIC R3BNeulandCalibration R3BSource #[[ R3BTCal R3BNeulandShared ]]
-)
-root_generate_dictionary(
-    R3BNeulandOnline_dict
-    ${HEADERS}
-    MODULE
+add_library_with_dictionary(
+    LIBNAME
     R3BNeulandOnline
     LINKDEF
     NeulandOnlineLinkDef.h
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    canvases
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    R3BNeulandCalibration R3BSource
 )

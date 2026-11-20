@@ -83,9 +83,19 @@ if(BUILD_GEOMETRY)
     )
 endif()
 
-add_library(R3BNeulandGeoBase SHARED R3BNeulandGeoCreator.cxx)
-target_include_directories(R3BNeulandGeoBase PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(R3BNeulandGeoBase SHARED)
+target_sources(
+    R3BNeulandGeoBase
+    PRIVATE R3BNeulandGeoCreator.cxx
+    PUBLIC FILE_SET HEADERS FILES R3BNeulandGeoCreator.h
+)
 target_link_libraries(
     R3BNeulandGeoBase
     PUBLIC R3BNeulandShared FairRoot::GeoBase
 )
+set_property(
+    GLOBAL
+    APPEND
+    PROPERTY R3BROOT_BUILD_TREE_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
+)
+install(TARGETS R3BNeulandGeoBase EXPORT R3BRootLibs FILE_SET HEADERS)

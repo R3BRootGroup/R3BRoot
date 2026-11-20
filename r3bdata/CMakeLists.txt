@@ -300,7 +300,6 @@ set(DIRS
     footData
     frsData
     frssciData
-    gfiData
     landData
     losData
     musicData

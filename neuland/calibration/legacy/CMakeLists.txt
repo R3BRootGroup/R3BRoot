@@ -36,7 +36,8 @@ set(SRCS
     R3BNeulandTacquilaMapped2Cal.cxx
     R3BNeulandTacquilaMapped2CalPar.cxx
     R3BNeulandTacquilaMapped2QCalPar.cxx
-    R3BNeulandTSyncer.cxx)
+    R3BNeulandTSyncer.cxx
+)
 
 set(HEADERS
     # cmake-format: sortable
@@ -61,15 +62,22 @@ set(HEADERS
     R3BNeulandTacquilaMapped2Cal.h
     R3BNeulandTacquilaMapped2CalPar.h
     R3BNeulandTacquilaMapped2QCalPar.h
-    R3BNeulandTSyncer.h)
+    R3BNeulandTSyncer.h
+)
 
-add_library(R3BNeulandCalibrationLegacy SHARED ${SRCS})
-target_include_directories(R3BNeulandCalibrationLegacy PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(R3BNeulandCalibrationLegacy PUBLIC R3BData R3BTCal R3BNeulandShared)
-root_generate_dictionary(
-    R3BNeulandCalibrationLegacy_dict
-    ${HEADERS}
-    MODULE
+add_library_with_dictionary(
+    LIBNAME
     R3BNeulandCalibrationLegacy
     LINKDEF
-    NeulandCalibrationLinkDef.h)
+    NeulandCalibrationLinkDef.h
+    HEADERS
+    ${HEADERS}
+    SRCS
+    ${SRCS}
+    INCLUDEDIRS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    DEPENDENCIES
+    R3BData
+    R3BTCal
+    R3BNeulandShared
+)

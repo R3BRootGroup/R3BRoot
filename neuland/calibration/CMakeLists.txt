@@ -34,3 +34,5 @@ if(CMAKE_CXX_STANDARD GREATER_EQUAL 23)
         INTERFACE R3BNeulandMapToCal R3BNeulandCalToHit
     )
 endif()
+
+install(TARGETS R3BNeulandCalibration EXPORT R3BRootLibs FILE_SET HEADERS)

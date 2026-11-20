@@ -53,7 +53,7 @@ void testNeulandSimulation()
     run->AddModule(cave);
 
     // Geometry: Neuland
-    run->AddModule(new R3BNeuland(30, { 0., 0., 1650. }));
+    run->AddModule(new R3BNeuland(13, { 0., 0., 1650. }));
 
     // Init
     run->Init();
